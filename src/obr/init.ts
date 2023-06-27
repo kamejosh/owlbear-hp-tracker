@@ -1,10 +1,24 @@
 import "./init.scss";
 import OBR from "@owlbear-rodeo/sdk";
+import { ID } from "../helper/variables.ts";
 
-const ID = "com.bitperfect-software.hp-tracker";
+const initItems = async () => {
+  return OBR.scene.items.updateItems(
+    (item) => item.layer === "CHARACTER",
+    (items) => {
+      items.forEach((item) => {
+        item.metadata[`${ID}/data`] = {
+          name: "",
+          hp: 0,
+          maxHp: 0,
+          hpTrackerActive: false,
+        };
+      });
+    }
+  );
+};
 
 const setupContextMenu = async () => {
-  OBR.player;
   return OBR.contextMenu.create({
     id: `${ID}/tool`,
     icons: [
@@ -18,7 +32,6 @@ const setupContextMenu = async () => {
       },
     ],
     onClick: (context, elementId) => {
-      console.log(context);
       OBR.popover.open({
         id: "rodeo.owlbear.example/popover",
         url: `/popover.html?id=${context.items[0].id}`,
@@ -31,5 +44,6 @@ const setupContextMenu = async () => {
 };
 
 OBR.onReady(async () => {
+  initItems();
   setupContextMenu();
 });
