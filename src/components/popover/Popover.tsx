@@ -7,89 +7,120 @@ import { ID } from "../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../helper/types.ts";
 
 export const Popover = () => {
-  return (
-    <ContextWrapper>
-      <Content />
-    </ContextWrapper>
-  );
+    return (
+        <ContextWrapper>
+            <Content />
+        </ContextWrapper>
+    );
 };
 
 const Content = () => {
-  const playerContext = usePlayerContext();
+    const playerContext = usePlayerContext();
 
-  return playerContext.role ? (
-    playerContext.role === "PLAYER" ? (
-      <></>
-    ) : (
-      <Layer />
-    )
-  ) : (
-    <h1>Waiting for OBR startup</h1>
-  );
+    return playerContext.role ? playerContext.role === "PLAYER" ? <></> : <Layer /> : <h1>Waiting for OBR startup</h1>;
 };
 
 const Layer = () => {
-  const id = new URLSearchParams(window.location.search).get("id") ?? null;
-  const [hp, setHp] = useState<number>(0);
-  const [maxHp, setMaxHp] = useState<number>(0);
-  const [name, setName] = useState<string>("");
+    const id = new URLSearchParams(window.location.search).get("id") ?? null;
+    const [hp, setHp] = useState<number>(0);
+    const [maxHp, setMaxHp] = useState<number>(0);
+    const [name, setName] = useState<string>("");
+    const [hpTrackerActive, setHpTrackerActive] = useState<boolean>(false);
+    const [canPlayersSee, setCanPlayersSee] = useState<boolean>(false);
 
-  useEffect(() => {
-    if (id) {
-      OBR.scene.items.updateItems([id], (items) => {
-        items.forEach((item) => {
-          item.metadata[`${ID}/data`] = {
-            name: name,
-            maxHp: maxHp,
-            hp: hp,
-          };
-        });
-      });
-    }
-  }, [hp, maxHp, name]);
-
-  OBR.onReady(async () => {
-    if (id) {
-      const items = await OBR.scene.items.getItems([id]);
-      if (items.length > 0) {
-        const item = items[0];
-        if (`${ID}/data` in item.metadata) {
-          console.log(item.metadata[`${ID}/data`]);
-          const data = item.metadata[`${ID}/data`] as HpTrackerMetadata;
-          setName(data.name ?? "");
-          setHp(data.hp ?? 0);
-          setMaxHp(data.maxHp ?? 0);
+    useEffect(() => {
+        if (id) {
+            OBR.scene.items.updateItems([id], (items) => {
+                items.forEach((item) => {
+                    item.metadata[`${ID}/data`] = {
+                        name: name,
+                        maxHp: maxHp,
+                        hp: hp,
+                        hpTrackerActive: hpTrackerActive,
+                        canPlayersSee: canPlayersSee,
+                    };
+                });
+            });
         }
-      }
-    }
-  });
+    }, [hp, maxHp, name, hpTrackerActive, canPlayersSee]);
 
-  return (
-    <div className={"popover-wrapper"}>
-      <input
-        type={"number"}
-        defaultValue={maxHp}
-        min={0}
-        onChange={(e) => {
-          setMaxHp(Number(e.target.value));
-        }}
-      ></input>
-      <input
-        type={"number"}
-        defaultValue={hp}
-        max={maxHp}
-        min={0}
-        onChange={(e) => {
-          setHp(Number(e.target.value));
-        }}
-      ></input>
-      <input
-        type={"text"}
-        defaultValue={name}
-        onChange={(e) => {
-          setName(e.target.value);
-        }}
-      ></input>
-    </div>
-  );
+    useEffect(() => {
+        if (id) {
+            const x = async () => {
+                const items = await OBR.scene.items.getItems([id]);
+                if (items.length > 0) {
+                    const item = items[0];
+                    if (`${ID}/data` in item.metadata) {
+                        const data = item.metadata[`${ID}/data`] as HpTrackerMetadata;
+                        setName(data.name != "" ? data.name : item.name);
+                        setHp(data.hp ?? 0);
+                        setMaxHp(data.maxHp ?? 0);
+                        setHpTrackerActive(data.hpTrackerActive ?? false);
+                        setCanPlayersSee(data.canPlayersSee ?? false);
+                    }
+                }
+            };
+            x();
+        }
+    }, []);
+
+    return (
+        <div className={"popover-wrapper"}>
+            <label>
+                Max HP:
+                <input
+                    type={"number"}
+                    value={maxHp}
+                    min={0}
+                    onChange={(e) => {
+                        setMaxHp(Number(e.target.value));
+                    }}
+                />
+            </label>
+            <label>
+                HP:
+                <input
+                    type={"number"}
+                    value={hp}
+                    max={maxHp}
+                    min={0}
+                    onChange={(e) => {
+                        setHp(Number(e.target.value));
+                    }}
+                />
+            </label>
+            <label>
+                Name:
+                <input
+                    type={"text"}
+                    value={name}
+                    onChange={(e) => {
+                        setName(e.target.value);
+                    }}
+                />
+            </label>
+            <label>
+                Active:
+                <input
+                    type={"checkbox"}
+                    value={String(hpTrackerActive)}
+                    checked={hpTrackerActive}
+                    onChange={() => {
+                        setHpTrackerActive(!hpTrackerActive);
+                    }}
+                />
+            </label>
+            <label>
+                Visible for Players:
+                <input
+                    type={"checkbox"}
+                    value={String(canPlayersSee)}
+                    checked={canPlayersSee}
+                    onChange={() => {
+                        setHpTrackerActive(!canPlayersSee);
+                    }}
+                />
+            </label>
+        </div>
+    );
 };

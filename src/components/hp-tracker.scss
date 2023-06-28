@@ -1,0 +1,25 @@
+.player-wrapper {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+
+    .player-name {
+        cursor: pointer;
+
+        &:hover {
+            font-weight: 800;
+        }
+    }
+
+    span {
+        display: flex;
+    }
+
+    input[type="number"] {
+        border: none;
+        background-color: transparent;
+        width: 40px;
+        color: rgba(255, 255, 255, 0.87);
+        font-size: 1em;
+    }
+}

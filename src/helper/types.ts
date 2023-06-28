@@ -3,4 +3,5 @@ export type HpTrackerMetadata = {
   hp: number;
   maxHp: number;
   hpTrackerActive: false;
+  canPlayersSee: false;
 };
