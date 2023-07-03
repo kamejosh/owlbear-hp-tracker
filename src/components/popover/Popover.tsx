@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { ReactEventHandler, useEffect, useState } from "react";
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
-import OBR from "@owlbear-rodeo/sdk";
+import OBR, { buildText } from "@owlbear-rodeo/sdk";
 import "./popover.scss";
 import { ID } from "../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../helper/types.ts";
+import { createText } from "../../helper/helpers.ts";
 
 export const Popover = () => {
     return (
@@ -27,6 +28,9 @@ const Layer = () => {
     const [name, setName] = useState<string>("");
     const [hpTrackerActive, setHpTrackerActive] = useState<boolean>(false);
     const [canPlayersSee, setCanPlayersSee] = useState<boolean>(false);
+    const [hpOnMap, setHpOnMap] = useState<string>("");
+
+    console.log(hpOnMap);
 
     useEffect(() => {
         if (id) {
@@ -38,11 +42,12 @@ const Layer = () => {
                         hp: hp,
                         hpTrackerActive: hpTrackerActive,
                         canPlayersSee: canPlayersSee,
+                        hpOnMap: hpOnMap,
                     };
                 });
             });
         }
-    }, [hp, maxHp, name, hpTrackerActive, canPlayersSee]);
+    }, [hp, maxHp, name, hpTrackerActive, canPlayersSee, hpOnMap]);
 
     useEffect(() => {
         if (id) {
@@ -57,12 +62,26 @@ const Layer = () => {
                         setMaxHp(data.maxHp ?? 0);
                         setHpTrackerActive(data.hpTrackerActive ?? false);
                         setCanPlayersSee(data.canPlayersSee ?? false);
+                        setHpOnMap(data.hpOnMap ?? "");
                     }
                 }
             };
             initTokens();
         }
     }, []);
+
+    const handleAddToMap = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.checked) {
+            const item = await createText(`HP:${hp}/${maxHp}`, id ?? "");
+            if (item) {
+                OBR.scene.items.addItems([item]);
+                setHpOnMap(item.id);
+            }
+        } else if (!event.target.checked) {
+            OBR.scene.items.deleteItems([hpOnMap as string]);
+            setHpOnMap("");
+        }
+    };
 
     return (
         <div className={"popover-wrapper"}>
@@ -117,7 +136,18 @@ const Layer = () => {
                     value={String(canPlayersSee)}
                     checked={canPlayersSee}
                     onChange={() => {
-                        setHpTrackerActive(!canPlayersSee);
+                        setCanPlayersSee(!canPlayersSee);
+                    }}
+                />
+            </label>
+            <label>
+                Add to Map:
+                <input
+                    type={"checkbox"}
+                    value={String(hpOnMap !== "")}
+                    checked={hpOnMap !== ""}
+                    onChange={(event) => {
+                        handleAddToMap(event);
                     }}
                 />
             </label>

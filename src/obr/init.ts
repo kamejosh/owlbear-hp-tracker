@@ -14,6 +14,7 @@ const initItems = async () => {
                         maxHp: 0,
                         hpTrackerActive: false,
                         canPlayersSee: false,
+                        hpOnMap: "",
                     };
                 }
             });
