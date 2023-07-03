@@ -83,7 +83,7 @@ const Content = () => {
                 <h1>HP Tracker</h1>
                 {tokens?.map((token) => {
                     const data = token.metadata[`${ID}/data`] as HpTrackerMetadata;
-                    return <Player id={token.id} data={data} />;
+                    return <Player key={token.id} id={token.id} data={data} />;
                 })}
             </>
         )

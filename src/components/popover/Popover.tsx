@@ -46,7 +46,7 @@ const Layer = () => {
 
     useEffect(() => {
         if (id) {
-            const x = async () => {
+            const initTokens = async () => {
                 const items = await OBR.scene.items.getItems([id]);
                 if (items.length > 0) {
                     const item = items[0];
@@ -60,7 +60,7 @@ const Layer = () => {
                     }
                 }
             };
-            x();
+            initTokens();
         }
     }, []);
 
