@@ -1,9 +1,9 @@
 import React, { ChangeEvent, MouseEvent, useEffect, useState } from "react";
-import { ContextWrapper } from "./ContextWrapper.tsx";
-import { usePlayerContext } from "../context/PlayerContext.ts";
+import { ContextWrapper } from "../ContextWrapper.tsx";
+import { usePlayerContext } from "../../context/PlayerContext.ts";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
-import { ID } from "../helper/variables.ts";
-import { HpTrackerMetadata } from "../helper/types.ts";
+import { characterMetadata } from "../../helper/variables.ts";
+import { HpTrackerMetadata } from "../../helper/types.ts";
 import "./hp-tracker.scss";
 
 type PlayerProps = {
@@ -20,12 +20,13 @@ export const HPTracker = () => {
 };
 
 const Player = (props: PlayerProps) => {
+    const playerContext = usePlayerContext();
     const handleHpChange = (event: ChangeEvent<HTMLInputElement>) => {
         OBR.scene.items.updateItems([props.id], (items) => {
             items.forEach((item) => {
-                const currentData: HpTrackerMetadata = item.metadata[`${ID}/data`] as HpTrackerMetadata;
+                const currentData: HpTrackerMetadata = item.metadata[characterMetadata] as HpTrackerMetadata;
                 currentData.hp = Number(event.target.value);
-                item.metadata[`${ID}/data`] = currentData;
+                item.metadata[characterMetadata] = { ...currentData };
             });
         });
     };
@@ -42,7 +43,14 @@ const Player = (props: PlayerProps) => {
         });
     };
 
-    return props.data.hpTrackerActive ? (
+    const display = (): boolean => {
+        return (
+            props.data.hpTrackerActive &&
+            (playerContext.role === "GM" || (playerContext.role === "PLAYER" && props.data.canPlayersSee))
+        );
+    };
+
+    return display() ? (
         <div className={"player-wrapper"}>
             <div
                 className={"player-name"}
@@ -52,9 +60,16 @@ const Player = (props: PlayerProps) => {
             >
                 {props.data.name}
             </div>
-            <span>
-                <input type={"number"} defaultValue={props.data.hp} max={props.data.maxHp} onChange={handleHpChange} />/
-                {props.data.maxHp}
+            <span className={"current-hp"}>
+                <input
+                    type={"number"}
+                    defaultValue={props.data.hp}
+                    max={props.data.maxHp}
+                    onChange={handleHpChange}
+                    disabled={playerContext.role === "PLAYER"}
+                />
+                <span>/</span>
+                <span>{props.data.maxHp}</span>
             </span>
         </div>
     ) : (
@@ -67,7 +82,10 @@ const Content = () => {
     const [tokens, setTokens] = useState<Item[] | undefined>(undefined);
 
     useEffect(() => {
-        OBR.onReady(() => {
+        OBR.onReady(async () => {
+            const initialItems = await OBR.scene.items.getItems((item) => item.layer === "CHARACTER");
+            setTokens(initialItems);
+
             OBR.scene.items.onChange(async (items) => {
                 const filteredItems = items.filter((item) => item.layer === "CHARACTER");
                 setTokens(filteredItems);
@@ -76,20 +94,16 @@ const Content = () => {
     }, []);
 
     return playerContext.role ? (
-        playerContext.role === "PLAYER" ? (
-            <h1>Only for GMs</h1>
-        ) : (
-            <>
-                <h1>HP Tracker</h1>
-                {tokens?.map((token) => {
-                    const data = token.metadata[`${ID}/data`] as HpTrackerMetadata;
-                    if (data) {
-                        return <Player key={token.id} id={token.id} data={data} />;
-                    }
-                    return null;
-                })}
-            </>
-        )
+        <>
+            <h1>HP Tracker</h1>
+            {tokens?.map((token) => {
+                const data = token.metadata[characterMetadata] as HpTrackerMetadata;
+                if (data) {
+                    return <Player key={token.id} id={token.id} data={data} />;
+                }
+                return null;
+            })}
+        </>
     ) : (
         <h1>Waiting for OBR startup</h1>
     );

@@ -1,9 +1,9 @@
-import React, { ReactEventHandler, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
-import OBR, { buildText } from "@owlbear-rodeo/sdk";
+import OBR from "@owlbear-rodeo/sdk";
 import "./popover.scss";
-import { ID } from "../../helper/variables.ts";
+import { characterMetadata, textMetadata } from "../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../helper/types.ts";
 import { createText } from "../../helper/helpers.ts";
 
@@ -30,19 +30,20 @@ const Layer = () => {
     const [canPlayersSee, setCanPlayersSee] = useState<boolean>(false);
     const [hpOnMap, setHpOnMap] = useState<string>("");
 
-    console.log(hpOnMap);
-
     useEffect(() => {
         if (id) {
             OBR.scene.items.updateItems([id], (items) => {
                 items.forEach((item) => {
-                    item.metadata[`${ID}/data`] = {
+                    const data = {
                         name: name,
                         maxHp: maxHp,
                         hp: hp,
                         hpTrackerActive: hpTrackerActive,
                         canPlayersSee: canPlayersSee,
                         hpOnMap: hpOnMap,
+                    };
+                    item.metadata[characterMetadata] = {
+                        ...data,
                     };
                 });
             });
@@ -55,8 +56,8 @@ const Layer = () => {
                 const items = await OBR.scene.items.getItems([id]);
                 if (items.length > 0) {
                     const item = items[0];
-                    if (`${ID}/data` in item.metadata) {
-                        const data = item.metadata[`${ID}/data`] as HpTrackerMetadata;
+                    if (characterMetadata in item.metadata) {
+                        const data = item.metadata[characterMetadata] as HpTrackerMetadata;
                         setName(data.name != "" ? data.name : item.name);
                         setHp(data.hp ?? 0);
                         setMaxHp(data.maxHp ?? 0);
@@ -74,6 +75,7 @@ const Layer = () => {
         if (event.target.checked) {
             const item = await createText(`HP:${hp}/${maxHp}`, id ?? "");
             if (item) {
+                item.metadata[textMetadata] = { isHpText: true };
                 OBR.scene.items.addItems([item]);
                 setHpOnMap(item.id);
             }

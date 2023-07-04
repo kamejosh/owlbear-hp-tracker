@@ -6,3 +6,7 @@ export type HpTrackerMetadata = {
     canPlayersSee: boolean;
     hpOnMap: string;
 };
+
+export type HpTextMetadata = {
+    isHpText: boolean;
+};

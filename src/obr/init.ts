@@ -1,14 +1,15 @@
 import "./init.scss";
-import OBR from "@owlbear-rodeo/sdk";
-import { ID } from "../helper/variables.ts";
+import OBR, { isText } from "@owlbear-rodeo/sdk";
+import { ID, characterMetadata, textMetadata } from "../helper/variables.ts";
+import { HpTextMetadata, HpTrackerMetadata } from "../helper/types.ts";
 
 const initItems = async () => {
     return OBR.scene.items.updateItems(
         (item) => item.layer === "CHARACTER",
         (items) => {
             items.forEach((item) => {
-                if (!(`${ID}/data` in item.metadata)) {
-                    item.metadata[`${ID}/data`] = {
+                if (!(characterMetadata in item.metadata)) {
+                    item.metadata[characterMetadata] = {
                         name: "",
                         hp: 0,
                         maxHp: 0,
@@ -20,6 +21,38 @@ const initItems = async () => {
             });
         }
     );
+};
+
+const initTexts = async () => {
+    const role = await OBR.player.getRole();
+    OBR.scene.items.onChange((items) => {
+        const characters = items.filter((item) => item.layer === "CHARACTER");
+        characters.forEach(async (character) => {
+            if (characterMetadata in character.metadata) {
+                const data = character.metadata[characterMetadata] as HpTrackerMetadata;
+                if (data.hpOnMap) {
+                    const attachments = await OBR.scene.items.getItemAttachments([character.id]);
+                    attachments.forEach((attachment) => {
+                        if (textMetadata in attachment.metadata) {
+                            const attachmentData = attachment.metadata[textMetadata] as HpTextMetadata;
+                            if (attachmentData.isHpText) {
+                                OBR.scene.items.updateItems(isText, (texts) => {
+                                    texts.forEach((text) => {
+                                        if (text.id === attachment.id) {
+                                            text.text.plainText = `HP:${data.hp}/${data.maxHp}`;
+                                            if (role === "PLAYER" && !data.canPlayersSee) {
+                                                text.visible = false;
+                                            }
+                                        }
+                                    });
+                                });
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    });
 };
 
 const setupContextMenu = async () => {
@@ -50,4 +83,5 @@ const setupContextMenu = async () => {
 OBR.onReady(async () => {
     initItems();
     setupContextMenu();
+    initTexts();
 });
