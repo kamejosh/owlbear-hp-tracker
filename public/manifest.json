@@ -3,12 +3,14 @@
     "version": "1.0.",
     "manifest_version": 1,
     "author": "Joshua Hercher",
-    "description": "A tool to keep track of NPC HP without showing it to the Players",
+    "description": "A tool to keep track of N/PC HP. With visibility for players can be toggled for each token.",
+    "icon": "/icon.svg",
     "action": {
         "title": "HP Tracker",
         "icon": "/icon.svg",
         "popover": "/",
         "height": 600,
         "width": 400
-    }
+    },
+    "background_url": "/background.html"
 }
