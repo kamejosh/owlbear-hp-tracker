@@ -1,30 +1,32 @@
-.player-wrapper {
-    display: flex;
-    justify-content: space-between;
-    gap: 5px;
-
-    .player-name {
-        cursor: pointer;
-
-        &:hover {
-            font-weight: 800;
-        }
-    }
-
-    .current-hp {
+.hp-tracker {
+    .player-wrapper {
         display: flex;
+        justify-content: space-between;
         gap: 5px;
-    }
 
-    input[type="number"] {
-        border: none;
-        background-color: transparent;
-        width: 40px;
-        color: rgba(255, 255, 255, 0.87);
-        font-size: 1em;
+        .player-name {
+            cursor: pointer;
 
-        &:disabled {
+            &:hover {
+                font-weight: 800;
+            }
+        }
+
+        .current-hp {
+            display: flex;
+            gap: 5px;
+        }
+
+        input[type="number"] {
+            border: none;
+            background-color: transparent;
             width: 40px;
+            color: rgba(255, 255, 255, 0.87);
+            font-size: 1em;
+
+            &:disabled {
+                width: 40px;
+            }
         }
     }
 }

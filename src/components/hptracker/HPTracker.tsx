@@ -26,6 +26,7 @@ const Player = (props: PlayerProps) => {
             items.forEach((item) => {
                 const currentData: HpTrackerMetadata = item.metadata[characterMetadata] as HpTrackerMetadata;
                 currentData.hp = Number(event.target.value);
+                // just assigning currentData did not trigger onChange event. Spreading helps
                 item.metadata[characterMetadata] = { ...currentData };
             });
         });
@@ -94,7 +95,7 @@ const Content = () => {
     }, []);
 
     return playerContext.role ? (
-        <>
+        <div className={"hp-tracker"}>
             <h1>HP Tracker</h1>
             {tokens?.map((token) => {
                 const data = token.metadata[characterMetadata] as HpTrackerMetadata;
@@ -103,7 +104,7 @@ const Content = () => {
                 }
                 return null;
             })}
-        </>
+        </div>
     ) : (
         <h1>Waiting for OBR startup</h1>
     );
