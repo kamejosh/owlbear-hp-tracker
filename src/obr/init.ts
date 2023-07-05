@@ -1,4 +1,4 @@
-import OBR, { isText } from "@owlbear-rodeo/sdk";
+import OBR, { isText, Item } from "@owlbear-rodeo/sdk";
 import { ID, characterMetadata, textMetadata } from "../helper/variables.ts";
 import { HpTextMetadata, HpTrackerMetadata } from "../helper/types.ts";
 
@@ -7,23 +7,22 @@ import { HpTextMetadata, HpTrackerMetadata } from "../helper/types.ts";
  * This ensures that further handling can be done properly
  */
 const initItems = async () => {
-    return OBR.scene.items.updateItems(
-        (item) => item.layer === "CHARACTER",
-        (items) => {
-            items.forEach((item) => {
-                if (!(characterMetadata in item.metadata)) {
-                    item.metadata[characterMetadata] = {
-                        name: "",
-                        hp: 0,
-                        maxHp: 0,
-                        hpTrackerActive: false,
-                        canPlayersSee: false,
-                        hpOnMap: "",
-                    };
-                }
-            });
-        }
-    );
+    const addMetaData = (items: Item[]) => {
+        items.forEach((item) => {
+            if (!(characterMetadata in item.metadata)) {
+                item.metadata[characterMetadata] = {
+                    name: "",
+                    hp: 0,
+                    maxHp: 0,
+                    hpTrackerActive: false,
+                    canPlayersSee: false,
+                    hpOnMap: "",
+                };
+            }
+        });
+    };
+
+    await OBR.scene.items.updateItems((item) => item.layer === "CHARACTER", addMetaData);
 };
 
 /**

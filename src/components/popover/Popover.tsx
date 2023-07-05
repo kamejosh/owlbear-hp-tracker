@@ -56,15 +56,24 @@ const Layer = () => {
                 const items = await OBR.scene.items.getItems([id]);
                 if (items.length > 0) {
                     const item = items[0];
+                    console.log(item.name, characterMetadata in item.metadata);
+                    let data: HpTrackerMetadata = {
+                        name: item.name,
+                        hp: 0,
+                        maxHp: 0,
+                        hpTrackerActive: false,
+                        canPlayersSee: false,
+                        hpOnMap: "",
+                    };
                     if (characterMetadata in item.metadata) {
-                        const data = item.metadata[characterMetadata] as HpTrackerMetadata;
-                        setName(data.name != "" ? data.name : item.name);
-                        setHp(data.hp ?? 0);
-                        setMaxHp(data.maxHp ?? 0);
-                        setHpTrackerActive(data.hpTrackerActive ?? false);
-                        setCanPlayersSee(data.canPlayersSee ?? false);
-                        setHpOnMap(data.hpOnMap ?? "");
+                        data = item.metadata[characterMetadata] as HpTrackerMetadata;
                     }
+                    setName(data.name !== "" ? data.name : item.name);
+                    setHp(data.hp ?? 0);
+                    setMaxHp(data.maxHp ?? 0);
+                    setHpTrackerActive(data.hpTrackerActive ?? false);
+                    setCanPlayersSee(data.canPlayersSee ?? false);
+                    setHpOnMap(data.hpOnMap ?? "");
                 }
             };
             initTokens();
