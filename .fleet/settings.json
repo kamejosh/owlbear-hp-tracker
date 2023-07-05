@@ -1,3 +1,0 @@
-{
-    "nodejs.editor.formatOnSave.prettier.glob": "{**/*,*}.{js,ts,scss,html,json,jsx,tsx}"
-}
