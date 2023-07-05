@@ -56,7 +56,6 @@ const Layer = () => {
                 const items = await OBR.scene.items.getItems([id]);
                 if (items.length > 0) {
                     const item = items[0];
-                    console.log(item.name, characterMetadata in item.metadata);
                     let data: HpTrackerMetadata = {
                         name: item.name,
                         hp: 0,
