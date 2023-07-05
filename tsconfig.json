@@ -3,11 +3,7 @@
         "target": "ES2020",
         "useDefineForClassFields": true,
         "module": "ESNext",
-        "lib": [
-            "ES2020",
-            "DOM",
-            "DOM.Iterable"
-        ],
+        "lib": ["ES2020", "DOM", "DOM.Iterable"],
         "skipLibCheck": true,
         /* Bundler mode */
         "moduleResolution": "Node",
@@ -25,7 +21,6 @@
         "noImplicitAny": true,
         "noImplicitThis": true,
         "strictNullChecks": true,
-        "types": ["node", "webpack-env"],
         "typeRoots": ["./types"],
         "downlevelIteration": true,
         "baseUrl": "src",
@@ -33,7 +28,5 @@
             "@/*": ["src/*"]
         }
     },
-    "include": [
-        "src"
-    ]
+    "include": ["src"]
 }

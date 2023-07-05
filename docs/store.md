@@ -2,14 +2,14 @@
 title: HP Tracker
 description: A Tool that keeps track of the HP of each Character Token where enabled
 author: Joshua Hercher
-image: 
-icon: 
+image: https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/HP_Tracker.png
+icon: https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/public/icon.svg
 tags:
   - combat
   - tool
   - automation
 manifest: 
-learn-more: 
+learn-more: https://github.com/kamejosh/owlbear-hp-tracker
 ---
 
 # HP Tracker
