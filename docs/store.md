@@ -8,7 +8,7 @@ tags:
   - combat
   - tool
   - automation
-manifest: 
+manifest: https://hp-tracker.onrender.com/manifest.json
 learn-more: https://github.com/kamejosh/owlbear-hp-tracker
 ---
 
