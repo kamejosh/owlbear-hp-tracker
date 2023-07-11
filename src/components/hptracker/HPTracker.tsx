@@ -83,13 +83,17 @@ const Content = () => {
     const [tokens, setTokens] = useState<Item[] | undefined>(undefined);
 
     useEffect(() => {
-        OBR.onReady(async () => {
-            const initialItems = await OBR.scene.items.getItems((item) => item.layer === "CHARACTER");
-            setTokens(initialItems);
+        OBR.onReady(() => {
+            OBR.scene.onReadyChange(async (isReady) => {
+                if (isReady) {
+                    const initialItems = await OBR.scene.items.getItems((item) => item.layer === "CHARACTER");
+                    setTokens(initialItems);
 
-            OBR.scene.items.onChange(async (items) => {
-                const filteredItems = items.filter((item) => item.layer === "CHARACTER");
-                setTokens(filteredItems);
+                    OBR.scene.items.onChange(async (items) => {
+                        const filteredItems = items.filter((item) => item.layer === "CHARACTER");
+                        setTokens(filteredItems);
+                    });
+                }
             });
         });
     }, []);

@@ -99,7 +99,12 @@ const setupContextMenu = async () => {
 };
 
 OBR.onReady(async () => {
-    initItems();
     setupContextMenu();
     initTexts();
+    OBR.scene.onReadyChange((isReady) => {
+        console.log(isReady);
+        if (isReady) {
+            initItems();
+        }
+    });
 });
