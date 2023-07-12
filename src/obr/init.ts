@@ -102,7 +102,6 @@ OBR.onReady(async () => {
     setupContextMenu();
     initTexts();
     OBR.scene.onReadyChange((isReady) => {
-        console.log(isReady);
         if (isReady) {
             initItems();
         }
