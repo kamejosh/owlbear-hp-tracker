@@ -1,6 +1,7 @@
-import OBR, { isText, Item } from "@owlbear-rodeo/sdk";
-import { ID, characterMetadata, textMetadata } from "../helper/variables.ts";
-import { HpTextMetadata, HpTrackerMetadata } from "../helper/types.ts";
+import OBR, { Item } from "@owlbear-rodeo/sdk";
+import { ID, characterMetadata } from "../helper/variables.ts";
+import { HpTrackerMetadata } from "../helper/types.ts";
+import { deleteText, handleOtherChanges, saveOrChangeText } from "../helper/textHelpers.ts";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -14,9 +15,10 @@ const initItems = async () => {
                     name: "",
                     hp: 0,
                     maxHp: 0,
+                    armorClass: 0,
                     hpTrackerActive: false,
                     canPlayersSee: false,
-                    hpOnMap: "",
+                    hpOnMap: false,
                 };
             }
         });
@@ -41,32 +43,11 @@ const initTexts = async () => {
             if (characterMetadata in character.metadata) {
                 const data = character.metadata[characterMetadata] as HpTrackerMetadata;
                 // Even more specifically where the metadata `hpOnMap` is not an empty string
-                if (data.hpOnMap) {
-                    // For these characters we than need the attachments
-                    const attachments = await OBR.scene.items.getItemAttachments([character.id]);
-                    attachments.forEach((attachment) => {
-                        // But only the attachments with textMetadata
-                        if (textMetadata in attachment.metadata) {
-                            const attachmentData = attachment.metadata[textMetadata] as HpTextMetadata;
-                            // Specifically where the `isHpText` metadata is true
-                            if (attachmentData.isHpText) {
-                                // We then update all items that are isText
-                                OBR.scene.items.updateItems(isText, (texts) => {
-                                    texts.forEach((text) => {
-                                        // But set a filter that only changes the element if it is the same as the attachment
-                                        if (text.id === attachment.id) {
-                                            // We update the text
-                                            text.text.plainText = `HP:${data.hp}/${data.maxHp}`;
-                                            // and make sure that it is only visible for GMs or players if the flag is set
-                                            if (role === "PLAYER" && !data.canPlayersSee) {
-                                                text.visible = false;
-                                            }
-                                        }
-                                    });
-                                });
-                            }
-                        }
-                    });
+                if (data.hpOnMap && (role === "GM" || (role === "PLAYER" && data.canPlayersSee))) {
+                    saveOrChangeText(character, data);
+                    handleOtherChanges(character);
+                } else {
+                    deleteText(character);
                 }
             }
         });
@@ -101,7 +82,7 @@ const setupContextMenu = async () => {
 OBR.onReady(async () => {
     setupContextMenu();
     initTexts();
-    OBR.scene.onReadyChange((isReady) => {
+    OBR.scene.onReadyChange(async (isReady) => {
         if (isReady) {
             initItems();
         }

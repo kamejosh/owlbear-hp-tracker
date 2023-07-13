@@ -3,9 +3,8 @@ import { ContextWrapper } from "../ContextWrapper.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import OBR from "@owlbear-rodeo/sdk";
 import "./popover.scss";
-import { characterMetadata, textMetadata } from "../../helper/variables.ts";
+import { characterMetadata } from "../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../helper/types.ts";
-import { createText } from "../../helper/helpers.ts";
 
 export const Popover = () => {
     return (
@@ -25,10 +24,11 @@ const Layer = () => {
     const id = new URLSearchParams(window.location.search).get("id") ?? null;
     const [hp, setHp] = useState<number>(0);
     const [maxHp, setMaxHp] = useState<number>(0);
+    const [armorClass, setArmorClass] = useState<number>(0);
     const [name, setName] = useState<string>("");
     const [hpTrackerActive, setHpTrackerActive] = useState<boolean>(false);
     const [canPlayersSee, setCanPlayersSee] = useState<boolean>(false);
-    const [hpOnMap, setHpOnMap] = useState<string>("");
+    const [hpOnMap, setHpOnMap] = useState<boolean>(false);
 
     useEffect(() => {
         if (id) {
@@ -38,6 +38,7 @@ const Layer = () => {
                         name: name,
                         maxHp: maxHp,
                         hp: hp,
+                        armorClass: armorClass,
                         hpTrackerActive: hpTrackerActive,
                         canPlayersSee: canPlayersSee,
                         hpOnMap: hpOnMap,
@@ -48,7 +49,7 @@ const Layer = () => {
                 });
             });
         }
-    }, [hp, maxHp, name, hpTrackerActive, canPlayersSee, hpOnMap]);
+    }, [hp, maxHp, name, hpTrackerActive, canPlayersSee, hpOnMap, armorClass]);
 
     useEffect(() => {
         if (id) {
@@ -60,41 +61,39 @@ const Layer = () => {
                         name: item.name,
                         hp: 0,
                         maxHp: 0,
+                        armorClass: 0,
                         hpTrackerActive: false,
                         canPlayersSee: false,
-                        hpOnMap: "",
+                        hpOnMap: false,
                     };
                     if (characterMetadata in item.metadata) {
                         data = item.metadata[characterMetadata] as HpTrackerMetadata;
                     }
                     setName(data.name !== "" ? data.name : item.name);
                     setHp(data.hp ?? 0);
+                    setArmorClass(data.armorClass ?? 0);
                     setMaxHp(data.maxHp ?? 0);
                     setHpTrackerActive(data.hpTrackerActive ?? false);
                     setCanPlayersSee(data.canPlayersSee ?? false);
-                    setHpOnMap(data.hpOnMap ?? "");
+                    setHpOnMap(data.hpOnMap ?? false);
                 }
             };
             initTokens();
         }
     }, []);
 
-    const handleAddToMap = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.checked) {
-            const item = await createText(`HP:${hp}/${maxHp}`, id ?? "");
-            if (item) {
-                item.metadata[textMetadata] = { isHpText: true };
-                OBR.scene.items.addItems([item]);
-                setHpOnMap(item.id);
-            }
-        } else if (!event.target.checked) {
-            OBR.scene.items.deleteItems([hpOnMap as string]);
-            setHpOnMap("");
-        }
-    };
-
     return (
         <div className={"popover-wrapper"}>
+            <label>
+                Name:
+                <input
+                    type={"text"}
+                    value={name}
+                    onChange={(e) => {
+                        setName(e.target.value);
+                    }}
+                />
+            </label>
             <label>
                 Max HP:
                 <input
@@ -119,12 +118,13 @@ const Layer = () => {
                 />
             </label>
             <label>
-                Name:
+                AC:
                 <input
-                    type={"text"}
-                    value={name}
+                    type={"number"}
+                    value={armorClass}
+                    min={0}
                     onChange={(e) => {
-                        setName(e.target.value);
+                        setArmorClass(Number(e.target.value));
                     }}
                 />
             </label>
@@ -154,10 +154,10 @@ const Layer = () => {
                 Add to Map:
                 <input
                     type={"checkbox"}
-                    value={String(hpOnMap !== "")}
-                    checked={hpOnMap !== ""}
+                    value={String(hpOnMap)}
+                    checked={hpOnMap}
                     onChange={(event) => {
-                        handleAddToMap(event);
+                        setHpOnMap(event.target.checked);
                     }}
                 />
             </label>

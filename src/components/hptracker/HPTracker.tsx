@@ -68,6 +68,7 @@ const Player = (props: PlayerProps) => {
                 <button className={"hp-change minus"} onClick={() => handleHpChange(-1)}></button>
                 <button className={"hp-change plus"} onClick={() => handleHpChange(1)}></button>
             </span>
+            <span className={"armor-class"}>AC: {props.data.armorClass}</span>
         </div>
     ) : (
         <></>
