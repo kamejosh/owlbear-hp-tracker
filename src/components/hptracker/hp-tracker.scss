@@ -1,8 +1,15 @@
 .hp-tracker {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
     .player-wrapper {
-        display: flex;
-        justify-content: space-between;
-        gap: 5px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        justify-items: flex-start;
+        gap: 10px;
+        border-bottom: 1px solid white;
+        padding: 5px 5px 1px;
 
         .player-name {
             cursor: pointer;
@@ -15,6 +22,27 @@
         .current-hp {
             display: flex;
             gap: 5px;
+
+            .hp-change {
+                border-radius: 50%;
+                background-position: center;
+                background-size: contain;
+                background-repeat: no-repeat;
+                width: 20px;
+                height: 20px;
+
+                &.plus {
+                    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='48' viewBox='0 -960 960 960' width='48'%3E%3Cpath d='M450-200v-250H200v-60h250v-250h60v250h250v60H510v250h-60Z' fill='white'/%3E%3C/svg%3E");
+                }
+
+                &.minus {
+                    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='48' viewBox='0 -960 960 960' width='48'%3E%3Cpath d='M200-450v-60h560v60H200Z' fill='white'/%3E%3C/svg%3E");
+                }
+            }
+        }
+
+        .armor-class {
+            justify-self: flex-end;
         }
 
         input[type="number"] {

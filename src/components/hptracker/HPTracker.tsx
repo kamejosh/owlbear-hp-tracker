@@ -1,4 +1,4 @@
-import React, { ChangeEvent, MouseEvent, useEffect, useState } from "react";
+import React, { MouseEvent, useEffect, useState } from "react";
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
@@ -21,11 +21,11 @@ export const HPTracker = () => {
 
 const Player = (props: PlayerProps) => {
     const playerContext = usePlayerContext();
-    const handleHpChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const handleHpChange = (value: number) => {
         OBR.scene.items.updateItems([props.id], (items) => {
             items.forEach((item) => {
                 const currentData: HpTrackerMetadata = item.metadata[characterMetadata] as HpTrackerMetadata;
-                currentData.hp = Number(event.target.value);
+                currentData.hp += value;
                 // just assigning currentData did not trigger onChange event. Spreading helps
                 item.metadata[characterMetadata] = { ...currentData };
             });
@@ -62,16 +62,13 @@ const Player = (props: PlayerProps) => {
                 {props.data.name}
             </div>
             <span className={"current-hp"}>
-                <input
-                    type={"number"}
-                    defaultValue={props.data.hp}
-                    max={props.data.maxHp}
-                    onChange={handleHpChange}
-                    disabled={playerContext.role === "PLAYER"}
-                />
+                <span>{props.data.hp}</span>
                 <span>/</span>
                 <span>{props.data.maxHp}</span>
+                <button className={"hp-change minus"} onClick={() => handleHpChange(-1)}></button>
+                <button className={"hp-change plus"} onClick={() => handleHpChange(1)}></button>
             </span>
+            <span className={"armor-class"}>AC: {props.data.armorClass}</span>
         </div>
     ) : (
         <></>
@@ -91,7 +88,7 @@ const Content = () => {
 
                     OBR.scene.items.onChange(async (items) => {
                         const filteredItems = items.filter((item) => item.layer === "CHARACTER");
-                        setTokens(filteredItems);
+                        setTokens(Array.from(filteredItems));
                     });
                 }
             });
