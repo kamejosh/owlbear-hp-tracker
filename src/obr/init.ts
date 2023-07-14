@@ -1,8 +1,6 @@
 import OBR, { isText, Item } from "@owlbear-rodeo/sdk";
 import { ID, characterMetadata } from "../helper/variables.ts";
-import { Changes, HpTrackerMetadata, TextItemChanges } from "../helper/types.ts";
-import { deleteText, handleOtherChanges, prepareTextChanges, saveOrChangeText } from "../helper/textHelpers.ts";
-import { getAttachedTextItem } from "../helper/helpers.ts";
+import { prepareTextChanges } from "../helper/textHelpers.ts";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
