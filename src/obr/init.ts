@@ -1,7 +1,8 @@
-import OBR, { Item } from "@owlbear-rodeo/sdk";
+import OBR, { isText, Item } from "@owlbear-rodeo/sdk";
 import { ID, characterMetadata } from "../helper/variables.ts";
-import { HpTrackerMetadata } from "../helper/types.ts";
-import { deleteText, handleOtherChanges, saveOrChangeText } from "../helper/textHelpers.ts";
+import { Changes, HpTrackerMetadata, TextItemChanges } from "../helper/types.ts";
+import { deleteText, handleOtherChanges, prepareTextChanges, saveOrChangeText } from "../helper/textHelpers.ts";
+import { getAttachedTextItem } from "../helper/helpers.ts";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -35,22 +36,31 @@ const initItems = async () => {
 const initTexts = async () => {
     const role = await OBR.player.getRole();
     // Triggers everytime any item is changed
-    OBR.scene.items.onChange((items) => {
+    OBR.scene.items.onChange(async (items) => {
         // But we only care about Character Items
         const characters = items.filter((item) => item.layer === "CHARACTER");
-        characters.forEach(async (character) => {
-            // Specifically on character items with the characterMetadata
-            if (characterMetadata in character.metadata) {
-                const data = character.metadata[characterMetadata] as HpTrackerMetadata;
-                // Even more specifically where the metadata `hpOnMap` is not an empty string
-                if (data.hpOnMap && (role === "GM" || (role === "PLAYER" && data.canPlayersSee))) {
-                    saveOrChangeText(character, data);
-                    handleOtherChanges(character);
-                } else {
-                    deleteText(character);
-                }
-            }
-        });
+        const changes = await prepareTextChanges(characters, role);
+
+        if (changes.textItems.size > 0) {
+            await OBR.scene.local.updateItems(isText, (texts) => {
+                texts.forEach((text) => {
+                    if (changes.textItems.has(text.id)) {
+                        const change = changes.textItems.get(text.id);
+                        if (change) {
+                            if (change.text) {
+                                text.text.plainText = change.text;
+                            }
+                            if (change.visible) {
+                                text.visible = change.visible;
+                            }
+                            if (change.position) {
+                                text.position = change.position;
+                            }
+                        }
+                    }
+                });
+            });
+        }
     });
 };
 
