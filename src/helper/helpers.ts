@@ -1,5 +1,10 @@
-import OBR, { buildText } from "@owlbear-rodeo/sdk";
+import OBR, { buildText, Item } from "@owlbear-rodeo/sdk";
 import { textMetadata } from "./variables.ts";
+
+export const localItemsCache = {
+    items: Array<Item>(),
+    invalid: true,
+};
 
 export const createText = async (text: string, id: string) => {
     const items = await OBR.scene.items.getItems([id]);
@@ -47,7 +52,11 @@ export const createText = async (text: string, id: string) => {
 };
 
 export const getAttachedTextItem = async (id: string) => {
-    const localItems = await OBR.scene.local.getItems();
+    if (localItemsCache.invalid) {
+        localItemsCache.items = await OBR.scene.local.getItems();
+        localItemsCache.invalid = false;
+    }
+    const localItems = localItemsCache.items;
     const attachments = localItems.filter((item) => item.attachedTo === id);
 
     return attachments.filter((attachment) => {

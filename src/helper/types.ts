@@ -11,3 +11,13 @@ export type HpTrackerMetadata = {
 export type HpTextMetadata = {
     isHpText: boolean;
 };
+
+export type TextItemChanges = {
+    text?: string;
+    visible?: boolean;
+    position?: { x: number; y: number };
+};
+
+export type Changes = {
+    textItems: Map<string, TextItemChanges>;
+};
