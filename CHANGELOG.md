@@ -12,3 +12,8 @@
 - fixed invisible state by moving the text to local scene
 - handle move and visible state for local scene items
 - refactoring and minor optical improvements
+
+# 1.0.3
+
+- Increase performance of local item handling
+- Refactoring of update functions
