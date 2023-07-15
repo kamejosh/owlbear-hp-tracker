@@ -1,6 +1,7 @@
 import OBR, { isText, Item } from "@owlbear-rodeo/sdk";
 import { ID, characterMetadata } from "../helper/variables.ts";
 import { prepareTextChanges } from "../helper/textHelpers.ts";
+import { migrate102To103 } from "../migrations/v103.ts";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -87,11 +88,16 @@ const setupContextMenu = async () => {
     });
 };
 
+const migrations = async () => {
+    await migrate102To103();
+};
+
 OBR.onReady(async () => {
     setupContextMenu();
     initTexts();
     OBR.scene.onReadyChange(async (isReady) => {
         if (isReady) {
+            migrations();
             initItems();
         }
     });
