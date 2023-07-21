@@ -1,0 +1,26 @@
+$laptop: 470px;
+
+@mixin min-width($width) {
+    @media (min-width: $width) {
+        @content;
+    }
+}
+
+@mixin laptop() {
+    @include min-width($laptop) {
+        @content;
+    }
+}
+
+// try to avoid max-width breakpoints
+@mixin max-width($width) {
+    @media (max-width: $width) {
+        @content;
+    }
+}
+
+@mixin mobile-and-tablet-only {
+    @include max-width($laptop - 1px) {
+        @content;
+    }
+}
