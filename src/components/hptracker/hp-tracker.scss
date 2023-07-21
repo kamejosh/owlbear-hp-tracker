@@ -1,3 +1,5 @@
+@use "../../helper/breakpoint";
+
 .hp-tracker {
     display: flex;
     flex-direction: column;
@@ -9,23 +11,45 @@
 
     .player-wrapper {
         display: grid;
-        grid-template-columns: repeat(3, 1fr) minmax(40px, auto);
+        grid-template-rows: repeat(2, 1fr);
+        grid-template-columns: repeat(2, 1fr);
         justify-content: space-between;
         align-items: center;
-        justify-items: flex-start;
         gap: 10px;
         border-bottom: 1px solid white;
         padding: 5px;
+
+        @include breakpoint.laptop {
+            grid-template-rows: 1fr;
+            grid-template-columns: repeat(3, 1fr) minmax(40px, auto);
+            justify-items: flex-start;
+        }
+
+        &.headings {
+            display: none;
+
+            @include breakpoint.laptop {
+                display: grid;
+            }
+        }
 
         .player-name {
             display: flex;
             justify-content: space-between;
             width: 100%;
-            min-width: 130px;
+            min-width: 100px;
+
+            @include breakpoint.laptop {
+                min-width: 130px;
+            }
 
             .name {
                 cursor: pointer;
-                white-space: nowrap;
+
+                @include breakpoint.laptop {
+                    white-space: nowrap;
+                }
+
                 &:hover {
                     font-weight: 800;
                 }
@@ -36,6 +60,7 @@
             }
 
             .edit {
+                cursor: pointer;
                 border: none;
                 background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='48' viewBox='0 -960 960 960' width='48'%3E%3Cpath d='M180-180h44l443-443-44-44-443 443v44Zm614-486L666-794l42-42q17-17 42-17t42 17l44 44q17 17 17 42t-17 42l-42 42Zm-42 42L248-120H120v-128l504-504 128 128Zm-107-21-22-22 44 44-22-22Z' fill='%23E2E2E2'/%3E%3C/svg%3E");
                 background-position: center;
@@ -53,15 +78,23 @@
 
         .settings {
             display: flex;
+            justify-content: space-between;
             gap: 2px;
+
             .toggle-button {
+                cursor: pointer;
                 border: none;
                 background-position: center;
                 background-size: contain;
                 background-repeat: no-repeat;
                 background-color: transparent;
-                width: 30px;
-                height: 30px;
+                width: 20px;
+                height: 20px;
+
+                @include breakpoint.laptop {
+                    width: 30px;
+                    height: 30px;
+                }
             }
 
             .hp {

@@ -30,7 +30,6 @@ const Player = (props: PlayerProps) => {
     const [canPlayersSee, setCanPlayersSee] = useState<boolean>(props.data.canPlayersSee);
     const [editName, setEditName] = useState<boolean>(false);
     const [name, setName] = useState<string>(props.data.name);
-    const [mouseDown, setMouseDown] = useState<boolean>(false);
 
     const handleValueChange = (value: string | number | boolean, key: string) => {
         OBR.scene.items.updateItems([props.id], (items) => {
@@ -186,21 +185,6 @@ const Player = (props: PlayerProps) => {
                             handleValueChange(Math.min(hp + 1, maxHp), "hp");
                         }
                     }}
-                    onMouseDown={() => {
-                        setMouseDown(true);
-                    }}
-                    onMouseUp={() => {
-                        setMouseDown(false);
-                    }}
-                    onMouseMove={(e) => {
-                        if (mouseDown) {
-                            if (e.movementY > 0) {
-                                handleValueChange(Math.min(hp - 1, maxHp), "hp");
-                            } else if (e.movementY < 0) {
-                                handleValueChange(Math.min(hp + 1, maxHp), "hp");
-                            }
-                        }
-                    }}
                 />
                 <span>/</span>
                 <input
@@ -225,21 +209,6 @@ const Player = (props: PlayerProps) => {
                             handleValueChange(maxHp + 1, "maxHP");
                         }
                     }}
-                    onMouseDown={() => {
-                        setMouseDown(true);
-                    }}
-                    onMouseUp={() => {
-                        setMouseDown(false);
-                    }}
-                    onMouseMove={(e) => {
-                        if (mouseDown) {
-                            if (e.movementY > 0) {
-                                handleValueChange(maxHp - 1, "maxHP");
-                            } else if (e.movementY < 0) {
-                                handleValueChange(maxHp + 1, "maxHP");
-                            }
-                        }
-                    }}
                 />
             </div>
             <input
@@ -262,21 +231,6 @@ const Player = (props: PlayerProps) => {
                         handleValueChange(armorClass - 1, "armorClass");
                     } else if (e.deltaY < 0) {
                         handleValueChange(armorClass + 1, "armorClass");
-                    }
-                }}
-                onMouseDown={() => {
-                    setMouseDown(true);
-                }}
-                onMouseUp={() => {
-                    setMouseDown(false);
-                }}
-                onMouseMove={(e) => {
-                    if (mouseDown) {
-                        if (e.movementY > 0) {
-                            handleValueChange(armorClass - 1, "armorClass");
-                        } else if (e.movementY < 0) {
-                            handleValueChange(armorClass + 1, "armorClass");
-                        }
                     }
                 }}
                 className={"armor-class"}
@@ -322,7 +276,7 @@ const Content = () => {
     return playerContext.role ? (
         <div className={"hp-tracker"}>
             <h1 className={"title"}>HP Tracker</h1>
-            <div className={"player-wrapper"}>
+            <div className={"player-wrapper headings"}>
                 <span>Name</span>
                 <span>Settings</span>
                 <span>HP / MAX</span>
