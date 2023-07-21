@@ -14,7 +14,7 @@ learn-more: https://github.com/kamejosh/owlbear-hp-tracker
 
 # HP Tracker
 
-A Tool to keep track of the HP of Character Tokens. With visibilty options to hide information from players (like Boss HP).
+A Tool to keep track of the HP of Character Tokens. With visibility options to hide information from players (like Boss HP).
 
 With this tool the HP for each Token can be setup. Max HP and current HP can be entered and displayed in the Tool Window, where all current activated HP are visible. 
 

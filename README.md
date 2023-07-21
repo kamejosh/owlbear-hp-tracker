@@ -13,20 +13,18 @@ The extension can be installed manually, by pasting the [manifest link](https://
 This project uses [React](https://reactjs.org/) for the UI. It contains three different parts:
 
 + Hp Tracker window
-+ Hp Tracker popover
++ Hp Tracker context menu
 + Hp Tracker background tasks
 
 ### Hp Tracker Window
 
-This is a custom Action that can be opened on the top left to display all Characters HP and also change the current HP setting. Max HP must be changed in the [HP Tracker Popover](#hp-tracker-popover). Also when clicking on the name of a character the icon is tilted a little to make it easy to find on the map.
+This is a custom Action that can be opened on the top left to display all Characters HP and also change the current the settings for current HP, max HP, AC, name,...
 
-### Hp Tracker Popover
+Also when clicking on the name of a character the icon is tilted a little to make it easy to find on the map.
 
-This is a custom Popover than can be accessed from the Item Contextmenu. Per default on a new Item the Name is set to the Item name. Besides name and hp settings three checkboxes allow for the following changes:
+### Hp Tracker Context Menu
 
-+ Active: Sets if the HP is tracked in the [Hp Tracker Window](#p-tracker-window)
-+ Visible for Players: Sets if the Item is also displayed in the Hp Tracker Window when logged in with role "PLAYER"
-+ Add to Map: Sets if the current HP and max HP are displayed on the map beneath the character token. Is per default displayed on the GM screen. If `Visible for Players` is also checked then players can also see these values.
+In the Context Menu the Active state of the Token in the HP Tracker Extension is toggled
 
 ### Hp Tracker background Tasks
 

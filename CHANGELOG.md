@@ -17,3 +17,12 @@
 
 - Increase performance of local item handling
 - Refactoring of update functions
+
+# 1.0.4
+
+- Refactored the whole menu
+  - Popover is no longer needed all settings are in the main window
+  - HP indicator in Main window
+  - HP Bar that can be toggled
+  - Input via Mouse Drag/Wheel or Arrowkeys
+- Lots of other imrovements that help with debugging
