@@ -26,3 +26,10 @@
   - HP Bar that can be toggled
   - Input via Mouse Drag/Wheel or Arrowkeys
 - Lots of other imrovements that help with debugging
+
+# 1.0.5
+
+- Fix issue on chrome where mouse over would always trigger value change after activating it once
+  - mouse drag can no longer change values (thank google)
+- buttons have proper cursor icon
+- Fix layout not working for mobile
