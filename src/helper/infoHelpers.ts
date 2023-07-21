@@ -1,5 +1,5 @@
 import { createShape, createText, getAttachedItems, localItemsCache } from "./helpers.ts";
-import { characterMetadata, textMetadata } from "./variables.ts";
+import { characterMetadata, infoMetadata } from "./variables.ts";
 import OBR, { Item, Text, Shape } from "@owlbear-rodeo/sdk";
 import { Changes, HpTrackerMetadata, ShapeItemChanges, TextItemChanges } from "./types.ts";
 
@@ -12,7 +12,7 @@ export const saveOrChangeShape = async (
     const width = 200;
     if (attachments.length > 0) {
         attachments.forEach((attachment) => {
-            if (attachment.name === "name" && textMetadata in attachment.metadata) {
+            if (attachment.name === "hp" && infoMetadata in attachment.metadata) {
                 const change = changeMap.get(attachment.id) ?? {};
                 change.width = (width * data.hp) / data.maxHp - 4;
                 changeMap.set(attachment.id, change);
@@ -21,7 +21,6 @@ export const saveOrChangeShape = async (
     } else {
         const percentage = data.hp === 0 && data.maxHp === 0 ? 0 : data.hp / data.maxHp;
         const shapes = await createShape(percentage, character.id);
-        console.log(shapes, character.id);
         if (shapes) {
             await OBR.scene.local.addItems(shapes);
             localItemsCache.invalid = true;
@@ -37,7 +36,7 @@ export const saveOrChangeText = async (
 ) => {
     if (attachments.length > 0) {
         attachments.forEach((attachment) => {
-            if (textMetadata in attachment.metadata) {
+            if (infoMetadata in attachment.metadata) {
                 const change = changeMap.get(attachment.id) ?? {};
 
                 const text =
@@ -75,7 +74,7 @@ export const handleOtherTextChanges = async (
 ) => {
     if (attachments.length > 0) {
         attachments.forEach((attachment) => {
-            if (textMetadata in attachment.metadata) {
+            if (infoMetadata in attachment.metadata) {
                 const change = changeMap.get(attachment.id) ?? {};
                 if (character.visible !== attachment.visible) {
                     change.visible = character.visible;
@@ -100,21 +99,34 @@ export const handleOtherShapeChanges = async (
     attachments: Shape[],
     changeMap: Map<string, ShapeItemChanges>
 ) => {
+    const width = 200;
     if (attachments.length > 0) {
         attachments.forEach((attachment) => {
-            if (textMetadata in attachment.metadata) {
+            if (infoMetadata in attachment.metadata) {
                 const change = changeMap.get(attachment.id) ?? {};
                 if (character.visible !== attachment.visible) {
                     change.visible = character.visible;
                 }
-                if (
-                    character.position.x - Number(attachment.text.width) / 2 != attachment.position.x ||
-                    character.position.y + 10 != attachment.position.y
-                ) {
-                    change.position = {
-                        x: character.position.x - Number(attachment.text.width) / 2,
-                        y: character.position.y + 10,
-                    };
+                if (attachment.name === "hp") {
+                    if (
+                        character.position.x - width / 2 + 2 != attachment.position.x ||
+                        character.position.y + 28 != attachment.position.y
+                    ) {
+                        change.position = {
+                            x: character.position.x - width / 2 + 2,
+                            y: character.position.y + 28,
+                        };
+                    }
+                } else {
+                    if (
+                        character.position.x - width / 2 != attachment.position.x ||
+                        character.position.y + 26 != attachment.position.y
+                    ) {
+                        change.position = {
+                            x: character.position.x - width / 2,
+                            y: character.position.y + 26,
+                        };
+                    }
                 }
                 changeMap.set(attachment.id, change);
             }
@@ -133,7 +145,7 @@ export const prepareDisplayChanges = async (characters: Item[], role: "GM" | "PL
             const shapeAttachments = await getAttachedItems(character.id, "SHAPE");
             const data = character.metadata[characterMetadata] as HpTrackerMetadata;
 
-            if (!data.hpOnMap && data.hpMode === "NUM" && !data.acOnMap) {
+            if (!data.hpTrackerActive || (!data.hpOnMap && data.hpMode === "NUM" && !data.acOnMap)) {
                 await deleteAttachments(textAttachments.concat(shapeAttachments));
             } else {
                 if (!data.hpOnMap && !data.acOnMap) {
@@ -146,6 +158,7 @@ export const prepareDisplayChanges = async (characters: Item[], role: "GM" | "PL
 
             if (data.hpMode === "BAR") {
                 await saveOrChangeShape(character, data, shapeAttachments, changes.shapeItems);
+                await handleOtherShapeChanges(character, shapeAttachments as Array<Shape>, changes.shapeItems);
             }
 
             if (role === "GM" || (role === "PLAYER" && data.canPlayersSee)) {

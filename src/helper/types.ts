@@ -29,6 +29,8 @@ export type TextItemChanges = {
 
 export type ShapeItemChanges = {
     width?: number;
+    visible?: boolean;
+    position?: { x: number; y: number };
 };
 
 export type Changes = {

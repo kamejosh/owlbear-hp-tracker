@@ -1,5 +1,5 @@
-import OBR, { buildShape, buildText, Image, Item, Layer } from "@owlbear-rodeo/sdk";
-import { textMetadata } from "./variables.ts";
+import OBR, { buildShape, buildText, Image, Item } from "@owlbear-rodeo/sdk";
+import { infoMetadata } from "./variables.ts";
 
 export const localItemsCache = {
     items: Array<Item>(),
@@ -45,16 +45,17 @@ export const createText = async (text: string, id: string) => {
             .attachedTo(id as string)
             .layer("TEXT")
             .locked(true)
+            .disableAttachmentBehavior(["SCALE"])
             .build();
 
-        textItem.metadata[textMetadata] = { isHpText: true };
+        textItem.metadata[infoMetadata] = { isHpText: true };
         return textItem;
     }
 };
 
 export const createShape = async (percentage: number, id: string) => {
     const width = 200;
-    const height = 27;
+    const height = 31;
 
     const items = await OBR.scene.items.getItems([id]);
 
@@ -75,6 +76,7 @@ export const createShape = async (percentage: number, id: string) => {
             .attachedTo(id)
             .layer("ATTACHMENT")
             .locked(true)
+            .disableAttachmentBehavior(["SCALE"])
             .build();
 
         const hpShape = buildShape()
@@ -88,10 +90,11 @@ export const createShape = async (percentage: number, id: string) => {
             .layer("ATTACHMENT")
             .locked(true)
             .name("hp")
+            .disableAttachmentBehavior(["SCALE"])
             .build();
 
-        backgroundShape.metadata[textMetadata] = { isHpText: true };
-        hpShape.metadata[textMetadata] = { isHpText: true };
+        backgroundShape.metadata[infoMetadata] = { isHpText: true };
+        hpShape.metadata[infoMetadata] = { isHpText: true };
         return [backgroundShape, hpShape];
     }
     return [];
@@ -106,7 +109,7 @@ export const getAttachedItems = async (id: string, itemType: string) => {
     // why am I not using .filter() because if I do there is a bug and I can't find it
     const attachments: Item[] = [];
     localItemsCache.items.forEach((item) => {
-        if (item.attachedTo === id && textMetadata in item.metadata && itemType === item.type) {
+        if (item.attachedTo === id && infoMetadata in item.metadata && itemType === item.type) {
             attachments.push(item);
         }
     });

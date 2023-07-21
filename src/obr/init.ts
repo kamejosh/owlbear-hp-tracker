@@ -1,6 +1,6 @@
-import OBR, { isText, Item, Metadata } from "@owlbear-rodeo/sdk";
+import OBR, { isShape, isText, Item, Metadata } from "@owlbear-rodeo/sdk";
 import { ID, characterMetadata, sceneMetadata } from "../helper/variables.ts";
-import { prepareDisplayChanges } from "../helper/textHelpers.ts";
+import { prepareDisplayChanges } from "../helper/infoHelpers.ts";
 import { migrate102To103 } from "../migrations/v103.ts";
 import { compare } from "compare-versions";
 import { HpTrackerMetadata, SceneMetadata } from "../helper/types.ts";
@@ -68,6 +68,26 @@ const initTexts = async () => {
                 });
             });
         }
+        if (changes.shapeItems.size > 0) {
+            await OBR.scene.local.updateItems(isShape, (shapes) => {
+                shapes.forEach((shape) => {
+                    if (changes.shapeItems.has(shape.id)) {
+                        const change = changes.shapeItems.get(shape.id);
+                        if (change) {
+                            if (change.width) {
+                                shape.width = change.width;
+                            }
+                            if (change.visible) {
+                                shape.visible = change.visible;
+                            }
+                            if (change.position) {
+                                shape.position = change.position;
+                            }
+                        }
+                    }
+                });
+            });
+        }
     });
 };
 
@@ -109,7 +129,6 @@ const setupContextMenu = async () => {
         onClick: (context) => {
             const initTokens = async () => {
                 OBR.scene.items.updateItems(context.items, (items) => {
-                    console.log(items);
                     items.forEach((item) => {
                         if (characterMetadata in item.metadata) {
                             const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;

@@ -117,10 +117,10 @@
   resolved "https://registry.yarnpkg.com/@esbuild/win32-x64/-/win32-x64-0.18.11.tgz#6526c7e1b40d5b9f0a222c6b767c22f6fb97aa57"
   integrity sha512-rQI4cjLHd2hGsM1LqgDI7oOCYbQ6IBOVsX9ejuRMSze0GqXUG2ekwiKkiBU1pRGSeCqFFHxTrcEydB2Hyoz9CA==
 
-"@owlbear-rodeo/sdk@^1.3.9":
-  version "1.3.9"
-  resolved "https://registry.npmjs.org/@owlbear-rodeo/sdk/-/sdk-1.3.9.tgz"
-  integrity sha512-yiU+R7llxxvZXmAfc6WKYniCfdFjCbZQZ6PuC/sv0ozPxOiNqAGBkeK7KWe4dvcSXFnO7sE5CC4JZMSijMPejA==
+"@owlbear-rodeo/sdk@1.3.10":
+  version "1.3.10"
+  resolved "https://registry.yarnpkg.com/@owlbear-rodeo/sdk/-/sdk-1.3.10.tgz#a640376997a4992d41b1e722730b25b6375a269c"
+  integrity sha512-Kt5ewOfs71C8bBZwp60eLzXLyhoOJUsALilGOwxdG8qk4q2BS+vgR76bnX8Aa7rw4ZK0Dl6FLJdO8xkte9S9JQ==
   dependencies:
     events "^3.3.0"
     immer "^9.0.15"

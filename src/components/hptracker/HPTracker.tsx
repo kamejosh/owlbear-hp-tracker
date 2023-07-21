@@ -30,101 +30,41 @@ const Player = (props: PlayerProps) => {
     const [canPlayersSee, setCanPlayersSee] = useState<boolean>(props.data.canPlayersSee);
     const [editName, setEditName] = useState<boolean>(false);
     const [name, setName] = useState<string>(props.data.name);
+    const [mouseDown, setMouseDown] = useState<boolean>(false);
 
-    const handleHpChange = (value: number) => {
+    const handleValueChange = (value: string | number | boolean, key: string) => {
         OBR.scene.items.updateItems([props.id], (items) => {
             items.forEach((item) => {
                 const currentData: HpTrackerMetadata = item.metadata[characterMetadata] as HpTrackerMetadata;
-                currentData.hp = value;
-                setHp(currentData.hp);
-                // just assigning currentData did not trigger onChange event. Spreading helps
-                item.metadata[characterMetadata] = { ...currentData };
-            });
-        });
-    };
-
-    const handleMaxHpChange = (value: number) => {
-        OBR.scene.items.updateItems([props.id], (items) => {
-            items.forEach((item) => {
-                const currentData: HpTrackerMetadata = item.metadata[characterMetadata] as HpTrackerMetadata;
-                currentData.maxHp = value;
-                if (currentData.maxHp < currentData.hp) {
-                    currentData.hp = currentData.maxHp;
+                if (key === "name") {
+                    currentData.name = String(value);
+                    setName(currentData.name);
+                } else if (key === "players") {
+                    currentData.canPlayersSee = !!value;
+                    setCanPlayersSee(currentData.canPlayersSee);
+                } else if (key === "acOnMap") {
+                    currentData.acOnMap = !!value;
+                    setAcOnMap(currentData.acOnMap);
+                } else if (key === "hpOnMap") {
+                    currentData.hpOnMap = !!value;
+                    setHpOnMap(currentData.hpOnMap);
+                } else if (key === "hpMode") {
+                    currentData.hpMode = String(value) === "NUM" ? "NUM" : "BAR";
+                    setHpMode(currentData.hpMode);
+                } else if (key === "armorClass") {
+                    currentData.armorClass = Math.max(Number(value), 0);
+                    setArmorClass(currentData.armorClass);
+                } else if (key === "maxHP") {
+                    currentData.maxHp = Math.max(Number(value), 0);
+                    if (currentData.maxHp < currentData.hp) {
+                        currentData.hp = currentData.maxHp;
+                        setHp(currentData.hp);
+                    }
+                    setMaxHp(currentData.maxHp);
+                } else if (key === "hp") {
+                    currentData.hp = Math.max(Number(value), 0);
                     setHp(currentData.hp);
                 }
-                setMaxHp(currentData.maxHp);
-                // just assigning currentData did not trigger onChange event. Spreading helps
-                item.metadata[characterMetadata] = { ...currentData };
-            });
-        });
-    };
-
-    const handleAcChange = (value: number) => {
-        OBR.scene.items.updateItems([props.id], (items) => {
-            items.forEach((item) => {
-                const currentData: HpTrackerMetadata = item.metadata[characterMetadata] as HpTrackerMetadata;
-                currentData.armorClass = value;
-                setArmorClass(currentData.armorClass);
-                // just assigning currentData did not trigger onChange event. Spreading helps
-                item.metadata[characterMetadata] = { ...currentData };
-            });
-        });
-    };
-
-    const handleHpModeClick = () => {
-        OBR.scene.items.updateItems([props.id], (items) => {
-            items.forEach((item) => {
-                const currentData: HpTrackerMetadata = item.metadata[characterMetadata] as HpTrackerMetadata;
-                currentData.hpMode = hpMode === "NUM" ? "BAR" : "NUM";
-                setHpMode(currentData.hpMode);
-                // just assigning currentData did not trigger onChange event. Spreading helps
-                item.metadata[characterMetadata] = { ...currentData };
-            });
-        });
-    };
-
-    const handleHpOnMapClick = () => {
-        OBR.scene.items.updateItems([props.id], (items) => {
-            items.forEach((item) => {
-                const currentData: HpTrackerMetadata = item.metadata[characterMetadata] as HpTrackerMetadata;
-                currentData.hpOnMap = !hpOnMap;
-                setHpOnMap(!hpOnMap);
-                // just assigning currentData did not trigger onChange event. Spreading helps
-                item.metadata[characterMetadata] = { ...currentData };
-            });
-        });
-    };
-
-    const handleAcOnMapClick = () => {
-        OBR.scene.items.updateItems([props.id], (items) => {
-            items.forEach((item) => {
-                const currentData: HpTrackerMetadata = item.metadata[characterMetadata] as HpTrackerMetadata;
-                currentData.acOnMap = !acOnMap;
-                setAcOnMap(!acOnMap);
-                // just assigning currentData did not trigger onChange event. Spreading helps
-                item.metadata[characterMetadata] = { ...currentData };
-            });
-        });
-    };
-
-    const handleCanPlayersSeeClick = () => {
-        OBR.scene.items.updateItems([props.id], (items) => {
-            items.forEach((item) => {
-                const currentData: HpTrackerMetadata = item.metadata[characterMetadata] as HpTrackerMetadata;
-                currentData.canPlayersSee = !canPlayersSee;
-                setCanPlayersSee(!canPlayersSee);
-                // just assigning currentData did not trigger onChange event. Spreading helps
-                item.metadata[characterMetadata] = { ...currentData };
-            });
-        });
-    };
-
-    const handleNameChange = (value: string) => {
-        OBR.scene.items.updateItems([props.id], (items) => {
-            items.forEach((item) => {
-                const currentData: HpTrackerMetadata = item.metadata[characterMetadata] as HpTrackerMetadata;
-                currentData.name = value;
-                setName(value);
                 // just assigning currentData did not trigger onChange event. Spreading helps
                 item.metadata[characterMetadata] = { ...currentData };
             });
@@ -174,7 +114,7 @@ const Player = (props: PlayerProps) => {
                         type={"text"}
                         value={name}
                         onChange={(e) => {
-                            handleNameChange(e.target.value);
+                            handleValueChange(e.target.value, "name");
                         }}
                     />
                 ) : (
@@ -195,22 +135,30 @@ const Player = (props: PlayerProps) => {
                         <button
                             title={"Toggle HP Display Mode for Character"}
                             className={`toggle-button hp ${hpMode === "NUM" ? "numbers" : "bar"}`}
-                            onClick={handleHpModeClick}
+                            onClick={() => {
+                                handleValueChange(hpMode === "NUM" ? "BAR" : "NUM", "hpMode");
+                            }}
                         ></button>
                         <button
                             title={"Toggle HP displayed on Map"}
                             className={`toggle-button map ${hpOnMap ? "on" : "off"}`}
-                            onClick={handleHpOnMapClick}
+                            onClick={() => {
+                                handleValueChange(!hpOnMap, "hpOnMap");
+                            }}
                         ></button>
                         <button
                             title={"Toggle AC visible on Map"}
                             className={`toggle-button ac ${acOnMap ? "on" : "off"}`}
-                            onClick={handleAcOnMapClick}
+                            onClick={() => {
+                                handleValueChange(!acOnMap, "acOnMap");
+                            }}
                         ></button>
                         <button
                             title={"Toggle HP visible for players"}
                             className={`toggle-button players ${canPlayersSee ? "on" : "off"}`}
-                            onClick={handleCanPlayersSeeClick}
+                            onClick={() => {
+                                handleValueChange(!canPlayersSee, "players");
+                            }}
                         ></button>{" "}
                     </>
                 ) : null}
@@ -222,20 +170,35 @@ const Player = (props: PlayerProps) => {
                     value={hp}
                     onChange={(e) => {
                         const value = Number(e.target.value.replace(/[^0-9]/g, ""));
-                        handleHpChange(Math.min(Number(value), maxHp));
+                        handleValueChange(Math.min(Number(value), maxHp), "hp");
                     }}
                     onKeyDown={(e) => {
                         if (e.key === "ArrowUp") {
-                            handleHpChange(Math.min(hp + 1, maxHp));
+                            handleValueChange(Math.min(hp + 1, maxHp), "hp");
                         } else if (e.key === "ArrowDown") {
-                            handleHpChange(Math.min(hp - 1, maxHp));
+                            handleValueChange(Math.min(hp - 1, maxHp), "hp");
                         }
                     }}
                     onWheel={(e) => {
                         if (e.deltaY > 0) {
-                            handleHpChange(Math.min(hp - 1, maxHp));
+                            handleValueChange(Math.min(hp - 1, maxHp), "hp");
                         } else if (e.deltaY < 0) {
-                            handleHpChange(Math.min(hp + 1, maxHp));
+                            handleValueChange(Math.min(hp + 1, maxHp), "hp");
+                        }
+                    }}
+                    onMouseDown={() => {
+                        setMouseDown(true);
+                    }}
+                    onMouseUp={() => {
+                        setMouseDown(false);
+                    }}
+                    onMouseMove={(e) => {
+                        if (mouseDown) {
+                            if (e.movementY > 0) {
+                                handleValueChange(Math.min(hp - 1, maxHp), "hp");
+                            } else if (e.movementY < 0) {
+                                handleValueChange(Math.min(hp + 1, maxHp), "hp");
+                            }
                         }
                     }}
                 />
@@ -246,20 +209,35 @@ const Player = (props: PlayerProps) => {
                     value={maxHp}
                     onChange={(e) => {
                         const value = Number(e.target.value.replace(/[^0-9]/g, ""));
-                        handleMaxHpChange(Number(value));
+                        handleValueChange(Number(value), "maxHP");
                     }}
                     onKeyDown={(e) => {
                         if (e.key === "ArrowUp") {
-                            handleMaxHpChange(maxHp + 1);
+                            handleValueChange(maxHp + 1, "maxHP");
                         } else if (e.key === "ArrowDown") {
-                            handleMaxHpChange(maxHp - 1);
+                            handleValueChange(maxHp - 1, "maxHP");
                         }
                     }}
                     onWheel={(e) => {
                         if (e.deltaY > 0) {
-                            handleMaxHpChange(maxHp - 1);
+                            handleValueChange(maxHp - 1, "maxHP");
                         } else if (e.deltaY < 0) {
-                            handleMaxHpChange(maxHp + 1);
+                            handleValueChange(maxHp + 1, "maxHP");
+                        }
+                    }}
+                    onMouseDown={() => {
+                        setMouseDown(true);
+                    }}
+                    onMouseUp={() => {
+                        setMouseDown(false);
+                    }}
+                    onMouseMove={(e) => {
+                        if (mouseDown) {
+                            if (e.movementY > 0) {
+                                handleValueChange(maxHp - 1, "maxHP");
+                            } else if (e.movementY < 0) {
+                                handleValueChange(maxHp + 1, "maxHP");
+                            }
                         }
                     }}
                 />
@@ -270,20 +248,35 @@ const Player = (props: PlayerProps) => {
                 value={armorClass}
                 onChange={(e) => {
                     const value = Number(e.target.value.replace(/[^0-9]/g, ""));
-                    handleAcChange(value);
+                    handleValueChange(value, "armorClass");
                 }}
                 onKeyDown={(e) => {
                     if (e.key === "ArrowUp") {
-                        handleAcChange(armorClass + 1);
+                        handleValueChange(armorClass + 1, "armorClass");
                     } else if (e.key === "ArrowDown") {
-                        handleAcChange(armorClass - 1);
+                        handleValueChange(armorClass - 1, "armorClass");
                     }
                 }}
                 onWheel={(e) => {
                     if (e.deltaY > 0) {
-                        handleAcChange(armorClass - 1);
+                        handleValueChange(armorClass - 1, "armorClass");
                     } else if (e.deltaY < 0) {
-                        handleAcChange(armorClass + 1);
+                        handleValueChange(armorClass + 1, "armorClass");
+                    }
+                }}
+                onMouseDown={() => {
+                    setMouseDown(true);
+                }}
+                onMouseUp={() => {
+                    setMouseDown(false);
+                }}
+                onMouseMove={(e) => {
+                    if (mouseDown) {
+                        if (e.movementY > 0) {
+                            handleValueChange(armorClass - 1, "armorClass");
+                        } else if (e.movementY < 0) {
+                            handleValueChange(armorClass + 1, "armorClass");
+                        }
                     }
                 }}
                 className={"armor-class"}
