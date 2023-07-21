@@ -4,6 +4,7 @@ import OBR, { isText } from "@owlbear-rodeo/sdk";
 import { textMetadata } from "../helper/variables.ts";
 
 export const migrate102To103 = async () => {
+    console.log("Migration from 102 to 103 running");
     const globalTexts = await OBR.scene.items.getItems(isText);
     const deleteTexts: string[] = [];
 

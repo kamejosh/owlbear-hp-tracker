@@ -1,4 +1,4 @@
-import OBR, { buildText, Item } from "@owlbear-rodeo/sdk";
+import OBR, { buildShape, buildText, Image, Item, Layer } from "@owlbear-rodeo/sdk";
 import { textMetadata } from "./variables.ts";
 
 export const localItemsCache = {
@@ -8,14 +8,15 @@ export const localItemsCache = {
 
 export const createText = async (text: string, id: string) => {
     const items = await OBR.scene.items.getItems([id]);
-    const width = 300;
-    const height = 20;
+    const width = 400;
+    // height is zero, so we're not in the way when trying to move the character icon
+    const height = 0;
 
     if (items.length > 0) {
-        const item = items[0];
+        const item = items[0] as Image;
         const position = {
             x: item.position.x - width / 2,
-            y: item.position.y + 50 + height,
+            y: item.position.y + 10,
         };
 
         const textItem = buildText()
@@ -51,15 +52,64 @@ export const createText = async (text: string, id: string) => {
     }
 };
 
-export const getAttachedTextItem = async (id: string) => {
+export const createShape = async (percentage: number, id: string) => {
+    const width = 200;
+    const height = 27;
+
+    const items = await OBR.scene.items.getItems([id]);
+
+    if (items.length > 0) {
+        const item = items[0] as Image;
+        const position = {
+            x: item.position.x - width / 2,
+            y: item.position.y + 26,
+        };
+
+        const backgroundShape = buildShape()
+            .width(width)
+            .height(height)
+            .shapeType("RECTANGLE")
+            .fillColor("black")
+            .strokeColor("black")
+            .position(position)
+            .attachedTo(id)
+            .layer("ATTACHMENT")
+            .locked(true)
+            .build();
+
+        const hpShape = buildShape()
+            .width(width * percentage - 4)
+            .height(height - 4)
+            .shapeType("RECTANGLE")
+            .fillColor("red")
+            .strokeWidth(0)
+            .position({ x: position.x + 2, y: position.y + 2 })
+            .attachedTo(id)
+            .layer("ATTACHMENT")
+            .locked(true)
+            .name("hp")
+            .build();
+
+        backgroundShape.metadata[textMetadata] = { isHpText: true };
+        hpShape.metadata[textMetadata] = { isHpText: true };
+        return [backgroundShape, hpShape];
+    }
+    return [];
+};
+
+export const getAttachedItems = async (id: string, itemType: string) => {
     if (localItemsCache.invalid) {
         localItemsCache.items = await OBR.scene.local.getItems();
         localItemsCache.invalid = false;
     }
-    const localItems = localItemsCache.items;
-    const attachments = localItems.filter((item) => item.attachedTo === id);
 
-    return attachments.filter((attachment) => {
-        return attachment.layer === "TEXT" && textMetadata in attachment.metadata;
+    // why am I not using .filter() because if I do there is a bug and I can't find it
+    const attachments: Item[] = [];
+    localItemsCache.items.forEach((item) => {
+        if (item.attachedTo === id && textMetadata in item.metadata && itemType === item.type) {
+            attachments.push(item);
+        }
     });
+
+    return attachments;
 };

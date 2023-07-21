@@ -1,7 +1,11 @@
-import OBR, { isText, Item } from "@owlbear-rodeo/sdk";
-import { ID, characterMetadata } from "../helper/variables.ts";
-import { prepareTextChanges } from "../helper/textHelpers.ts";
+import OBR, { isText, Item, Metadata } from "@owlbear-rodeo/sdk";
+import { ID, characterMetadata, sceneMetadata } from "../helper/variables.ts";
+import { prepareDisplayChanges } from "../helper/textHelpers.ts";
 import { migrate102To103 } from "../migrations/v103.ts";
+import { compare } from "compare-versions";
+import { HpTrackerMetadata, SceneMetadata } from "../helper/types.ts";
+
+const version = "1.0.4";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -11,7 +15,8 @@ const initItems = async () => {
     const addMetaData = (items: Item[]) => {
         items.forEach((item) => {
             if (!(characterMetadata in item.metadata)) {
-                item.metadata[characterMetadata] = {
+                // initializing a variable gives us type safety
+                const initialMetadata: HpTrackerMetadata = {
                     name: "",
                     hp: 0,
                     maxHp: 0,
@@ -19,7 +24,10 @@ const initItems = async () => {
                     hpTrackerActive: false,
                     canPlayersSee: false,
                     hpOnMap: false,
+                    acOnMap: false,
+                    hpMode: "NUM",
                 };
+                item.metadata[characterMetadata] = initialMetadata;
             }
         });
     };
@@ -38,7 +46,7 @@ const initTexts = async () => {
     OBR.scene.items.onChange(async (items) => {
         // But we only care about Character Items
         const characters = items.filter((item) => item.layer === "CHARACTER");
-        const changes = await prepareTextChanges(characters, role);
+        const changes = await prepareDisplayChanges(characters, role);
 
         if (changes.textItems.size > 0) {
             await OBR.scene.local.updateItems(isText, (texts) => {
@@ -63,6 +71,12 @@ const initTexts = async () => {
     });
 };
 
+const initScene = async () => {
+    const metadata: Metadata = await OBR.scene.getMetadata();
+    metadata[sceneMetadata] = { version: version };
+    await OBR.scene.setMetadata(metadata);
+};
+
 const setupContextMenu = async () => {
     return OBR.contextMenu.create({
         id: `${ID}/tool`,
@@ -71,34 +85,78 @@ const setupContextMenu = async () => {
                 icon: "/icon.svg",
                 label: "HP Tracker",
                 filter: {
+                    every: [
+                        { key: "layer", value: "CHARACTER" },
+                        { key: ["metadata", `${characterMetadata}`], value: undefined, coordinator: "||" },
+                        {
+                            key: ["metadata", `${characterMetadata}`, "hpTrackerActive"],
+                            value: false,
+                            coordinator: "||",
+                        },
+                    ],
+                    roles: ["GM"],
+                },
+            },
+            {
+                icon: "/iconOff.svg",
+                label: "HP Tracker",
+                filter: {
                     every: [{ key: "layer", value: "CHARACTER" }],
                     roles: ["GM"],
                 },
             },
         ],
-        onClick: (context, elementId) => {
-            OBR.popover.open({
-                id: `${ID}/popover`,
-                url: `/popover.html?id=${context.items[0].id}`,
-                height: 140,
-                width: 600,
-                anchorElementId: elementId,
-            });
+        onClick: (context) => {
+            const initTokens = async () => {
+                OBR.scene.items.updateItems(context.items, (items) => {
+                    console.log(items);
+                    items.forEach((item) => {
+                        if (characterMetadata in item.metadata) {
+                            const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
+                            metadata.hpTrackerActive = !metadata.hpTrackerActive;
+                            item.metadata[characterMetadata] = metadata;
+                        } else {
+                            // variable allows us to be typesafe
+                            const defaultMetadata: HpTrackerMetadata = {
+                                name: item.name,
+                                hp: 0,
+                                maxHp: 0,
+                                armorClass: 0,
+                                hpTrackerActive: true,
+                                canPlayersSee: false,
+                                hpOnMap: false,
+                                acOnMap: false,
+                                hpMode: "NUM",
+                            };
+                            item.metadata[characterMetadata] = defaultMetadata;
+                        }
+                    });
+                });
+            };
+            initTokens();
         },
     });
 };
 
 const migrations = async () => {
-    await migrate102To103();
+    const metadata = await OBR.scene.getMetadata();
+    if (sceneMetadata in metadata) {
+        const data: SceneMetadata = metadata[sceneMetadata] as SceneMetadata;
+        if (compare(data.version, "1.0.3", "<")) {
+            await migrate102To103();
+        }
+    }
 };
 
 OBR.onReady(async () => {
+    console.log(`HP Tracker version ${version} initializing`);
     setupContextMenu();
     initTexts();
     OBR.scene.onReadyChange(async (isReady) => {
         if (isReady) {
             migrations();
             initItems();
+            initScene();
         }
     });
 });
