@@ -6,7 +6,7 @@ import { migrate105To106 } from "../migrations/v106.ts";
 import { compare } from "compare-versions";
 import { HpTrackerMetadata, SceneMetadata } from "../helper/types.ts";
 
-const version = "1.0.6";
+const version = "1.0.7";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -58,7 +58,7 @@ const initTexts = async () => {
                             if (change.text) {
                                 text.text.plainText = change.text;
                             }
-                            if (change.visible) {
+                            if (change.visible !== undefined) {
                                 text.visible = change.visible;
                             }
                             if (change.position) {
@@ -74,11 +74,12 @@ const initTexts = async () => {
                 shapes.forEach((shape) => {
                     if (changes.shapeItems.has(shape.id)) {
                         const change = changes.shapeItems.get(shape.id);
+                        console.log(change);
                         if (change) {
                             if (change.width) {
                                 shape.width = change.width;
                             }
-                            if (change.visible) {
+                            if (change.visible !== undefined) {
                                 shape.visible = change.visible;
                             }
                             if (change.position) {

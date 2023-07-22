@@ -39,3 +39,7 @@
 - Improve HP Bar handling and make icons easier to understand
 - Add Highlighted Character to Playerview when HP Bar is active
 - Removes changing values with mouse wheel due to bug with large numbers of items
+
+# 1.0.7
+
+- Fix error when changing visible state
