@@ -80,7 +80,7 @@ export const createShape = async (percentage: number, id: string) => {
             .build();
 
         const hpShape = buildShape()
-            .width(width * percentage - 4)
+            .width(percentage === 0 ? 0 : width * percentage - 4)
             .height(height - 4)
             .shapeType("RECTANGLE")
             .fillColor("red")

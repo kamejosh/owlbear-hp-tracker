@@ -12,10 +12,19 @@ export const saveOrChangeShape = async (
     const width = 200;
     if (attachments.length > 0) {
         attachments.forEach((attachment) => {
+            const shape = attachment as Shape;
             if (attachment.name === "hp" && infoMetadata in attachment.metadata) {
                 const change = changeMap.get(attachment.id) ?? {};
-                change.width = (width * data.hp) / data.maxHp - 4;
-                changeMap.set(attachment.id, change);
+                const percentage = data.maxHp === 0 || data.hp === 0 ? 0 : data.hp / data.maxHp;
+                if (percentage === 0) {
+                    change.color = "black";
+                } else {
+                    change.color = "red";
+                }
+                change.width = percentage === 0 ? 0 : width * percentage - 4;
+                if (shape.width != change.width || shape.style.fillColor != change.color) {
+                    changeMap.set(attachment.id, change);
+                }
             }
         });
     } else {
@@ -145,27 +154,22 @@ export const prepareDisplayChanges = async (characters: Item[], role: "GM" | "PL
             const shapeAttachments = await getAttachedItems(character.id, "SHAPE");
             const data = character.metadata[characterMetadata] as HpTrackerMetadata;
 
-            if (!data.hpTrackerActive || (!data.hpOnMap && data.hpMode === "NUM" && !data.acOnMap)) {
+            if (!data.hpTrackerActive) {
                 await deleteAttachments(textAttachments.concat(shapeAttachments));
             } else {
-                if (!data.hpOnMap && !data.acOnMap) {
+                if ((!data.hpOnMap && !data.acOnMap) || (role === "PLAYER" && !data.canPlayersSee)) {
                     await deleteAttachments(textAttachments);
+                } else {
+                    await saveOrChangeText(character, data, textAttachments, changes.textItems);
+                    await handleOtherTextChanges(character, textAttachments as Array<Text>, changes.textItems);
                 }
-                if (data.hpMode === "NUM") {
+
+                if (!data.hpBar) {
                     await deleteAttachments(shapeAttachments);
+                } else {
+                    await saveOrChangeShape(character, data, shapeAttachments, changes.shapeItems);
+                    await handleOtherShapeChanges(character, shapeAttachments as Array<Shape>, changes.shapeItems);
                 }
-            }
-
-            if (data.hpMode === "BAR") {
-                await saveOrChangeShape(character, data, shapeAttachments, changes.shapeItems);
-                await handleOtherShapeChanges(character, shapeAttachments as Array<Shape>, changes.shapeItems);
-            }
-
-            if (role === "GM" || (role === "PLAYER" && data.canPlayersSee)) {
-                await saveOrChangeText(character, data, textAttachments, changes.textItems);
-                await handleOtherTextChanges(character, textAttachments as Array<Text>, changes.textItems);
-            } else {
-                await deleteAttachments(textAttachments);
             }
         }
     }

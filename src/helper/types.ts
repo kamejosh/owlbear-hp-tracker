@@ -1,5 +1,3 @@
-export type HPMode = "NUM" | "BAR";
-
 export type HpTrackerMetadata = {
     name: string;
     hp: number;
@@ -9,7 +7,7 @@ export type HpTrackerMetadata = {
     canPlayersSee: boolean;
     hpOnMap: boolean;
     acOnMap: boolean;
-    hpMode: HPMode;
+    hpBar: boolean;
 };
 
 export type HpTextMetadata = {
@@ -28,6 +26,7 @@ export type TextItemChanges = {
 };
 
 export type ShapeItemChanges = {
+    color?: string;
     width?: number;
     visible?: boolean;
     position?: { x: number; y: number };

@@ -3,7 +3,7 @@ import { ContextWrapper } from "../ContextWrapper.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
 import { characterMetadata } from "../../helper/variables.ts";
-import { HPMode, HpTrackerMetadata } from "../../helper/types.ts";
+import { HpTrackerMetadata } from "../../helper/types.ts";
 import "./hp-tracker.scss";
 
 type PlayerProps = {
@@ -24,7 +24,7 @@ const Player = (props: PlayerProps) => {
     const [hp, setHp] = useState<number>(props.data.hp);
     const [maxHp, setMaxHp] = useState<number>(props.data.maxHp);
     const [armorClass, setArmorClass] = useState<number>(props.data.armorClass);
-    const [hpMode, setHpMode] = useState<HPMode>(props.data.hpMode);
+    const [hpBar, setHpBar] = useState<boolean>(props.data.hpBar);
     const [hpOnMap, setHpOnMap] = useState<boolean>(props.data.hpOnMap);
     const [acOnMap, setAcOnMap] = useState<boolean>(props.data.acOnMap);
     const [canPlayersSee, setCanPlayersSee] = useState<boolean>(props.data.canPlayersSee);
@@ -47,9 +47,9 @@ const Player = (props: PlayerProps) => {
                 } else if (key === "hpOnMap") {
                     currentData.hpOnMap = !!value;
                     setHpOnMap(currentData.hpOnMap);
-                } else if (key === "hpMode") {
-                    currentData.hpMode = String(value) === "NUM" ? "NUM" : "BAR";
-                    setHpMode(currentData.hpMode);
+                } else if (key === "hpBar") {
+                    currentData.hpBar = !!value;
+                    setHpBar(currentData.hpBar);
                 } else if (key === "armorClass") {
                     currentData.armorClass = Math.max(Number(value), 0);
                     setArmorClass(currentData.armorClass);
@@ -133,9 +133,9 @@ const Player = (props: PlayerProps) => {
                     <>
                         <button
                             title={"Toggle HP Display Mode for Character"}
-                            className={`toggle-button hp ${hpMode === "NUM" ? "numbers" : "bar"}`}
+                            className={`toggle-button hp ${hpBar ? "on" : "off"}`}
                             onClick={() => {
-                                handleValueChange(hpMode === "NUM" ? "BAR" : "NUM", "hpMode");
+                                handleValueChange(!hpBar, "hpBar");
                             }}
                         ></button>
                         <button
@@ -178,13 +178,6 @@ const Player = (props: PlayerProps) => {
                             handleValueChange(Math.min(hp - 1, maxHp), "hp");
                         }
                     }}
-                    onWheel={(e) => {
-                        if (e.deltaY > 0) {
-                            handleValueChange(Math.min(hp - 1, maxHp), "hp");
-                        } else if (e.deltaY < 0) {
-                            handleValueChange(Math.min(hp + 1, maxHp), "hp");
-                        }
-                    }}
                 />
                 <span>/</span>
                 <input
@@ -200,13 +193,6 @@ const Player = (props: PlayerProps) => {
                             handleValueChange(maxHp + 1, "maxHP");
                         } else if (e.key === "ArrowDown") {
                             handleValueChange(maxHp - 1, "maxHP");
-                        }
-                    }}
-                    onWheel={(e) => {
-                        if (e.deltaY > 0) {
-                            handleValueChange(maxHp - 1, "maxHP");
-                        } else if (e.deltaY < 0) {
-                            handleValueChange(maxHp + 1, "maxHP");
                         }
                     }}
                 />
@@ -226,15 +212,24 @@ const Player = (props: PlayerProps) => {
                         handleValueChange(armorClass - 1, "armorClass");
                     }
                 }}
-                onWheel={(e) => {
-                    if (e.deltaY > 0) {
-                        handleValueChange(armorClass - 1, "armorClass");
-                    } else if (e.deltaY < 0) {
-                        handleValueChange(armorClass + 1, "armorClass");
-                    }
-                }}
                 className={"armor-class"}
             />
+        </div>
+    ) : props.data.hpBar ? (
+        <div
+            className={"player-wrapper"}
+            style={{ background: `linear-gradient(to right, ${getBgColor()}, #242424 50%, #242424 )` }}
+        >
+            <div className={"player-name"}>
+                <div
+                    className={"name"}
+                    onMouseDown={handleOnPlayerClick}
+                    onMouseUp={handleOnPlayerClick}
+                    onMouseLeave={handleOnPlayerClick}
+                >
+                    {props.data.name}
+                </div>
+            </div>
         </div>
     ) : (
         <></>
