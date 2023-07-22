@@ -2,10 +2,11 @@ import OBR, { isShape, isText, Item, Metadata } from "@owlbear-rodeo/sdk";
 import { ID, characterMetadata, sceneMetadata } from "../helper/variables.ts";
 import { prepareDisplayChanges } from "../helper/infoHelpers.ts";
 import { migrate102To103 } from "../migrations/v103.ts";
+import { migrate105To106 } from "../migrations/v106.ts";
 import { compare } from "compare-versions";
 import { HpTrackerMetadata, SceneMetadata } from "../helper/types.ts";
 
-const version = "1.0.5";
+const version = "1.0.6";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -25,7 +26,7 @@ const initItems = async () => {
                     canPlayersSee: false,
                     hpOnMap: false,
                     acOnMap: false,
-                    hpMode: "NUM",
+                    hpBar: false,
                 };
                 item.metadata[characterMetadata] = initialMetadata;
             }
@@ -82,6 +83,9 @@ const initTexts = async () => {
                             }
                             if (change.position) {
                                 shape.position = change.position;
+                            }
+                            if (change.color) {
+                                shape.style.fillColor = change.color;
                             }
                         }
                     }
@@ -145,7 +149,7 @@ const setupContextMenu = async () => {
                                 canPlayersSee: false,
                                 hpOnMap: false,
                                 acOnMap: false,
-                                hpMode: "NUM",
+                                hpBar: false,
                             };
                             item.metadata[characterMetadata] = defaultMetadata;
                         }
@@ -163,6 +167,9 @@ const migrations = async () => {
         const data: SceneMetadata = metadata[sceneMetadata] as SceneMetadata;
         if (compare(data.version, "1.0.3", "<")) {
             await migrate102To103();
+        }
+        if (compare(data.version, "1.0.6", "<")) {
+            await migrate105To106();
         }
     }
 };
