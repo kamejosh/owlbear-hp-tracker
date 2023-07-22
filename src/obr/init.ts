@@ -74,7 +74,6 @@ const initTexts = async () => {
                 shapes.forEach((shape) => {
                     if (changes.shapeItems.has(shape.id)) {
                         const change = changes.shapeItems.get(shape.id);
-                        console.log(change);
                         if (change) {
                             if (change.width) {
                                 shape.width = change.width;
