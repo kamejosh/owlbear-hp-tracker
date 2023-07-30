@@ -8,6 +8,7 @@ export type HpTrackerMetadata = {
     hpOnMap: boolean;
     acOnMap: boolean;
     hpBar: boolean;
+    index?: number;
 };
 
 export type HpTextMetadata = {

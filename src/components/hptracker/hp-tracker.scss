@@ -36,6 +36,7 @@
         .player-name {
             display: flex;
             justify-content: space-between;
+            gap: 5px;
             width: 100%;
             min-width: 100px;
 
@@ -45,6 +46,8 @@
 
             .name {
                 cursor: pointer;
+                overflow: hidden;
+                text-overflow: ellipsis;
 
                 @include breakpoint.laptop {
                     white-space: nowrap;
@@ -152,6 +155,7 @@
         .armor-class {
             justify-self: flex-end;
             min-width: 20px;
+            text-align: right;
         }
     }
 }

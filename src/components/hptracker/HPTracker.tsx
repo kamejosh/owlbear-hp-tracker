@@ -31,7 +31,7 @@ const Player = (props: PlayerProps) => {
     const [editName, setEditName] = useState<boolean>(false);
     const [name, setName] = useState<string>(props.data.name);
 
-    const handleValueChange = (value: string | number | boolean, key: string) => {
+    const handleValueChange = (value: string | number | boolean, key: string, updateHp: boolean = false) => {
         OBR.scene.items.updateItems([props.id], (items) => {
             items.forEach((item) => {
                 const currentData: HpTrackerMetadata = item.metadata[characterMetadata] as HpTrackerMetadata;
@@ -55,7 +55,7 @@ const Player = (props: PlayerProps) => {
                     setArmorClass(currentData.armorClass);
                 } else if (key === "maxHP") {
                     currentData.maxHp = Math.max(Number(value), 0);
-                    if (currentData.maxHp < currentData.hp) {
+                    if (updateHp && currentData.maxHp < currentData.hp) {
                         currentData.hp = currentData.maxHp;
                         setHp(currentData.hp);
                     }
@@ -186,14 +186,18 @@ const Player = (props: PlayerProps) => {
                     value={maxHp}
                     onChange={(e) => {
                         const value = Number(e.target.value.replace(/[^0-9]/g, ""));
-                        handleValueChange(Number(value), "maxHP");
+                        handleValueChange(Number(value), "maxHP", false);
                     }}
                     onKeyDown={(e) => {
                         if (e.key === "ArrowUp") {
-                            handleValueChange(maxHp + 1, "maxHP");
+                            handleValueChange(maxHp + 1, "maxHP", true);
                         } else if (e.key === "ArrowDown") {
-                            handleValueChange(maxHp - 1, "maxHP");
+                            handleValueChange(maxHp - 1, "maxHP", true);
                         }
+                    }}
+                    onBlur={(e) => {
+                        const value = Number(e.target.value.replace(/[^0-9]/g, ""));
+                        handleValueChange(Number(value), "maxHP", true);
                     }}
                 />
             </div>
@@ -242,7 +246,9 @@ const Content = () => {
     const [isReady, setIsReady] = useState<boolean>(false);
 
     const initHpTracker = async () => {
-        const initialItems = await OBR.scene.items.getItems((item) => item.layer === "CHARACTER");
+        const initialItems = await OBR.scene.items.getItems(
+            (item) => item.layer === "CHARACTER" && characterMetadata in item.metadata
+        );
         setTokens(initialItems);
 
         OBR.scene.items.onChange(async (items) => {
@@ -268,6 +274,15 @@ const Content = () => {
         }
     }, [isReady]);
 
+    const sortedTokens = tokens?.sort((a, b) => {
+        const aData = a.metadata[characterMetadata] as HpTrackerMetadata;
+        const bData = b.metadata[characterMetadata] as HpTrackerMetadata;
+        if (aData.index && bData.index) {
+            return aData.index - bData.index;
+        }
+        return 0;
+    });
+
     return playerContext.role ? (
         <div className={"hp-tracker"}>
             <h1 className={"title"}>HP Tracker</h1>
@@ -277,7 +292,7 @@ const Content = () => {
                 <span>HP / MAX</span>
                 <span className={"armor-class"}>AC</span>
             </div>
-            {tokens?.map((token) => {
+            {sortedTokens?.map((token) => {
                 const data = token.metadata[characterMetadata] as HpTrackerMetadata;
                 if (data) {
                     return <Player key={token.id} id={token.id} data={data} />;
