@@ -13,6 +13,7 @@
         "@bitperfect-software/prettier-config": "^2.0.1",
         "@types/node": "^20.3.3",
         "@types/react": "^18.2.14",
+        "@types/react-beautiful-dnd": "^13.1.4",
         "@types/react-dom": "^18.2.6",
         "@types/uuid": "^9.0.2",
         "compare-versions": "^6.0.0",

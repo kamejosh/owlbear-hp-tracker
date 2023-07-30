@@ -4,6 +4,7 @@ import { usePlayerContext } from "../../context/PlayerContext.ts";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
 import { characterMetadata } from "../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../helper/types.ts";
+import { DragDropContext, Droppable, Draggable, DropResult } from "react-beautiful-dnd";
 import "./hp-tracker.scss";
 
 type PlayerProps = {
@@ -240,6 +241,44 @@ const Player = (props: PlayerProps) => {
     );
 };
 
+const TokenList = React.memo(function TokenList({ tokens }: { tokens: Item[] }) {
+    const updateTokenIndex = (id: string, index: number) => {
+        OBR.scene.items.updateItems([id], (items) => {
+            items.forEach((item) => {
+                const data = item.metadata[characterMetadata] as HpTrackerMetadata;
+
+                data.index = index;
+
+                item.metadata[characterMetadata] = { ...data };
+            });
+        });
+    };
+
+    return (
+        <>
+            {tokens?.map((token, index) => {
+                const data = token.metadata[characterMetadata] as HpTrackerMetadata;
+                if (data) {
+                    if (data.index === undefined) {
+                        updateTokenIndex(token.id, index);
+                    }
+                    return (
+                        <Draggable key={token.id} draggableId={token.id} index={data.index ?? 0}>
+                            {(provided) => (
+                                <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                    <Player id={token.id} data={data} />
+                                </div>
+                            )}
+                        </Draggable>
+                    );
+                }
+
+                return null;
+            })}
+        </>
+    );
+});
+
 const Content = () => {
     const playerContext = usePlayerContext();
     const [tokens, setTokens] = useState<Item[] | undefined>(undefined);
@@ -277,11 +316,49 @@ const Content = () => {
     const sortedTokens = tokens?.sort((a, b) => {
         const aData = a.metadata[characterMetadata] as HpTrackerMetadata;
         const bData = b.metadata[characterMetadata] as HpTrackerMetadata;
-        if (aData.index && bData.index) {
-            return aData.index - bData.index;
+        if (aData && bData && aData.index !== undefined && bData.index !== undefined) {
+            if (aData.index < bData.index) {
+                return -1;
+            } else if (aData.index > bData.index) {
+                return 1;
+            } else {
+                return 0;
+            }
         }
         return 0;
     });
+
+    const reorder = (list: Item[], startIndex: number, endIndex: number) => {
+        const result = Array.from(list);
+        const [removed] = result.splice(startIndex, 1);
+        result.splice(endIndex, 0, removed);
+        const tokens = result.filter((item) => item !== undefined);
+
+        OBR.scene.items.updateItems(tokens, (items) => {
+            items.forEach((item) => {
+                const data = item.metadata[characterMetadata] as HpTrackerMetadata;
+                data.index = tokens.findIndex((r) => item.id === r.id);
+
+                item.metadata[characterMetadata] = { ...data };
+            });
+        });
+
+        return tokens;
+    };
+
+    const onDragEnd = (result: DropResult) => {
+        if (!result.destination) {
+            return;
+        }
+
+        if (result.destination.index === result.source.index) {
+            return;
+        }
+
+        const reorderedTokens = reorder(tokens ?? [], result.source.index, result.destination.index);
+
+        setTokens(reorderedTokens);
+    };
 
     return playerContext.role ? (
         <div className={"hp-tracker"}>
@@ -292,13 +369,16 @@ const Content = () => {
                 <span>HP / MAX</span>
                 <span className={"armor-class"}>AC</span>
             </div>
-            {sortedTokens?.map((token) => {
-                const data = token.metadata[characterMetadata] as HpTrackerMetadata;
-                if (data) {
-                    return <Player key={token.id} id={token.id} data={data} />;
-                }
-                return null;
-            })}
+            <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable droppableId={"tokens"}>
+                    {(provided) => (
+                        <div ref={provided.innerRef} {...provided.droppableProps}>
+                            <TokenList tokens={sortedTokens ?? []} />
+                            {provided.placeholder}
+                        </div>
+                    )}
+                </Droppable>
+            </DragDropContext>
         </div>
     ) : (
         <h1>Waiting for OBR startup</h1>
