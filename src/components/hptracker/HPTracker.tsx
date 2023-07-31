@@ -31,6 +31,7 @@ const Player = (props: PlayerProps) => {
     const [canPlayersSee, setCanPlayersSee] = useState<boolean>(props.data.canPlayersSee);
     const [editName, setEditName] = useState<boolean>(false);
     const [name, setName] = useState<string>(props.data.name);
+    const [initiative, setInitiative] = useState<number>(0);
 
     const handleValueChange = (value: string | number | boolean, key: string, updateHp: boolean = false) => {
         OBR.scene.items.updateItems([props.id], (items) => {
@@ -64,6 +65,9 @@ const Player = (props: PlayerProps) => {
                 } else if (key === "hp") {
                     currentData.hp = Math.max(Number(value), 0);
                     setHp(currentData.hp);
+                } else if (key === "initiative") {
+                    currentData.initiative = Number(value);
+                    setInitiative(currentData.initiative);
                 }
                 // just assigning currentData did not trigger onChange event. Spreading helps
                 item.metadata[characterMetadata] = { ...currentData };
@@ -202,23 +206,43 @@ const Player = (props: PlayerProps) => {
                     }}
                 />
             </div>
-            <input
-                type={"text"}
-                size={1}
-                value={armorClass}
-                onChange={(e) => {
-                    const value = Number(e.target.value.replace(/[^0-9]/g, ""));
-                    handleValueChange(value, "armorClass");
-                }}
-                onKeyDown={(e) => {
-                    if (e.key === "ArrowUp") {
-                        handleValueChange(armorClass + 1, "armorClass");
-                    } else if (e.key === "ArrowDown") {
-                        handleValueChange(armorClass - 1, "armorClass");
-                    }
-                }}
-                className={"armor-class"}
-            />
+            <div className={"armor-class"}>
+                <input
+                    type={"text"}
+                    size={1}
+                    value={armorClass}
+                    onChange={(e) => {
+                        const value = Number(e.target.value.replace(/[^0-9]/g, ""));
+                        handleValueChange(value, "armorClass");
+                    }}
+                    onKeyDown={(e) => {
+                        if (e.key === "ArrowUp") {
+                            handleValueChange(armorClass + 1, "armorClass");
+                        } else if (e.key === "ArrowDown") {
+                            handleValueChange(armorClass - 1, "armorClass");
+                        }
+                    }}
+                />
+            </div>
+            <div className={"initiative-wrapper"}>
+                <input
+                    type={"text"}
+                    size={1}
+                    value={initiative}
+                    onChange={(e) => {
+                        const value = Number(e.target.value.replace(/[^0-9]/g, ""));
+                        handleValueChange(value, "initiative");
+                    }}
+                    className={"initiative"}
+                />
+                <button
+                    title={"Toggle HP displayed on Map"}
+                    className={`toggle-button initiative-button`}
+                    onClick={() => {
+                        handleValueChange(Math.floor(Math.random() * 21), "initiative");
+                    }}
+                />
+            </div>
         </div>
     ) : props.data.hpBar ? (
         <div
@@ -366,8 +390,9 @@ const Content = () => {
             <div className={"player-wrapper headings"}>
                 <span>Name</span>
                 <span>Settings</span>
-                <span>HP / MAX</span>
+                <span className={"current-hp"}>HP / MAX</span>
                 <span className={"armor-class"}>AC</span>
+                <span className={"initiative-wrapper"}>INIT</span>
             </div>
             <DragDropContext onDragEnd={onDragEnd}>
                 <Droppable droppableId={"tokens"}>
