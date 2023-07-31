@@ -1,6 +1,6 @@
 import { createShape, createText, getAttachedItems, localItemsCache } from "./helpers.ts";
 import { characterMetadata, infoMetadata } from "./variables.ts";
-import OBR, { Item, Text, Shape, Image } from "@owlbear-rodeo/sdk";
+import OBR, { Item, Text, Shape } from "@owlbear-rodeo/sdk";
 import { Changes, HpTrackerMetadata, ShapeItemChanges, TextItemChanges } from "./types.ts";
 
 export const saveOrChangeShape = async (
@@ -9,7 +9,8 @@ export const saveOrChangeShape = async (
     attachments: Item[],
     changeMap: Map<string, ShapeItemChanges>
 ) => {
-    const width = (character as Image).image.width / 2;
+    const bounds = await OBR.scene.items.getItemBounds([character.id]);
+    const width = bounds.width;
     if (attachments.length > 0) {
         attachments.forEach((attachment) => {
             const shape = attachment as Shape;
@@ -21,7 +22,7 @@ export const saveOrChangeShape = async (
                 } else {
                     change.color = "red";
                 }
-                change.width = percentage === 0 ? 0 : width * percentage - 4;
+                change.width = percentage === 0 ? 0 : (width - 4) * percentage;
                 if (shape.width != change.width || shape.style.fillColor != change.color) {
                     changeMap.set(attachment.id, change);
                 }
@@ -82,7 +83,8 @@ export const handleOtherTextChanges = async (
     changeMap: Map<string, TextItemChanges>
 ) => {
     if (attachments.length > 0) {
-        const height = (character as Image).image.height / 4;
+        const bounds = await OBR.scene.items.getItemBounds([character.id]);
+        const height = bounds.height / 2;
         attachments.forEach((attachment) => {
             if (infoMetadata in attachment.metadata) {
                 const change = changeMap.get(attachment.id) ?? {};
@@ -109,8 +111,9 @@ export const handleOtherShapeChanges = async (
     attachments: Shape[],
     changeMap: Map<string, ShapeItemChanges>
 ) => {
-    const width = (character as Image).image.width / 2;
-    const height = (character as Image).image.height / 4;
+    const bounds = await OBR.scene.items.getItemBounds([character.id]);
+    const width = bounds.width;
+    const height = bounds.height / 2;
     const barHeight = 31;
     if (attachments.length > 0) {
         attachments.forEach((attachment) => {

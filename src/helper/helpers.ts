@@ -13,10 +13,11 @@ export const createText = async (text: string, id: string) => {
     const height = 0;
 
     if (items.length > 0) {
+        const bounds = await OBR.scene.items.getItemBounds([id]);
         const item = items[0] as Image;
         const position = {
             x: item.position.x - width / 2,
-            y: item.position.y + item.image.height / 4 - 47,
+            y: item.position.y + bounds.height / 2 - 47,
         };
 
         const textItem = buildText()
@@ -54,17 +55,18 @@ export const createText = async (text: string, id: string) => {
 };
 
 export const createShape = async (percentage: number, id: string) => {
-    let width = 200;
+    let width = 200; // default width if loading item fails
     const height = 31;
 
     const items = await OBR.scene.items.getItems([id]);
 
     if (items.length > 0) {
         const item = items[0] as Image;
-        width = item.image.width / 2;
+        const bounds = await OBR.scene.items.getItemBounds([item.id]);
+        width = bounds.width;
         const position = {
             x: item.position.x - width / 2,
-            y: item.position.y + item.image.height / 4 - height,
+            y: item.position.y + bounds.height / 2 - height,
         };
 
         const backgroundShape = buildShape()
@@ -83,7 +85,7 @@ export const createShape = async (percentage: number, id: string) => {
             .build();
 
         const hpShape = buildShape()
-            .width(percentage === 0 ? 0 : width * percentage - 4)
+            .width(percentage === 0 ? 0 : (width - 4) * percentage)
             .height(height - 4)
             .shapeType("RECTANGLE")
             .fillColor("red")
