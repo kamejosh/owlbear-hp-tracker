@@ -26,6 +26,12 @@ export const saveOrChangeShape = async (
                 if (shape.width != change.width || shape.style.fillColor != change.color) {
                     changeMap.set(attachment.id, change);
                 }
+            } else if (infoMetadata in attachment.metadata) {
+                const change = changeMap.get(attachment.id) ?? {};
+                if (shape.width != width) {
+                    change.width = width;
+                    changeMap.set(attachment.id, change);
+                }
             }
         });
     } else {
