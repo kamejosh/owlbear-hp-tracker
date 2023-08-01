@@ -21,7 +21,7 @@ export type SearchResult = {
         fly?: number;
         swim?: number;
     };
-    streng: number;
+    strength: number;
     dexterity: number;
     constitution: number;
     intelligence: number;
@@ -41,7 +41,7 @@ export type SearchResult = {
     damage_resistances: string;
     damage_immunities: string;
     condition_immunities: string;
-    sense: string;
+    senses: string;
     languages: string;
     challenge_rating: string;
     cr: string;
@@ -70,10 +70,29 @@ const fetchSearch = (search: string): Promise<Results<SearchResult>> => {
         });
 };
 
+const fetchMonster = (slug: string): Promise<SearchResult> => {
+    return axios
+        .request({
+            url: `${baseUrl}/${slug}`,
+            method: "GET",
+        })
+        .then((response) => {
+            return response.data as SearchResult;
+        });
+};
+
 export const useOpen5eSearch = (search: string) => {
     return useQuery<Results<SearchResult>>({
         queryKey: ["search", search],
         queryFn: () => fetchSearch(search),
         enabled: search !== "",
+    });
+};
+
+export const useGetOpen5eMonster = (slug: string) => {
+    return useQuery<SearchResult>({
+        queryKey: ["get", slug],
+        queryFn: () => fetchMonster(slug),
+        enabled: slug !== "",
     });
 };
