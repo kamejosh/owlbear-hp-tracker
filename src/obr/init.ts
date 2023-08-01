@@ -28,6 +28,7 @@ const initItems = async () => {
                     acOnMap: false,
                     hpBar: false,
                     initiative: 0,
+                    sheet: "",
                 };
                 item.metadata[characterMetadata] = initialMetadata;
             }
@@ -152,6 +153,7 @@ const setupContextMenu = async () => {
                                 acOnMap: false,
                                 hpBar: false,
                                 initiative: 0,
+                                sheet: "",
                             };
                             item.metadata[characterMetadata] = defaultMetadata;
                         }
@@ -179,9 +181,9 @@ const migrations = async () => {
 OBR.onReady(async () => {
     console.log(`HP Tracker version ${version} initializing`);
     setupContextMenu();
-    initTexts();
     OBR.scene.onReadyChange(async (isReady) => {
         if (isReady) {
+            initTexts();
             migrations();
             initItems();
             initScene();

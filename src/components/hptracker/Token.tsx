@@ -3,6 +3,7 @@ import { usePlayerContext } from "../../context/PlayerContext.ts";
 import React, { MouseEvent, useEffect, useState } from "react";
 import OBR from "@owlbear-rodeo/sdk";
 import { characterMetadata } from "../../helper/variables.ts";
+import { useCharSheet } from "../../context/CharacterContext.ts";
 
 type TokenProps = {
     id: string;
@@ -13,6 +14,7 @@ export const Token = (props: TokenProps) => {
     const [data, setData] = useState<HpTrackerMetadata>(props.data);
     const playerContext = usePlayerContext();
     const [editName, setEditName] = useState<boolean>(false);
+    const { setId } = useCharSheet();
 
     useEffect(() => {
         setData(props.data);
@@ -228,6 +230,7 @@ export const Token = (props: TokenProps) => {
                     }}
                 />
             </div>
+            <button className={"toggle-button info-button"} onClick={() => setId(props.id)} />
         </div>
     ) : props.data.hpBar ? (
         <div

@@ -7,6 +7,8 @@ import { HpTrackerMetadata } from "../../helper/types.ts";
 import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd";
 import "./hp-tracker.scss";
 import { DraggableTokenList, PlayerTokenList } from "./TokenList.tsx";
+import { useCharSheet } from "../../context/CharacterContext.ts";
+import { CharacterSheet } from "./charactersheet/CharacterSheet.tsx";
 
 export const HPTracker = () => {
     return (
@@ -20,6 +22,7 @@ const Content = () => {
     const playerContext = usePlayerContext();
     const [tokens, setTokens] = useState<Item[] | undefined>(undefined);
     const [isReady, setIsReady] = useState<boolean>(false);
+    const { characterId } = useCharSheet();
 
     const initHpTracker = async () => {
         const initialItems = await OBR.scene.items.getItems(
@@ -96,30 +99,35 @@ const Content = () => {
     };
 
     return playerContext.role ? (
-        <div className={"hp-tracker"}>
-            <h1 className={"title"}>HP Tracker</h1>
-            <div className={"player-wrapper headings"}>
-                <span>Name</span>
-                <span>Settings</span>
-                <span className={"current-hp"}>HP / MAX</span>
-                <span className={"armor-class"}>AC</span>
-                <span className={"initiative-wrapper"}>INIT</span>
+        characterId ? (
+            <CharacterSheet />
+        ) : (
+            <div className={"hp-tracker"}>
+                <h1 className={"title"}>HP Tracker</h1>
+                <div className={"player-wrapper headings"}>
+                    <span>Name</span>
+                    <span>Settings</span>
+                    <span className={"current-hp"}>HP / MAX</span>
+                    <span className={"armor-class"}>AC</span>
+                    <span className={"initiative-wrapper"}>INIT</span>
+                    <span className={"character-sheet"}>INFO</span>
+                </div>
+                {playerContext.role === "GM" ? (
+                    <DragDropContext onDragEnd={onDragEnd}>
+                        <Droppable droppableId={"tokens"}>
+                            {(provided) => (
+                                <div ref={provided.innerRef} {...provided.droppableProps}>
+                                    <DraggableTokenList tokens={sortedTokens} />
+                                    {provided.placeholder}
+                                </div>
+                            )}
+                        </Droppable>
+                    </DragDropContext>
+                ) : (
+                    <PlayerTokenList tokens={tokens ?? []} />
+                )}
             </div>
-            {playerContext.role === "GM" ? (
-                <DragDropContext onDragEnd={onDragEnd}>
-                    <Droppable droppableId={"tokens"}>
-                        {(provided) => (
-                            <div ref={provided.innerRef} {...provided.droppableProps}>
-                                <DraggableTokenList tokens={sortedTokens} />
-                                {provided.placeholder}
-                            </div>
-                        )}
-                    </Droppable>
-                </DragDropContext>
-            ) : (
-                <PlayerTokenList tokens={tokens ?? []} />
-            )}
-        </div>
+        )
     ) : (
         <h1>Waiting for OBR startup</h1>
     );
