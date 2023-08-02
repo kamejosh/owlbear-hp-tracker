@@ -1,6 +1,6 @@
 ---
 title: HP Tracker
-description: A Tool that keeps track of the HP of each Character Token where enabled
+description: A Tool that keeps track of the Character Stats of each Token where enabled 
 author: Joshua Hercher
 image: https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/HP_Tracker.png
 icon: https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/public/icon.svg
@@ -14,10 +14,12 @@ learn-more: https://github.com/kamejosh/owlbear-hp-tracker
 
 # HP Tracker
 
-A Tool to keep track of the HP of Character Tokens. With visibility options to hide information from players (like Boss HP).
+A Tool to keep track of the HP/AC/Initiative of Character Tokens. With visibility options to hide information from players (like Boss HP).
 
-With this tool the HP for each Token can be setup. Max HP and current HP can be entered and displayed in the Tool Window, where all current activated HP are visible. 
+Add Monster Sheets (using the Open5e API) to your monster tokens, with easy search and click. To have all stats and a bilities on one screen. 
 
-For each Token there is a setting to hide the HP in the Tool window from the players (default) and show the HP information beneath the Token on the Map (follows player visibility setting).
+You can hide or display only an HP Bar to indicate the HP Status without revealing too much information, or hide all information entirely from your characters.
 
-The HP changes can be made in the Tool window and are reflected in both the settings popover and the info text beneath the token.
+Reordering the Tokenlist via Drag and Drop (for GMs only) is possible, without changing the order in the list visible by the player.
+
+For activated Tokens the HP can be changed directly in the context menu of the Token (also for multiple tokens at the same time).

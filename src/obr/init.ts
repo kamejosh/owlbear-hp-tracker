@@ -6,7 +6,7 @@ import { migrate105To106 } from "../migrations/v106.ts";
 import { compare } from "compare-versions";
 import { HpTrackerMetadata, SceneMetadata } from "../helper/types.ts";
 
-const version = "1.0.7";
+const version = "1.1.0";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -27,6 +27,8 @@ const initItems = async () => {
                     hpOnMap: false,
                     acOnMap: false,
                     hpBar: false,
+                    initiative: 0,
+                    sheet: "",
                 };
                 item.metadata[characterMetadata] = initialMetadata;
             }
@@ -41,11 +43,10 @@ const initItems = async () => {
  * is changed.
  *
  */
-const initTexts = async () => {
+const initLocalItems = async () => {
     const role = await OBR.player.getRole();
-    // Triggers everytime any item is changed
-    OBR.scene.items.onChange(async (items) => {
-        // But we only care about Character Items
+
+    const updateScene = async (items: Item[]) => {
         const characters = items.filter((item) => item.layer === "CHARACTER");
         const changes = await prepareDisplayChanges(characters, role);
 
@@ -92,6 +93,17 @@ const initTexts = async () => {
                 });
             });
         }
+    };
+
+    const sceneItems = await OBR.scene.items.getItems(
+        (item) => item.layer === "CHARACTER" && characterMetadata in item.metadata
+    );
+    await updateScene(sceneItems);
+
+    // Triggers everytime any item is changed
+    OBR.scene.items.onChange(async (items) => {
+        // But we only care about Character Items
+        await updateScene(items);
     });
 };
 
@@ -102,7 +114,67 @@ const initScene = async () => {
 };
 
 const setupContextMenu = async () => {
-    return OBR.contextMenu.create({
+    await OBR.contextMenu.create({
+        id: `${ID}/plus`,
+        icons: [
+            {
+                icon: "/plus.svg",
+                label: "Increase HP",
+                filter: {
+                    every: [
+                        { key: "layer", value: "CHARACTER" },
+                        {
+                            key: ["metadata", `${characterMetadata}`, "hpTrackerActive"],
+                            value: true,
+                        },
+                    ],
+                    roles: ["GM"],
+                },
+            },
+        ],
+        onClick: async (context) => {
+            OBR.scene.items.updateItems(context.items, (items) => {
+                items.forEach((item) => {
+                    if (characterMetadata in item.metadata) {
+                        const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
+                        metadata.hp = Math.min(metadata.hp + 1, metadata.maxHp);
+                        item.metadata[characterMetadata] = { ...metadata };
+                    }
+                });
+            });
+        },
+    });
+    await OBR.contextMenu.create({
+        id: `${ID}/minus`,
+        icons: [
+            {
+                icon: "/minus.svg",
+                label: "Decrease HP",
+                filter: {
+                    every: [
+                        { key: "layer", value: "CHARACTER" },
+                        {
+                            key: ["metadata", `${characterMetadata}`, "hpTrackerActive"],
+                            value: true,
+                        },
+                    ],
+                    roles: ["GM"],
+                },
+            },
+        ],
+        onClick: (context) => {
+            OBR.scene.items.updateItems(context.items, (items) => {
+                items.forEach((item) => {
+                    if (characterMetadata in item.metadata) {
+                        const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
+                        metadata.hp = Math.max(metadata.hp - 1, 0);
+                        item.metadata[characterMetadata] = { ...metadata };
+                    }
+                });
+            });
+        },
+    });
+    await OBR.contextMenu.create({
         id: `${ID}/tool`,
         icons: [
             {
@@ -150,6 +222,8 @@ const setupContextMenu = async () => {
                                 hpOnMap: false,
                                 acOnMap: false,
                                 hpBar: false,
+                                initiative: 0,
+                                sheet: "",
                             };
                             item.metadata[characterMetadata] = defaultMetadata;
                         }
@@ -174,15 +248,33 @@ const migrations = async () => {
     }
 };
 
+const delay = (ms: number) => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
+const initLocalLoop = async () => {
+    let initialized = false;
+    while (!initialized) {
+        try {
+            await initLocalItems();
+            initialized = true;
+        } catch {
+            await delay(1000);
+        }
+    }
+};
+
 OBR.onReady(async () => {
     console.log(`HP Tracker version ${version} initializing`);
-    setupContextMenu();
-    initTexts();
-    OBR.scene.onReadyChange(async (isReady) => {
+    await setupContextMenu();
+    try {
+        await initLocalLoop();
+    } catch {}
+    await OBR.scene.onReadyChange(async (isReady) => {
         if (isReady) {
-            migrations();
-            initItems();
-            initScene();
+            await migrations();
+            await initItems();
+            await initScene();
         }
     });
 });

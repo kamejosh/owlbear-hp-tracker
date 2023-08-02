@@ -13,10 +13,11 @@ export const createText = async (text: string, id: string) => {
     const height = 0;
 
     if (items.length > 0) {
+        const bounds = await OBR.scene.items.getItemBounds([id]);
         const item = items[0] as Image;
         const position = {
             x: item.position.x - width / 2,
-            y: item.position.y + 10,
+            y: item.position.y + bounds.height / 2 - 47,
         };
 
         const textItem = buildText()
@@ -54,16 +55,18 @@ export const createText = async (text: string, id: string) => {
 };
 
 export const createShape = async (percentage: number, id: string) => {
-    const width = 200;
+    let width = 200; // default width if loading item fails
     const height = 31;
 
     const items = await OBR.scene.items.getItems([id]);
 
     if (items.length > 0) {
         const item = items[0] as Image;
+        const bounds = await OBR.scene.items.getItemBounds([item.id]);
+        width = bounds.width;
         const position = {
             x: item.position.x - width / 2,
-            y: item.position.y + 26,
+            y: item.position.y + bounds.height / 2 - height,
         };
 
         const backgroundShape = buildShape()
@@ -71,7 +74,9 @@ export const createShape = async (percentage: number, id: string) => {
             .height(height)
             .shapeType("RECTANGLE")
             .fillColor("black")
+            .fillOpacity(0.5)
             .strokeColor("black")
+            .strokeOpacity(0.5)
             .position(position)
             .attachedTo(id)
             .layer("ATTACHMENT")
@@ -80,11 +85,13 @@ export const createShape = async (percentage: number, id: string) => {
             .build();
 
         const hpShape = buildShape()
-            .width(percentage === 0 ? 0 : width * percentage - 4)
+            .width(percentage === 0 ? 0 : (width - 4) * percentage)
             .height(height - 4)
             .shapeType("RECTANGLE")
             .fillColor("red")
+            .fillOpacity(0.5)
             .strokeWidth(0)
+            .strokeOpacity(0)
             .position({ x: position.x + 2, y: position.y + 2 })
             .attachedTo(id)
             .layer("ATTACHMENT")
