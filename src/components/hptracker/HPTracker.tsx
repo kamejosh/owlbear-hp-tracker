@@ -104,9 +104,9 @@ const Content = () => {
         ) : (
             <div className={"hp-tracker"}>
                 <h1 className={"title"}>HP Tracker</h1>
-                <div className={"player-wrapper headings"}>
+                <div className={`player-wrapper headings ${playerContext.role === "PLAYER" ? "player" : ""}`}>
                     <span>Name</span>
-                    <span>Settings</span>
+                    {playerContext.role === "GM" ? <span>Settings</span> : null}
                     <span className={"current-hp"}>HP / MAX</span>
                     <span className={"armor-class"}>AC</span>
                     <span className={"initiative-wrapper"}>INIT</span>

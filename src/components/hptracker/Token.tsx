@@ -4,6 +4,7 @@ import React, { MouseEvent, useEffect, useState } from "react";
 import OBR from "@owlbear-rodeo/sdk";
 import { characterMetadata } from "../../helper/variables.ts";
 import { useCharSheet } from "../../context/CharacterContext.ts";
+import { useGetOpen5eMonster } from "../../open5e/useOpen5e.ts";
 
 type TokenProps = {
     id: string;
@@ -15,6 +16,10 @@ export const Token = (props: TokenProps) => {
     const playerContext = usePlayerContext();
     const [editName, setEditName] = useState<boolean>(false);
     const { setId } = useCharSheet();
+
+    const sheetQuery = useGetOpen5eMonster(data.sheet ?? "");
+
+    const sheetData = sheetQuery.isSuccess ? sheetQuery.data : null;
 
     useEffect(() => {
         setData(props.data);
@@ -95,7 +100,7 @@ export const Token = (props: TokenProps) => {
 
     return display() ? (
         <div
-            className={"player-wrapper"}
+            className={`player-wrapper ${playerContext.role === "PLAYER" ? "player" : ""}`}
             style={{ background: `linear-gradient(to right, ${getBgColor()}, #242424 50%, #242424 )` }}
         >
             <div className={"player-name"}>
@@ -120,40 +125,38 @@ export const Token = (props: TokenProps) => {
                 )}
                 <button className={`edit ${editName ? "on" : "off"}`} onClick={() => setEditName(!editName)}></button>
             </div>
-            <div className={"settings"}>
-                {playerContext.role === "GM" ? (
-                    <>
-                        <button
-                            title={"Toggle HP Display Mode for Character"}
-                            className={`toggle-button hp ${data.hpBar ? "on" : "off"}`}
-                            onClick={() => {
-                                handleValueChange(!data.hpBar, "hpBar");
-                            }}
-                        ></button>
-                        <button
-                            title={"Toggle HP displayed on Map"}
-                            className={`toggle-button map ${data.hpOnMap ? "on" : "off"}`}
-                            onClick={() => {
-                                handleValueChange(!data.hpOnMap, "hpOnMap");
-                            }}
-                        ></button>
-                        <button
-                            title={"Toggle AC visible on Map"}
-                            className={`toggle-button ac ${data.acOnMap ? "on" : "off"}`}
-                            onClick={() => {
-                                handleValueChange(!data.acOnMap, "acOnMap");
-                            }}
-                        ></button>
-                        <button
-                            title={"Toggle HP visible for players"}
-                            className={`toggle-button players ${data.canPlayersSee ? "on" : "off"}`}
-                            onClick={() => {
-                                handleValueChange(!data.canPlayersSee, "players");
-                            }}
-                        ></button>{" "}
-                    </>
-                ) : null}
-            </div>
+            {playerContext.role === "GM" ? (
+                <div className={"settings"}>
+                    <button
+                        title={"Toggle HP Display Mode for Character"}
+                        className={`toggle-button hp ${data.hpBar ? "on" : "off"}`}
+                        onClick={() => {
+                            handleValueChange(!data.hpBar, "hpBar");
+                        }}
+                    ></button>
+                    <button
+                        title={"Toggle HP displayed on Map"}
+                        className={`toggle-button map ${data.hpOnMap ? "on" : "off"}`}
+                        onClick={() => {
+                            handleValueChange(!data.hpOnMap, "hpOnMap");
+                        }}
+                    ></button>
+                    <button
+                        title={"Toggle AC visible on Map"}
+                        className={`toggle-button ac ${data.acOnMap ? "on" : "off"}`}
+                        onClick={() => {
+                            handleValueChange(!data.acOnMap, "acOnMap");
+                        }}
+                    ></button>
+                    <button
+                        title={"Toggle HP visible for players"}
+                        className={`toggle-button players ${data.canPlayersSee ? "on" : "off"}`}
+                        onClick={() => {
+                            handleValueChange(!data.canPlayersSee, "players");
+                        }}
+                    ></button>{" "}
+                </div>
+            ) : null}
             <div className={"current-hp"}>
                 <input
                     type={"text"}
@@ -226,7 +229,11 @@ export const Token = (props: TokenProps) => {
                     title={"Toggle HP displayed on Map"}
                     className={`toggle-button initiative-button`}
                     onClick={() => {
-                        handleValueChange(Math.floor(Math.random() * 21), "initiative");
+                        let dexBonus = 0;
+                        if (sheetData) {
+                            dexBonus = Math.floor((sheetData.dexterity - 10) / 2);
+                        }
+                        handleValueChange(Math.floor(Math.random() * 21) + dexBonus, "initiative");
                     }}
                 />
             </div>
@@ -234,7 +241,7 @@ export const Token = (props: TokenProps) => {
         </div>
     ) : props.data.hpBar ? (
         <div
-            className={"player-wrapper"}
+            className={"player-wrapper player"}
             style={{ background: `linear-gradient(to right, ${getBgColor()}, #242424 50%, #242424 )` }}
         >
             <div className={"player-name"}>

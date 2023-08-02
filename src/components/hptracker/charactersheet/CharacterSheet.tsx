@@ -5,6 +5,7 @@ import OBR, { Item } from "@owlbear-rodeo/sdk";
 import { characterMetadata } from "../../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../../helper/types.ts";
 import { SearchResult, useGetOpen5eMonster, useOpen5eSearch } from "../../../open5e/useOpen5e.ts";
+import { usePlayerContext } from "../../../context/PlayerContext.ts";
 
 export const Open5eSheet = ({ slug }: { slug: string }) => {
     const { characterId } = useCharSheet();
@@ -155,6 +156,7 @@ const SearchResult = ({ entries }: { entries: Array<SearchResult> }) => {
 
 export const CharacterSheet = () => {
     const { characterId, setId } = useCharSheet();
+    const playerContext = usePlayerContext();
     const [token, setToken] = useState<Item | null>(null);
     const [data, setData] = useState<HpTrackerMetadata | null>(null);
     const [search, setSearch] = useState<string>("");
@@ -208,30 +210,32 @@ export const CharacterSheet = () => {
             {token && data ? (
                 <div className={"content"}>
                     <h2>{data.name}</h2>
-                    <div className={"search-wrapper"}>
-                        <input
-                            ref={searchRef}
-                            type={"text"}
-                            defaultValue={data.name}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                    setSearch(e.currentTarget.value);
+                    {playerContext.role === "GM" ? (
+                        <div className={"search-wrapper"}>
+                            <input
+                                ref={searchRef}
+                                type={"text"}
+                                defaultValue={data.name}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        setSearch(e.currentTarget.value);
+                                        setForceSearch(true);
+                                    }
+                                }}
+                                onBlur={(e) => {
+                                    setSearch(e.target.value);
                                     setForceSearch(true);
-                                }
-                            }}
-                            onBlur={(e) => {
-                                setSearch(e.target.value);
-                                setForceSearch(true);
-                            }}
-                        />
-                        <button
-                            className={"only-icon search"}
-                            onClick={() => {
-                                setForceSearch(true);
-                                setSearch(searchRef.current!.value);
-                            }}
-                        />
-                    </div>
+                                }}
+                            />
+                            <button
+                                className={"only-icon search"}
+                                onClick={() => {
+                                    setForceSearch(true);
+                                    setSearch(searchRef.current!.value);
+                                }}
+                            />
+                        </div>
+                    ) : null}
                     {data.sheet && !forceSearch ? (
                         <Open5eSheet slug={data.sheet} />
                     ) : search !== "" && characterSheetQuery.isSuccess && characterSheetQuery.data ? (
