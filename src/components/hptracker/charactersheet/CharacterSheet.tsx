@@ -143,6 +143,8 @@ const SearchResult = ({ entries }: { entries: Array<SearchResult> }) => {
                 return (
                     <li className={"search-result"} key={entry.slug} onClick={() => setSheet(entry.slug)}>
                         <span>{entry.name}</span>
+                        <span>HP: {entry.hit_points}</span>
+                        <span>AC: {entry.armor_class}</span>
                         <span>CR: {entry.cr}</span>
                     </li>
                 );

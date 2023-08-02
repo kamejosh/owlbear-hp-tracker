@@ -62,13 +62,23 @@
         .search-results {
             display: flex;
             flex-direction: column;
+            padding: 0;
 
             .search-result {
-                display: flex;
+                display: grid;
+                grid-template-columns: 1fr repeat(3, 0.5fr);
                 justify-content: space-between;
                 gap: 10px;
                 cursor: pointer;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
                 padding: 2px;
+                text-align: left;
+
+                > * {
+                    &:not(:first-child) {
+                        text-align: right;
+                    }
+                }
 
                 &:hover {
                     box-shadow: -5px 5px 20px #00000059;
