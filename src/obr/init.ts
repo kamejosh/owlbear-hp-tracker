@@ -104,7 +104,67 @@ const initScene = async () => {
 };
 
 const setupContextMenu = async () => {
-    return OBR.contextMenu.create({
+    await OBR.contextMenu.create({
+        id: `${ID}/plus`,
+        icons: [
+            {
+                icon: "/plus.svg",
+                label: "Increase HP",
+                filter: {
+                    every: [
+                        { key: "layer", value: "CHARACTER" },
+                        {
+                            key: ["metadata", `${characterMetadata}`, "hpTrackerActive"],
+                            value: true,
+                        },
+                    ],
+                    roles: ["GM"],
+                },
+            },
+        ],
+        onClick: async (context) => {
+            OBR.scene.items.updateItems(context.items, (items) => {
+                items.forEach((item) => {
+                    if (characterMetadata in item.metadata) {
+                        const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
+                        metadata.hp = Math.min(metadata.hp + 1, metadata.maxHp);
+                        item.metadata[characterMetadata] = { ...metadata };
+                    }
+                });
+            });
+        },
+    });
+    await OBR.contextMenu.create({
+        id: `${ID}/minus`,
+        icons: [
+            {
+                icon: "/minus.svg",
+                label: "Decrease HP",
+                filter: {
+                    every: [
+                        { key: "layer", value: "CHARACTER" },
+                        {
+                            key: ["metadata", `${characterMetadata}`, "hpTrackerActive"],
+                            value: true,
+                        },
+                    ],
+                    roles: ["GM"],
+                },
+            },
+        ],
+        onClick: (context) => {
+            OBR.scene.items.updateItems(context.items, (items) => {
+                items.forEach((item) => {
+                    if (characterMetadata in item.metadata) {
+                        const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
+                        metadata.hp = Math.max(metadata.hp - 1, 0);
+                        item.metadata[characterMetadata] = { ...metadata };
+                    }
+                });
+            });
+        },
+    });
+    await OBR.contextMenu.create({
         id: `${ID}/tool`,
         icons: [
             {
@@ -180,10 +240,10 @@ const migrations = async () => {
 
 OBR.onReady(async () => {
     console.log(`HP Tracker version ${version} initializing`);
-    setupContextMenu();
+    await setupContextMenu();
+    await initTexts();
     OBR.scene.onReadyChange(async (isReady) => {
         if (isReady) {
-            initTexts();
             migrations();
             initItems();
             initScene();
