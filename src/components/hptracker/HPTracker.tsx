@@ -26,12 +26,20 @@ const Content = () => {
 
     const initHpTracker = async () => {
         const initialItems = await OBR.scene.items.getItems(
-            (item) => item.layer === "CHARACTER" && characterMetadata in item.metadata
+            (item) =>
+                item.layer === "CHARACTER" &&
+                characterMetadata in item.metadata &&
+                (item.metadata[characterMetadata] as HpTrackerMetadata).hpTrackerActive
         );
         setTokens(initialItems);
 
         OBR.scene.items.onChange(async (items) => {
-            const filteredItems = items.filter((item) => item.layer === "CHARACTER");
+            const filteredItems = items.filter(
+                (item) =>
+                    item.layer === "CHARACTER" &&
+                    characterMetadata in item.metadata &&
+                    (item.metadata[characterMetadata] as HpTrackerMetadata).hpTrackerActive
+            );
             setTokens(Array.from(filteredItems));
         });
     };
@@ -53,7 +61,7 @@ const Content = () => {
         }
     }, [isReady]);
 
-    const sortedTokens = Array.from(tokens ?? []).sort((a, b) => {
+    const sortItems = (a: Item, b: Item) => {
         const aData = a.metadata[characterMetadata] as HpTrackerMetadata;
         const bData = b.metadata[characterMetadata] as HpTrackerMetadata;
         if (aData && bData && aData.index !== undefined && bData.index !== undefined) {
@@ -66,10 +74,21 @@ const Content = () => {
             }
         }
         return 0;
-    });
+    };
+
+    const sortedTokens = Array.from(tokens ?? []).sort(sortItems);
+
+    /*    const listInfo = (list: Array<Item>) => {
+        return list.map((token) => {
+            const data = token.metadata[characterMetadata] as HpTrackerMetadata;
+
+            return [data.name, data.index];
+        });
+    };*/
 
     const reorder = (list: Item[], startIndex: number, endIndex: number) => {
         const result = Array.from(list);
+        result.sort(sortItems);
         const [removed] = result.splice(startIndex, 1);
         result.splice(endIndex, 0, removed);
         const tokens = result.filter((item) => item !== undefined);
@@ -78,12 +97,11 @@ const Content = () => {
             items.forEach((item, index) => {
                 const data = item.metadata[characterMetadata] as HpTrackerMetadata;
                 data.index = index;
+                console.log(data.name, index);
 
                 item.metadata[characterMetadata] = { ...data };
             });
         });
-
-        return tokens;
     };
 
     const onDragEnd = (result: DropResult) => {

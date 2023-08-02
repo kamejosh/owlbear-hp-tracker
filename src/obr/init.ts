@@ -6,7 +6,7 @@ import { migrate105To106 } from "../migrations/v106.ts";
 import { compare } from "compare-versions";
 import { HpTrackerMetadata, SceneMetadata } from "../helper/types.ts";
 
-const version = "1.0.7";
+const version = "1.1.0";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -43,11 +43,10 @@ const initItems = async () => {
  * is changed.
  *
  */
-const initTexts = async () => {
+const initLocalItems = async () => {
     const role = await OBR.player.getRole();
-    // Triggers everytime any item is changed
-    OBR.scene.items.onChange(async (items) => {
-        // But we only care about Character Items
+
+    const updateScene = async (items: Item[]) => {
         const characters = items.filter((item) => item.layer === "CHARACTER");
         const changes = await prepareDisplayChanges(characters, role);
 
@@ -94,6 +93,17 @@ const initTexts = async () => {
                 });
             });
         }
+    };
+
+    const sceneItems = await OBR.scene.items.getItems(
+        (item) => item.layer === "CHARACTER" && characterMetadata in item.metadata
+    );
+    await updateScene(sceneItems);
+
+    // Triggers everytime any item is changed
+    OBR.scene.items.onChange(async (items) => {
+        // But we only care about Character Items
+        await updateScene(items);
     });
 };
 
@@ -238,15 +248,35 @@ const migrations = async () => {
     }
 };
 
+const delay = (ms: number) => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
+const initLocalLoop = async () => {
+    let initialized = false;
+    while (!initialized) {
+        try {
+            await initLocalItems();
+            initialized = true;
+        } catch (e) {
+            console.log(e);
+            await delay(1000);
+        }
+    }
+};
+
 OBR.onReady(async () => {
     console.log(`HP Tracker version ${version} initializing`);
     await setupContextMenu();
-    await initTexts();
-    OBR.scene.onReadyChange(async (isReady) => {
+    try {
+        await initLocalLoop();
+    } catch {}
+    await OBR.scene.onReadyChange(async (isReady) => {
+        console.log(isReady);
         if (isReady) {
-            migrations();
-            initItems();
-            initScene();
+            await migrations();
+            await initItems();
+            await initScene();
         }
     });
 });
