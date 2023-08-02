@@ -258,8 +258,7 @@ const initLocalLoop = async () => {
         try {
             await initLocalItems();
             initialized = true;
-        } catch (e) {
-            console.log(e);
+        } catch {
             await delay(1000);
         }
     }

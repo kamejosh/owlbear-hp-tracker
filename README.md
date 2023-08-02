@@ -26,6 +26,8 @@ Also when clicking on the name of a character the icon is tilted a little to mak
 
 In the Context Menu the Active state of the Token in the HP Tracker Extension is toggled
 
+When active two additional context menu items are available to increase or decrease the HP of the selected Token/s.
+
 ### Hp Tracker background Tasks
 
 Handle setting defaults and subscribing and handling HP changes so they are propagated properly across all Views.
@@ -35,7 +37,7 @@ Handle setting defaults and subscribing and handling HP changes so they are prop
 The Extension is currently released as MVP. There is still a list of features that will be added in the coming weeks/months/years (suggestions welcome).
 
 + UI Improvements: It's not the prettiest yet but we'll get there
-+ Add character state chaanges (prone, sleep, poison,...)
++ Add character state changes (prone, sleep, poison,...)
 + Death Save tracking
 + ...
 
