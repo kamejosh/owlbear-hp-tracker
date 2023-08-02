@@ -97,7 +97,6 @@ const Content = () => {
             items.forEach((item, index) => {
                 const data = item.metadata[characterMetadata] as HpTrackerMetadata;
                 data.index = index;
-                console.log(data.name, index);
 
                 item.metadata[characterMetadata] = { ...data };
             });

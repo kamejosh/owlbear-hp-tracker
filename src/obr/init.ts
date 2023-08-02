@@ -271,7 +271,6 @@ OBR.onReady(async () => {
         await initLocalLoop();
     } catch {}
     await OBR.scene.onReadyChange(async (isReady) => {
-        console.log(isReady);
         if (isReady) {
             await migrations();
             await initItems();
