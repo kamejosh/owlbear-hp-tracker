@@ -133,28 +133,28 @@ export const Token = (props: TokenProps) => {
                         onClick={() => {
                             handleValueChange(!data.hpBar, "hpBar");
                         }}
-                    ></button>
+                    />
                     <button
                         title={"Toggle HP displayed on Map"}
                         className={`toggle-button map ${data.hpOnMap ? "on" : "off"}`}
                         onClick={() => {
                             handleValueChange(!data.hpOnMap, "hpOnMap");
                         }}
-                    ></button>
+                    />
                     <button
                         title={"Toggle AC visible on Map"}
                         className={`toggle-button ac ${data.acOnMap ? "on" : "off"}`}
                         onClick={() => {
                             handleValueChange(!data.acOnMap, "acOnMap");
                         }}
-                    ></button>
+                    />
                     <button
                         title={"Toggle HP visible for players"}
                         className={`toggle-button players ${data.canPlayersSee ? "on" : "off"}`}
                         onClick={() => {
                             handleValueChange(!data.canPlayersSee, "players");
                         }}
-                    ></button>{" "}
+                    />{" "}
                 </div>
             ) : null}
             <div className={"current-hp"}>

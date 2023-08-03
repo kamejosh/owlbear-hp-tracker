@@ -9,6 +9,7 @@ import "./hp-tracker.scss";
 import { DraggableTokenList, PlayerTokenList } from "./TokenList.tsx";
 import { useCharSheet } from "../../context/CharacterContext.ts";
 import { CharacterSheet } from "./charactersheet/CharacterSheet.tsx";
+import { GlobalSettings } from "./globalsettings/GlobalSettings.tsx";
 
 export const HPTracker = () => {
     return (
@@ -121,6 +122,7 @@ const Content = () => {
         ) : (
             <div className={"hp-tracker"}>
                 <h1 className={"title"}>HP Tracker</h1>
+                {playerContext.role === "GM" ? <GlobalSettings /> : null}
                 <div className={`player-wrapper headings ${playerContext.role === "PLAYER" ? "player" : ""}`}>
                     <span>Name</span>
                     {playerContext.role === "GM" ? <span>Settings</span> : null}

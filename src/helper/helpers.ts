@@ -1,5 +1,6 @@
-import OBR, { buildShape, buildText, Image, Item } from "@owlbear-rodeo/sdk";
-import { infoMetadata } from "./variables.ts";
+import OBR, { buildShape, buildText, Image, Item, Metadata } from "@owlbear-rodeo/sdk";
+import { infoMetadata, sceneMetadata } from "./variables.ts";
+import { HpTrackerMetadata, SceneMetadata } from "./types.ts";
 
 export const localItemsCache = {
     items: Array<Item>(),
@@ -11,13 +12,16 @@ export const createText = async (text: string, id: string) => {
     const width = 400;
     // height is zero, so we're not in the way when trying to move the character icon
     const height = 0;
+    let offset = (((await OBR.scene.getMetadata()) as Metadata)[sceneMetadata] as SceneMetadata).hpBarOffset ?? 0;
 
     if (items.length > 0) {
         const bounds = await OBR.scene.items.getItemBounds([id]);
         const item = items[0] as Image;
+        const offsetFactor = bounds.height / 150;
+        offset *= offsetFactor;
         const position = {
             x: item.position.x - width / 2,
-            y: item.position.y + bounds.height / 2 - 47,
+            y: item.position.y + bounds.height / 2 - 47 + offset,
         };
 
         const textItem = buildText()
@@ -55,22 +59,22 @@ export const createText = async (text: string, id: string) => {
 };
 
 export const createShape = async (percentage: number, id: string) => {
-    let width = 200; // default width if loading item fails
     const height = 31;
-
+    let offset = (((await OBR.scene.getMetadata()) as Metadata)[sceneMetadata] as SceneMetadata).hpBarOffset ?? 0;
     const items = await OBR.scene.items.getItems([id]);
 
     if (items.length > 0) {
         const item = items[0] as Image;
         const bounds = await OBR.scene.items.getItemBounds([item.id]);
-        width = bounds.width;
+        const offsetFactor = bounds.height / 150;
+        offset *= offsetFactor;
         const position = {
-            x: item.position.x - width / 2,
-            y: item.position.y + bounds.height / 2 - height,
+            x: item.position.x - bounds.width / 2,
+            y: item.position.y + bounds.height / 2 - height + offset,
         };
 
         const backgroundShape = buildShape()
-            .width(width)
+            .width(bounds.width)
             .height(height)
             .shapeType("RECTANGLE")
             .fillColor("black")
@@ -85,7 +89,7 @@ export const createShape = async (percentage: number, id: string) => {
             .build();
 
         const hpShape = buildShape()
-            .width(percentage === 0 ? 0 : (width - 4) * percentage)
+            .width(percentage === 0 ? 0 : (bounds.width - 4) * percentage)
             .height(height - 4)
             .shapeType("RECTANGLE")
             .fillColor("red")
@@ -122,4 +126,19 @@ export const getAttachedItems = async (id: string, itemType: string) => {
     });
 
     return attachments;
+};
+
+export const calculatePercentage = async (data: HpTrackerMetadata) => {
+    const segments = (((await OBR.scene.getMetadata()) as Metadata)[sceneMetadata] as SceneMetadata).hpBarSegments ?? 0;
+
+    const percentage = data.maxHp === 0 || data.hp === 0 ? 0 : data.hp / data.maxHp;
+
+    if (segments === 0) {
+        return percentage;
+    } else {
+        const minStep = 100 / segments;
+        const numSteps = Math.ceil((percentage * 100) / minStep);
+        const adjustedPercentage = (numSteps * minStep) / 100;
+        return adjustedPercentage;
+    }
 };

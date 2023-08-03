@@ -19,6 +19,8 @@ export type HpTextMetadata = {
 
 export type SceneMetadata = {
     version: string;
+    hpBarSegments?: number;
+    hpBarOffset?: number;
     activeTokens: [];
 };
 

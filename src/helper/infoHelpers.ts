@@ -1,7 +1,7 @@
-import { createShape, createText, getAttachedItems, localItemsCache } from "./helpers.ts";
-import { characterMetadata, infoMetadata } from "./variables.ts";
-import OBR, { Item, Text, Shape } from "@owlbear-rodeo/sdk";
-import { Changes, HpTrackerMetadata, ShapeItemChanges, TextItemChanges } from "./types.ts";
+import { calculatePercentage, createShape, createText, getAttachedItems, localItemsCache } from "./helpers.ts";
+import { characterMetadata, infoMetadata, sceneMetadata } from "./variables.ts";
+import OBR, { Item, Text, Shape, Metadata } from "@owlbear-rodeo/sdk";
+import { Changes, HpTrackerMetadata, SceneMetadata, ShapeItemChanges, TextItemChanges } from "./types.ts";
 
 export const saveOrChangeShape = async (
     character: Item,
@@ -11,31 +11,34 @@ export const saveOrChangeShape = async (
 ) => {
     const bounds = await OBR.scene.items.getItemBounds([character.id]);
     const width = bounds.width;
-    if (attachments.length > 0) {
-        attachments.forEach((attachment) => {
-            const shape = attachment as Shape;
-            if (attachment.name === "hp" && infoMetadata in attachment.metadata) {
-                const change = changeMap.get(attachment.id) ?? {};
-                const percentage = data.maxHp === 0 || data.hp === 0 ? 0 : data.hp / data.maxHp;
-                if (percentage === 0) {
-                    change.color = "black";
-                } else {
-                    change.color = "red";
-                }
-                change.width = percentage === 0 ? 0 : (width - 4) * percentage;
-                if (shape.width != change.width || shape.style.fillColor != change.color) {
-                    changeMap.set(attachment.id, change);
-                }
-            } else if (infoMetadata in attachment.metadata) {
-                const change = changeMap.get(attachment.id) ?? {};
-                if (shape.width != width) {
-                    change.width = width;
-                    changeMap.set(attachment.id, change);
-                }
+
+    const handleAttachment = async (attachment: Item) => {
+        const shape = attachment as Shape;
+        if (attachment.name === "hp" && infoMetadata in attachment.metadata) {
+            const change = changeMap.get(attachment.id) ?? {};
+            const percentage = await calculatePercentage(data);
+            if (percentage === 0) {
+                change.color = "black";
+            } else {
+                change.color = "red";
             }
-        });
+            change.width = percentage === 0 ? 0 : (width - 4) * percentage;
+            if (shape.width != change.width || shape.style.fillColor != change.color) {
+                changeMap.set(attachment.id, change);
+            }
+        } else if (infoMetadata in attachment.metadata) {
+            const change = changeMap.get(attachment.id) ?? {};
+            if (shape.width != width) {
+                change.width = width;
+                changeMap.set(attachment.id, change);
+            }
+        }
+    };
+
+    if (attachments.length > 0) {
+        attachments.forEach(handleAttachment);
     } else {
-        const percentage = data.hp === 0 && data.maxHp === 0 ? 0 : data.hp / data.maxHp;
+        const percentage = await calculatePercentage(data);
         const shapes = await createShape(percentage, character.id);
         if (shapes) {
             await OBR.scene.local.addItems(shapes);
@@ -91,6 +94,9 @@ export const handleOtherTextChanges = async (
     if (attachments.length > 0) {
         const bounds = await OBR.scene.items.getItemBounds([character.id]);
         const height = bounds.height / 2;
+        let offset = (((await OBR.scene.getMetadata()) as Metadata)[sceneMetadata] as SceneMetadata).hpBarOffset ?? 0;
+        const offsetFactor = bounds.height / 150;
+        offset *= offsetFactor;
         attachments.forEach((attachment) => {
             if (infoMetadata in attachment.metadata) {
                 const change = changeMap.get(attachment.id) ?? {};
@@ -99,11 +105,11 @@ export const handleOtherTextChanges = async (
                 }
                 if (
                     character.position.x - Number(attachment.text.width) / 2 != attachment.position.x ||
-                    character.position.y + height - 47 != attachment.position.y
+                    character.position.y + height - 47 + offset != attachment.position.y
                 ) {
                     change.position = {
                         x: character.position.x - Number(attachment.text.width) / 2,
-                        y: character.position.y + height - 47,
+                        y: character.position.y + height - 47 + offset,
                     };
                 }
                 changeMap.set(attachment.id, change);
@@ -120,6 +126,9 @@ export const handleOtherShapeChanges = async (
     const bounds = await OBR.scene.items.getItemBounds([character.id]);
     const width = bounds.width;
     const height = bounds.height / 2;
+    let offset = (((await OBR.scene.getMetadata()) as Metadata)[sceneMetadata] as SceneMetadata).hpBarOffset ?? 0;
+    const offsetFactor = bounds.height / 150;
+    offset *= offsetFactor;
     const barHeight = 31;
     if (attachments.length > 0) {
         attachments.forEach((attachment) => {
@@ -131,21 +140,21 @@ export const handleOtherShapeChanges = async (
                 if (attachment.name === "hp") {
                     if (
                         character.position.x - width / 2 + 2 != attachment.position.x ||
-                        character.position.y + height - barHeight + 2 != attachment.position.y
+                        character.position.y + height - barHeight + 2 + offset != attachment.position.y
                     ) {
                         change.position = {
                             x: character.position.x - width / 2 + 2,
-                            y: character.position.y + height - barHeight + 2,
+                            y: character.position.y + height - barHeight + 2 + offset,
                         };
                     }
                 } else {
                     if (
                         character.position.x - width / 2 != attachment.position.x ||
-                        character.position.y + height - barHeight != attachment.position.y
+                        character.position.y + height - barHeight + offset != attachment.position.y
                     ) {
                         change.position = {
                             x: character.position.x - width / 2,
-                            y: character.position.y + height - barHeight,
+                            y: character.position.y + height - barHeight + offset,
                         };
                     }
                 }
