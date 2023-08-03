@@ -49,7 +49,6 @@ const initLocalItems = async () => {
     const updateScene = async (items: Item[]) => {
         const characters = items.filter((item) => item.layer === "CHARACTER");
         const changes = await prepareDisplayChanges(characters, role);
-
         if (changes.textItems.size > 0) {
             await OBR.scene.local.updateItems(isText, (texts) => {
                 texts.forEach((text) => {
@@ -105,11 +104,19 @@ const initLocalItems = async () => {
         // But we only care about Character Items
         await updateScene(items);
     });
+
+    // Triggers when the scene metadata is changed
+    OBR.scene.onMetadataChange(async () => {
+        const items = await OBR.scene.items.getItems(
+            (item) => item.layer === "CHARACTER" && characterMetadata in item.metadata
+        );
+        await updateScene(items);
+    });
 };
 
 const initScene = async () => {
     const metadata: Metadata = await OBR.scene.getMetadata();
-    metadata[sceneMetadata] = { version: version };
+    (metadata[sceneMetadata] as SceneMetadata).version = version;
     await OBR.scene.setMetadata(metadata);
 };
 
