@@ -6,7 +6,7 @@ import { migrate105To106 } from "../migrations/v106.ts";
 import { compare } from "compare-versions";
 import { HpTrackerMetadata, SceneMetadata } from "../helper/types.ts";
 
-const version = "1.1.0";
+const version = "1.1.1";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.

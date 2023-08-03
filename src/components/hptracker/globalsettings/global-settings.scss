@@ -1,0 +1,24 @@
+.global-setting {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    margin-bottom: 10px;
+
+    .heading {
+        display: flex;
+        gap: 5px;
+        margin-bottom: 10px;
+    }
+
+    h3 {
+        margin-block: 0;
+    }
+
+    .setting {
+        display: grid;
+        grid-template-columns: 4fr 1fr;
+        justify-content: flex-start;
+        text-align: left;
+    }
+}

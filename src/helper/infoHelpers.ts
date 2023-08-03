@@ -1,4 +1,4 @@
-import { createShape, createText, getAttachedItems, localItemsCache } from "./helpers.ts";
+import { calculatePercentage, createShape, createText, getAttachedItems, localItemsCache } from "./helpers.ts";
 import { characterMetadata, infoMetadata, sceneMetadata } from "./variables.ts";
 import OBR, { Item, Text, Shape, Metadata } from "@owlbear-rodeo/sdk";
 import { Changes, HpTrackerMetadata, SceneMetadata, ShapeItemChanges, TextItemChanges } from "./types.ts";
@@ -11,31 +11,34 @@ export const saveOrChangeShape = async (
 ) => {
     const bounds = await OBR.scene.items.getItemBounds([character.id]);
     const width = bounds.width;
-    if (attachments.length > 0) {
-        attachments.forEach((attachment) => {
-            const shape = attachment as Shape;
-            if (attachment.name === "hp" && infoMetadata in attachment.metadata) {
-                const change = changeMap.get(attachment.id) ?? {};
-                const percentage = data.maxHp === 0 || data.hp === 0 ? 0 : data.hp / data.maxHp;
-                if (percentage === 0) {
-                    change.color = "black";
-                } else {
-                    change.color = "red";
-                }
-                change.width = percentage === 0 ? 0 : (width - 4) * percentage;
-                if (shape.width != change.width || shape.style.fillColor != change.color) {
-                    changeMap.set(attachment.id, change);
-                }
-            } else if (infoMetadata in attachment.metadata) {
-                const change = changeMap.get(attachment.id) ?? {};
-                if (shape.width != width) {
-                    change.width = width;
-                    changeMap.set(attachment.id, change);
-                }
+
+    const handleAttachment = async (attachment: Item) => {
+        const shape = attachment as Shape;
+        if (attachment.name === "hp" && infoMetadata in attachment.metadata) {
+            const change = changeMap.get(attachment.id) ?? {};
+            const percentage = await calculatePercentage(data);
+            if (percentage === 0) {
+                change.color = "black";
+            } else {
+                change.color = "red";
             }
-        });
+            change.width = percentage === 0 ? 0 : (width - 4) * percentage;
+            if (shape.width != change.width || shape.style.fillColor != change.color) {
+                changeMap.set(attachment.id, change);
+            }
+        } else if (infoMetadata in attachment.metadata) {
+            const change = changeMap.get(attachment.id) ?? {};
+            if (shape.width != width) {
+                change.width = width;
+                changeMap.set(attachment.id, change);
+            }
+        }
+    };
+
+    if (attachments.length > 0) {
+        attachments.forEach(handleAttachment);
     } else {
-        const percentage = data.hp === 0 && data.maxHp === 0 ? 0 : data.hp / data.maxHp;
+        const percentage = await calculatePercentage(data);
         const shapes = await createShape(percentage, character.id);
         if (shapes) {
             await OBR.scene.local.addItems(shapes);

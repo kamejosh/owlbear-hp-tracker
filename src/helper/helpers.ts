@@ -1,6 +1,6 @@
 import OBR, { buildShape, buildText, Image, Item, Metadata } from "@owlbear-rodeo/sdk";
 import { infoMetadata, sceneMetadata } from "./variables.ts";
-import { SceneMetadata } from "./types.ts";
+import { HpTrackerMetadata, SceneMetadata } from "./types.ts";
 
 export const localItemsCache = {
     items: Array<Item>(),
@@ -126,4 +126,19 @@ export const getAttachedItems = async (id: string, itemType: string) => {
     });
 
     return attachments;
+};
+
+export const calculatePercentage = async (data: HpTrackerMetadata) => {
+    const segments = (((await OBR.scene.getMetadata()) as Metadata)[sceneMetadata] as SceneMetadata).hpBarSegments ?? 0;
+
+    const percentage = data.maxHp === 0 || data.hp === 0 ? 0 : data.hp / data.maxHp;
+
+    if (segments === 0) {
+        return percentage;
+    } else {
+        const minStep = 100 / segments;
+        const numSteps = Math.ceil((percentage * 100) / minStep);
+        const adjustedPercentage = (numSteps * minStep) / 100;
+        return adjustedPercentage;
+    }
 };
