@@ -1,3 +1,9 @@
+# 1.1.1
+
+- Add Global Settings
+  - Change HP Bar offset to position hp bar on the y axis
+  - Change HP Bar Segments to define the maximum segments that the HP Bar has (fuzzy HP)
+
 # 1.1.0
 
 - Add Quality of Life features - HP are only changed when maxHP loses focus - AC are also right aligned - No resize of Name column on hover
