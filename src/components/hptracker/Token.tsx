@@ -1,10 +1,11 @@
-import { HpTrackerMetadata } from "../../helper/types.ts";
+import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import React, { MouseEvent, useEffect, useState } from "react";
-import OBR from "@owlbear-rodeo/sdk";
-import { characterMetadata } from "../../helper/variables.ts";
+import OBR, { Metadata } from "@owlbear-rodeo/sdk";
+import { characterMetadata, sceneMetadata } from "../../helper/variables.ts";
 import { useCharSheet } from "../../context/CharacterContext.ts";
 import { useGetOpen5eMonster } from "../../open5e/useOpen5e.ts";
+import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 
 type TokenProps = {
     id: string;
@@ -12,9 +13,11 @@ type TokenProps = {
 };
 
 export const Token = (props: TokenProps) => {
-    const [data, setData] = useState<HpTrackerMetadata>(props.data);
     const playerContext = usePlayerContext();
+    const [data, setData] = useState<HpTrackerMetadata>(props.data);
     const [editName, setEditName] = useState<boolean>(false);
+    const [allowNegativNumbers, setAllowNegativeNumbers] = useState<boolean | undefined>(undefined);
+    const { isReady } = SceneReadyContext();
     const { setId } = useCharSheet();
 
     const sheetQuery = useGetOpen5eMonster(data.sheet ?? "");
@@ -24,6 +27,38 @@ export const Token = (props: TokenProps) => {
     useEffect(() => {
         setData(props.data);
     }, [props.data]);
+
+    useEffect(() => {
+        const initMetadataValues = async () => {
+            const handleMetadata = (metadata: Metadata) => {
+                if (sceneMetadata in metadata) {
+                    const sceneData = metadata[sceneMetadata] as SceneMetadata;
+                    setAllowNegativeNumbers(sceneData.allowNegativeNumbers ?? false);
+                }
+            };
+            const metadata = (await OBR.scene.getMetadata()) as Metadata;
+            handleMetadata(metadata);
+
+            OBR.scene.onMetadataChange((metadata) => {
+                handleMetadata(metadata);
+            });
+        };
+        if (isReady) {
+            initMetadataValues();
+        }
+    }, [isReady]);
+
+    useEffect(() => {
+        // could be undefined so we check for boolean
+        if (allowNegativNumbers === false) {
+            if (data.hp < 0) {
+                handleValueChange(0, "hp");
+            }
+            if (data.armorClass < 0) {
+                handleValueChange(0, "armorClass");
+            }
+        }
+    }, [allowNegativNumbers]);
 
     const handleValueChange = (value: string | number | boolean, key: string, updateHp: boolean = false) => {
         OBR.scene.items.updateItems([props.id], (items) => {
@@ -45,7 +80,7 @@ export const Token = (props: TokenProps) => {
                     currentData.hpBar = !!value;
                     setData({ ...data, hpBar: currentData.hpBar });
                 } else if (key === "armorClass") {
-                    currentData.armorClass = Math.max(Number(value), 0);
+                    currentData.armorClass = allowNegativNumbers ? Number(value) : Math.max(Number(value), 0);
                     setData({ ...data, armorClass: currentData.armorClass });
                 } else if (key === "maxHP") {
                     currentData.maxHp = Math.max(Number(value), 0);
@@ -55,7 +90,7 @@ export const Token = (props: TokenProps) => {
                     }
                     setData({ ...data, maxHp: currentData.maxHp });
                 } else if (key === "hp") {
-                    currentData.hp = Math.max(Number(value), 0);
+                    currentData.hp = allowNegativNumbers ? Number(value) : Math.max(Number(value), 0);
                     setData({ ...data, hp: currentData.hp });
                 } else if (key === "initiative") {
                     currentData.initiative = Number(value);
@@ -163,8 +198,12 @@ export const Token = (props: TokenProps) => {
                     size={3}
                     value={data.hp}
                     onChange={(e) => {
+                        let factor = 1;
+                        if (allowNegativNumbers) {
+                            factor = e.target.value.startsWith("-") ? -1 : 1;
+                        }
                         const value = Number(e.target.value.replace(/[^0-9]/g, ""));
-                        handleValueChange(Math.min(Number(value), data.maxHp), "hp");
+                        handleValueChange(Math.min(Number(value * factor), data.maxHp), "hp");
                     }}
                     onKeyDown={(e) => {
                         if (e.key === "ArrowUp") {
@@ -202,8 +241,12 @@ export const Token = (props: TokenProps) => {
                     size={1}
                     value={data.armorClass}
                     onChange={(e) => {
+                        let factor = 1;
+                        if (allowNegativNumbers) {
+                            factor = e.target.value.startsWith("-") ? -1 : 1;
+                        }
                         const value = Number(e.target.value.replace(/[^0-9]/g, ""));
-                        handleValueChange(value, "armorClass");
+                        handleValueChange(value * factor, "armorClass");
                     }}
                     onKeyDown={(e) => {
                         if (e.key === "ArrowUp") {

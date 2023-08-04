@@ -6,6 +6,7 @@ import { migrate105To106 } from "../migrations/v106.ts";
 import { compare } from "compare-versions";
 import { HpTrackerMetadata, SceneMetadata } from "../helper/types.ts";
 import { migrate111To112 } from "../migrations/v112.ts";
+import { migrate112To113 } from "../migrations/v113.ts";
 
 const version = "1.1.2";
 
@@ -118,7 +119,7 @@ const initLocalItems = async () => {
 const initScene = async () => {
     const metadata: Metadata = await OBR.scene.getMetadata();
     if (!(sceneMetadata in metadata)) {
-        metadata[sceneMetadata] = { version: version, hpBarSegments: 0, hpBarOffset: 0 };
+        metadata[sceneMetadata] = { version: version, hpBarSegments: 0, hpBarOffset: 0, allowNegativNumbers: false };
     } else {
         const sceneData = metadata[sceneMetadata] as SceneMetadata;
         sceneData.version = version;
@@ -128,6 +129,9 @@ const initScene = async () => {
         }
         if (sceneData.hpBarOffset === undefined) {
             sceneData.hpBarOffset = 0;
+        }
+        if (sceneData.allowNegativeNumbers === undefined) {
+            sceneData.allowNegativeNumbers = false;
         }
         metadata[sceneMetadata] = sceneData;
     }
@@ -268,6 +272,9 @@ const migrations = async () => {
         }
         if (compare(data.version, "1.1.2", "<")) {
             await migrate111To112();
+        }
+        if (compare(data.version, "1.1.3", "<")) {
+            await migrate112To113();
         }
     }
 };
