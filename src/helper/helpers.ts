@@ -12,7 +12,9 @@ export const createText = async (text: string, id: string) => {
     const width = 400;
     // height is zero, so we're not in the way when trying to move the character icon
     const height = 0;
-    let offset = (((await OBR.scene.getMetadata()) as Metadata)[sceneMetadata] as SceneMetadata).hpBarOffset ?? 0;
+    const metadata = (await OBR.scene.getMetadata()) as Metadata;
+    const sceneData = metadata[sceneMetadata] as SceneMetadata;
+    let offset = sceneData.hpBarOffset ?? 0;
 
     if (items.length > 0) {
         const bounds = await OBR.scene.items.getItemBounds([id]);
@@ -60,7 +62,9 @@ export const createText = async (text: string, id: string) => {
 
 export const createShape = async (percentage: number, id: string) => {
     const height = 31;
-    let offset = (((await OBR.scene.getMetadata()) as Metadata)[sceneMetadata] as SceneMetadata).hpBarOffset ?? 0;
+    const metadata = (await OBR.scene.getMetadata()) as Metadata;
+    const sceneData = metadata[sceneMetadata] as SceneMetadata;
+    let offset = sceneData.hpBarOffset ?? 0;
     const items = await OBR.scene.items.getItems([id]);
 
     if (items.length > 0) {
