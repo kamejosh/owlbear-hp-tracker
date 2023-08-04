@@ -95,7 +95,9 @@
                 "abilities"
                 "tidbits"
                 "actions"
-                "actions";
+                "actions"
+                "specials"
+                "specials";
             gap: 10px 30px;
             margin-top: 30px;
             text-align: left;
@@ -105,7 +107,8 @@
                 grid-template-areas:
                     "what values"
                     "abilities tidbits"
-                    "actions actions";
+                    "actions actions"
+                    "specials specials";
             }
 
             > * {
@@ -155,6 +158,15 @@
 
             .actions {
                 grid-area: actions;
+
+                h3 {
+                    border-bottom: 1px solid white;
+                    width: 100%;
+                }
+            }
+
+            .special-abilities {
+                grid-area: specials;
 
                 h3 {
                     border-bottom: 1px solid white;
