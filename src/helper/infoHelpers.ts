@@ -1,6 +1,13 @@
-import { calculatePercentage, createShape, createText, getAttachedItems, localItemsCache } from "./helpers.ts";
+import {
+    calculatePercentage,
+    createShape,
+    createText,
+    getAttachedItems,
+    getImageBounds,
+    localItemsCache,
+} from "./helpers.ts";
 import { characterMetadata, infoMetadata, sceneMetadata } from "./variables.ts";
-import OBR, { Item, Text, Shape, Metadata } from "@owlbear-rodeo/sdk";
+import OBR, { Item, Text, Shape, Metadata, Image } from "@owlbear-rodeo/sdk";
 import { Changes, HpTrackerMetadata, SceneMetadata, ShapeItemChanges, TextItemChanges } from "./types.ts";
 
 export const saveOrChangeShape = async (
@@ -9,7 +16,9 @@ export const saveOrChangeShape = async (
     attachments: Item[],
     changeMap: Map<string, ShapeItemChanges>
 ) => {
-    const bounds = await OBR.scene.items.getItemBounds([character.id]);
+    // const bounds = await OBR.scene.items.getItemBounds([character.id]);
+    const dpi = await OBR.scene.grid.getDpi();
+    const bounds = getImageBounds(character as Image, dpi);
     const width = bounds.width;
 
     const handleAttachment = async (attachment: Item) => {
@@ -92,7 +101,9 @@ export const handleOtherTextChanges = async (
     changeMap: Map<string, TextItemChanges>
 ) => {
     if (attachments.length > 0) {
-        const bounds = await OBR.scene.items.getItemBounds([character.id]);
+        // const bounds = await OBR.scene.items.getItemBounds([character.id]);
+        const dpi = await OBR.scene.grid.getDpi();
+        const bounds = getImageBounds(character as Image, dpi);
         const height = bounds.height / 2;
         let offset = (((await OBR.scene.getMetadata()) as Metadata)[sceneMetadata] as SceneMetadata).hpBarOffset ?? 0;
         const offsetFactor = bounds.height / 150;
@@ -123,7 +134,9 @@ export const handleOtherShapeChanges = async (
     attachments: Shape[],
     changeMap: Map<string, ShapeItemChanges>
 ) => {
-    const bounds = await OBR.scene.items.getItemBounds([character.id]);
+    // const bounds = await OBR.scene.items.getItemBounds([character.id]);
+    const dpi = await OBR.scene.grid.getDpi();
+    const bounds = getImageBounds(character as Image, dpi);
     const width = bounds.width;
     const height = bounds.height / 2;
     let offset = (((await OBR.scene.getMetadata()) as Metadata)[sceneMetadata] as SceneMetadata).hpBarOffset ?? 0;
