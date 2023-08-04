@@ -7,6 +7,7 @@ import { compare } from "compare-versions";
 import { HpTrackerMetadata, SceneMetadata } from "../helper/types.ts";
 import { migrate111To112 } from "../migrations/v112.ts";
 import { migrate112To113 } from "../migrations/v113.ts";
+import { all } from "axios";
 
 const version = "1.1.2";
 
@@ -158,7 +159,7 @@ const setupContextMenu = async () => {
             },
         ],
         onClick: async (context) => {
-            OBR.scene.items.updateItems(context.items, (items) => {
+            await OBR.scene.items.updateItems(context.items, (items) => {
                 items.forEach((item) => {
                     if (characterMetadata in item.metadata) {
                         const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
@@ -187,12 +188,18 @@ const setupContextMenu = async () => {
                 },
             },
         ],
-        onClick: (context) => {
-            OBR.scene.items.updateItems(context.items, (items) => {
+        onClick: async (context) => {
+            const metadata = await OBR.scene.getMetadata();
+            let allowNegativeNumbers = false;
+            if (sceneMetadata in metadata) {
+                const sceneData = metadata[sceneMetadata] as SceneMetadata;
+                allowNegativeNumbers = sceneData.allowNegativeNumbers ?? false;
+            }
+            await OBR.scene.items.updateItems(context.items, (items) => {
                 items.forEach((item) => {
                     if (characterMetadata in item.metadata) {
                         const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
-                        metadata.hp = Math.max(metadata.hp - 1, 0);
+                        metadata.hp = allowNegativeNumbers ? metadata.hp - 1 : Math.max(metadata.hp - 1, 0);
                         item.metadata[characterMetadata] = { ...metadata };
                     }
                 });
