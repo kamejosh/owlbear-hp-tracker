@@ -1,3 +1,7 @@
+# 1.1.2
+
+- Fix global settings not being initialized
+
 # 1.1.1
 
 - Add Global Settings

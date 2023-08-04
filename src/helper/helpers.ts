@@ -129,7 +129,9 @@ export const getAttachedItems = async (id: string, itemType: string) => {
 };
 
 export const calculatePercentage = async (data: HpTrackerMetadata) => {
-    const segments = (((await OBR.scene.getMetadata()) as Metadata)[sceneMetadata] as SceneMetadata).hpBarSegments ?? 0;
+    const metadata = (await OBR.scene.getMetadata()) as Metadata;
+    const sceneData = metadata[sceneMetadata] as SceneMetadata;
+    const segments = sceneData.hpBarSegments ?? 0;
 
     const percentage = data.maxHp === 0 || data.hp === 0 ? 0 : data.hp / data.maxHp;
 
