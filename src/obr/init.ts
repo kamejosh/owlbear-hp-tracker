@@ -5,8 +5,9 @@ import { migrate102To103 } from "../migrations/v103.ts";
 import { migrate105To106 } from "../migrations/v106.ts";
 import { compare } from "compare-versions";
 import { HpTrackerMetadata, SceneMetadata } from "../helper/types.ts";
+import { migrate111To112 } from "../migrations/v112.ts";
 
-const version = "1.1.1";
+const version = "1.1.2";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -116,7 +117,20 @@ const initLocalItems = async () => {
 
 const initScene = async () => {
     const metadata: Metadata = await OBR.scene.getMetadata();
-    (metadata[sceneMetadata] as SceneMetadata).version = version;
+    if (!(sceneMetadata in metadata)) {
+        metadata[sceneMetadata] = { version: version, hpBarSegments: 0, hpBarOffset: 0 };
+    } else {
+        const sceneData = metadata[sceneMetadata] as SceneMetadata;
+        sceneData.version = version;
+
+        if (sceneData.hpBarSegments === undefined) {
+            sceneData.hpBarSegments = 0;
+        }
+        if (sceneData.hpBarOffset === undefined) {
+            sceneData.hpBarOffset = 0;
+        }
+        metadata[sceneMetadata] = sceneData;
+    }
     await OBR.scene.setMetadata(metadata);
 };
 
@@ -252,6 +266,9 @@ const migrations = async () => {
         if (compare(data.version, "1.0.6", "<")) {
             await migrate105To106();
         }
+        if (compare(data.version, "1.1.2", "<")) {
+            await migrate111To112();
+        }
     }
 };
 
@@ -274,14 +291,14 @@ const initLocalLoop = async () => {
 OBR.onReady(async () => {
     console.log(`HP Tracker version ${version} initializing`);
     await setupContextMenu();
-    try {
-        await initLocalLoop();
-    } catch {}
-    await OBR.scene.onReadyChange(async (isReady) => {
+    OBR.scene.onReadyChange(async (isReady) => {
         if (isReady) {
             await migrations();
             await initItems();
             await initScene();
         }
     });
+    try {
+        await initLocalLoop();
+    } catch {}
 });
