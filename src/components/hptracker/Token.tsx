@@ -280,7 +280,9 @@ export const Token = (props: TokenProps) => {
                     }}
                 />
             </div>
-            <button className={"toggle-button info-button"} onClick={() => setId(props.id)} />
+            <div className={"info-button-wrapper"}>
+                <button className={"toggle-button info-button"} onClick={() => setId(props.id)} />
+            </div>
         </div>
     ) : props.data.hpBar ? (
         <div

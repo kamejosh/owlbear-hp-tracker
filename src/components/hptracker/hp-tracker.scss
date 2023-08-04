@@ -92,13 +92,8 @@
             background-size: contain;
             background-repeat: no-repeat;
             background-color: transparent;
-            width: 20px;
-            height: 20px;
-
-            @include breakpoint.laptop {
-                width: 30px;
-                height: 30px;
-            }
+            width: 30px;
+            height: 30px;
         }
 
         .settings {
@@ -169,9 +164,22 @@
 
         .armor-class {
             display: flex;
-            justify-self: center;
+            justify-self: flex-end;
+            gap: 5px;
             min-width: 20px;
             text-align: right;
+
+            @include breakpoint.laptop {
+                justify-self: center;
+            }
+
+            &::before {
+                content: "AC: ";
+
+                @include breakpoint.laptop {
+                    display: none;
+                }
+            }
         }
 
         .initiative-wrapper {
@@ -200,8 +208,23 @@
             }
         }
 
-        .info-button {
-            background-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8' standalone='no'%3F%3E%3Csvg width='50mm' height='50mm' viewBox='0 0 50 50' version='1.1' id='svg5' xml:space='preserve' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3Cdefs id='defs2'%3E%3Crect x='341.01865' y='385.832' width='113.67288' height='76.51059' id='rect363' /%3E%3Crect x='341.01865' y='385.832' width='113.67288' height='76.51059' id='rect363-5' /%3E%3Crect x='341.01865' y='385.832' width='113.67288' height='76.51059' id='rect363-3' /%3E%3Crect x='341.01865' y='385.832' width='113.67288' height='76.51059' id='rect363-5-8' /%3E%3C/defs%3E%3Cg id='layer1' transform='translate(-80,-40)'%3E%3Ccircle style='fill:%23ffffff;stroke-width:0.212772' id='path111-39' cx='105' cy='65' r='20' /%3E%3Cg id='layer1-8' transform='translate(58.52319,1.9955569)'%3E%3Ccircle style='fill:%23808080;stroke-width:0.265965' id='path111' cx='46.47681' cy='63.004444' r='25' /%3E%3Ccircle style='fill:%23cccccc;stroke-width:0.212772' id='path111-39-1' cx='46.47681' cy='63.004444' r='20' /%3E%3C/g%3E%3C/g%3E%3Cg id='layer1-0' transform='translate(-127.51574,-78.200278)' /%3E%3Cstyle type='text/css' id='style306'%3E .st0%7Bfill:%23000000;%7D%0A%3C/style%3E%3Cpath d='m 25.000002,28.022754 q 1.246884,0 2.134816,-0.887936 Q 28.022753,26.246886 28.022753,25 q 0,-1.246885 -0.887935,-2.134819 -0.887932,-0.887934 -2.134816,-0.887934 -1.246888,0 -2.134819,0.887934 Q 21.977247,23.753115 21.977247,25 q 0,1.246886 0.887936,2.134818 0.887931,0.887936 2.134819,0.887936 z m -6.045506,6.045503 h 12.091009 v -0.86904 q 0,-0.906825 -0.491197,-1.662515 -0.491197,-0.755687 -1.360239,-1.133532 -0.982394,-0.415629 -2.021465,-0.642336 -1.03907,-0.226691 -2.172602,-0.226691 -1.133533,0 -2.172607,0.226691 -1.03907,0.226693 -2.021464,0.642336 -0.869042,0.377845 -1.360238,1.133532 -0.491197,0.75569 -0.491197,1.662515 z m 15.86945,6.045506 H 15.176054 q -0.906825,0 -1.586945,-0.680119 -0.680119,-0.68012 -0.680119,-1.586946 V 12.153303 q 0,-0.906825 0.680119,-1.586945 0.68012,-0.680119 1.586945,-0.680119 h 12.884483 l 9.030474,9.030474 v 18.929985 q 0,0.906826 -0.68012,1.586946 -0.68012,0.680119 -1.586945,0.680119 z m 0,-2.267065 V 19.936891 L 27.040359,12.153303 H 15.176054 v 25.693395 z m -19.647892,0 V 12.153303 Z' id='path137' style='stroke-width:0.0377845' /%3E%3C/svg%3E%0A");
+        .info-button-wrapper {
+            display: flex;
+            align-items: center;
+            justify-self: flex-end;
+            gap: 5px;
+
+            &::before {
+                content: "Statblock: ";
+
+                @include breakpoint.laptop {
+                    display: none;
+                }
+            }
+
+            .info-button {
+                background-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8' standalone='no'%3F%3E%3Csvg width='50mm' height='50mm' viewBox='0 0 50 50' version='1.1' id='svg5' xml:space='preserve' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3Cdefs id='defs2'%3E%3Crect x='341.01865' y='385.832' width='113.67288' height='76.51059' id='rect363' /%3E%3Crect x='341.01865' y='385.832' width='113.67288' height='76.51059' id='rect363-5' /%3E%3Crect x='341.01865' y='385.832' width='113.67288' height='76.51059' id='rect363-3' /%3E%3Crect x='341.01865' y='385.832' width='113.67288' height='76.51059' id='rect363-5-8' /%3E%3C/defs%3E%3Cg id='layer1' transform='translate(-80,-40)'%3E%3Ccircle style='fill:%23ffffff;stroke-width:0.212772' id='path111-39' cx='105' cy='65' r='20' /%3E%3Cg id='layer1-8' transform='translate(58.52319,1.9955569)'%3E%3Ccircle style='fill:%23808080;stroke-width:0.265965' id='path111' cx='46.47681' cy='63.004444' r='25' /%3E%3Ccircle style='fill:%23cccccc;stroke-width:0.212772' id='path111-39-1' cx='46.47681' cy='63.004444' r='20' /%3E%3C/g%3E%3C/g%3E%3Cg id='layer1-0' transform='translate(-127.51574,-78.200278)' /%3E%3Cstyle type='text/css' id='style306'%3E .st0%7Bfill:%23000000;%7D%0A%3C/style%3E%3Cpath d='m 25.000002,28.022754 q 1.246884,0 2.134816,-0.887936 Q 28.022753,26.246886 28.022753,25 q 0,-1.246885 -0.887935,-2.134819 -0.887932,-0.887934 -2.134816,-0.887934 -1.246888,0 -2.134819,0.887934 Q 21.977247,23.753115 21.977247,25 q 0,1.246886 0.887936,2.134818 0.887931,0.887936 2.134819,0.887936 z m -6.045506,6.045503 h 12.091009 v -0.86904 q 0,-0.906825 -0.491197,-1.662515 -0.491197,-0.755687 -1.360239,-1.133532 -0.982394,-0.415629 -2.021465,-0.642336 -1.03907,-0.226691 -2.172602,-0.226691 -1.133533,0 -2.172607,0.226691 -1.03907,0.226693 -2.021464,0.642336 -0.869042,0.377845 -1.360238,1.133532 -0.491197,0.75569 -0.491197,1.662515 z m 15.86945,6.045506 H 15.176054 q -0.906825,0 -1.586945,-0.680119 -0.680119,-0.68012 -0.680119,-1.586946 V 12.153303 q 0,-0.906825 0.680119,-1.586945 0.68012,-0.680119 1.586945,-0.680119 h 12.884483 l 9.030474,9.030474 v 18.929985 q 0,0.906826 -0.68012,1.586946 -0.68012,0.680119 -1.586945,0.680119 z m 0,-2.267065 V 19.936891 L 27.040359,12.153303 H 15.176054 v 25.693395 z m -19.647892,0 V 12.153303 Z' id='path137' style='stroke-width:0.0377845' /%3E%3C/svg%3E%0A");
+            }
         }
     }
 
