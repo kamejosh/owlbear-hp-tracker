@@ -158,12 +158,16 @@ export const Token = (props: TokenProps) => {
                         {props.data.name}
                     </div>
                 )}
-                <button className={`edit ${editName ? "on" : "off"}`} onClick={() => setEditName(!editName)}></button>
+                <button
+                    title={"Change entry name"}
+                    className={`edit ${editName ? "on" : "off"}`}
+                    onClick={() => setEditName(!editName)}
+                ></button>
             </div>
             {playerContext.role === "GM" ? (
                 <div className={"settings"}>
                     <button
-                        title={"Toggle HP Display Mode for Character"}
+                        title={"Toggle HP Bar visibility for GM and Players"}
                         className={`toggle-button hp ${data.hpBar ? "on" : "off"}`}
                         onClick={() => {
                             handleValueChange(!data.hpBar, "hpBar");
@@ -177,14 +181,14 @@ export const Token = (props: TokenProps) => {
                         }}
                     />
                     <button
-                        title={"Toggle AC visible on Map"}
+                        title={"Toggle AC displayed on Map"}
                         className={`toggle-button ac ${data.acOnMap ? "on" : "off"}`}
                         onClick={() => {
                             handleValueChange(!data.acOnMap, "acOnMap");
                         }}
                     />
                     <button
-                        title={"Toggle HP visible for players"}
+                        title={"Toggle HP/AC visibility for players"}
                         className={`toggle-button players ${data.canPlayersSee ? "on" : "off"}`}
                         onClick={() => {
                             handleValueChange(!data.canPlayersSee, "players");
@@ -269,7 +273,7 @@ export const Token = (props: TokenProps) => {
                     className={"initiative"}
                 />
                 <button
-                    title={"Toggle HP displayed on Map"}
+                    title={"Roll Initiative (including DEX modifier from statblock)"}
                     className={`toggle-button initiative-button`}
                     onClick={() => {
                         let dexBonus = 0;
@@ -281,7 +285,11 @@ export const Token = (props: TokenProps) => {
                 />
             </div>
             <div className={"info-button-wrapper"}>
-                <button className={"toggle-button info-button"} onClick={() => setId(props.id)} />
+                <button
+                    title={"Show Statblock"}
+                    className={"toggle-button info-button"}
+                    onClick={() => setId(props.id)}
+                />
             </div>
         </div>
     ) : props.data.hpBar ? (

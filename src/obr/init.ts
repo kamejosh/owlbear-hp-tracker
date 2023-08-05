@@ -7,9 +7,8 @@ import { compare } from "compare-versions";
 import { HpTrackerMetadata, SceneMetadata } from "../helper/types.ts";
 import { migrate111To112 } from "../migrations/v112.ts";
 import { migrate112To113 } from "../migrations/v113.ts";
-import { all } from "axios";
 
-const version = "1.1.2";
+const version = "1.1.3";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
