@@ -1,3 +1,11 @@
+# 1.1.3
+
+- Add Special Abilities to Monster Stat Block
+- Fix that sometime when moving on the remote screen the Image height was calculated wrong
+- Add global Setting to allow negative HP and AC
+- Improvements for the mobile UI
+- Fix wrong tooltips
+
 # 1.1.2
 
 - Fix global settings not being initialized

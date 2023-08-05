@@ -17,8 +17,10 @@ export const createText = async (text: string, id: string) => {
     let offset = sceneData.hpBarOffset ?? 0;
 
     if (items.length > 0) {
-        const bounds = await OBR.scene.items.getItemBounds([id]);
+        // const bounds = await OBR.scene.items.getItemBounds([id]);
+        const dpi = await OBR.scene.grid.getDpi();
         const item = items[0] as Image;
+        const bounds = getImageBounds(item, dpi);
         const offsetFactor = bounds.height / 150;
         offset *= offsetFactor;
         const position = {
@@ -69,7 +71,9 @@ export const createShape = async (percentage: number, id: string) => {
 
     if (items.length > 0) {
         const item = items[0] as Image;
-        const bounds = await OBR.scene.items.getItemBounds([item.id]);
+        // const bounds = await OBR.scene.items.getItemBounds([item.id]);
+        const dpi = await OBR.scene.grid.getDpi();
+        const bounds = getImageBounds(item, dpi);
         const offsetFactor = bounds.height / 150;
         offset *= offsetFactor;
         const position = {
@@ -137,7 +141,7 @@ export const calculatePercentage = async (data: HpTrackerMetadata) => {
     const sceneData = metadata[sceneMetadata] as SceneMetadata;
     const segments = sceneData.hpBarSegments ?? 0;
 
-    const percentage = data.maxHp === 0 || data.hp === 0 ? 0 : data.hp / data.maxHp;
+    const percentage = data.maxHp === 0 || data.hp === 0 || data.hp < 0 ? 0 : data.hp / data.maxHp;
 
     if (segments === 0) {
         return percentage;
@@ -147,4 +151,11 @@ export const calculatePercentage = async (data: HpTrackerMetadata) => {
         const adjustedPercentage = (numSteps * minStep) / 100;
         return adjustedPercentage;
     }
+};
+
+export const getImageBounds = (item: Image, dpi: number) => {
+    const dpiScale = dpi / item.grid.dpi;
+    const width = item.image.width * dpiScale * item.scale.x;
+    const height = item.image.height * dpiScale * item.scale.y;
+    return { width, height };
 };

@@ -13,6 +13,8 @@ export const Open5eSheet = ({ slug }: { slug: string }) => {
 
     const data = monsterQuery.isSuccess ? monsterQuery.data : null;
 
+    const specialAbillities = data && typeof data.special_abilities !== "string" ? data.special_abilities : [];
+
     const updateValues = (maxHp: number, ac: number) => {
         if (characterId) {
             OBR.scene.items.updateItems([characterId], (items) => {
@@ -119,6 +121,18 @@ export const Open5eSheet = ({ slug }: { slug: string }) => {
                             );
                         })}
                     </div>
+                    {data.special_abilities ? (
+                        <div className={"special-abilities"}>
+                            <h3>Special Abilities</h3>
+                            {specialAbillities.map((ability) => {
+                                return (
+                                    <div key={ability.name} className={"action"}>
+                                        <b>{ability.name}.</b> {ability.desc}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ) : null}
                 </>
             ) : null}
         </div>

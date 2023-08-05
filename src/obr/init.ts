@@ -6,8 +6,9 @@ import { migrate105To106 } from "../migrations/v106.ts";
 import { compare } from "compare-versions";
 import { HpTrackerMetadata, SceneMetadata } from "../helper/types.ts";
 import { migrate111To112 } from "../migrations/v112.ts";
+import { migrate112To113 } from "../migrations/v113.ts";
 
-const version = "1.1.2";
+const version = "1.1.3";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -118,7 +119,7 @@ const initLocalItems = async () => {
 const initScene = async () => {
     const metadata: Metadata = await OBR.scene.getMetadata();
     if (!(sceneMetadata in metadata)) {
-        metadata[sceneMetadata] = { version: version, hpBarSegments: 0, hpBarOffset: 0 };
+        metadata[sceneMetadata] = { version: version, hpBarSegments: 0, hpBarOffset: 0, allowNegativNumbers: false };
     } else {
         const sceneData = metadata[sceneMetadata] as SceneMetadata;
         sceneData.version = version;
@@ -128,6 +129,9 @@ const initScene = async () => {
         }
         if (sceneData.hpBarOffset === undefined) {
             sceneData.hpBarOffset = 0;
+        }
+        if (sceneData.allowNegativeNumbers === undefined) {
+            sceneData.allowNegativeNumbers = false;
         }
         metadata[sceneMetadata] = sceneData;
     }
@@ -154,7 +158,7 @@ const setupContextMenu = async () => {
             },
         ],
         onClick: async (context) => {
-            OBR.scene.items.updateItems(context.items, (items) => {
+            await OBR.scene.items.updateItems(context.items, (items) => {
                 items.forEach((item) => {
                     if (characterMetadata in item.metadata) {
                         const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
@@ -183,12 +187,18 @@ const setupContextMenu = async () => {
                 },
             },
         ],
-        onClick: (context) => {
-            OBR.scene.items.updateItems(context.items, (items) => {
+        onClick: async (context) => {
+            const metadata = await OBR.scene.getMetadata();
+            let allowNegativeNumbers = false;
+            if (sceneMetadata in metadata) {
+                const sceneData = metadata[sceneMetadata] as SceneMetadata;
+                allowNegativeNumbers = sceneData.allowNegativeNumbers ?? false;
+            }
+            await OBR.scene.items.updateItems(context.items, (items) => {
                 items.forEach((item) => {
                     if (characterMetadata in item.metadata) {
                         const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
-                        metadata.hp = Math.max(metadata.hp - 1, 0);
+                        metadata.hp = allowNegativeNumbers ? metadata.hp - 1 : Math.max(metadata.hp - 1, 0);
                         item.metadata[characterMetadata] = { ...metadata };
                     }
                 });
@@ -268,6 +278,9 @@ const migrations = async () => {
         }
         if (compare(data.version, "1.1.2", "<")) {
             await migrate111To112();
+        }
+        if (compare(data.version, "1.1.3", "<")) {
+            await migrate112To113();
         }
     }
 };

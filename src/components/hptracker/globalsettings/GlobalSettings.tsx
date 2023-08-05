@@ -4,11 +4,16 @@ import { ID, sceneMetadata } from "../../../helper/variables.ts";
 import OBR, { Metadata } from "@owlbear-rodeo/sdk";
 import { SceneMetadata } from "../../../helper/types.ts";
 import "./global-settings.scss";
+import { SceneReadyContext } from "../../../context/SceneReadyContext.ts";
 
 export const GlobalSettings = () => {
     const [offset, setOffset] = useLocalStorage<number>(`${ID}.offset`, 0);
     const [segments, setSegments] = useLocalStorage<number>(`${ID}.hpSegments`, 0);
-    const [isReady, setIsReady] = useState<boolean>(false);
+    const [allowNegativNumbers, setAllowNegativeNumbers] = useLocalStorage<boolean>(
+        `${ID}.allowNegativeNumbers`,
+        false
+    );
+    const { isReady } = SceneReadyContext();
     const [hide, setHide] = useState<boolean>(true);
 
     useEffect(() => {
@@ -16,23 +21,13 @@ export const GlobalSettings = () => {
             const metadata: Metadata = await OBR.scene.getMetadata();
             (metadata[sceneMetadata] as SceneMetadata).hpBarOffset = offset;
             (metadata[sceneMetadata] as SceneMetadata).hpBarSegments = segments;
+            (metadata[sceneMetadata] as SceneMetadata).allowNegativeNumbers = allowNegativNumbers;
             await OBR.scene.setMetadata(metadata);
         };
         if (isReady) {
             setSceneMetadata();
         }
-    }, [offset, segments]);
-
-    const initIsReady = async () => {
-        setIsReady(await OBR.scene.isReady());
-    };
-
-    useEffect(() => {
-        OBR.scene.onReadyChange(async (ready) => {
-            setIsReady(ready);
-        });
-        initIsReady();
-    }, []);
+    }, [offset, segments, allowNegativNumbers]);
 
     const handleOffsetChange = (value: number) => {
         setOffset(value);
@@ -81,6 +76,16 @@ export const GlobalSettings = () => {
                                 } else if (e.key === "ArrowDown") {
                                     handleOffsetChange(offset - 1);
                                 }
+                            }}
+                        />
+                    </div>
+                    <div className={"negative-numbers setting"}>
+                        Allow negative HP/AC:
+                        <input
+                            type={"checkbox"}
+                            checked={allowNegativNumbers}
+                            onChange={() => {
+                                setAllowNegativeNumbers(!allowNegativNumbers);
                             }}
                         />
                     </div>

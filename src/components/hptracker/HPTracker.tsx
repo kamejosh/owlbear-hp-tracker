@@ -10,6 +10,7 @@ import { DraggableTokenList, PlayerTokenList } from "./TokenList.tsx";
 import { useCharSheet } from "../../context/CharacterContext.ts";
 import { CharacterSheet } from "./charactersheet/CharacterSheet.tsx";
 import { GlobalSettings } from "./globalsettings/GlobalSettings.tsx";
+import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 
 export const HPTracker = () => {
     return (
@@ -22,7 +23,7 @@ export const HPTracker = () => {
 const Content = () => {
     const playerContext = usePlayerContext();
     const [tokens, setTokens] = useState<Item[] | undefined>(undefined);
-    const [isReady, setIsReady] = useState<boolean>(false);
+    const { isReady } = SceneReadyContext();
     const { characterId } = useCharSheet();
 
     const initHpTracker = async () => {
@@ -44,17 +45,6 @@ const Content = () => {
             setTokens(Array.from(filteredItems));
         });
     };
-
-    const initIsReady = async () => {
-        setIsReady(await OBR.scene.isReady());
-    };
-
-    useEffect(() => {
-        OBR.scene.onReadyChange(async (ready) => {
-            setIsReady(ready);
-        });
-        initIsReady();
-    }, []);
 
     useEffect(() => {
         if (isReady) {
