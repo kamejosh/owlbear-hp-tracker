@@ -40,19 +40,15 @@ const initItems = async () => {
     await OBR.scene.items.updateItems((item) => item.layer === "CHARACTER", addMetaData);
 };
 
-/**
- * The Texts that display the current HP of a Character Item must be updated anytime the metadata of the Character Items
- * is changed.
- *
- */
-const initLocalItems = async () => {
+const initUpdates = async () => {
     const role = await OBR.player.getRole();
 
     const updateScene = async (items: Item[]) => {
-        const characters = items.filter((item) => item.layer === "CHARACTER");
+        console.log("updateScene");
+        const characters = items.filter((item) => item.layer === "CHARACTER" && characterMetadata in item.metadata);
         const changes = await prepareDisplayChanges(characters, role);
         if (changes.textItems.size > 0) {
-            await OBR.scene.local.updateItems(isText, (texts) => {
+            await OBR.scene.items.updateItems(isText, (texts) => {
                 texts.forEach((text) => {
                     if (changes.textItems.has(text.id)) {
                         const change = changes.textItems.get(text.id);
@@ -63,16 +59,13 @@ const initLocalItems = async () => {
                             if (change.visible !== undefined) {
                                 text.visible = change.visible;
                             }
-                            if (change.position) {
-                                text.position = change.position;
-                            }
                         }
                     }
                 });
             });
         }
         if (changes.shapeItems.size > 0) {
-            await OBR.scene.local.updateItems(isShape, (shapes) => {
+            await OBR.scene.items.updateItems(isShape, (shapes) => {
                 shapes.forEach((shape) => {
                     if (changes.shapeItems.has(shape.id)) {
                         const change = changes.shapeItems.get(shape.id);
@@ -82,9 +75,6 @@ const initLocalItems = async () => {
                             }
                             if (change.visible !== undefined) {
                                 shape.visible = change.visible;
-                            }
-                            if (change.position) {
-                                shape.position = change.position;
                             }
                             if (change.color) {
                                 shape.style.fillColor = change.color;
@@ -289,11 +279,11 @@ const delay = (ms: number) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
-const initLocalLoop = async () => {
+const initUpdateLoop = async () => {
     let initialized = false;
     while (!initialized) {
         try {
-            await initLocalItems();
+            await initUpdates();
             initialized = true;
         } catch {
             await delay(1000);
@@ -301,17 +291,24 @@ const initLocalLoop = async () => {
     }
 };
 
+const initPlayerScene = async () => {};
+
 OBR.onReady(async () => {
     console.log(`HP Tracker version ${version} initializing`);
     await setupContextMenu();
     OBR.scene.onReadyChange(async (isReady) => {
         if (isReady) {
-            await migrations();
-            await initItems();
-            await initScene();
+            const role = await OBR.player.getRole();
+            if (role === "GM") {
+                await migrations();
+                await initItems();
+                await initScene();
+            } else {
+                await initPlayerScene();
+            }
         }
     });
     try {
-        await initLocalLoop();
+        await initUpdateLoop();
     } catch {}
 });

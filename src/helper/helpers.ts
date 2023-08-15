@@ -2,12 +2,18 @@ import OBR, { buildShape, buildText, Image, Item, Metadata } from "@owlbear-rode
 import { infoMetadata, sceneMetadata } from "./variables.ts";
 import { HpTrackerMetadata, SceneMetadata } from "./types.ts";
 
+export const itemsCache = {
+    items: Array<Item>(),
+    invalid: true,
+};
+
 export const localItemsCache = {
     items: Array<Item>(),
     invalid: true,
 };
 
 export const createText = async (text: string, id: string) => {
+    console.log("create text");
     const items = await OBR.scene.items.getItems([id]);
     const width = 400;
     // height is zero, so we're not in the way when trying to move the character icon
@@ -54,7 +60,7 @@ export const createText = async (text: string, id: string) => {
             .attachedTo(id as string)
             .layer("TEXT")
             .locked(true)
-            .disableAttachmentBehavior(["SCALE"])
+            .disableAttachmentBehavior(["SCALE", "ROTATION"])
             .build();
 
         textItem.metadata[infoMetadata] = { isHpText: true };
@@ -63,6 +69,7 @@ export const createText = async (text: string, id: string) => {
 };
 
 export const createShape = async (percentage: number, id: string) => {
+    console.log("create shape");
     const height = 31;
     const metadata = (await OBR.scene.getMetadata()) as Metadata;
     const sceneData = metadata[sceneMetadata] as SceneMetadata;
@@ -93,7 +100,7 @@ export const createShape = async (percentage: number, id: string) => {
             .attachedTo(id)
             .layer("ATTACHMENT")
             .locked(true)
-            .disableAttachmentBehavior(["SCALE"])
+            .disableAttachmentBehavior(["ROTATION"])
             .build();
 
         const hpShape = buildShape()
@@ -109,7 +116,7 @@ export const createShape = async (percentage: number, id: string) => {
             .layer("ATTACHMENT")
             .locked(true)
             .name("hp")
-            .disableAttachmentBehavior(["SCALE"])
+            .disableAttachmentBehavior(["ROTATION"])
             .build();
 
         backgroundShape.metadata[infoMetadata] = { isHpText: true };
@@ -120,6 +127,23 @@ export const createShape = async (percentage: number, id: string) => {
 };
 
 export const getAttachedItems = async (id: string, itemType: string) => {
+    if (itemsCache.invalid) {
+        itemsCache.items = await OBR.scene.items.getItemAttachments([id]);
+        itemsCache.invalid = false;
+    }
+
+    // why am I not using .filter() because if I do there is a bug and I can't find it
+    const attachments: Item[] = [];
+    itemsCache.items.forEach((item) => {
+        if (infoMetadata in item.metadata && itemType === item.type) {
+            attachments.push(item);
+        }
+    });
+
+    return attachments;
+};
+
+export const getAttachedLocalItems = async (id: string, itemType: string) => {
     if (localItemsCache.invalid) {
         localItemsCache.items = await OBR.scene.local.getItems();
         localItemsCache.invalid = false;
@@ -128,7 +152,7 @@ export const getAttachedItems = async (id: string, itemType: string) => {
     // why am I not using .filter() because if I do there is a bug and I can't find it
     const attachments: Item[] = [];
     localItemsCache.items.forEach((item) => {
-        if (item.attachedTo === id && infoMetadata in item.metadata && itemType === item.type) {
+        if (item.id === id && infoMetadata in item.metadata && itemType === item.type) {
             attachments.push(item);
         }
     });
