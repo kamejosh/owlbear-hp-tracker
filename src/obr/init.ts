@@ -43,78 +43,69 @@ const initItems = async () => {
 /**
  * The Texts that display the current HP of a Character Item must be updated anytime the metadata of the Character Items
  * is changed.
- *
  */
-const initLocalItems = async () => {
+const updateLocalScene = async (items: Item[]) => {
     const role = await OBR.player.getRole();
-
-    const updateScene = async (items: Item[]) => {
-        const characters = items.filter((item) => item.layer === "CHARACTER");
-        const changes = await prepareDisplayChanges(characters, role);
-        if (changes.textItems.size > 0) {
-            await OBR.scene.local.updateItems(isText, (texts) => {
-                texts.forEach((text) => {
-                    if (changes.textItems.has(text.id)) {
-                        const change = changes.textItems.get(text.id);
-                        if (change) {
-                            if (change.text) {
-                                text.text.plainText = change.text;
-                            }
-                            if (change.visible !== undefined) {
-                                text.visible = change.visible;
-                            }
-                            if (change.position) {
-                                text.position = change.position;
-                            }
+    const characters = items.filter((item) => item.layer === "CHARACTER" && characterMetadata in item.metadata);
+    const changes = await prepareDisplayChanges(characters, role);
+    if (changes.textItems.size > 0) {
+        await OBR.scene.local.updateItems(isText, (texts) => {
+            texts.forEach((text) => {
+                if (changes.textItems.has(text.id)) {
+                    const change = changes.textItems.get(text.id);
+                    if (change) {
+                        if (change.text) {
+                            text.text.plainText = change.text;
+                        }
+                        if (change.visible !== undefined) {
+                            text.visible = change.visible;
+                        }
+                        if (change.position) {
+                            text.position = change.position;
                         }
                     }
-                });
+                }
             });
-        }
-        if (changes.shapeItems.size > 0) {
-            await OBR.scene.local.updateItems(isShape, (shapes) => {
-                shapes.forEach((shape) => {
-                    if (changes.shapeItems.has(shape.id)) {
-                        const change = changes.shapeItems.get(shape.id);
-                        if (change) {
-                            if (change.width) {
-                                shape.width = change.width;
-                            }
-                            if (change.visible !== undefined) {
-                                shape.visible = change.visible;
-                            }
-                            if (change.position) {
-                                shape.position = change.position;
-                            }
-                            if (change.color) {
-                                shape.style.fillColor = change.color;
-                            }
+        });
+    }
+    if (changes.shapeItems.size > 0) {
+        await OBR.scene.local.updateItems(isShape, (shapes) => {
+            shapes.forEach((shape) => {
+                if (changes.shapeItems.has(shape.id)) {
+                    const change = changes.shapeItems.get(shape.id);
+                    if (change) {
+                        if (change.width) {
+                            shape.width = change.width;
+                        }
+                        if (change.visible !== undefined) {
+                            shape.visible = change.visible;
+                        }
+                        if (change.position) {
+                            shape.position = change.position;
+                        }
+                        if (change.color) {
+                            shape.style.fillColor = change.color;
                         }
                     }
-                });
+                }
             });
-        }
-    };
+        });
+    }
+}
 
-    const sceneItems = await OBR.scene.items.getItems(
-        (item) => item.layer === "CHARACTER" && characterMetadata in item.metadata
-    );
-    await updateScene(sceneItems);
-
+const setupLocalSceneListeners = () => {
     // Triggers everytime any item is changed
     OBR.scene.items.onChange(async (items) => {
         // But we only care about Character Items
-        await updateScene(items);
+        await updateLocalScene(items);
     });
 
     // Triggers when the scene metadata is changed
     OBR.scene.onMetadataChange(async () => {
-        const items = await OBR.scene.items.getItems(
-            (item) => item.layer === "CHARACTER" && characterMetadata in item.metadata
-        );
-        await updateScene(items);
+        const items = await OBR.scene.items.getItems();
+        await updateLocalScene(items);
     });
-};
+}
 
 const initScene = async () => {
     const metadata: Metadata = await OBR.scene.getMetadata();
@@ -285,33 +276,31 @@ const migrations = async () => {
     }
 };
 
-const delay = (ms: number) => {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-};
-
-const initLocalLoop = async () => {
-    let initialized = false;
-    while (!initialized) {
-        try {
-            await initLocalItems();
-            initialized = true;
-        } catch {
-            await delay(1000);
-        }
-    }
-};
+const sceneReady = async () => {
+    await migrations();
+    await initItems();
+    await initScene();
+    const items = await OBR.scene.items.getItems();
+    updateLocalScene(items);
+}
 
 OBR.onReady(async () => {
     console.log(`HP Tracker version ${version} initializing`);
     await setupContextMenu();
+
+    // Handle when the scene is either changed or made ready after extension load
     OBR.scene.onReadyChange(async (isReady) => {
         if (isReady) {
-            await migrations();
-            await initItems();
-            await initScene();
+            sceneReady();
         }
     });
-    try {
-        await initLocalLoop();
-    } catch {}
+
+    // Check if the scene is already ready once the extension loads 
+    const isReady = await OBR.scene.isReady();
+    if (isReady) {
+        sceneReady();
+    }
+
+    // Setup local scene listeners once so that we don't have to cleanup the event listeners
+    setupLocalSceneListeners();
 });
