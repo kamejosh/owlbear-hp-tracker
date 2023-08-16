@@ -29,21 +29,11 @@ const Content = () => {
     const initHpTracker = async () => {
         const initialItems = await OBR.scene.items.getItems(
             (item) =>
-                item.layer === "CHARACTER" &&
+                (item.layer === "CHARACTER" || item.layer === "MOUNT") &&
                 characterMetadata in item.metadata &&
                 (item.metadata[characterMetadata] as HpTrackerMetadata).hpTrackerActive
         );
         setTokens(initialItems);
-
-        OBR.scene.items.onChange(async (items) => {
-            const filteredItems = items.filter(
-                (item) =>
-                    item.layer === "CHARACTER" &&
-                    characterMetadata in item.metadata &&
-                    (item.metadata[characterMetadata] as HpTrackerMetadata).hpTrackerActive
-            );
-            setTokens(Array.from(filteredItems));
-        });
     };
 
     useEffect(() => {
@@ -51,6 +41,18 @@ const Content = () => {
             initHpTracker();
         }
     }, [isReady]);
+
+    useEffect(() => {
+        OBR.scene.items.onChange(async (items) => {
+            const filteredItems = items.filter(
+                (item) =>
+                    (item.layer === "CHARACTER" || item.layer === "MOUNT") &&
+                    characterMetadata in item.metadata &&
+                    (item.metadata[characterMetadata] as HpTrackerMetadata).hpTrackerActive
+            );
+            setTokens(Array.from(filteredItems));
+        });
+    }, []);
 
     const sortItems = (a: Item, b: Item) => {
         const aData = a.metadata[characterMetadata] as HpTrackerMetadata;
@@ -68,14 +70,6 @@ const Content = () => {
     };
 
     const sortedTokens = Array.from(tokens ?? []).sort(sortItems);
-
-    /*    const listInfo = (list: Array<Item>) => {
-        return list.map((token) => {
-            const data = token.metadata[characterMetadata] as HpTrackerMetadata;
-
-            return [data.name, data.index];
-        });
-    };*/
 
     const reorder = (list: Item[], startIndex: number, endIndex: number) => {
         const result = Array.from(list);

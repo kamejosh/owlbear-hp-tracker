@@ -6,6 +6,8 @@ import { characterMetadata, sceneMetadata } from "../../helper/variables.ts";
 import { useCharSheet } from "../../context/CharacterContext.ts";
 import { useGetOpen5eMonster } from "../../open5e/useOpen5e.ts";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
+import { updateText } from "../../helper/textHelpers.ts";
+import { updateHpBar } from "../../helper/shapeHelpers.ts";
 
 type TokenProps = {
     id: string;
@@ -69,18 +71,26 @@ export const Token = (props: TokenProps) => {
                     setData({ ...data, name: currentData.name });
                 } else if (key === "players") {
                     currentData.canPlayersSee = !!value;
+                    updateText(data.hpOnMap || data.acOnMap, !!value, props.id, { ...data, canPlayersSee: !!value });
                     setData({ ...data, canPlayersSee: currentData.canPlayersSee });
                 } else if (key === "acOnMap") {
                     currentData.acOnMap = !!value;
+                    updateText(data.hpOnMap || !!value, data.canPlayersSee, props.id, { ...data, acOnMap: !!value });
                     setData({ ...data, acOnMap: currentData.acOnMap });
                 } else if (key === "hpOnMap") {
                     currentData.hpOnMap = !!value;
+                    updateText(!!value || data.acOnMap, data.canPlayersSee, props.id, { ...data, hpOnMap: !!value });
                     setData({ ...data, hpOnMap: currentData.hpOnMap });
                 } else if (key === "hpBar") {
                     currentData.hpBar = !!value;
+                    updateHpBar(!!value, props.id, data);
                     setData({ ...data, hpBar: currentData.hpBar });
                 } else if (key === "armorClass") {
                     currentData.armorClass = allowNegativNumbers ? Number(value) : Math.max(Number(value), 0);
+                    updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee, props.id, {
+                        ...data,
+                        armorClass: currentData.armorClass,
+                    });
                     setData({ ...data, armorClass: currentData.armorClass });
                 } else if (key === "maxHP") {
                     currentData.maxHp = Math.max(Number(value), 0);
@@ -88,9 +98,20 @@ export const Token = (props: TokenProps) => {
                         currentData.hp = currentData.maxHp;
                         setData({ ...data, hp: currentData.hp });
                     }
+                    updateHpBar(data.hpBar, props.id, { ...data, hp: currentData.hp, maxHp: currentData.maxHp });
+                    updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee, props.id, {
+                        ...data,
+                        maxHp: currentData.maxHp,
+                        hp: currentData.hp,
+                    });
                     setData({ ...data, maxHp: currentData.maxHp });
                 } else if (key === "hp") {
                     currentData.hp = allowNegativNumbers ? Number(value) : Math.max(Number(value), 0);
+                    updateHpBar(data.hpBar, props.id, { ...data, hp: currentData.hp });
+                    updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee, props.id, {
+                        ...data,
+                        hp: currentData.hp,
+                    });
                     setData({ ...data, hp: currentData.hp });
                 } else if (key === "initiative") {
                     currentData.initiative = Number(value);

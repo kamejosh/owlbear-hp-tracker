@@ -37,8 +37,3 @@ export type ShapeItemChanges = {
     visible?: boolean;
     position?: { x: number; y: number };
 };
-
-export type Changes = {
-    textItems: Map<string, TextItemChanges>;
-    shapeItems: Map<string, ShapeItemChanges>;
-};
