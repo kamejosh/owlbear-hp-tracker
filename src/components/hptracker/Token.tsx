@@ -47,6 +47,8 @@ export const Token = (props: TokenProps) => {
         };
         if (isReady) {
             initMetadataValues();
+            updateHpBar(data.hpBar, props.id, data);
+            updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee, props.id, data);
         }
     }, [isReady]);
 

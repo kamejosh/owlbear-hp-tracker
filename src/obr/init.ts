@@ -9,7 +9,7 @@ import { migrate112To113 } from "../migrations/v113.ts";
 import { updateHpBar } from "../helper/shapeHelpers.ts";
 import { updateText } from "../helper/textHelpers.ts";
 
-const version = "1.1.3";
+const version = "1.2.0";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
