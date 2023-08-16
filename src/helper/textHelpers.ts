@@ -1,7 +1,7 @@
 import { HpTrackerMetadata, SceneMetadata, ShapeItemChanges, TextItemChanges } from "./types.ts";
 import { deleteAttachments, getAttachedItems, getImageBounds, getYOffset } from "./helpers.ts";
 import OBR, { buildText, Image, isText, Item, Metadata, Text } from "@owlbear-rodeo/sdk";
-import { infoMetadata, sceneMetadata } from "./variables.ts";
+import { characterMetadata, infoMetadata, sceneMetadata } from "./variables.ts";
 
 export const createText = async (text: string, token: Image) => {
     const width = 400;
@@ -93,7 +93,7 @@ export const updateText = async (show: boolean, visible: boolean, tokenId: strin
     }
 };
 
-const updateTextChanges = async (changes: Map<string, TextItemChanges>) => {
+export const updateTextChanges = async (changes: Map<string, TextItemChanges>) => {
     if (changes.size > 0) {
         await OBR.scene.items.updateItems(isText, (texts) => {
             texts.forEach((text) => {
@@ -149,31 +149,21 @@ export const saveOrChangeText = async (
     }
 };
 
-export const handleOtherTextChanges = async (
+export const handleTextVisibility = async (
     character: Item,
     attachments: Text[],
     changeMap: Map<string, TextItemChanges>
 ) => {
     if (attachments.length > 0) {
-        const bounds = await getImageBounds(character as Image);
-        const height = bounds.height / 2;
-        let offset = (((await OBR.scene.getMetadata()) as Metadata)[sceneMetadata] as SceneMetadata).hpBarOffset ?? 0;
-        const offsetFactor = bounds.height / 150;
-        offset *= offsetFactor;
+        const data = character.metadata[characterMetadata] as HpTrackerMetadata;
         attachments.forEach((attachment) => {
             if (infoMetadata in attachment.metadata) {
                 const change = changeMap.get(attachment.id) ?? {};
-                if (character.visible !== attachment.visible) {
-                    change.visible = character.visible;
-                }
                 if (
-                    character.position.x - Number(attachment.text.width) / 2 != attachment.position.x ||
-                    character.position.y + height - 47 + offset != attachment.position.y
+                    (!character.visible && character.visible !== attachment.visible) ||
+                    (character.visible && data.canPlayersSee)
                 ) {
-                    change.position = {
-                        x: character.position.x - Number(attachment.text.width) / 2,
-                        y: character.position.y + height - 47 + offset,
-                    };
+                    change.visible = character.visible;
                 }
                 changeMap.set(attachment.id, change);
             }

@@ -1,13 +1,14 @@
-import OBR, { Item, Metadata } from "@owlbear-rodeo/sdk";
+import OBR, { Item, Text, Metadata } from "@owlbear-rodeo/sdk";
 import { ID, characterMetadata, sceneMetadata } from "../helper/variables.ts";
 import { migrate102To103 } from "../migrations/v103.ts";
 import { migrate105To106 } from "../migrations/v106.ts";
 import { compare } from "compare-versions";
-import { HpTrackerMetadata, SceneMetadata } from "../helper/types.ts";
+import { HpTrackerMetadata, SceneMetadata, TextItemChanges } from "../helper/types.ts";
 import { migrate111To112 } from "../migrations/v112.ts";
 import { migrate112To113 } from "../migrations/v113.ts";
 import { updateHpBar } from "../helper/shapeHelpers.ts";
-import { updateText } from "../helper/textHelpers.ts";
+import { handleOtherTextChanges, handleTextVisibility, updateText, updateTextChanges } from "../helper/textHelpers.ts";
+import { getAttachedItems } from "../helper/helpers.ts";
 
 const version = "1.2.0";
 
@@ -227,6 +228,19 @@ const sceneReady = async () => {
     await initScene();
 };
 
+const registerEvents = () => {
+    // Triggers everytime any item is changed
+    OBR.scene.items.onChange(async (items) => {
+        const changeMap = new Map<string, TextItemChanges>();
+        const tokens = items.filter((item) => characterMetadata in item.metadata);
+        for (const token of tokens) {
+            const texts = await getAttachedItems(token.id, "TEXT");
+            await handleTextVisibility(token, texts as Array<Text>, changeMap);
+        }
+        await updateTextChanges(changeMap);
+    });
+};
+
 OBR.onReady(async () => {
     console.log(`HP Tracker version ${version} initializing`);
     await setupContextMenu();
@@ -240,4 +254,6 @@ OBR.onReady(async () => {
     if (isReady) {
         await sceneReady();
     }
+
+    registerEvents();
 });
