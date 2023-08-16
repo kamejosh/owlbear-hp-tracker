@@ -63,3 +63,10 @@ export const deleteAttachments = async (attachments: Item[]) => {
         await OBR.scene.items.deleteItems(attachments.map((attachment) => attachment.id));
     }
 };
+
+export const evalString = (s: string) => {
+    const tokens = s.replace(/\s/g, "").match(/[+\-]?([0-9]+)/g) || [];
+
+    // @ts-ignore this works but ts doesn't like it
+    return tokens.reduce((sum: string, value: string) => parseFloat(sum) + parseFloat(value));
+};

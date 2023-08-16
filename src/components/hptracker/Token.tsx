@@ -8,6 +8,7 @@ import { useGetOpen5eMonster } from "../../open5e/useOpen5e.ts";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { updateText } from "../../helper/textHelpers.ts";
 import { updateHpBar } from "../../helper/shapeHelpers.ts";
+import { evalString } from "../../helper/helpers.ts";
 
 type TokenProps = {
     id: string;
@@ -156,6 +157,21 @@ export const Token = (props: TokenProps) => {
         return "rgb(" + r + "," + g + ",0,0.2)";
     };
 
+    const getNewHpValue = (input: string) => {
+        let value = 0;
+        let factor = 1;
+        if (allowNegativNumbers) {
+            factor = input.startsWith("-") ? -1 : 1;
+        }
+        if (input.indexOf("+") > 0 || input.indexOf("-") > 0) {
+            value = evalString(input);
+        } else {
+            value = Number(input.replace(/[^0-9]/g, ""));
+        }
+        const hp = Math.min(Number(value * factor), data.maxHp);
+        return allowNegativNumbers ? hp : Math.max(hp, 0);
+    };
+
     return display() ? (
         <div
             className={`player-wrapper ${playerContext.role === "PLAYER" ? "player" : ""}`}
@@ -223,20 +239,25 @@ export const Token = (props: TokenProps) => {
                 <input
                     type={"text"}
                     size={3}
-                    value={data.hp}
-                    onChange={(e) => {
-                        let factor = 1;
-                        if (allowNegativNumbers) {
-                            factor = e.target.value.startsWith("-") ? -1 : 1;
-                        }
-                        const value = Number(e.target.value.replace(/[^0-9]/g, ""));
-                        handleValueChange(Math.min(Number(value * factor), data.maxHp), "hp");
+                    defaultValue={data.hp}
+                    onBlur={(e) => {
+                        const input = e.target.value;
+                        const hp = getNewHpValue(input);
+                        e.target.value = hp.toString();
                     }}
                     onKeyDown={(e) => {
                         if (e.key === "ArrowUp") {
-                            handleValueChange(Math.min(data.hp + 1, data.maxHp), "hp");
+                            const hp = Math.min(data.hp + 1, data.maxHp);
+                            handleValueChange(hp, "hp");
+                            e.currentTarget.value = hp.toString();
                         } else if (e.key === "ArrowDown") {
-                            handleValueChange(Math.min(data.hp - 1, data.maxHp), "hp");
+                            const hp = Math.min(data.hp - 1, data.maxHp);
+                            handleValueChange(hp, "hp");
+                            e.currentTarget.value = hp.toString();
+                        } else if (e.key === "Enter") {
+                            const input = e.currentTarget.value;
+                            const hp = getNewHpValue(input);
+                            e.currentTarget.value = hp.toString();
                         }
                     }}
                 />
