@@ -7,7 +7,7 @@ import { HpTrackerMetadata, SceneMetadata, TextItemChanges } from "../helper/typ
 import { migrate111To112 } from "../migrations/v112.ts";
 import { migrate112To113 } from "../migrations/v113.ts";
 import { updateHpBar } from "../helper/shapeHelpers.ts";
-import { handleOtherTextChanges, handleTextVisibility, updateText, updateTextChanges } from "../helper/textHelpers.ts";
+import { handleTextVisibility, updateText, updateTextChanges } from "../helper/textHelpers.ts";
 import { getAttachedItems } from "../helper/helpers.ts";
 
 const version = "1.2.0";
