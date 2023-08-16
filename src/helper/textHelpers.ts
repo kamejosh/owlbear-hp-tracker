@@ -1,7 +1,7 @@
-import { HpTrackerMetadata, SceneMetadata, ShapeItemChanges, TextItemChanges } from "./types.ts";
+import { HpTrackerMetadata, ShapeItemChanges, TextItemChanges } from "./types.ts";
 import { deleteAttachments, getAttachedItems, getImageBounds, getYOffset } from "./helpers.ts";
-import OBR, { buildText, Image, isText, Item, Metadata, Text } from "@owlbear-rodeo/sdk";
-import { characterMetadata, infoMetadata, sceneMetadata } from "./variables.ts";
+import OBR, { buildText, Image, isText, Item, Text } from "@owlbear-rodeo/sdk";
+import { characterMetadata, infoMetadata } from "./variables.ts";
 
 export const createText = async (text: string, token: Image) => {
     const width = 400;
