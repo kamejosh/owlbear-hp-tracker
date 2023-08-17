@@ -1,6 +1,6 @@
 import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
-import React, { MouseEvent, useEffect, useState } from "react";
+import React, { MouseEvent, useEffect, useRef, useState } from "react";
 import OBR, { Metadata } from "@owlbear-rodeo/sdk";
 import { characterMetadata, sceneMetadata } from "../../helper/variables.ts";
 import { useCharSheet } from "../../context/CharacterContext.ts";
@@ -22,6 +22,7 @@ export const Token = (props: TokenProps) => {
     const [allowNegativNumbers, setAllowNegativeNumbers] = useState<boolean | undefined>(undefined);
     const { isReady } = SceneReadyContext();
     const { setId } = useCharSheet();
+    const hpRef = useRef<HTMLInputElement>(null);
 
     const sheetQuery = useGetOpen5eMonster(data.sheet ?? "");
 
@@ -30,6 +31,12 @@ export const Token = (props: TokenProps) => {
     useEffect(() => {
         setData(props.data);
     }, [props.data]);
+
+    useEffect(() => {
+        if (hpRef && hpRef.current) {
+            hpRef.current.value = props.data.hp.toString();
+        }
+    }, [props.data.hp]);
 
     useEffect(() => {
         const initMetadataValues = async () => {
@@ -237,6 +244,7 @@ export const Token = (props: TokenProps) => {
             ) : null}
             <div className={"current-hp"}>
                 <input
+                    ref={hpRef}
                     type={"text"}
                     size={3}
                     defaultValue={data.hp}
@@ -244,6 +252,7 @@ export const Token = (props: TokenProps) => {
                         const input = e.target.value;
                         const hp = getNewHpValue(input);
                         e.target.value = hp.toString();
+                        handleValueChange(hp, "hp");
                     }}
                     onKeyDown={(e) => {
                         if (e.key === "ArrowUp") {
@@ -258,6 +267,7 @@ export const Token = (props: TokenProps) => {
                             const input = e.currentTarget.value;
                             const hp = getNewHpValue(input);
                             e.currentTarget.value = hp.toString();
+                            handleValueChange(hp, "hp");
                         }
                     }}
                 />
