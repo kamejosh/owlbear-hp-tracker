@@ -32,15 +32,6 @@ When active two additional context menu items are available to increase or decre
 
 Handle setting defaults and subscribing and handling HP changes so they are propagated properly across all Views.
 
-## Next steps
-
-The Extension is currently released as MVP. There is still a list of features that will be added in the coming weeks/months/years (suggestions welcome).
-
-+ UI Improvements: It's not the prettiest yet but we'll get there
-+ Add character state changes (prone, sleep, poison,...)
-+ Death Save tracking
-+ ...
-
 ## Building
 
 Can be built with `make build`, for development use `make run`.

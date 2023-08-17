@@ -1,11 +1,14 @@
 import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
-import React, { MouseEvent, useEffect, useState } from "react";
+import React, { MouseEvent, useEffect, useRef, useState } from "react";
 import OBR, { Metadata } from "@owlbear-rodeo/sdk";
 import { characterMetadata, sceneMetadata } from "../../helper/variables.ts";
 import { useCharSheet } from "../../context/CharacterContext.ts";
 import { useGetOpen5eMonster } from "../../open5e/useOpen5e.ts";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
+import { updateText } from "../../helper/textHelpers.ts";
+import { updateHpBar } from "../../helper/shapeHelpers.ts";
+import { evalString } from "../../helper/helpers.ts";
 
 type TokenProps = {
     id: string;
@@ -19,6 +22,7 @@ export const Token = (props: TokenProps) => {
     const [allowNegativNumbers, setAllowNegativeNumbers] = useState<boolean | undefined>(undefined);
     const { isReady } = SceneReadyContext();
     const { setId } = useCharSheet();
+    const hpRef = useRef<HTMLInputElement>(null);
 
     const sheetQuery = useGetOpen5eMonster(data.sheet ?? "");
 
@@ -27,6 +31,12 @@ export const Token = (props: TokenProps) => {
     useEffect(() => {
         setData(props.data);
     }, [props.data]);
+
+    useEffect(() => {
+        if (hpRef && hpRef.current) {
+            hpRef.current.value = props.data.hp.toString();
+        }
+    }, [props.data.hp]);
 
     useEffect(() => {
         const initMetadataValues = async () => {
@@ -45,6 +55,8 @@ export const Token = (props: TokenProps) => {
         };
         if (isReady) {
             initMetadataValues();
+            updateHpBar(data.hpBar, props.id, data);
+            updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee, props.id, data);
         }
     }, [isReady]);
 
@@ -69,18 +81,26 @@ export const Token = (props: TokenProps) => {
                     setData({ ...data, name: currentData.name });
                 } else if (key === "players") {
                     currentData.canPlayersSee = !!value;
+                    updateText(data.hpOnMap || data.acOnMap, !!value, props.id, { ...data, canPlayersSee: !!value });
                     setData({ ...data, canPlayersSee: currentData.canPlayersSee });
                 } else if (key === "acOnMap") {
                     currentData.acOnMap = !!value;
+                    updateText(data.hpOnMap || !!value, data.canPlayersSee, props.id, { ...data, acOnMap: !!value });
                     setData({ ...data, acOnMap: currentData.acOnMap });
                 } else if (key === "hpOnMap") {
                     currentData.hpOnMap = !!value;
+                    updateText(!!value || data.acOnMap, data.canPlayersSee, props.id, { ...data, hpOnMap: !!value });
                     setData({ ...data, hpOnMap: currentData.hpOnMap });
                 } else if (key === "hpBar") {
                     currentData.hpBar = !!value;
+                    updateHpBar(!!value, props.id, data);
                     setData({ ...data, hpBar: currentData.hpBar });
                 } else if (key === "armorClass") {
                     currentData.armorClass = allowNegativNumbers ? Number(value) : Math.max(Number(value), 0);
+                    updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee, props.id, {
+                        ...data,
+                        armorClass: currentData.armorClass,
+                    });
                     setData({ ...data, armorClass: currentData.armorClass });
                 } else if (key === "maxHP") {
                     currentData.maxHp = Math.max(Number(value), 0);
@@ -88,9 +108,20 @@ export const Token = (props: TokenProps) => {
                         currentData.hp = currentData.maxHp;
                         setData({ ...data, hp: currentData.hp });
                     }
+                    updateHpBar(data.hpBar, props.id, { ...data, hp: currentData.hp, maxHp: currentData.maxHp });
+                    updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee, props.id, {
+                        ...data,
+                        maxHp: currentData.maxHp,
+                        hp: currentData.hp,
+                    });
                     setData({ ...data, maxHp: currentData.maxHp });
                 } else if (key === "hp") {
                     currentData.hp = allowNegativNumbers ? Number(value) : Math.max(Number(value), 0);
+                    updateHpBar(data.hpBar, props.id, { ...data, hp: currentData.hp });
+                    updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee, props.id, {
+                        ...data,
+                        hp: currentData.hp,
+                    });
                     setData({ ...data, hp: currentData.hp });
                 } else if (key === "initiative") {
                     currentData.initiative = Number(value);
@@ -131,6 +162,21 @@ export const Token = (props: TokenProps) => {
         const g = 255 * percent;
         const r = 255 - 255 * percent;
         return "rgb(" + r + "," + g + ",0,0.2)";
+    };
+
+    const getNewHpValue = (input: string) => {
+        let value = 0;
+        let factor = 1;
+        if (allowNegativNumbers) {
+            factor = input.startsWith("-") ? -1 : 1;
+        }
+        if (input.indexOf("+") > 0 || input.indexOf("-") > 0) {
+            value = evalString(input);
+        } else {
+            value = Number(input.replace(/[^0-9]/g, ""));
+        }
+        const hp = Math.min(Number(value * factor), data.maxHp);
+        return allowNegativNumbers ? hp : Math.max(hp, 0);
     };
 
     return display() ? (
@@ -198,22 +244,30 @@ export const Token = (props: TokenProps) => {
             ) : null}
             <div className={"current-hp"}>
                 <input
+                    ref={hpRef}
                     type={"text"}
                     size={3}
-                    value={data.hp}
-                    onChange={(e) => {
-                        let factor = 1;
-                        if (allowNegativNumbers) {
-                            factor = e.target.value.startsWith("-") ? -1 : 1;
-                        }
-                        const value = Number(e.target.value.replace(/[^0-9]/g, ""));
-                        handleValueChange(Math.min(Number(value * factor), data.maxHp), "hp");
+                    defaultValue={data.hp}
+                    onBlur={(e) => {
+                        const input = e.target.value;
+                        const hp = getNewHpValue(input);
+                        e.target.value = hp.toString();
+                        handleValueChange(hp, "hp");
                     }}
                     onKeyDown={(e) => {
                         if (e.key === "ArrowUp") {
-                            handleValueChange(Math.min(data.hp + 1, data.maxHp), "hp");
+                            const hp = Math.min(data.hp + 1, data.maxHp);
+                            handleValueChange(hp, "hp");
+                            e.currentTarget.value = hp.toString();
                         } else if (e.key === "ArrowDown") {
-                            handleValueChange(Math.min(data.hp - 1, data.maxHp), "hp");
+                            const hp = Math.min(data.hp - 1, data.maxHp);
+                            handleValueChange(hp, "hp");
+                            e.currentTarget.value = hp.toString();
+                        } else if (e.key === "Enter") {
+                            const input = e.currentTarget.value;
+                            const hp = getNewHpValue(input);
+                            e.currentTarget.value = hp.toString();
+                            handleValueChange(hp, "hp");
                         }
                     }}
                 />

@@ -1,3 +1,12 @@
+# 1.2.0
+
++ Move from local Items to global Items because Owlbear handles them better out of the box
++ Now takes Token offset into consideration when placing HP Tracker Items
++ Visible State of HP Tracker Information now works as expected
++ HP Bar gets deleted if Token gets deleted
++ Existing Tokens now get their name assigned when HP Tracker Extension is added (didn't work previously)
++ HP can now be change via arithmetic operations
+
 # 1.1.3
 
 - Add Special Abilities to Monster Stat Block

@@ -5,6 +5,8 @@ import OBR, { Metadata } from "@owlbear-rodeo/sdk";
 import { SceneMetadata } from "../../../helper/types.ts";
 import "./global-settings.scss";
 import { SceneReadyContext } from "../../../context/SceneReadyContext.ts";
+import { updateHpBarOffset } from "../../../helper/shapeHelpers.ts";
+import { updateTextOffset } from "../../../helper/textHelpers.ts";
 
 export const GlobalSettings = () => {
     const [offset, setOffset] = useLocalStorage<number>(`${ID}.offset`, 0);
@@ -30,6 +32,8 @@ export const GlobalSettings = () => {
     }, [offset, segments, allowNegativNumbers]);
 
     const handleOffsetChange = (value: number) => {
+        updateHpBarOffset(value);
+        updateTextOffset(value);
         setOffset(value);
     };
 
