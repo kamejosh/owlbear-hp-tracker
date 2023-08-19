@@ -1,3 +1,7 @@
+# 1.2.1
+
++ Fix issue where HP Bar and Text would not disappear when hp tracker was set to inactive
+
 # 1.2.0
 
 + Move from local Items to global Items because Owlbear handles them better out of the box
