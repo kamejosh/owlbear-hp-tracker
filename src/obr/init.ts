@@ -10,7 +10,7 @@ import { updateHpBar } from "../helper/shapeHelpers.ts";
 import { handleTextVisibility, updateText, updateTextChanges } from "../helper/textHelpers.ts";
 import { getAttachedItems } from "../helper/helpers.ts";
 
-const version = "1.2.0";
+const version = "1.2.1";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -176,6 +176,13 @@ const setupContextMenu = async () => {
                     items.forEach((item) => {
                         if (characterMetadata in item.metadata) {
                             const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
+                            updateText(
+                                (metadata.hpOnMap || metadata.acOnMap) && !metadata.hpTrackerActive,
+                                metadata.canPlayersSee,
+                                item.id,
+                                { ...metadata }
+                            );
+                            updateHpBar(metadata.hpBar && !metadata.hpTrackerActive, item.id, { ...metadata });
                             metadata.hpTrackerActive = !metadata.hpTrackerActive;
                             item.metadata[characterMetadata] = metadata;
                         } else {
