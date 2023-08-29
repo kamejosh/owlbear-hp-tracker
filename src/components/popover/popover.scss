@@ -1,0 +1,46 @@
+#app {
+    &.popover-app {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        //overflow: hidden;
+
+        .popover {
+            .player-wrapper {
+                grid-template-rows: 1fr;
+                grid-template-columns: repeat(2, 1fr) repeat(3, 0.5fr);
+                justify-items: flex-start;
+                gap: 12px;
+                border-bottom: none;
+                height: 30px;
+
+                &.player {
+                    grid-template-columns: 1fr 0.5fr 0.25fr 0.5fr;
+                }
+
+                .current-hp {
+                    &::before {
+                        display: block;
+                        content: "HP: ";
+                    }
+                }
+
+                .armor-class {
+                    min-width: unset;
+
+                    &::before {
+                        display: block;
+                        content: "AC: ";
+                    }
+                }
+
+                .initiative-wrapper {
+                    &::before {
+                        display: block;
+                        content: "Init: ";
+                    }
+                }
+            }
+        }
+    }
+}
