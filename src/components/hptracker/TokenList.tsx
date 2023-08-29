@@ -30,7 +30,7 @@ export const DraggableTokenList = React.memo(function DraggableTokenList({ token
                         <Draggable key={token.id} draggableId={token.id} index={data.index ?? 0}>
                             {(provided) => (
                                 <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                    <Token id={token.id} data={data} />
+                                    <Token id={token.id} data={data} popover={false} />
                                 </div>
                             )}
                         </Draggable>
@@ -49,7 +49,7 @@ export const PlayerTokenList = ({ tokens }: { tokens: Item[] }) => {
             {tokens.map((token) => {
                 const data = token.metadata[characterMetadata] as HpTrackerMetadata;
                 if (data) {
-                    return <Token key={token.id} id={token.id} data={data} />;
+                    return <Token key={token.id} id={token.id} data={data} popover={false} />;
                 }
             })}
         </>

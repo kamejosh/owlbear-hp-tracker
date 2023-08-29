@@ -9,10 +9,12 @@ import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { updateText } from "../../helper/textHelpers.ts";
 import { updateHpBar } from "../../helper/shapeHelpers.ts";
 import { evalString } from "../../helper/helpers.ts";
+import "./player-wrapper.scss";
 
 type TokenProps = {
     id: string;
     data: HpTrackerMetadata;
+    popover: boolean;
 };
 
 export const Token = (props: TokenProps) => {
@@ -338,13 +340,15 @@ export const Token = (props: TokenProps) => {
                     }}
                 />
             </div>
-            <div className={"info-button-wrapper"}>
-                <button
-                    title={"Show Statblock"}
-                    className={"toggle-button info-button"}
-                    onClick={() => setId(props.id)}
-                />
-            </div>
+            {props.popover ? null : (
+                <div className={"info-button-wrapper"}>
+                    <button
+                        title={"Show Statblock"}
+                        className={"toggle-button info-button"}
+                        onClick={() => setId(props.id)}
+                    />
+                </div>
+            )}
         </div>
     ) : props.data.hpBar ? (
         <div

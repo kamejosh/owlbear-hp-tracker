@@ -66,81 +66,58 @@ const initScene = async () => {
 
 const setupContextMenu = async () => {
     await OBR.contextMenu.create({
-        id: `${ID}/plus`,
+        id: `${ID}/popover`,
         icons: [
             {
                 icon: "/plus.svg",
-                label: "Increase HP",
+                label: "HP Tracker",
                 filter: {
-                    every: [
-                        { key: "layer", value: "CHARACTER" },
-                        { key: "layer", value: "MOUNT", coordinator: "||" },
-                        {
-                            key: ["metadata", `${characterMetadata}`, "hpTrackerActive"],
-                            value: true,
-                        },
-                    ],
+                    every: [{ key: ["metadata", `${characterMetadata}`, "hpTrackerActive"], value: true }],
                     roles: ["GM"],
                 },
             },
         ],
-        onClick: async (context) => {
-            await OBR.scene.items.updateItems(context.items, (items) => {
-                items.forEach((item) => {
-                    if (characterMetadata in item.metadata) {
-                        const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
-                        metadata.hp = Math.min(metadata.hp + 1, metadata.maxHp);
-                        item.metadata[characterMetadata] = { ...metadata };
-                        updateHpBar(metadata.hpBar, item.id, { ...metadata });
-                        updateText(metadata.hpOnMap || metadata.acOnMap, metadata.canPlayersSee, item.id, {
-                            ...metadata,
-                        });
-                    }
-                });
+        onClick: (context, elementId) => {
+            OBR.popover.open({
+                id: `${ID}/popover`,
+                url: `/popover.html?id=${context.items[0].id}`,
+                height: 40,
+                width: 585,
+                anchorElementId: elementId,
             });
         },
     });
+
     await OBR.contextMenu.create({
-        id: `${ID}/minus`,
+        id: `${ID}/popoverPlayer`,
         icons: [
             {
-                icon: "/minus.svg",
-                label: "Decrease HP",
+                icon: "/plus.svg",
+                label: "HP Tracker",
                 filter: {
                     every: [
-                        { key: "layer", value: "CHARACTER" },
-                        { key: "layer", value: "MOUNT", coordinator: "||" },
+                        { key: ["metadata", `${characterMetadata}`, "hpTrackerActive"], value: true },
                         {
-                            key: ["metadata", `${characterMetadata}`, "hpTrackerActive"],
+                            key: ["metadata", `${characterMetadata}`, "canPlayersSee"],
                             value: true,
+                            coordinator: "&&",
                         },
                     ],
-                    roles: ["GM"],
+                    roles: ["PLAYER"],
                 },
             },
         ],
-        onClick: async (context) => {
-            const metadata = await OBR.scene.getMetadata();
-            let allowNegativeNumbers = false;
-            if (sceneMetadata in metadata) {
-                const sceneData = metadata[sceneMetadata] as SceneMetadata;
-                allowNegativeNumbers = sceneData.allowNegativeNumbers ?? false;
-            }
-            await OBR.scene.items.updateItems(context.items, (items) => {
-                items.forEach((item) => {
-                    if (characterMetadata in item.metadata) {
-                        const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
-                        metadata.hp = allowNegativeNumbers ? metadata.hp - 1 : Math.max(metadata.hp - 1, 0);
-                        item.metadata[characterMetadata] = { ...metadata };
-                        updateHpBar(metadata.hpBar, item.id, { ...metadata });
-                        updateText(metadata.hpOnMap || metadata.acOnMap, metadata.canPlayersSee, item.id, {
-                            ...metadata,
-                        });
-                    }
-                });
+        onClick: (context, elementId) => {
+            OBR.popover.open({
+                id: `${ID}/popover`,
+                url: `/popover.html?id=${context.items[0].id}`,
+                height: 40,
+                width: 471,
+                anchorElementId: elementId,
             });
         },
     });
+
     await OBR.contextMenu.create({
         id: `${ID}/tool`,
         icons: [
