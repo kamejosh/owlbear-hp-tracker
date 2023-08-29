@@ -186,32 +186,34 @@ export const Token = (props: TokenProps) => {
             className={`player-wrapper ${playerContext.role === "PLAYER" ? "player" : ""}`}
             style={{ background: `linear-gradient(to right, ${getBgColor()}, #242424 50%, #242424 )` }}
         >
-            <div className={"player-name"}>
-                {editName ? (
-                    <input
-                        className={"edit-name"}
-                        type={"text"}
-                        value={data.name}
-                        onChange={(e) => {
-                            handleValueChange(e.target.value, "name");
-                        }}
-                    />
-                ) : (
-                    <div
-                        className={"name"}
-                        onMouseDown={handleOnPlayerClick}
-                        onMouseUp={handleOnPlayerClick}
-                        onMouseLeave={handleOnPlayerClick}
-                    >
-                        {props.data.name}
-                    </div>
-                )}
-                <button
-                    title={"Change entry name"}
-                    className={`edit ${editName ? "on" : "off"}`}
-                    onClick={() => setEditName(!editName)}
-                ></button>
-            </div>
+            {props.popover ? null : (
+                <div className={"player-name"}>
+                    {editName ? (
+                        <input
+                            className={"edit-name"}
+                            type={"text"}
+                            value={data.name}
+                            onChange={(e) => {
+                                handleValueChange(e.target.value, "name");
+                            }}
+                        />
+                    ) : (
+                        <div
+                            className={"name"}
+                            onMouseDown={handleOnPlayerClick}
+                            onMouseUp={handleOnPlayerClick}
+                            onMouseLeave={handleOnPlayerClick}
+                        >
+                            {props.data.name}
+                        </div>
+                    )}
+                    <button
+                        title={"Change entry name"}
+                        className={`edit ${editName ? "on" : "off"}`}
+                        onClick={() => setEditName(!editName)}
+                    ></button>
+                </div>
+            )}
             {playerContext.role === "GM" ? (
                 <div className={"settings"}>
                     <button

@@ -82,7 +82,7 @@ const setupContextMenu = async () => {
                 id: `${ID}/popover`,
                 url: `/popover.html?id=${context.items[0].id}`,
                 height: 40,
-                width: 585,
+                width: 490,
                 anchorElementId: elementId,
             });
         },
@@ -112,7 +112,7 @@ const setupContextMenu = async () => {
                 id: `${ID}/popover`,
                 url: `/popover.html?id=${context.items[0].id}`,
                 height: 40,
-                width: 471,
+                width: 300,
                 anchorElementId: elementId,
             });
         },
