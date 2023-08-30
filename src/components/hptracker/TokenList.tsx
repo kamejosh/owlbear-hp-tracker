@@ -20,25 +20,33 @@ export const DraggableTokenList = React.memo(function DraggableTokenList({ token
 
     return (
         <>
-            {tokens?.map((token, index) => {
-                const data = token.metadata[characterMetadata] as HpTrackerMetadata;
-                if (data) {
-                    if (data.index === undefined) {
-                        updateTokenIndex(token.id, index);
+            {tokens.length > 0 ? (
+                tokens?.map((token, index) => {
+                    const data = token.metadata[characterMetadata] as HpTrackerMetadata;
+                    if (data) {
+                        if (data.index === undefined) {
+                            updateTokenIndex(token.id, index);
+                        }
+                        return (
+                            <Draggable key={token.id} draggableId={token.id} index={data.index ?? 0}>
+                                {(provided) => (
+                                    <div
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        {...provided.dragHandleProps}
+                                    >
+                                        <Token id={token.id} data={data} popover={false} />
+                                    </div>
+                                )}
+                            </Draggable>
+                        );
                     }
-                    return (
-                        <Draggable key={token.id} draggableId={token.id} index={data.index ?? 0}>
-                            {(provided) => (
-                                <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                    <Token id={token.id} data={data} popover={false} />
-                                </div>
-                            )}
-                        </Draggable>
-                    );
-                }
 
-                return null;
-            })}
+                    return null;
+                })
+            ) : (
+                <div className={"empty-group"}></div>
+            )}
         </>
     );
 });

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useLocalStorage } from "../../../helper/hooks.ts";
 import { ID, sceneMetadata } from "../../../helper/variables.ts";
 import OBR, { Metadata } from "@owlbear-rodeo/sdk";
@@ -15,6 +15,8 @@ export const GlobalSettings = () => {
         `${ID}.allowNegativeNumbers`,
         false
     );
+    const [groups, setGroups] = useLocalStorage<string>(`${ID}.allowNegativeNumbers`, "Default");
+    const groupInputRef = useRef<HTMLInputElement>(null);
     const { isReady } = SceneReadyContext();
     const [hide, setHide] = useState<boolean>(true);
 
@@ -31,10 +33,50 @@ export const GlobalSettings = () => {
         }
     }, [offset, segments, allowNegativNumbers]);
 
+    useEffect(() => {
+        const setSceneMetadata = async () => {
+            const metadata: Metadata = await OBR.scene.getMetadata();
+            if (
+                groups.split(" ").length > 0 &&
+                (metadata[sceneMetadata] as SceneMetadata).groups?.toString() !== groups
+            ) {
+                (metadata[sceneMetadata] as SceneMetadata).groups = groups.split(" ");
+                await OBR.scene.setMetadata(metadata);
+            }
+        };
+        if (isReady) {
+            setSceneMetadata();
+        }
+    }, [groups]);
+
+    useEffect(() => {
+        const setInitialGroups = async () => {
+            const metadata: Metadata = await OBR.scene.getMetadata();
+            const data = metadata[sceneMetadata] as SceneMetadata;
+            if (data.groups) {
+                setGroups(data.groups.join(" "));
+            }
+        };
+        if (isReady) {
+            setInitialGroups();
+        }
+    }, []);
+
     const handleOffsetChange = (value: number) => {
         updateHpBarOffset(value);
         updateTextOffset(value);
         setOffset(value);
+    };
+
+    const handleGroupsChange = (value: string) => {
+        const g = value.split(" ").filter((value, index, array) => {
+            return index === array.indexOf(value) && value !== "";
+        });
+        if (!g.includes("Default")) {
+            g.splice(0, 0, "Default");
+        }
+        setGroups(g.join(" "));
+        groupInputRef.current!.value = g.join(" ");
     };
 
     return (
@@ -90,6 +132,22 @@ export const GlobalSettings = () => {
                             checked={allowNegativNumbers}
                             onChange={() => {
                                 setAllowNegativeNumbers(!allowNegativNumbers);
+                            }}
+                        />
+                    </div>
+                    <div className={"groups"}>
+                        Groups:
+                        <input
+                            ref={groupInputRef}
+                            type={"text"}
+                            defaultValue={groups}
+                            onBlur={(e) => {
+                                handleGroupsChange(e.target.value);
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    handleGroupsChange(e.currentTarget.value);
+                                }
                             }}
                         />
                     </div>
