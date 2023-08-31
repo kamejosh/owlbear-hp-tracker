@@ -10,7 +10,7 @@ import { updateHpBar } from "../helper/shapeHelpers.ts";
 import { handleTextVisibility, updateText, updateTextChanges } from "../helper/textHelpers.ts";
 import { getAttachedItems } from "../helper/helpers.ts";
 
-const version = "1.2.1";
+const version = "1.3.0";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.

@@ -1,6 +1,7 @@
 # 1.3.0
 
 + Reintroduce Popover to manage stats directly at the token
++ Add Token Grouping
 
 # 1.2.1
 

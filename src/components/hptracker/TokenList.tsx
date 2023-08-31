@@ -28,7 +28,7 @@ export const DraggableTokenList = React.memo(function DraggableTokenList({ token
                             updateTokenIndex(token.id, index);
                         }
                         return (
-                            <Draggable key={token.id} draggableId={token.id} index={data.index ?? 0}>
+                            <Draggable key={token.id} draggableId={token.id} index={index}>
                                 {(provided) => (
                                     <div
                                         ref={provided.innerRef}
