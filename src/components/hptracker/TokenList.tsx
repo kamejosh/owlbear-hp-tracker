@@ -1,17 +1,17 @@
 import React from "react";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
 import { characterMetadata } from "../../helper/variables.ts";
-import { HpTrackerMetadata } from "../../helper/types.ts";
+import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
 import { Draggable } from "react-beautiful-dnd";
 import { Token } from "./Token.tsx";
 
-export const DraggableTokenList = React.memo(function DraggableTokenList({
-    tokens,
-    selected,
-}: {
+type TokenListProps = {
     tokens: Item[];
     selected: Array<string>;
-}) {
+    metadata: SceneMetadata;
+};
+
+export const DraggableTokenList = React.memo(function DraggableTokenList(props: TokenListProps) {
     const updateTokenIndex = (id: string, index: number) => {
         OBR.scene.items.updateItems([id], (items) => {
             items.forEach((item) => {
@@ -26,8 +26,8 @@ export const DraggableTokenList = React.memo(function DraggableTokenList({
 
     return (
         <>
-            {tokens.length > 0 ? (
-                tokens?.map((token, index) => {
+            {props.tokens.length > 0 ? (
+                props.tokens?.map((token, index) => {
                     const data = token.metadata[characterMetadata] as HpTrackerMetadata;
                     if (data) {
                         if (data.index === undefined) {
@@ -45,7 +45,8 @@ export const DraggableTokenList = React.memo(function DraggableTokenList({
                                             id={token.id}
                                             data={data}
                                             popover={false}
-                                            selected={selected.includes(token.id)}
+                                            selected={props.selected.includes(token.id)}
+                                            metadata={props.metadata}
                                         />
                                     </div>
                                 )}
@@ -62,10 +63,10 @@ export const DraggableTokenList = React.memo(function DraggableTokenList({
     );
 });
 
-export const PlayerTokenList = ({ tokens, selected }: { tokens: Item[]; selected: Array<string> }) => {
+export const PlayerTokenList = (props: TokenListProps) => {
     return (
         <>
-            {tokens.map((token) => {
+            {props.tokens.map((token) => {
                 const data = token.metadata[characterMetadata] as HpTrackerMetadata;
                 if (data) {
                     return (
@@ -74,7 +75,8 @@ export const PlayerTokenList = ({ tokens, selected }: { tokens: Item[]; selected
                             id={token.id}
                             data={data}
                             popover={false}
-                            selected={selected.includes(token.id)}
+                            selected={props.selected.includes(token.id)}
+                            metadata={props.metadata}
                         />
                     );
                 }

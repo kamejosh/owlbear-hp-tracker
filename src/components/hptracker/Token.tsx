@@ -16,6 +16,7 @@ type TokenProps = {
     data: HpTrackerMetadata;
     popover: boolean;
     selected: boolean;
+    metadata: SceneMetadata;
 };
 
 export const Token = (props: TokenProps) => {
@@ -61,10 +62,8 @@ export const Token = (props: TokenProps) => {
     }, [isReady]);
 
     useEffect(() => {
-        OBR.scene.onMetadataChange((metadata) => {
-            handleMetadata(metadata);
-        });
-    }, []);
+        handleMetadata(props.metadata);
+    }, [props.metadata]);
 
     useEffect(() => {
         // could be undefined so we check for boolean

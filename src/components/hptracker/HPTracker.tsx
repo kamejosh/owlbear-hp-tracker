@@ -25,10 +25,9 @@ export const HPTracker = () => {
 const Content = () => {
     const playerContext = usePlayerContext();
     const [tokens, setTokens] = useState<Item[] | undefined>(undefined);
-    const [groups, setGroups] = useState<Array<string>>([]);
     const [selectedTokens, setSelectedTokens] = useState<Array<string>>([]);
     const [tokenLists, setTokenLists] = useState<Map<string, Array<Item>>>(new Map());
-    const [sceneId, setSceneId] = useState<string>("");
+    const [currentSceneMetadata, setCurrentSceneMetadata] = useState<SceneMetadata | null>(null);
     const { isReady } = SceneReadyContext();
     const { characterId } = useCharSheet();
 
@@ -43,8 +42,7 @@ const Content = () => {
 
         const sceneData = await OBR.scene.getMetadata();
         const metadata = sceneData[sceneMetadata] as SceneMetadata;
-        setGroups(metadata.groups ?? []);
-        setSceneId(sceneId);
+        setCurrentSceneMetadata(metadata);
     };
 
     useEffect(() => {
@@ -66,10 +64,7 @@ const Content = () => {
         OBR.scene.onMetadataChange((sceneData) => {
             const metadata = sceneData[sceneMetadata] as SceneMetadata;
             if (metadata) {
-                setGroups(metadata?.groups ?? []);
-                if (sceneId !== metadata.id) {
-                    setSceneId(metadata.id);
-                }
+                setCurrentSceneMetadata(metadata);
             }
         });
         OBR.player.onChange((player) => {
@@ -80,20 +75,20 @@ const Content = () => {
     useEffect(() => {
         const tokenMap = new Map<string, Array<Item>>();
 
-        groups.forEach((group) => {
+        currentSceneMetadata?.groups?.forEach((group) => {
             const groupItems = tokens?.filter((item) => {
                 const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
                 return (
                     (!metadata.group && group === "Default") ||
                     metadata.group === group ||
-                    (!groups.includes(metadata.group ?? "") && group === "Default")
+                    (!currentSceneMetadata?.groups?.includes(metadata.group ?? "") && group === "Default")
                 );
             });
             tokenMap.set(group, groupItems ?? []);
         });
 
         setTokenLists(tokenMap);
-    }, [groups, tokens]);
+    }, [currentSceneMetadata?.groups, tokens]);
 
     const reorderMetadataIndex = (list: Array<Item>, group?: string) => {
         OBR.scene.items.updateItems(list, (items) => {
@@ -162,7 +157,9 @@ const Content = () => {
         ) : (
             <div className={"hp-tracker"}>
                 <h1 className={"title"}>HP Tracker</h1>
-                {playerContext.role === "GM" && !!sceneId ? <GlobalSettings sceneId={sceneId} /> : null}
+                {playerContext.role === "GM" && !!currentSceneMetadata?.id ? (
+                    <GlobalSettings sceneId={currentSceneMetadata.id} />
+                ) : null}
                 <div className={`player-wrapper headings ${playerContext.role === "PLAYER" ? "player" : ""}`}>
                     <span>Name</span>
                     {playerContext.role === "GM" ? <span>Settings</span> : null}
@@ -171,10 +168,10 @@ const Content = () => {
                     <span className={"initiative-wrapper"}>INIT</span>
                     <span className={"character-sheet"}>INFO</span>
                 </div>
-                {playerContext.role === "GM" ? (
+                {playerContext.role === "GM" && currentSceneMetadata ? (
                     <DragDropContext onDragEnd={onDragEnd}>
-                        {groups.length > 0 ? (
-                            groups.map((group) => {
+                        {currentSceneMetadata.groups!.length > 0 ? (
+                            currentSceneMetadata.groups?.map((group) => {
                                 const list = tokenLists.get(group) || [];
                                 return (
                                     <DropGroup
@@ -182,6 +179,7 @@ const Content = () => {
                                         title={group}
                                         list={list.sort(sortItems)}
                                         selected={selectedTokens}
+                                        metadata={currentSceneMetadata}
                                     />
                                 );
                             })
@@ -190,11 +188,12 @@ const Content = () => {
                                 title={"Default"}
                                 list={Array.from(tokens ?? []).sort(sortItems)}
                                 selected={selectedTokens}
+                                metadata={currentSceneMetadata}
                             />
                         )}
                     </DragDropContext>
                 ) : (
-                    <PlayerTokenList tokens={tokens ?? []} selected={selectedTokens} />
+                    <PlayerTokenList tokens={tokens ?? []} selected={selectedTokens} metadata={currentSceneMetadata!} />
                 )}
             </div>
         )

@@ -2,11 +2,13 @@ import { Droppable } from "react-beautiful-dnd";
 import { DraggableTokenList } from "./TokenList.tsx";
 import React from "react";
 import { Item } from "@owlbear-rodeo/sdk";
+import { SceneMetadata } from "../../helper/types.ts";
 
 type DropGroupProps = {
     title: string;
     list: Array<Item>;
     selected: Array<string>;
+    metadata: SceneMetadata;
 };
 
 export const DropGroup = (props: DropGroupProps) => {
@@ -25,7 +27,11 @@ export const DropGroup = (props: DropGroupProps) => {
                 <Droppable droppableId={props.title}>
                     {(provided) => (
                         <div ref={provided.innerRef} {...provided.droppableProps}>
-                            <DraggableTokenList tokens={props.list} selected={props.selected} />
+                            <DraggableTokenList
+                                tokens={props.list}
+                                selected={props.selected}
+                                metadata={props.metadata}
+                            />
                             {provided.placeholder}
                         </div>
                     )}
