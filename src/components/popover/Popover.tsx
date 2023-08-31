@@ -48,7 +48,7 @@ const Content = () => {
 
     return id && data ? (
         <div className={"popover"}>
-            <Token id={id} data={data} popover={true} />
+            <Token id={id} data={data} popover={true} selected={false} />
         </div>
     ) : null;
 };
