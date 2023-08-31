@@ -6,6 +6,7 @@ import { Item } from "@owlbear-rodeo/sdk";
 type DropGroupProps = {
     title: string;
     list: Array<Item>;
+    selected: Array<string>;
 };
 
 export const DropGroup = (props: DropGroupProps) => {
@@ -24,7 +25,7 @@ export const DropGroup = (props: DropGroupProps) => {
                 <Droppable droppableId={props.title}>
                     {(provided) => (
                         <div ref={provided.innerRef} {...provided.droppableProps}>
-                            <DraggableTokenList tokens={props.list} />
+                            <DraggableTokenList tokens={props.list} selected={props.selected} />
                             {provided.placeholder}
                         </div>
                     )}

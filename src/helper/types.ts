@@ -20,11 +20,11 @@ export type HpTextMetadata = {
 
 export type SceneMetadata = {
     version: string;
+    id: string;
     allowNegativeNumbers?: boolean;
     hpBarSegments?: number;
     hpBarOffset?: number;
     groups?: Array<string>;
-    activeTokens: [];
 };
 
 export type TextItemChanges = {

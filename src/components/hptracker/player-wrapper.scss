@@ -10,6 +10,10 @@
     border-bottom: 1px solid white;
     padding: 5px;
 
+    &.selected {
+        box-shadow: 1px 1px 10px white;
+    }
+
     @include breakpoint.laptop {
         grid-template-rows: 1fr;
         grid-template-columns: repeat(2, 1fr) 0.5fr 0.25fr 0.5fr 0.25fr;

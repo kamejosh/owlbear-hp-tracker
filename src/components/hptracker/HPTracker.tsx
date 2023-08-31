@@ -26,7 +26,9 @@ const Content = () => {
     const playerContext = usePlayerContext();
     const [tokens, setTokens] = useState<Item[] | undefined>(undefined);
     const [groups, setGroups] = useState<Array<string>>([]);
+    const [selectedTokens, setSelectedTokens] = useState<Array<string>>([]);
     const [tokenLists, setTokenLists] = useState<Map<string, Array<Item>>>(new Map());
+    const [sceneId, setSceneId] = useState<string>("");
     const { isReady } = SceneReadyContext();
     const { characterId } = useCharSheet();
 
@@ -42,6 +44,7 @@ const Content = () => {
         const sceneData = await OBR.scene.getMetadata();
         const metadata = sceneData[sceneMetadata] as SceneMetadata;
         setGroups(metadata.groups ?? []);
+        setSceneId(sceneId);
     };
 
     useEffect(() => {
@@ -62,7 +65,13 @@ const Content = () => {
         });
         OBR.scene.onMetadataChange((sceneData) => {
             const metadata = sceneData[sceneMetadata] as SceneMetadata;
-            setGroups(metadata.groups ?? []);
+            setGroups(metadata?.groups ?? []);
+            if (sceneId !== metadata.id) {
+                setSceneId(metadata.id);
+            }
+        });
+        OBR.player.onChange((player) => {
+            setSelectedTokens(player.selection ?? []);
         });
     }, []);
 
@@ -151,7 +160,7 @@ const Content = () => {
         ) : (
             <div className={"hp-tracker"}>
                 <h1 className={"title"}>HP Tracker</h1>
-                {playerContext.role === "GM" ? <GlobalSettings /> : null}
+                {playerContext.role === "GM" && !!sceneId ? <GlobalSettings sceneId={sceneId} /> : null}
                 <div className={`player-wrapper headings ${playerContext.role === "PLAYER" ? "player" : ""}`}>
                     <span>Name</span>
                     {playerContext.role === "GM" ? <span>Settings</span> : null}
@@ -165,14 +174,25 @@ const Content = () => {
                         {groups.length > 0 ? (
                             groups.map((group) => {
                                 const list = tokenLists.get(group) || [];
-                                return <DropGroup key={group} title={group} list={list.sort(sortItems)} />;
+                                return (
+                                    <DropGroup
+                                        key={group}
+                                        title={group}
+                                        list={list.sort(sortItems)}
+                                        selected={selectedTokens}
+                                    />
+                                );
                             })
                         ) : (
-                            <DropGroup title={"Default"} list={Array.from(tokens ?? []).sort(sortItems)} />
+                            <DropGroup
+                                title={"Default"}
+                                list={Array.from(tokens ?? []).sort(sortItems)}
+                                selected={selectedTokens}
+                            />
                         )}
                     </DragDropContext>
                 ) : (
-                    <PlayerTokenList tokens={tokens ?? []} />
+                    <PlayerTokenList tokens={tokens ?? []} selected={selectedTokens} />
                 )}
             </div>
         )

@@ -8,14 +8,14 @@ import { SceneReadyContext } from "../../../context/SceneReadyContext.ts";
 import { updateHpBarOffset } from "../../../helper/shapeHelpers.ts";
 import { updateTextOffset } from "../../../helper/textHelpers.ts";
 
-export const GlobalSettings = () => {
+export const GlobalSettings = ({ sceneId }: { sceneId: string }) => {
     const [offset, setOffset] = useLocalStorage<number>(`${ID}.offset`, 0);
     const [segments, setSegments] = useLocalStorage<number>(`${ID}.hpSegments`, 0);
     const [allowNegativNumbers, setAllowNegativeNumbers] = useLocalStorage<boolean>(
         `${ID}.allowNegativeNumbers`,
         false
     );
-    const [groups, setGroups] = useLocalStorage<string>(`${ID}.allowNegativeNumbers`, "Default");
+    const [groups, setGroups] = useLocalStorage<string>(`${ID}.${sceneId}.groups`, "Default");
     const groupInputRef = useRef<HTMLInputElement>(null);
     const { isReady } = SceneReadyContext();
     const [hide, setHide] = useState<boolean>(true);

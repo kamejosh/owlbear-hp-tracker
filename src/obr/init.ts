@@ -9,6 +9,7 @@ import { migrate112To113 } from "../migrations/v113.ts";
 import { updateHpBar } from "../helper/shapeHelpers.ts";
 import { handleTextVisibility, updateText, updateTextChanges } from "../helper/textHelpers.ts";
 import { getAttachedItems } from "../helper/helpers.ts";
+import { v4 as uuidv4 } from "uuid";
 
 const version = "1.3.0";
 
@@ -45,11 +46,20 @@ const initItems = async () => {
 const initScene = async () => {
     const metadata: Metadata = await OBR.scene.getMetadata();
     if (!(sceneMetadata in metadata)) {
-        metadata[sceneMetadata] = { version: version, hpBarSegments: 0, hpBarOffset: 0, allowNegativNumbers: false };
+        metadata[sceneMetadata] = {
+            version: version,
+            hpBarSegments: 0,
+            hpBarOffset: 0,
+            allowNegativNumbers: false,
+            id: uuidv4(),
+        };
     } else {
         const sceneData = metadata[sceneMetadata] as SceneMetadata;
         sceneData.version = version;
 
+        if (!sceneData.id) {
+            sceneData.id = uuidv4();
+        }
         if (sceneData.hpBarSegments === undefined) {
             sceneData.hpBarSegments = 0;
         }
@@ -61,6 +71,7 @@ const initScene = async () => {
         }
         metadata[sceneMetadata] = sceneData;
     }
+    console.log(metadata);
     await OBR.scene.setMetadata(metadata);
 };
 

@@ -5,7 +5,13 @@ import { HpTrackerMetadata } from "../../helper/types.ts";
 import { Draggable } from "react-beautiful-dnd";
 import { Token } from "./Token.tsx";
 
-export const DraggableTokenList = React.memo(function DraggableTokenList({ tokens }: { tokens: Item[] }) {
+export const DraggableTokenList = React.memo(function DraggableTokenList({
+    tokens,
+    selected,
+}: {
+    tokens: Item[];
+    selected: Array<string>;
+}) {
     const updateTokenIndex = (id: string, index: number) => {
         OBR.scene.items.updateItems([id], (items) => {
             items.forEach((item) => {
@@ -35,7 +41,12 @@ export const DraggableTokenList = React.memo(function DraggableTokenList({ token
                                         {...provided.draggableProps}
                                         {...provided.dragHandleProps}
                                     >
-                                        <Token id={token.id} data={data} popover={false} />
+                                        <Token
+                                            id={token.id}
+                                            data={data}
+                                            popover={false}
+                                            selected={selected.includes(token.id)}
+                                        />
                                     </div>
                                 )}
                             </Draggable>
@@ -51,13 +62,21 @@ export const DraggableTokenList = React.memo(function DraggableTokenList({ token
     );
 });
 
-export const PlayerTokenList = ({ tokens }: { tokens: Item[] }) => {
+export const PlayerTokenList = ({ tokens, selected }: { tokens: Item[]; selected: Array<string> }) => {
     return (
         <>
             {tokens.map((token) => {
                 const data = token.metadata[characterMetadata] as HpTrackerMetadata;
                 if (data) {
-                    return <Token key={token.id} id={token.id} data={data} popover={false} />;
+                    return (
+                        <Token
+                            key={token.id}
+                            id={token.id}
+                            data={data}
+                            popover={false}
+                            selected={selected.includes(token.id)}
+                        />
+                    );
                 }
             })}
         </>

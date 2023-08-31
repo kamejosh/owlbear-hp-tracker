@@ -1,6 +1,6 @@
 import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
-import React, { MouseEvent, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import OBR, { Metadata } from "@owlbear-rodeo/sdk";
 import { characterMetadata, sceneMetadata } from "../../helper/variables.ts";
 import { useCharSheet } from "../../context/CharacterContext.ts";
@@ -15,6 +15,7 @@ type TokenProps = {
     id: string;
     data: HpTrackerMetadata;
     popover: boolean;
+    selected: boolean;
 };
 
 export const Token = (props: TokenProps) => {
@@ -135,15 +136,22 @@ export const Token = (props: TokenProps) => {
         });
     };
 
-    const handleOnPlayerClick = (event: MouseEvent) => {
-        OBR.scene.items.updateItems([props.id], (items) => {
-            items.forEach((item) => {
-                if (event.type === "mousedown") {
-                    item.rotation = 10;
-                } else {
-                    item.rotation = 0;
-                }
-            });
+    const handleOnPlayerClick = async () => {
+        const currentSelection = (await OBR.player.getSelection()) || [];
+        if (currentSelection.includes(props.id)) {
+            currentSelection.splice(currentSelection.indexOf(props.id), 1);
+        } else {
+            currentSelection.push(props.id);
+        }
+        await OBR.player.select(currentSelection);
+    };
+
+    const handleOnPlayerDoubleClick = async () => {
+        const bounds = await OBR.scene.items.getItemBounds([props.id]);
+        await OBR.viewport.animateToBounds({
+            ...bounds,
+            min: { x: bounds.min.x - 1000, y: bounds.min.y - 1000 },
+            max: { x: bounds.max.x + 1000, y: bounds.max.y + 1000 },
         });
     };
 
@@ -183,7 +191,9 @@ export const Token = (props: TokenProps) => {
 
     return display() ? (
         <div
-            className={`player-wrapper ${playerContext.role === "PLAYER" ? "player" : ""}`}
+            className={`player-wrapper ${playerContext.role === "PLAYER" ? "player" : ""} ${
+                props.selected ? "selected" : ""
+            }`}
             style={{ background: `linear-gradient(to right, ${getBgColor()}, #242424 50%, #242424 )` }}
         >
             {props.popover ? null : (
@@ -198,12 +208,7 @@ export const Token = (props: TokenProps) => {
                             }}
                         />
                     ) : (
-                        <div
-                            className={"name"}
-                            onMouseDown={handleOnPlayerClick}
-                            onMouseUp={handleOnPlayerClick}
-                            onMouseLeave={handleOnPlayerClick}
-                        >
+                        <div className={"name"} onClick={handleOnPlayerClick} onDoubleClick={handleOnPlayerDoubleClick}>
                             {props.data.name}
                         </div>
                     )}
