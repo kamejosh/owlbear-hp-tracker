@@ -65,9 +65,11 @@ const Content = () => {
         });
         OBR.scene.onMetadataChange((sceneData) => {
             const metadata = sceneData[sceneMetadata] as SceneMetadata;
-            setGroups(metadata?.groups ?? []);
-            if (sceneId !== metadata.id) {
-                setSceneId(metadata.id);
+            if (metadata) {
+                setGroups(metadata?.groups ?? []);
+                if (sceneId !== metadata.id) {
+                    setSceneId(metadata.id);
+                }
             }
         });
         OBR.player.onChange((player) => {

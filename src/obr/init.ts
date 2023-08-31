@@ -71,7 +71,6 @@ const initScene = async () => {
         }
         metadata[sceneMetadata] = sceneData;
     }
-    console.log(metadata);
     await OBR.scene.setMetadata(metadata);
 };
 

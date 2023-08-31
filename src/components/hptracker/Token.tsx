@@ -31,6 +31,13 @@ export const Token = (props: TokenProps) => {
 
     const sheetData = sheetQuery.isSuccess ? sheetQuery.data : null;
 
+    const handleMetadata = (metadata: Metadata) => {
+        if (sceneMetadata in metadata) {
+            const sceneData = metadata[sceneMetadata] as SceneMetadata;
+            setAllowNegativeNumbers(sceneData.allowNegativeNumbers ?? false);
+        }
+    };
+
     useEffect(() => {
         setData(props.data);
     }, [props.data]);
@@ -43,18 +50,8 @@ export const Token = (props: TokenProps) => {
 
     useEffect(() => {
         const initMetadataValues = async () => {
-            const handleMetadata = (metadata: Metadata) => {
-                if (sceneMetadata in metadata) {
-                    const sceneData = metadata[sceneMetadata] as SceneMetadata;
-                    setAllowNegativeNumbers(sceneData.allowNegativeNumbers ?? false);
-                }
-            };
             const metadata = (await OBR.scene.getMetadata()) as Metadata;
             handleMetadata(metadata);
-
-            OBR.scene.onMetadataChange((metadata) => {
-                handleMetadata(metadata);
-            });
         };
         if (isReady) {
             initMetadataValues();
@@ -62,6 +59,12 @@ export const Token = (props: TokenProps) => {
             updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee, props.id, data);
         }
     }, [isReady]);
+
+    useEffect(() => {
+        OBR.scene.onMetadataChange((metadata) => {
+            handleMetadata(metadata);
+        });
+    }, []);
 
     useEffect(() => {
         // could be undefined so we check for boolean
