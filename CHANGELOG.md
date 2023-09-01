@@ -4,6 +4,7 @@
 + Add Token Grouping
 + Improve token highlighting and better selection feedback
 + Double click on Token Name focuses viewport von Token 
++ Add Changelog Button
 
 # 1.2.1
 

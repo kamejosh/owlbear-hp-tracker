@@ -43,6 +43,10 @@
 
     .title {
         align-self: flex-start;
+
+        .small {
+            font-size: 10px;
+        }
     }
 
     .group-wrapper {

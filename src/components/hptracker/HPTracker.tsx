@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
-import { characterMetadata, sceneMetadata } from "../../helper/variables.ts";
+import { characterMetadata, sceneMetadata, version } from "../../helper/variables.ts";
 import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
 import { DragDropContext, DraggableLocation, DropResult } from "react-beautiful-dnd";
 import "./hp-tracker.scss";
@@ -172,7 +172,9 @@ const Content = () => {
                     </button>
                     <ReactMarkdown children={changelogText} />
                 </dialog>
-                <h1 className={"title"}>HP Tracker</h1>
+                <h1 className={"title"}>
+                    HP Tracker<span className={"small"}>{version}</span>
+                </h1>
                 {playerContext.role === "GM" && !!currentSceneMetadata?.id ? (
                     <GlobalSettings sceneId={currentSceneMetadata.id} />
                 ) : null}

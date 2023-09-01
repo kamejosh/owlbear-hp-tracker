@@ -1,5 +1,5 @@
 import OBR, { Item, Text, Metadata } from "@owlbear-rodeo/sdk";
-import { ID, characterMetadata, sceneMetadata } from "../helper/variables.ts";
+import { ID, characterMetadata, sceneMetadata, version } from "../helper/variables.ts";
 import { migrate102To103 } from "../migrations/v103.ts";
 import { migrate105To106 } from "../migrations/v106.ts";
 import { compare } from "compare-versions";
@@ -10,8 +10,6 @@ import { updateHpBar } from "../helper/shapeHelpers.ts";
 import { handleTextVisibility, updateText, updateTextChanges } from "../helper/textHelpers.ts";
 import { getAttachedItems } from "../helper/helpers.ts";
 import { v4 as uuidv4 } from "uuid";
-
-const version = "1.3.0";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
