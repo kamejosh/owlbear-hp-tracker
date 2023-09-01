@@ -80,12 +80,9 @@
                 background-position: center;
                 background-size: contain;
                 background-repeat: no-repeat;
+                background-color: transparent;
                 width: 20px;
                 height: 20px;
-
-                &:hover {
-                    background-color: transparent;
-                }
             }
         }
         .empty-group {
