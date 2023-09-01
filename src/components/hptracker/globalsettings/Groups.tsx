@@ -57,7 +57,7 @@ const DraggableGroupList = React.memo(function DraggableGroupList(props: GroupLi
                                             if (!groups.includes("Default")) {
                                                 groups.splice(0, 0, "Default");
                                             }
-                                            console.log(groups);
+                                            props.setGroups(groups);
                                         }}
                                     >
                                         X
