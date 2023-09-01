@@ -188,7 +188,7 @@ const Content = () => {
                 </div>
                 {playerContext.role === "GM" && currentSceneMetadata ? (
                     <DragDropContext onDragEnd={onDragEnd}>
-                        {currentSceneMetadata.groups!.length > 0 ? (
+                        {currentSceneMetadata.groups && currentSceneMetadata.groups?.length > 0 ? (
                             currentSceneMetadata.groups?.map((group) => {
                                 const list = tokenLists.get(group) || [];
                                 return (
