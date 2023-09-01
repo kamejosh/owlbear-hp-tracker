@@ -3,6 +3,7 @@ import { resolve } from "path";
 
 declare var __dirname: string;
 export default defineConfig({
+    assetsInclude: ["**/*.md"],
     build: {
         rollupOptions: {
             input: {

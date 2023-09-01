@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
@@ -13,6 +13,8 @@ import { GlobalSettings } from "./globalsettings/GlobalSettings.tsx";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { DropGroup } from "./DropGroup.tsx";
 import { sortItems } from "../../helper/helpers.ts";
+import changelog from "../../../CHANGELOG.md";
+import ReactMarkdown from "react-markdown";
 
 export const HPTracker = () => {
     return (
@@ -28,6 +30,8 @@ const Content = () => {
     const [selectedTokens, setSelectedTokens] = useState<Array<string>>([]);
     const [tokenLists, setTokenLists] = useState<Map<string, Array<Item>>>(new Map());
     const [currentSceneMetadata, setCurrentSceneMetadata] = useState<SceneMetadata | null>(null);
+    const [changelogText, setChangelogText] = useState<string>("");
+    const dialogRef = useRef<HTMLDialogElement>(null);
     const { isReady } = SceneReadyContext();
     const { characterId } = useCharSheet();
 
@@ -70,6 +74,9 @@ const Content = () => {
         OBR.player.onChange((player) => {
             setSelectedTokens(player.selection ?? []);
         });
+        fetch(changelog)
+            .then((res) => res.text())
+            .then((text) => setChangelogText(text));
     }, []);
 
     useEffect(() => {
@@ -156,6 +163,15 @@ const Content = () => {
             <CharacterSheet />
         ) : (
             <div className={"hp-tracker"}>
+                <button className={"change-log-button"} onClick={() => dialogRef.current?.showModal()}>
+                    ?
+                </button>
+                <dialog ref={dialogRef} className={"changelog"}>
+                    <button className={"change-log-button close"} onClick={() => dialogRef.current?.close()}>
+                        X
+                    </button>
+                    <ReactMarkdown children={changelogText} />
+                </dialog>
                 <h1 className={"title"}>HP Tracker</h1>
                 {playerContext.role === "GM" && !!currentSceneMetadata?.id ? (
                     <GlobalSettings sceneId={currentSceneMetadata.id} />

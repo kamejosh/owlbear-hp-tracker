@@ -3,6 +3,44 @@
     flex-direction: column;
     gap: 2px;
 
+    .change-log-button {
+        position: absolute;
+        top: 2ch;
+        right: 2ch;
+        transition: all ease-in-out 0.25s;
+        cursor: pointer;
+        border: 1px solid white;
+        border-radius: 5px;
+        background-color: transparent;
+        width: 20px;
+        text-align: center;
+
+        &.close {
+            top: 4.5ch;
+        }
+
+        &:hover,
+        &focus {
+            background-color: white;
+            color: #242424;
+        }
+    }
+
+    .changelog {
+        outline: none;
+        border: none;
+        padding: 40px;
+        text-align: left;
+
+        h1 {
+            font-size: 2rem;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+    }
+
     .title {
         align-self: flex-start;
     }
@@ -47,6 +85,8 @@
             }
         }
         .empty-group {
+            opacity: 0.5;
+            border-radius: 5px;
             background-color: rgba(255, 255, 255, 0.5);
             height: 40px;
         }

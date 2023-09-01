@@ -145,12 +145,14 @@ export const Groups = (props: GroupProps) => {
                         const value = e.currentTarget.value;
                         const newGroups = updateGroups(value, groups);
                         setGroups(newGroups);
+                        e.currentTarget.value = "";
                     }}
                     onKeyDown={(e) => {
                         if (e.key === "Enter") {
                             const value = e.currentTarget.value;
                             const newGroups = updateGroups(value, groups);
                             setGroups(newGroups);
+                            e.currentTarget.value = "";
                         }
                     }}
                 />
