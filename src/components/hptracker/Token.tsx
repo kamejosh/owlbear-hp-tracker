@@ -33,7 +33,7 @@ export const Token = (props: TokenProps) => {
     const sheetData = sheetQuery.isSuccess ? sheetQuery.data : null;
 
     const handleMetadata = (metadata: Metadata) => {
-        if (sceneMetadata in metadata) {
+        if (metadata && sceneMetadata in metadata) {
             const sceneData = metadata[sceneMetadata] as SceneMetadata;
             setAllowNegativeNumbers(sceneData.allowNegativeNumbers ?? false);
         }

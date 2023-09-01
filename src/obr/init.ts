@@ -60,6 +60,10 @@ const initScene = async () => {
         if (!sceneData.id) {
             sceneData.id = uuidv4();
         }
+        if (typeof sceneData.groups === "string") {
+            // @ts-ignore there might be some legacy issue where groups is still a string
+            sceneData.groups = sceneData.groups.split(" ");
+        }
         if (sceneData.hpBarSegments === undefined) {
             sceneData.hpBarSegments = 0;
         }
