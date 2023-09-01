@@ -2,6 +2,8 @@
 
 + Reintroduce Popover to manage stats directly at the token
 + Add Token Grouping
++ Improve token highlighting and better selection feedback
++ Double click on Token Name focuses viewport von Token 
 
 # 1.2.1
 
