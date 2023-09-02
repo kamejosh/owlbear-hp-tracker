@@ -23,6 +23,7 @@ export const Token = (props: TokenProps) => {
     const { isReady } = SceneReadyContext();
     const { setId } = useCharSheet();
     const hpRef = useRef<HTMLInputElement>(null);
+    const hp2Ref = useRef<HTMLInputElement>(null);
 
     const sheetQuery = useGetOpen5eMonster(data.sheet ?? "");
 
@@ -37,6 +38,12 @@ export const Token = (props: TokenProps) => {
             hpRef.current.value = props.data.hp.toString();
         }
     }, [props.data.hp]);
+
+    useEffect(() => {
+        if (hp2Ref && hp2Ref.current) {
+            hp2Ref.current.value = props.data.hp2.toString();
+        }
+    }, [props.data.hp2]);
 
     useEffect(() => {
         const initMetadataValues = async () => {
@@ -65,6 +72,9 @@ export const Token = (props: TokenProps) => {
         if (allowNegativNumbers === false) {
             if (data.hp < 0) {
                 handleValueChange(0, "hp");
+            }
+            if (data.hp2 < 0) {
+                handleValueChange(0, "hp2");
             }
             if (data.armorClass < 0) {
                 handleValueChange(0, "armorClass");
@@ -123,6 +133,27 @@ export const Token = (props: TokenProps) => {
                         hp: currentData.hp,
                     });
                     setData({ ...data, hp: currentData.hp });
+                } else if (key === "maxHP2") {
+                    currentData.maxHp2 = Math.max(Number(value), 0);
+                    if (updateHp && currentData.maxHp2 < currentData.hp2) {
+                        currentData.hp2 = currentData.maxHp2;
+                        setData({ ...data, hp2: currentData.hp2 });
+                    }
+                    updateHpBar(data.hpBar, props.id, { ...data, hp2: currentData.hp2, maxHp2: currentData.maxHp2 });
+                    updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee, props.id, {
+                        ...data,
+                        maxHp2: currentData.maxHp2,
+                        hp2: currentData.hp2,
+                    });
+                    setData({ ...data, maxHp2: currentData.maxHp2 });
+                } else if (key === "hp2") {
+                    currentData.hp2 = allowNegativNumbers ? Number(value) : Math.max(Number(value), 0);
+                    updateHpBar(data.hpBar, props.id, { ...data, hp2: currentData.hp2 });
+                    updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee, props.id, {
+                        ...data,
+                        hp2: currentData.hp2,
+                    });
+                    setData({ ...data, hp2: currentData.hp2 });
                 } else if (key === "initiative") {
                     currentData.initiative = Number(value);
                     setData({ ...data, initiative: currentData.initiative });
@@ -290,6 +321,57 @@ export const Token = (props: TokenProps) => {
                     onBlur={(e) => {
                         const value = Number(e.target.value.replace(/[^0-9]/g, ""));
                         handleValueChange(Number(value), "maxHP", true);
+                    }}
+                />
+            </div>
+            <div className={"current-hp current-shields"}>
+                <input
+                    ref={hp2Ref}
+                    type={"text"}
+                    size={3}
+                    defaultValue={data.hp2}
+                    onBlur={(e) => {
+                        const input = e.target.value;
+                        const hp2 = getNewHpValue(input);
+                        e.target.value = hp2.toString();
+                        handleValueChange(hp2, "hp2");
+                    }}
+                    onKeyDown={(e) => {
+                        if (e.key === "ArrowUp") {
+                            const hp2 = Math.min(data.hp2 + 1, data.maxHp2);
+                            handleValueChange(hp2, "hp2");
+                            e.currentTarget.value = hp2.toString();
+                        } else if (e.key === "ArrowDown") {
+                            const hp2 = Math.min(data.hp2 - 1, data.maxHp2);
+                            handleValueChange(hp2, "hp2");
+                            e.currentTarget.value = hp2.toString();
+                        } else if (e.key === "Enter") {
+                            const input = e.currentTarget.value;
+                            const hp2 = getNewHpValue(input);
+                            e.currentTarget.value = hp2.toString();
+                            handleValueChange(hp2, "hp2");
+                        }
+                    }}
+                />
+                <span>/</span>
+                <input
+                    type={"text"}
+                    size={3}
+                    value={data.maxHp2}
+                    onChange={(e) => {
+                        const value = Number(e.target.value.replace(/[^0-9]/g, ""));
+                        handleValueChange(Number(value), "maxHP2", false);
+                    }}
+                    onKeyDown={(e) => {
+                        if (e.key === "ArrowUp") {
+                            handleValueChange(data.maxHp2 + 1, "maxHP2", true);
+                        } else if (e.key === "ArrowDown") {
+                            handleValueChange(data.maxHp2 - 1, "maxHP2", true);
+                        }
+                    }}
+                    onBlur={(e) => {
+                        const value = Number(e.target.value.replace(/[^0-9]/g, ""));
+                        handleValueChange(Number(value), "maxHP2", true);
                     }}
                 />
             </div>

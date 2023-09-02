@@ -3,7 +3,7 @@ import { HpTrackerMetadata, ShapeItemChanges } from "./types.ts";
 import { calculatePercentage, deleteAttachments, getAttachedItems, getImageBounds, getYOffset } from "./helpers.ts";
 import { infoMetadata } from "./variables.ts";
 
-export const createShape = async (percentage: number, token: Image) => {
+export const createShape = async (percentage: number, percentage2: number, token: Image) => {
     const height = 31;
     const bounds = await getImageBounds(token);
     const position = {
@@ -28,9 +28,9 @@ export const createShape = async (percentage: number, token: Image) => {
 
     const hpShape = buildShape()
         .width(percentage === 0 ? 0 : (bounds.width - 4) * percentage)
-        .height(height - 4)
+        .height(height / 2 - 4)
         .shapeType("RECTANGLE")
-        .fillColor("red")
+        .fillColor("cyan")
         .fillOpacity(0.5)
         .strokeWidth(0)
         .strokeOpacity(0)
@@ -42,9 +42,25 @@ export const createShape = async (percentage: number, token: Image) => {
         .disableAttachmentBehavior(["ROTATION"])
         .build();
 
+    const hp2Shape = buildShape()
+        .width(percentage2 === 0 ? 0 : (bounds.width - 4) * percentage2)
+        .height(height / 2 - 4)
+        .shapeType("RECTANGLE")
+        .fillColor("red")
+        .fillOpacity(0.5)
+        .strokeWidth(0)
+        .strokeOpacity(0)
+        .position({ x: position.x + 2, y: position.y + 2 + 15.5 })
+        .attachedTo(token.id)
+        .layer("ATTACHMENT")
+        .locked(true)
+        .name("hp2")
+        .disableAttachmentBehavior(["ROTATION"])
+        .build();
+
     backgroundShape.metadata[infoMetadata] = { isHpText: true };
     hpShape.metadata[infoMetadata] = { isHpText: true };
-    return [backgroundShape, hpShape];
+    return [backgroundShape, hpShape, hp2Shape];
 };
 
 const handleHpBarOffsetUpdate = async (offset: number, hpBar: Item) => {
@@ -138,8 +154,8 @@ export const saveOrChangeShape = async (
             changeMap.set(a.id, change);
         }
     } else {
-        const percentage = await calculatePercentage(data);
-        const shapes = await createShape(percentage, character as Image);
+        const [percentage, percentage2] = await calculatePercentage(data);
+        const shapes = await createShape(percentage, percentage2, character as Image);
         await OBR.scene.items.addItems(shapes);
     }
 };
@@ -154,13 +170,15 @@ const handleShapeAttachment = async (
     const bounds = await getImageBounds(character);
     const width = bounds.width;
 
-    if (attachment.name === "hp" && infoMetadata in attachment.metadata) {
+    if ((attachment.name === "hp" || attachment.name === "hp2") && infoMetadata in attachment.metadata) {
         const change = changeMap.get(attachment.id) ?? {};
-        const percentage = await calculatePercentage(data);
+        const [percentage1, percentage2] = await calculatePercentage(data);
+
+        const percentage = attachment.name === "hp" ? percentage1 : percentage2;
         if (percentage === 0) {
             change.color = "black";
         } else {
-            change.color = "red";
+            change.color = attachment.name === "hp" ? "cyan" : "red";
         }
         change.width = percentage === 0 ? 0 : (width - 4) * percentage;
         if (shape.width != change.width || shape.style.fillColor != change.color) {
