@@ -1,12 +1,12 @@
 {
-    "name": "Dungeon Master - HP Tracker",
+    "name": "Mythic Space Shields & Armor Tracker",
     "version": "1.2.1",
     "manifest_version": 1,
-    "author": "Joshua Hercher",
-    "description": "A tool to keep track of N/PC HP and more. Visibility for players can be toggled for each token.",
+    "author": "Trey Rumsey",
+    "description": "A temporary solution for tracking Armor and Shields in Owlbear Rodeo for Mythic Space. Original code by Joshua Hercher.",
     "icon": "/icon.svg",
     "action": {
-        "title": "HP Tracker",
+        "title": "Mythic Space Shields & Armor Tracker",
         "icon": "/icon.svg",
         "popover": "/",
         "height": 800,
