@@ -29,7 +29,8 @@ export const calculatePercentage = async (data: HpTrackerMetadata) => {
     const sceneData = metadata[sceneMetadata] as SceneMetadata;
     const segments = sceneData.hpBarSegments ?? 0;
 
-    const percentage = data.maxHp === 0 || data.hp === 0 || data.hp < 0 ? 0 : data.hp / data.maxHp;
+    const percentage =
+        data.maxShields === 0 || data.shields === 0 || data.shields < 0 ? 0 : data.shields / data.maxShields;
     const percentage2 = data.maxHp2 === 0 || data.hp2 === 0 || data.hp2 < 0 ? 0 : data.hp2 / data.maxHp2;
 
     if (segments === 0) {

@@ -23,17 +23,15 @@ const initItems = async () => {
                 // initializing a variable gives us type safety
                 const initialMetadata: HpTrackerMetadata = {
                     name: item.name,
-                    hp: 0,
-                    maxHp: 0,
+                    shields: 0,
+                    maxShields: 0,
                     hp2: 0,
                     maxHp2: 0,
-                    armorClass: 0,
                     hpTrackerActive: false,
                     canPlayersSee: false,
                     hpOnMap: false,
                     acOnMap: false,
                     hpBar: false,
-                    initiative: 0,
                     sheet: "",
                 };
                 item.metadata[characterMetadata] = initialMetadata;
@@ -91,7 +89,7 @@ const setupContextMenu = async () => {
                 items.forEach((item) => {
                     if (characterMetadata in item.metadata) {
                         const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
-                        metadata.hp = Math.min(metadata.hp + 1, metadata.maxHp);
+                        metadata.shields = Math.min(metadata.shields + 1, metadata.maxShields);
                         item.metadata[characterMetadata] = { ...metadata };
                         updateHpBar(metadata.hpBar, item.id, { ...metadata });
                         updateText(metadata.hpOnMap || metadata.acOnMap, metadata.canPlayersSee, item.id, {
@@ -132,7 +130,9 @@ const setupContextMenu = async () => {
                 items.forEach((item) => {
                     if (characterMetadata in item.metadata) {
                         const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
-                        metadata.hp = allowNegativeNumbers ? metadata.hp - 1 : Math.max(metadata.hp - 1, 0);
+                        metadata.shields = allowNegativeNumbers
+                            ? metadata.shields - 1
+                            : Math.max(metadata.shields - 1, 0);
                         item.metadata[characterMetadata] = { ...metadata };
                         updateHpBar(metadata.hpBar, item.id, { ...metadata });
                         updateText(metadata.hpOnMap || metadata.acOnMap, metadata.canPlayersSee, item.id, {
@@ -191,17 +191,15 @@ const setupContextMenu = async () => {
                             // variable allows us to be typesafe
                             const defaultMetadata: HpTrackerMetadata = {
                                 name: item.name,
-                                hp: 0,
-                                maxHp: 0,
+                                shields: 0,
+                                maxShields: 0,
                                 hp2: 0,
                                 maxHp2: 0,
-                                armorClass: 0,
                                 hpTrackerActive: true,
                                 canPlayersSee: false,
                                 hpOnMap: false,
                                 acOnMap: false,
                                 hpBar: false,
-                                initiative: 0,
                                 sheet: "",
                             };
                             item.metadata[characterMetadata] = defaultMetadata;

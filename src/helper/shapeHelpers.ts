@@ -38,7 +38,7 @@ export const createShape = async (percentage: number, percentage2: number, token
         .attachedTo(token.id)
         .layer("ATTACHMENT")
         .locked(true)
-        .name("hp")
+        .name("shields")
         .disableAttachmentBehavior(["ROTATION"])
         .build();
 
@@ -60,6 +60,7 @@ export const createShape = async (percentage: number, percentage2: number, token
 
     backgroundShape.metadata[infoMetadata] = { isHpText: true };
     hpShape.metadata[infoMetadata] = { isHpText: true };
+    hp2Shape.metadata[infoMetadata] = { isHpText: true };
     return [backgroundShape, hpShape, hp2Shape];
 };
 
@@ -73,7 +74,7 @@ const handleHpBarOffsetUpdate = async (offset: number, hpBar: Item) => {
             const offsetFactor = bounds.height / 150;
             offset *= offsetFactor;
             const height = 31;
-            if (hpBar.name === "hp") {
+            if (hpBar.name === "shields") {
                 change.position = {
                     x: bounds.position.x + 2,
                     y: bounds.position.y + bounds.height - height + offset + 2,
@@ -170,15 +171,15 @@ const handleShapeAttachment = async (
     const bounds = await getImageBounds(character);
     const width = bounds.width;
 
-    if ((attachment.name === "hp" || attachment.name === "hp2") && infoMetadata in attachment.metadata) {
+    if ((attachment.name === "shields" || attachment.name === "hp2") && infoMetadata in attachment.metadata) {
         const change = changeMap.get(attachment.id) ?? {};
         const [percentage1, percentage2] = await calculatePercentage(data);
 
-        const percentage = attachment.name === "hp" ? percentage1 : percentage2;
+        const percentage = attachment.name === "shields" ? percentage1 : percentage2;
         if (percentage === 0) {
             change.color = "black";
         } else {
-            change.color = attachment.name === "hp" ? "cyan" : "red";
+            change.color = attachment.name === "shields" ? "cyan" : "red";
         }
         change.width = percentage === 0 ? 0 : (width - 4) * percentage;
         if (shape.width != change.width || shape.style.fillColor != change.color) {

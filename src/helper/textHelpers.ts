@@ -129,18 +129,15 @@ export const saveOrChangeText = async (
                 const change = changeMap.get(attachment.id) ?? {};
 
                 change.text =
-                    (data.hpOnMap ? `HP:${data.hp}/${data.maxHp}` : "") +
-                    (data.hpOnMap && data.acOnMap ? " " : "") +
-                    (data.acOnMap ? `AC:${data.armorClass}` : "");
+                    (data.hpOnMap ? `S:${data.shields}/${data.maxShields}` : "") +
+                    (data.hpOnMap && data.acOnMap ? " " : "");
                 change.visible = visible;
                 changeMap.set(attachment.id, change);
             }
         });
     } else {
         const textContent =
-            (data.hpOnMap ? `HP:${data.hp}/${data.maxHp}` : "") +
-            (data.hpOnMap && data.acOnMap ? " " : "") +
-            (data.acOnMap ? `AC:${data.armorClass}` : "");
+            (data.hpOnMap ? `S:${data.shields}/${data.maxShields}` : "") + (data.hpOnMap && data.acOnMap ? " " : "");
         const text = await createText(textContent, character as Image);
         if (text) {
             text.visible = visible;

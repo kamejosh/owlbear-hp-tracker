@@ -1,16 +1,14 @@
 export type HpTrackerMetadata = {
     name: string;
-    hp: number;
-    maxHp: number;
+    shields: number;
+    maxShields: number;
     hp2: number;
     maxHp2: number;
-    armorClass: number;
     hpTrackerActive: boolean;
     canPlayersSee: boolean;
     hpOnMap: boolean;
     acOnMap: boolean;
     hpBar: boolean;
-    initiative: number;
     sheet: string;
     index?: number;
 };

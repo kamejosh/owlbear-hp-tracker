@@ -10,6 +10,12 @@
     }
 
     .player-wrapper {
+        @include breakpoint.laptop {
+            grid-template-rows: 1fr;
+            grid-template-columns: 145px 94px 85px 85px;
+            justify-items: flex-start;
+            gap: 12px;
+        }
         display: grid;
         grid-template-rows: repeat(3, auto);
         grid-template-columns: repeat(2, 1fr);
@@ -19,26 +25,17 @@
         border-bottom: 1px solid white;
         padding: 5px;
 
-        @include breakpoint.laptop {
-            grid-template-rows: 1fr;
-            grid-template-columns: repeat(2, 1fr) 0.5fr 0.25fr 0.5fr 0.25fr;
-            justify-items: flex-start;
-            gap: 12px;
-
-            &.player {
-                grid-template-columns: repeat(2, 1fr) 0.25fr 0.5fr 0.25fr;
-            }
-        }
-
         &.headings {
-            display: none;
-
             @include breakpoint.laptop {
                 display: grid;
             }
+            display: none;
         }
 
         .player-name {
+            @include breakpoint.laptop {
+                min-width: 130px;
+            }
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -46,18 +43,13 @@
             width: 100%;
             min-width: 100px;
 
-            @include breakpoint.laptop {
-                min-width: 130px;
-            }
-
             .name {
-                cursor: pointer;
-                overflow: hidden;
-                text-overflow: ellipsis;
-
                 @include breakpoint.laptop {
                     white-space: nowrap;
                 }
+                cursor: pointer;
+                overflow: hidden;
+                text-overflow: ellipsis;
 
                 &:hover {
                     font-weight: 800;
@@ -154,35 +146,35 @@
             }
 
             &::before {
-                content: "HP: ";
-
                 @include breakpoint.laptop {
                     display: none;
                 }
+                content: "HP: ";
             }
         }
 
         .armor-class {
+            @include breakpoint.laptop {
+                justify-self: center;
+            }
             display: flex;
             justify-self: flex-end;
             gap: 5px;
             min-width: 20px;
             text-align: right;
 
-            @include breakpoint.laptop {
-                justify-self: center;
-            }
-
             &::before {
-                content: "AC: ";
-
                 @include breakpoint.laptop {
                     display: none;
                 }
+                content: "AC: ";
             }
         }
 
         .initiative-wrapper {
+            @include breakpoint.laptop {
+                justify-content: center;
+            }
             display: flex;
             justify-content: flex-start;
             align-items: center;
@@ -191,16 +183,11 @@
             width: 100%;
             height: 22px;
 
-            @include breakpoint.laptop {
-                justify-content: center;
-            }
-
             &::before {
-                content: "Init: ";
-
                 @include breakpoint.laptop {
                     display: none;
                 }
+                content: "Init: ";
             }
 
             .initiative-button {
@@ -215,11 +202,10 @@
             gap: 5px;
 
             &::before {
-                content: "Statblock: ";
-
                 @include breakpoint.laptop {
                     display: none;
                 }
+                content: "Statblock: ";
             }
 
             .info-button {
