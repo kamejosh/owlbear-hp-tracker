@@ -65,84 +65,84 @@ const initScene = async () => {
 };
 
 const setupContextMenu = async () => {
-    await OBR.contextMenu.create({
-        id: `${ID}/plus`,
-        icons: [
-            {
-                icon: "/plus.svg",
-                label: "Increase HP",
-                filter: {
-                    every: [
-                        { key: "layer", value: "CHARACTER" },
-                        { key: "layer", value: "MOUNT", coordinator: "||" },
-                        {
-                            key: ["metadata", `${characterMetadata}`, "hpTrackerActive"],
-                            value: true,
-                        },
-                    ],
-                    roles: ["GM"],
-                },
-            },
-        ],
-        onClick: async (context) => {
-            await OBR.scene.items.updateItems(context.items, (items) => {
-                items.forEach((item) => {
-                    if (characterMetadata in item.metadata) {
-                        const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
-                        metadata.shields = Math.min(metadata.shields + 1, metadata.maxShields);
-                        item.metadata[characterMetadata] = { ...metadata };
-                        updateHpBar(metadata.hpBar, item.id, { ...metadata });
-                        updateText(metadata.hpOnMap || metadata.acOnMap, metadata.canPlayersSee, item.id, {
-                            ...metadata,
-                        });
-                    }
-                });
-            });
-        },
-    });
-    await OBR.contextMenu.create({
-        id: `${ID}/minus`,
-        icons: [
-            {
-                icon: "/minus.svg",
-                label: "Decrease HP",
-                filter: {
-                    every: [
-                        { key: "layer", value: "CHARACTER" },
-                        { key: "layer", value: "MOUNT", coordinator: "||" },
-                        {
-                            key: ["metadata", `${characterMetadata}`, "hpTrackerActive"],
-                            value: true,
-                        },
-                    ],
-                    roles: ["GM"],
-                },
-            },
-        ],
-        onClick: async (context) => {
-            const metadata = await OBR.scene.getMetadata();
-            let allowNegativeNumbers = false;
-            if (sceneMetadata in metadata) {
-                const sceneData = metadata[sceneMetadata] as SceneMetadata;
-                allowNegativeNumbers = sceneData.allowNegativeNumbers ?? false;
-            }
-            await OBR.scene.items.updateItems(context.items, (items) => {
-                items.forEach((item) => {
-                    if (characterMetadata in item.metadata) {
-                        const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
-                        metadata.shields = allowNegativeNumbers
-                            ? metadata.shields - 1
-                            : Math.max(metadata.shields - 1, 0);
-                        item.metadata[characterMetadata] = { ...metadata };
-                        updateHpBar(metadata.hpBar, item.id, { ...metadata });
-                        updateText(metadata.hpOnMap || metadata.acOnMap, metadata.canPlayersSee, item.id, {
-                            ...metadata,
-                        });
-                    }
-                });
-            });
-        },
-    });
+    // await OBR.contextMenu.create({
+    //     id: `${ID}/plus`,
+    //     icons: [
+    //         {
+    //             icon: "/plus.svg",
+    //             label: "Increase HP",
+    //             filter: {
+    //                 every: [
+    //                     { key: "layer", value: "CHARACTER" },
+    //                     { key: "layer", value: "MOUNT", coordinator: "||" },
+    //                     {
+    //                         key: ["metadata", `${characterMetadata}`, "hpTrackerActive"],
+    //                         value: true,
+    //                     },
+    //                 ],
+    //                 roles: ["GM"],
+    //             },
+    //         },
+    //     ],
+    //     onClick: async (context) => {
+    //         await OBR.scene.items.updateItems(context.items, (items) => {
+    //             items.forEach((item) => {
+    //                 if (characterMetadata in item.metadata) {
+    //                     const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
+    //                     metadata.shields = Math.min(metadata.shields + 1, metadata.maxShields);
+    //                     item.metadata[characterMetadata] = { ...metadata };
+    //                     updateHpBar(metadata.hpBar, item.id, { ...metadata });
+    //                     updateText(metadata.hpOnMap || metadata.acOnMap, metadata.canPlayersSee, item.id, {
+    //                         ...metadata,
+    //                     });
+    //                 }
+    //             });
+    //         });
+    //     },
+    // });
+    // await OBR.contextMenu.create({
+    //     id: `${ID}/minus`,
+    //     icons: [
+    //         {
+    //             icon: "/minus.svg",
+    //             label: "Decrease HP",
+    //             filter: {
+    //                 every: [
+    //                     { key: "layer", value: "CHARACTER" },
+    //                     { key: "layer", value: "MOUNT", coordinator: "||" },
+    //                     {
+    //                         key: ["metadata", `${characterMetadata}`, "hpTrackerActive"],
+    //                         value: true,
+    //                     },
+    //                 ],
+    //                 roles: ["GM"],
+    //             },
+    //         },
+    //     ],
+    //     onClick: async (context) => {
+    //         const metadata = await OBR.scene.getMetadata();
+    //         let allowNegativeNumbers = false;
+    //         if (sceneMetadata in metadata) {
+    //             const sceneData = metadata[sceneMetadata] as SceneMetadata;
+    //             allowNegativeNumbers = sceneData.allowNegativeNumbers ?? false;
+    //         }
+    //         await OBR.scene.items.updateItems(context.items, (items) => {
+    //             items.forEach((item) => {
+    //                 if (characterMetadata in item.metadata) {
+    //                     const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
+    //                     metadata.shields = allowNegativeNumbers
+    //                         ? metadata.shields - 1
+    //                         : Math.max(metadata.shields - 1, 0);
+    //                     item.metadata[characterMetadata] = { ...metadata };
+    //                     updateHpBar(metadata.hpBar, item.id, { ...metadata });
+    //                     updateText(metadata.hpOnMap || metadata.acOnMap, metadata.canPlayersSee, item.id, {
+    //                         ...metadata,
+    //                     });
+    //                 }
+    //             });
+    //         });
+    //     },
+    // });
     await OBR.contextMenu.create({
         id: `${ID}/tool`,
         icons: [
