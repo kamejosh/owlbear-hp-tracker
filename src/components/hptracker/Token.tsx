@@ -345,7 +345,7 @@ export const Token = (props: TokenProps) => {
                         if (sheetData) {
                             dexBonus = Math.floor((sheetData.dexterity - 10) / 2);
                         }
-                        handleValueChange(Math.floor(Math.random() * 21) + dexBonus, "initiative");
+                        handleValueChange(Math.floor(Math.random() * 20) + 1 + dexBonus, "initiative");
                     }}
                 />
             </div>
