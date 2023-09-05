@@ -138,18 +138,27 @@ export const Token = (props: TokenProps) => {
         });
     };
 
-    const handleOnPlayerClick = async () => {
+    const handleOnPlayerClick = async (e: React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
         const currentSelection = (await OBR.player.getSelection()) || [];
         if (currentSelection.includes(props.id)) {
             currentSelection.splice(currentSelection.indexOf(props.id), 1);
+            await OBR.player.select(currentSelection);
         } else {
-            currentSelection.push(props.id);
+            console.log(e.metaKey, e.ctrlKey, e.shiftKey);
+            if (e.metaKey || e.ctrlKey || e.shiftKey) {
+                currentSelection.push(props.id);
+                await OBR.player.select(currentSelection);
+            } else {
+                await OBR.player.select([props.id]);
+            }
         }
-        await OBR.player.select(currentSelection);
     };
 
     const handleOnPlayerDoubleClick = async () => {
         const bounds = await OBR.scene.items.getItemBounds([props.id]);
+        await OBR.player.select([props.id]);
         await OBR.viewport.animateToBounds({
             ...bounds,
             min: { x: bounds.min.x - 1000, y: bounds.min.y - 1000 },
@@ -210,7 +219,16 @@ export const Token = (props: TokenProps) => {
                             }}
                         />
                     ) : (
-                        <div className={"name"} onClick={handleOnPlayerClick} onDoubleClick={handleOnPlayerDoubleClick}>
+                        <div
+                            className={"name"}
+                            onClick={(e) => {
+                                handleOnPlayerClick(e);
+                            }}
+                            onDoubleClick={(e) => {
+                                e.preventDefault();
+                                handleOnPlayerDoubleClick();
+                            }}
+                        >
                             {props.data.name}
                         </div>
                     )}
