@@ -1,6 +1,6 @@
 import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
-import React, { MouseEvent, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import OBR, { Metadata } from "@owlbear-rodeo/sdk";
 import { characterMetadata, sceneMetadata } from "../../helper/variables.ts";
 import { useCharSheet } from "../../context/CharacterContext.ts";
@@ -9,10 +9,14 @@ import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { updateText } from "../../helper/textHelpers.ts";
 import { updateHpBar } from "../../helper/shapeHelpers.ts";
 import { evalString } from "../../helper/helpers.ts";
+import "./player-wrapper.scss";
 
 type TokenProps = {
     id: string;
     data: HpTrackerMetadata;
+    popover: boolean;
+    selected: boolean;
+    metadata: SceneMetadata;
 };
 
 export const Token = (props: TokenProps) => {
@@ -28,6 +32,13 @@ export const Token = (props: TokenProps) => {
 
     const sheetData = sheetQuery.isSuccess ? sheetQuery.data : null;
 
+    const handleMetadata = (metadata: Metadata) => {
+        if (metadata && sceneMetadata in metadata) {
+            const sceneData = metadata[sceneMetadata] as SceneMetadata;
+            setAllowNegativeNumbers(sceneData.allowNegativeNumbers ?? false);
+        }
+    };
+
     useEffect(() => {
         setData(props.data);
     }, [props.data]);
@@ -40,18 +51,8 @@ export const Token = (props: TokenProps) => {
 
     useEffect(() => {
         const initMetadataValues = async () => {
-            const handleMetadata = (metadata: Metadata) => {
-                if (sceneMetadata in metadata) {
-                    const sceneData = metadata[sceneMetadata] as SceneMetadata;
-                    setAllowNegativeNumbers(sceneData.allowNegativeNumbers ?? false);
-                }
-            };
             const metadata = (await OBR.scene.getMetadata()) as Metadata;
             handleMetadata(metadata);
-
-            OBR.scene.onMetadataChange((metadata) => {
-                handleMetadata(metadata);
-            });
         };
         if (isReady) {
             initMetadataValues();
@@ -59,6 +60,10 @@ export const Token = (props: TokenProps) => {
             updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee, props.id, data);
         }
     }, [isReady]);
+
+    useEffect(() => {
+        handleMetadata(props.metadata);
+    }, [props.metadata]);
 
     useEffect(() => {
         // could be undefined so we check for boolean
@@ -133,15 +138,31 @@ export const Token = (props: TokenProps) => {
         });
     };
 
-    const handleOnPlayerClick = (event: MouseEvent) => {
-        OBR.scene.items.updateItems([props.id], (items) => {
-            items.forEach((item) => {
-                if (event.type === "mousedown") {
-                    item.rotation = 10;
-                } else {
-                    item.rotation = 0;
-                }
-            });
+    const handleOnPlayerClick = async (e: React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const currentSelection = (await OBR.player.getSelection()) || [];
+        if (currentSelection.includes(props.id)) {
+            currentSelection.splice(currentSelection.indexOf(props.id), 1);
+            await OBR.player.select(currentSelection);
+        } else {
+            console.log(e.metaKey, e.ctrlKey, e.shiftKey);
+            if (e.metaKey || e.ctrlKey || e.shiftKey) {
+                currentSelection.push(props.id);
+                await OBR.player.select(currentSelection);
+            } else {
+                await OBR.player.select([props.id]);
+            }
+        }
+    };
+
+    const handleOnPlayerDoubleClick = async () => {
+        const bounds = await OBR.scene.items.getItemBounds([props.id]);
+        await OBR.player.select([props.id]);
+        await OBR.viewport.animateToBounds({
+            ...bounds,
+            min: { x: bounds.min.x - 1000, y: bounds.min.y - 1000 },
+            max: { x: bounds.max.x + 1000, y: bounds.max.y + 1000 },
         });
     };
 
@@ -181,35 +202,43 @@ export const Token = (props: TokenProps) => {
 
     return display() ? (
         <div
-            className={`player-wrapper ${playerContext.role === "PLAYER" ? "player" : ""}`}
+            className={`player-wrapper ${playerContext.role === "PLAYER" ? "player" : ""} ${
+                props.selected ? "selected" : ""
+            }`}
             style={{ background: `linear-gradient(to right, ${getBgColor()}, #242424 50%, #242424 )` }}
         >
-            <div className={"player-name"}>
-                {editName ? (
-                    <input
-                        className={"edit-name"}
-                        type={"text"}
-                        value={data.name}
-                        onChange={(e) => {
-                            handleValueChange(e.target.value, "name");
-                        }}
-                    />
-                ) : (
-                    <div
-                        className={"name"}
-                        onMouseDown={handleOnPlayerClick}
-                        onMouseUp={handleOnPlayerClick}
-                        onMouseLeave={handleOnPlayerClick}
-                    >
-                        {props.data.name}
-                    </div>
-                )}
-                <button
-                    title={"Change entry name"}
-                    className={`edit ${editName ? "on" : "off"}`}
-                    onClick={() => setEditName(!editName)}
-                ></button>
-            </div>
+            {props.popover ? null : (
+                <div className={"player-name"}>
+                    {editName ? (
+                        <input
+                            className={"edit-name"}
+                            type={"text"}
+                            value={data.name}
+                            onChange={(e) => {
+                                handleValueChange(e.target.value, "name");
+                            }}
+                        />
+                    ) : (
+                        <div
+                            className={"name"}
+                            onClick={(e) => {
+                                handleOnPlayerClick(e);
+                            }}
+                            onDoubleClick={(e) => {
+                                e.preventDefault();
+                                handleOnPlayerDoubleClick();
+                            }}
+                        >
+                            {props.data.name}
+                        </div>
+                    )}
+                    <button
+                        title={"Change entry name"}
+                        className={`edit ${editName ? "on" : "off"}`}
+                        onClick={() => setEditName(!editName)}
+                    ></button>
+                </div>
+            )}
             {playerContext.role === "GM" ? (
                 <div className={"settings"}>
                     <button
@@ -334,17 +363,19 @@ export const Token = (props: TokenProps) => {
                         if (sheetData) {
                             dexBonus = Math.floor((sheetData.dexterity - 10) / 2);
                         }
-                        handleValueChange(Math.floor(Math.random() * 21) + dexBonus, "initiative");
+                        handleValueChange(Math.floor(Math.random() * 20) + 1 + dexBonus, "initiative");
                     }}
                 />
             </div>
-            <div className={"info-button-wrapper"}>
-                <button
-                    title={"Show Statblock"}
-                    className={"toggle-button info-button"}
-                    onClick={() => setId(props.id)}
-                />
-            </div>
+            {props.popover ? null : (
+                <div className={"info-button-wrapper"}>
+                    <button
+                        title={"Show Statblock"}
+                        className={"toggle-button info-button"}
+                        onClick={() => setId(props.id)}
+                    />
+                </div>
+            )}
         </div>
     ) : props.data.hpBar ? (
         <div

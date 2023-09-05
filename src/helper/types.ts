@@ -11,6 +11,7 @@ export type HpTrackerMetadata = {
     initiative: number;
     sheet: string;
     index?: number;
+    group?: string;
 };
 
 export type HpTextMetadata = {
@@ -19,10 +20,11 @@ export type HpTextMetadata = {
 
 export type SceneMetadata = {
     version: string;
+    id: string;
     allowNegativeNumbers?: boolean;
     hpBarSegments?: number;
     hpBarOffset?: number;
-    activeTokens: [];
+    groups?: Array<string>;
 };
 
 export type TextItemChanges = {

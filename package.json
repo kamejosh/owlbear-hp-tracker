@@ -1,7 +1,7 @@
 {
     "name": "hp-tracker",
     "private": true,
-    "version": "1.2.1",
+    "version": "1.3.0",
     "type": "module",
     "scripts": {
         "dev": "vite --tsx",
@@ -31,6 +31,8 @@
     "dependencies": {
         "@owlbear-rodeo/sdk": "1.3.10",
         "@tanstack/react-query": "^4.32.0",
-        "axios": "^1.4.0"
+        "axios": "^1.4.0",
+        "react-markdown": "^8.0.7",
+        "uuid": "^9.0.0"
     }
 }

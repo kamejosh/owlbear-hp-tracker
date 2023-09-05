@@ -10,7 +10,7 @@
         "icon": "/icon.svg",
         "popover": "/",
         "height": 800,
-        "width": 600
+        "width": 610
     },
     "background_url": "/background.html"
 }

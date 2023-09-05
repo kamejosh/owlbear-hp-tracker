@@ -1,3 +1,11 @@
+# 1.3.0
+
++ Reintroduce Popover to manage stats directly at the token
++ Add Token Grouping
++ Improve token highlighting and better selection feedback
++ Double click on Token Name focuses viewport von Token 
++ Add Changelog Button
+
 # 1.2.1
 
 + Fix issue where HP Bar and Text would not disappear when hp tracker was set to inactive

@@ -7,8 +7,9 @@ import "./global-settings.scss";
 import { SceneReadyContext } from "../../../context/SceneReadyContext.ts";
 import { updateHpBarOffset } from "../../../helper/shapeHelpers.ts";
 import { updateTextOffset } from "../../../helper/textHelpers.ts";
+import { Groups } from "./Groups.tsx";
 
-export const GlobalSettings = () => {
+export const GlobalSettings = ({ sceneId }: { sceneId: string }) => {
     const [offset, setOffset] = useLocalStorage<number>(`${ID}.offset`, 0);
     const [segments, setSegments] = useLocalStorage<number>(`${ID}.hpSegments`, 0);
     const [allowNegativNumbers, setAllowNegativeNumbers] = useLocalStorage<boolean>(
@@ -93,6 +94,7 @@ export const GlobalSettings = () => {
                             }}
                         />
                     </div>
+                    <Groups sceneId={sceneId} />
                 </>
             )}
         </div>

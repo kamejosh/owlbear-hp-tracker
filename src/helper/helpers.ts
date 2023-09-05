@@ -1,5 +1,5 @@
 import OBR, { Image, Item, Metadata } from "@owlbear-rodeo/sdk";
-import { infoMetadata, sceneMetadata } from "./variables.ts";
+import { characterMetadata, infoMetadata, sceneMetadata } from "./variables.ts";
 import { HpTrackerMetadata, SceneMetadata } from "./types.ts";
 
 export const getYOffset = async (height: number) => {
@@ -69,4 +69,19 @@ export const evalString = (s: string) => {
 
     // @ts-ignore this works but ts doesn't like it
     return tokens.reduce((sum: string, value: string) => parseFloat(sum) + parseFloat(value));
+};
+
+export const sortItems = (a: Item, b: Item) => {
+    const aData = a.metadata[characterMetadata] as HpTrackerMetadata;
+    const bData = b.metadata[characterMetadata] as HpTrackerMetadata;
+    if (aData && bData && aData.index !== undefined && bData.index !== undefined) {
+        if (aData.index < bData.index) {
+            return -1;
+        } else if (aData.index > bData.index) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+    return 0;
 };

@@ -1,5 +1,5 @@
 import OBR, { Item, Text, Metadata } from "@owlbear-rodeo/sdk";
-import { ID, characterMetadata, sceneMetadata } from "../helper/variables.ts";
+import { ID, characterMetadata, sceneMetadata, version } from "../helper/variables.ts";
 import { migrate102To103 } from "../migrations/v103.ts";
 import { migrate105To106 } from "../migrations/v106.ts";
 import { compare } from "compare-versions";
@@ -9,8 +9,7 @@ import { migrate112To113 } from "../migrations/v113.ts";
 import { updateHpBar } from "../helper/shapeHelpers.ts";
 import { handleTextVisibility, updateText, updateTextChanges } from "../helper/textHelpers.ts";
 import { getAttachedItems } from "../helper/helpers.ts";
-
-const version = "1.2.1";
+import { v4 as uuidv4 } from "uuid";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -45,11 +44,24 @@ const initItems = async () => {
 const initScene = async () => {
     const metadata: Metadata = await OBR.scene.getMetadata();
     if (!(sceneMetadata in metadata)) {
-        metadata[sceneMetadata] = { version: version, hpBarSegments: 0, hpBarOffset: 0, allowNegativNumbers: false };
+        metadata[sceneMetadata] = {
+            version: version,
+            hpBarSegments: 0,
+            hpBarOffset: 0,
+            allowNegativNumbers: false,
+            id: uuidv4(),
+        };
     } else {
         const sceneData = metadata[sceneMetadata] as SceneMetadata;
         sceneData.version = version;
 
+        if (!sceneData.id) {
+            sceneData.id = uuidv4();
+        }
+        if (typeof sceneData.groups === "string") {
+            // @ts-ignore there might be some legacy issue where groups is still a string
+            sceneData.groups = sceneData.groups.split(" ");
+        }
         if (sceneData.hpBarSegments === undefined) {
             sceneData.hpBarSegments = 0;
         }
@@ -66,91 +78,66 @@ const initScene = async () => {
 
 const setupContextMenu = async () => {
     await OBR.contextMenu.create({
-        id: `${ID}/plus`,
+        id: `${ID}/popover`,
         icons: [
             {
-                icon: "/plus.svg",
-                label: "Increase HP",
+                icon: "/iconPopover.svg",
+                label: "HP Tracker Popover",
                 filter: {
-                    every: [
-                        { key: "layer", value: "CHARACTER" },
-                        { key: "layer", value: "MOUNT", coordinator: "||" },
-                        {
-                            key: ["metadata", `${characterMetadata}`, "hpTrackerActive"],
-                            value: true,
-                        },
-                    ],
+                    every: [{ key: ["metadata", `${characterMetadata}`, "hpTrackerActive"], value: true }],
                     roles: ["GM"],
                 },
             },
         ],
-        onClick: async (context) => {
-            await OBR.scene.items.updateItems(context.items, (items) => {
-                items.forEach((item) => {
-                    if (characterMetadata in item.metadata) {
-                        const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
-                        metadata.hp = Math.min(metadata.hp + 1, metadata.maxHp);
-                        item.metadata[characterMetadata] = { ...metadata };
-                        updateHpBar(metadata.hpBar, item.id, { ...metadata });
-                        updateText(metadata.hpOnMap || metadata.acOnMap, metadata.canPlayersSee, item.id, {
-                            ...metadata,
-                        });
-                    }
-                });
+        onClick: (context, elementId) => {
+            OBR.popover.open({
+                id: `${ID}/popover`,
+                url: `/popover.html?id=${context.items[0].id}`,
+                height: 40,
+                width: 490,
+                anchorElementId: elementId,
             });
         },
     });
+
     await OBR.contextMenu.create({
-        id: `${ID}/minus`,
+        id: `${ID}/popoverPlayer`,
         icons: [
             {
-                icon: "/minus.svg",
-                label: "Decrease HP",
+                icon: "/iconPopover.svg",
+                label: "HP Tracker Popover",
                 filter: {
                     every: [
-                        { key: "layer", value: "CHARACTER" },
-                        { key: "layer", value: "MOUNT", coordinator: "||" },
+                        { key: ["metadata", `${characterMetadata}`, "hpTrackerActive"], value: true },
                         {
-                            key: ["metadata", `${characterMetadata}`, "hpTrackerActive"],
+                            key: ["metadata", `${characterMetadata}`, "canPlayersSee"],
                             value: true,
+                            coordinator: "&&",
                         },
                     ],
-                    roles: ["GM"],
+                    roles: ["PLAYER"],
                 },
             },
         ],
-        onClick: async (context) => {
-            const metadata = await OBR.scene.getMetadata();
-            let allowNegativeNumbers = false;
-            if (sceneMetadata in metadata) {
-                const sceneData = metadata[sceneMetadata] as SceneMetadata;
-                allowNegativeNumbers = sceneData.allowNegativeNumbers ?? false;
-            }
-            await OBR.scene.items.updateItems(context.items, (items) => {
-                items.forEach((item) => {
-                    if (characterMetadata in item.metadata) {
-                        const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
-                        metadata.hp = allowNegativeNumbers ? metadata.hp - 1 : Math.max(metadata.hp - 1, 0);
-                        item.metadata[characterMetadata] = { ...metadata };
-                        updateHpBar(metadata.hpBar, item.id, { ...metadata });
-                        updateText(metadata.hpOnMap || metadata.acOnMap, metadata.canPlayersSee, item.id, {
-                            ...metadata,
-                        });
-                    }
-                });
+        onClick: (context, elementId) => {
+            OBR.popover.open({
+                id: `${ID}/popover`,
+                url: `/popover.html?id=${context.items[0].id}`,
+                height: 40,
+                width: 300,
+                anchorElementId: elementId,
             });
         },
     });
+
     await OBR.contextMenu.create({
         id: `${ID}/tool`,
         icons: [
             {
                 icon: "/icon.svg",
-                label: "HP Tracker",
+                label: "Activate HP Tracker",
                 filter: {
                     every: [
-                        { key: "layer", value: "CHARACTER" },
-                        { key: "layer", value: "MOUNT", coordinator: "||" },
                         { key: ["metadata", `${characterMetadata}`], value: undefined, coordinator: "||" },
                         {
                             key: ["metadata", `${characterMetadata}`, "hpTrackerActive"],
@@ -163,7 +150,7 @@ const setupContextMenu = async () => {
             },
             {
                 icon: "/iconOff.svg",
-                label: "HP Tracker",
+                label: "Deactivate HP Tracker",
                 filter: {
                     every: [{ key: ["metadata", `${characterMetadata}`, "hpTrackerActive"], value: true }],
                     roles: ["GM"],

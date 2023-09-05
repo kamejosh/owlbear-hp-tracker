@@ -1,11 +1,17 @@
 import React from "react";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
 import { characterMetadata } from "../../helper/variables.ts";
-import { HpTrackerMetadata } from "../../helper/types.ts";
+import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
 import { Draggable } from "react-beautiful-dnd";
 import { Token } from "./Token.tsx";
 
-export const DraggableTokenList = React.memo(function DraggableTokenList({ tokens }: { tokens: Item[] }) {
+type TokenListProps = {
+    tokens: Item[];
+    selected: Array<string>;
+    metadata: SceneMetadata;
+};
+
+export const DraggableTokenList = React.memo(function DraggableTokenList(props: TokenListProps) {
     const updateTokenIndex = (id: string, index: number) => {
         OBR.scene.items.updateItems([id], (items) => {
             items.forEach((item) => {
@@ -20,36 +26,59 @@ export const DraggableTokenList = React.memo(function DraggableTokenList({ token
 
     return (
         <>
-            {tokens?.map((token, index) => {
-                const data = token.metadata[characterMetadata] as HpTrackerMetadata;
-                if (data) {
-                    if (data.index === undefined) {
-                        updateTokenIndex(token.id, index);
+            {props.tokens.length > 0 ? (
+                props.tokens?.map((token, index) => {
+                    const data = token.metadata[characterMetadata] as HpTrackerMetadata;
+                    if (data) {
+                        if (data.index === undefined) {
+                            updateTokenIndex(token.id, index);
+                        }
+                        return (
+                            <Draggable key={token.id} draggableId={token.id} index={index}>
+                                {(provided) => (
+                                    <div
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        {...provided.dragHandleProps}
+                                    >
+                                        <Token
+                                            id={token.id}
+                                            data={data}
+                                            popover={false}
+                                            selected={props.selected.includes(token.id)}
+                                            metadata={props.metadata}
+                                        />
+                                    </div>
+                                )}
+                            </Draggable>
+                        );
                     }
-                    return (
-                        <Draggable key={token.id} draggableId={token.id} index={data.index ?? 0}>
-                            {(provided) => (
-                                <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                    <Token id={token.id} data={data} />
-                                </div>
-                            )}
-                        </Draggable>
-                    );
-                }
 
-                return null;
-            })}
+                    return null;
+                })
+            ) : (
+                <div className={"empty-group"}></div>
+            )}
         </>
     );
 });
 
-export const PlayerTokenList = ({ tokens }: { tokens: Item[] }) => {
+export const PlayerTokenList = (props: TokenListProps) => {
     return (
         <>
-            {tokens.map((token) => {
+            {props.tokens.map((token) => {
                 const data = token.metadata[characterMetadata] as HpTrackerMetadata;
                 if (data) {
-                    return <Token key={token.id} id={token.id} data={data} />;
+                    return (
+                        <Token
+                            key={token.id}
+                            id={token.id}
+                            data={data}
+                            popover={false}
+                            selected={props.selected.includes(token.id)}
+                            metadata={props.metadata}
+                        />
+                    );
                 }
             })}
         </>
