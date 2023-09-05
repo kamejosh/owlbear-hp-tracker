@@ -164,7 +164,7 @@ const Content = () => {
         ) : (
             <div className={"hp-tracker"}>
                 <button className={"change-log-button"} onClick={() => dialogRef.current?.showModal()}>
-                    ?
+                    i
                 </button>
                 <dialog ref={dialogRef} className={"changelog"}>
                     <button className={"change-log-button close"} onClick={() => dialogRef.current?.close()}>

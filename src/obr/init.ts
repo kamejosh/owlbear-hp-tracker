@@ -81,8 +81,8 @@ const setupContextMenu = async () => {
         id: `${ID}/popover`,
         icons: [
             {
-                icon: "/plus.svg",
-                label: "HP Tracker",
+                icon: "/iconPopover.svg",
+                label: "HP Tracker Popover",
                 filter: {
                     every: [{ key: ["metadata", `${characterMetadata}`, "hpTrackerActive"], value: true }],
                     roles: ["GM"],
@@ -104,8 +104,8 @@ const setupContextMenu = async () => {
         id: `${ID}/popoverPlayer`,
         icons: [
             {
-                icon: "/plus.svg",
-                label: "HP Tracker",
+                icon: "/iconPopover.svg",
+                label: "HP Tracker Popover",
                 filter: {
                     every: [
                         { key: ["metadata", `${characterMetadata}`, "hpTrackerActive"], value: true },
@@ -135,11 +135,9 @@ const setupContextMenu = async () => {
         icons: [
             {
                 icon: "/icon.svg",
-                label: "HP Tracker",
+                label: "Activate HP Tracker",
                 filter: {
                     every: [
-                        { key: "layer", value: "CHARACTER" },
-                        { key: "layer", value: "MOUNT", coordinator: "||" },
                         { key: ["metadata", `${characterMetadata}`], value: undefined, coordinator: "||" },
                         {
                             key: ["metadata", `${characterMetadata}`, "hpTrackerActive"],
@@ -152,7 +150,7 @@ const setupContextMenu = async () => {
             },
             {
                 icon: "/iconOff.svg",
-                label: "HP Tracker",
+                label: "Deactivate HP Tracker",
                 filter: {
                     every: [{ key: ["metadata", `${characterMetadata}`, "hpTrackerActive"], value: true }],
                     roles: ["GM"],
