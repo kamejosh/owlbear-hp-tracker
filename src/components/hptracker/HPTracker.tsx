@@ -14,7 +14,8 @@ import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { DropGroup } from "./DropGroup.tsx";
 import { sortItems } from "../../helper/helpers.ts";
 import changelog from "../../../CHANGELOG.md";
-import ReactMarkdown from "react-markdown";
+import help from "../../../USAGE.md";
+import { Markdown } from "../general/Markdown.tsx";
 
 export const HPTracker = () => {
     return (
@@ -31,7 +32,9 @@ const Content = () => {
     const [tokenLists, setTokenLists] = useState<Map<string, Array<Item>>>(new Map());
     const [currentSceneMetadata, setCurrentSceneMetadata] = useState<SceneMetadata | null>(null);
     const [changelogText, setChangelogText] = useState<string>("");
-    const dialogRef = useRef<HTMLDialogElement>(null);
+    const [helpText, setHelpText] = useState<string>("");
+    const changelogRef = useRef<HTMLDialogElement>(null);
+    const helpRef = useRef<HTMLDialogElement>(null);
     const { isReady } = SceneReadyContext();
     const { characterId } = useCharSheet();
 
@@ -77,6 +80,9 @@ const Content = () => {
         fetch(changelog)
             .then((res) => res.text())
             .then((text) => setChangelogText(text));
+        fetch(help)
+            .then((res) => res.text())
+            .then((text) => setHelpText(text));
     }, []);
 
     useEffect(() => {
@@ -163,14 +169,25 @@ const Content = () => {
             <CharacterSheet />
         ) : (
             <div className={"hp-tracker"}>
-                <button className={"change-log-button"} onClick={() => dialogRef.current?.showModal()}>
-                    i
-                </button>
-                <dialog ref={dialogRef} className={"changelog"}>
-                    <button className={"change-log-button close"} onClick={() => dialogRef.current?.close()}>
+                <div className={"help-buttons"}>
+                    <button className={"change-log-button"} onClick={() => changelogRef.current?.showModal()}>
+                        i
+                    </button>
+                    <button className={"help-button"} onClick={() => helpRef.current?.showModal()}>
+                        ?
+                    </button>
+                </div>
+                <dialog ref={changelogRef} className={"changelog"}>
+                    <button className={"close-button"} onClick={() => changelogRef.current?.close()}>
                         X
                     </button>
-                    <ReactMarkdown children={changelogText} />
+                    <Markdown text={changelogText} />
+                </dialog>
+                <dialog ref={helpRef} className={"help"}>
+                    <button className={"close-button"} onClick={() => helpRef.current?.close()}>
+                        X
+                    </button>
+                    <Markdown text={helpText} />
                 </dialog>
                 <h1 className={"title"}>
                     HP Tracker<span className={"small"}>{version}</span>

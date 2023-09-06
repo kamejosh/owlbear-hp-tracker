@@ -3,10 +3,17 @@
     flex-direction: column;
     gap: 2px;
 
-    .change-log-button {
+    .help-buttons {
+        display: flex;
         position: absolute;
         top: 2ch;
         right: 2ch;
+        gap: 1ch;
+    }
+
+    .change-log-button,
+    .help-button,
+    .close-button {
         transition: all ease-in-out 0.25s;
         cursor: pointer;
         border: 1px solid white;
@@ -26,7 +33,10 @@
         }
     }
 
-    .changelog {
+    .changelog,
+    .help {
+        position: relative;
+        margin: 0;
         outline: none;
         border: none;
         padding: 40px;
@@ -38,6 +48,16 @@
 
         ul {
             padding-left: 20px;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 2ch;
+            right: 2ch;
+        }
+
+        img {
+            max-width: 100%;
         }
     }
 
