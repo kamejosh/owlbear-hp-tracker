@@ -1,3 +1,7 @@
+# 1.3.1
+
++ Add better documentation/help
+
 # 1.3.0
 
 + Reintroduce Popover to manage stats directly at the token

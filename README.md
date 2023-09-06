@@ -10,27 +10,7 @@ The extension can be installed manually, by pasting the [manifest link](https://
 
 ## How it works
 
-This project uses [React](https://reactjs.org/) for the UI. It contains three different parts:
-
-+ Hp Tracker window
-+ Hp Tracker context menu
-+ Hp Tracker background tasks
-
-### Hp Tracker Window
-
-This is a custom Action that can be opened on the top left to display all Characters HP and also change the current the settings for current HP, max HP, AC, name,...
-
-Also when clicking on the name of a character the icon is tilted a little to make it easy to find on the map.
-
-### Hp Tracker Context Menu
-
-In the Context Menu the Active state of the Token in the HP Tracker Extension is toggled
-
-When active two additional context menu items are available to increase or decrease the HP of the selected Token/s.
-
-### Hp Tracker background Tasks
-
-Handle setting defaults and subscribing and handling HP changes so they are propagated properly across all Views.
+See [USAGE.md](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/USAGE.md)
 
 ## Building
 

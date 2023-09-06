@@ -2,6 +2,8 @@
 
 ## Bugs
 
++ Player Action Window lists invisible tokens.
+
 ## Feature Ideas
 
 + editable statblock (would probably require own hosting/database to not clog up players owlbear space)
