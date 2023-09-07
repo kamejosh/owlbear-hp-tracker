@@ -1,7 +1,7 @@
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import React, { useEffect, useState } from "react";
 import { Token } from "../hptracker/Token.tsx";
-import OBR from "@owlbear-rodeo/sdk";
+import OBR, { Item } from "@owlbear-rodeo/sdk";
 import { characterMetadata, sceneMetadata } from "../../helper/variables.ts";
 import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
 import "./popover.scss";
@@ -19,6 +19,7 @@ const Content = () => {
     const id = new URLSearchParams(window.location.search).get("id") ?? null;
     const [data, setData] = useState<HpTrackerMetadata | null>(null);
     const [currentSceneMetadata, setCurrentSceneMetadata] = useState<SceneMetadata | null>(null);
+    const [item, setItem] = useState<Item | null>(null);
     const { isReady } = SceneReadyContext();
 
     const getData = async () => {
@@ -28,6 +29,7 @@ const Content = () => {
                 const item = items[0];
                 if (characterMetadata in item.metadata) {
                     setData(item.metadata[characterMetadata] as HpTrackerMetadata);
+                    setItem(item);
                 }
             }
         }
@@ -69,9 +71,9 @@ const Content = () => {
         }
     }, [isReady]);
 
-    return id && data && currentSceneMetadata ? (
+    return id && data && currentSceneMetadata && item ? (
         <div className={"popover"}>
-            <Token id={id} data={data} popover={true} selected={false} metadata={currentSceneMetadata} />
+            <Token item={item} data={data} popover={true} selected={false} metadata={currentSceneMetadata} />
         </div>
     ) : null;
 };

@@ -40,6 +40,7 @@ export const createText = async (text: string, token: Image) => {
         .layer("TEXT")
         .locked(true)
         .disableAttachmentBehavior(["VISIBLE", "ROTATION"])
+        .visible(token.visible)
         .build();
 
     textItem.metadata[infoMetadata] = { isHpText: true };

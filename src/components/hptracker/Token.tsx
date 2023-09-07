@@ -1,7 +1,7 @@
 import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import React, { useEffect, useRef, useState } from "react";
-import OBR, { Metadata } from "@owlbear-rodeo/sdk";
+import OBR, { Item, Metadata } from "@owlbear-rodeo/sdk";
 import { characterMetadata, sceneMetadata } from "../../helper/variables.ts";
 import { useCharSheet } from "../../context/CharacterContext.ts";
 import { useGetOpen5eMonster } from "../../open5e/useOpen5e.ts";
@@ -12,7 +12,7 @@ import { evalString } from "../../helper/helpers.ts";
 import "./player-wrapper.scss";
 
 type TokenProps = {
-    id: string;
+    item: Item;
     data: HpTrackerMetadata;
     popover: boolean;
     selected: boolean;
@@ -56,8 +56,8 @@ export const Token = (props: TokenProps) => {
         };
         if (isReady) {
             initMetadataValues();
-            updateHpBar(data.hpBar, props.id, data);
-            updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee, props.id, data);
+            updateHpBar(data.hpBar, props.item.id, data);
+            updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee && props.item.visible, props.item.id, data);
         }
     }, [isReady]);
 
@@ -78,7 +78,7 @@ export const Token = (props: TokenProps) => {
     }, [allowNegativNumbers]);
 
     const handleValueChange = (value: string | number | boolean, key: string, updateHp: boolean = false) => {
-        OBR.scene.items.updateItems([props.id], (items) => {
+        OBR.scene.items.updateItems([props.item.id], (items) => {
             items.forEach((item) => {
                 const currentData: HpTrackerMetadata = item.metadata[characterMetadata] as HpTrackerMetadata;
                 if (key === "name") {
@@ -86,23 +86,32 @@ export const Token = (props: TokenProps) => {
                     setData({ ...data, name: currentData.name });
                 } else if (key === "players") {
                     currentData.canPlayersSee = !!value;
-                    updateText(data.hpOnMap || data.acOnMap, !!value, props.id, { ...data, canPlayersSee: !!value });
+                    updateText(data.hpOnMap || data.acOnMap, !!value && props.item.visible, props.item.id, {
+                        ...data,
+                        canPlayersSee: !!value,
+                    });
                     setData({ ...data, canPlayersSee: currentData.canPlayersSee });
                 } else if (key === "acOnMap") {
                     currentData.acOnMap = !!value;
-                    updateText(data.hpOnMap || !!value, data.canPlayersSee, props.id, { ...data, acOnMap: !!value });
+                    updateText(data.hpOnMap || !!value, data.canPlayersSee && props.item.visible, props.item.id, {
+                        ...data,
+                        acOnMap: !!value,
+                    });
                     setData({ ...data, acOnMap: currentData.acOnMap });
                 } else if (key === "hpOnMap") {
                     currentData.hpOnMap = !!value;
-                    updateText(!!value || data.acOnMap, data.canPlayersSee, props.id, { ...data, hpOnMap: !!value });
+                    updateText(!!value || data.acOnMap, data.canPlayersSee && props.item.visible, props.item.id, {
+                        ...data,
+                        hpOnMap: !!value,
+                    });
                     setData({ ...data, hpOnMap: currentData.hpOnMap });
                 } else if (key === "hpBar") {
                     currentData.hpBar = !!value;
-                    updateHpBar(!!value, props.id, data);
+                    updateHpBar(!!value, props.item.id, data);
                     setData({ ...data, hpBar: currentData.hpBar });
                 } else if (key === "armorClass") {
                     currentData.armorClass = allowNegativNumbers ? Number(value) : Math.max(Number(value), 0);
-                    updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee, props.id, {
+                    updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee && props.item.visible, props.item.id, {
                         ...data,
                         armorClass: currentData.armorClass,
                     });
@@ -113,8 +122,8 @@ export const Token = (props: TokenProps) => {
                         currentData.hp = currentData.maxHp;
                         setData({ ...data, hp: currentData.hp });
                     }
-                    updateHpBar(data.hpBar, props.id, { ...data, hp: currentData.hp, maxHp: currentData.maxHp });
-                    updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee, props.id, {
+                    updateHpBar(data.hpBar, props.item.id, { ...data, hp: currentData.hp, maxHp: currentData.maxHp });
+                    updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee && props.item.visible, props.item.id, {
                         ...data,
                         maxHp: currentData.maxHp,
                         hp: currentData.hp,
@@ -122,8 +131,8 @@ export const Token = (props: TokenProps) => {
                     setData({ ...data, maxHp: currentData.maxHp });
                 } else if (key === "hp") {
                     currentData.hp = allowNegativNumbers ? Number(value) : Math.max(Number(value), 0);
-                    updateHpBar(data.hpBar, props.id, { ...data, hp: currentData.hp });
-                    updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee, props.id, {
+                    updateHpBar(data.hpBar, props.item.id, { ...data, hp: currentData.hp });
+                    updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee && props.item.visible, props.item.id, {
                         ...data,
                         hp: currentData.hp,
                     });
@@ -142,23 +151,23 @@ export const Token = (props: TokenProps) => {
         e.preventDefault();
         e.stopPropagation();
         const currentSelection = (await OBR.player.getSelection()) || [];
-        if (currentSelection.includes(props.id)) {
-            currentSelection.splice(currentSelection.indexOf(props.id), 1);
+        if (currentSelection.includes(props.item.id)) {
+            currentSelection.splice(currentSelection.indexOf(props.item.id), 1);
             await OBR.player.select(currentSelection);
         } else {
             console.log(e.metaKey, e.ctrlKey, e.shiftKey);
             if (e.metaKey || e.ctrlKey || e.shiftKey) {
-                currentSelection.push(props.id);
+                currentSelection.push(props.item.id);
                 await OBR.player.select(currentSelection);
             } else {
-                await OBR.player.select([props.id]);
+                await OBR.player.select([props.item.id]);
             }
         }
     };
 
     const handleOnPlayerDoubleClick = async () => {
-        const bounds = await OBR.scene.items.getItemBounds([props.id]);
-        await OBR.player.select([props.id]);
+        const bounds = await OBR.scene.items.getItemBounds([props.item.id]);
+        await OBR.player.select([props.item.id]);
         await OBR.viewport.animateToBounds({
             ...bounds,
             min: { x: bounds.min.x - 1000, y: bounds.min.y - 1000 },
@@ -169,7 +178,8 @@ export const Token = (props: TokenProps) => {
     const display = (): boolean => {
         return (
             props.data.hpTrackerActive &&
-            (playerContext.role === "GM" || (playerContext.role === "PLAYER" && props.data.canPlayersSee))
+            (playerContext.role === "GM" ||
+                (playerContext.role === "PLAYER" && props.data.canPlayersSee && props.item.visible))
         );
     };
 
@@ -372,12 +382,12 @@ export const Token = (props: TokenProps) => {
                     <button
                         title={"Show Statblock"}
                         className={"toggle-button info-button"}
-                        onClick={() => setId(props.id)}
+                        onClick={() => setId(props.item.id)}
                     />
                 </div>
             )}
         </div>
-    ) : props.data.hpBar ? (
+    ) : props.data.hpBar && props.item.visible ? (
         <div
             className={"player-wrapper player"}
             style={{ background: `linear-gradient(to right, ${getBgColor()}, #242424 50%, #242424 )` }}

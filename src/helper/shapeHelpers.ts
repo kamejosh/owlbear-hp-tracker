@@ -24,6 +24,7 @@ export const createShape = async (percentage: number, token: Image) => {
         .layer("ATTACHMENT")
         .locked(true)
         .disableAttachmentBehavior(["ROTATION"])
+        .visible(token.visible)
         .build();
 
     const hpShape = buildShape()
@@ -40,6 +41,7 @@ export const createShape = async (percentage: number, token: Image) => {
         .locked(true)
         .name("hp")
         .disableAttachmentBehavior(["ROTATION"])
+        .visible(token.visible)
         .build();
 
     backgroundShape.metadata[infoMetadata] = { isHpText: true };

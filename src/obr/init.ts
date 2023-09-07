@@ -137,12 +137,12 @@ const setupContextMenu = async () => {
                 icon: "/icon.svg",
                 label: "Activate HP Tracker",
                 filter: {
-                    every: [
+                    every: [{ key: "type", value: "IMAGE" }],
+                    some: [
                         { key: ["metadata", `${characterMetadata}`], value: undefined, coordinator: "||" },
                         {
                             key: ["metadata", `${characterMetadata}`, "hpTrackerActive"],
                             value: false,
-                            coordinator: "||",
                         },
                     ],
                     roles: ["GM"],
@@ -165,7 +165,7 @@ const setupContextMenu = async () => {
                             const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
                             updateText(
                                 (metadata.hpOnMap || metadata.acOnMap) && !metadata.hpTrackerActive,
-                                metadata.canPlayersSee,
+                                metadata.canPlayersSee && item.visible,
                                 item.id,
                                 { ...metadata }
                             );

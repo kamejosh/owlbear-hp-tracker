@@ -34,7 +34,7 @@ This extension allows tracking and changing multiple Creature Settings while dyn
 
 ![hp-tracker example](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/HP_Tracker.png)
 
-## How it works
+# How it works
 
 The extension has two windows:
 
@@ -105,6 +105,10 @@ Clicking a token results in the corresponding item in the scene to be selected. 
 
 ![token_list_select](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/token_list_select.gif)
 
+Double-clicking a token focuses the scene on the corresponding icon:
+
+![token_list_dblclk](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/token_list_dblclk.gif)
+
 #### Token
 
 ![Action Window Token](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/action_window_token.png)
@@ -113,17 +117,17 @@ A token in the HP Tracker represents a single Owlbear scene item where the HP Tr
 
 + Dynamic Color Background (based on ratio between HP and max HP)
 + Name
-    + Edit Name Button
+  + Edit Name Button
 + [Toggle Buttons](#toggle-buttons)
-    + Toggle HP Bar
-    + Toggle HP Text
-    + Toggle AC Text
-    + Toggle Player Visibility
+  + Toggle HP Bar
+  + Toggle HP Text
+  + Toggle AC Text
+  + Toggle Player Visibility
 + Values
-    + Current HP
-    + Max HP
-    + AC
-    + Initiative
+  + Current HP
+  + Max HP
+  + AC
+  + Initiative
 + Roll initiative
 + Open [Statblock](#statblock) Button
 
@@ -174,9 +178,7 @@ The statblock shows the most important information of a creature as seen in the 
 
 ![Player Action Window](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/player_action_window.png)
 
-The Player Action Window has reduced functionality compared to the GM Action Window. Tokens that have either the HP Bar activated or where Player Visibility is active show up in this window.
-
-**Currently a bug exists, where Items that are invisible in the scene are still displayed in the list. This will be fixed with the next patch. Meanwhile disable the HP Bar while you want the Item not be in this list.**
+The Player Action Window has reduced functionality compared to the GM Action Window. Tokens that have either the HP Bar activated or where Player Visibility is active show up in this window. Items that are invisible in the scene don't show up here!
 
 For tokens that have the Player Visibility set, name change option, values and statblock are shown. Otherwise just the dynamic-color background ist there to indicate current status of the creature.
 

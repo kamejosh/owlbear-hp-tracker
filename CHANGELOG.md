@@ -1,3 +1,9 @@
+# 1.3.2
+
++ Fixed Context Menu Icons to only appear for Image Elements
++ Action Window and Text + HP Bar now consistently follow visible state of token
++ Fix help button styling for chrome and safari
+
 # 1.3.1
 
 + Add better documentation/help

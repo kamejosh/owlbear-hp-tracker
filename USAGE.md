@@ -164,9 +164,7 @@ The statblock shows the most important information of a creature as seen in the 
 
 ![Player Action Window](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/player_action_window.png)
 
-The Player Action Window has reduced functionality compared to the GM Action Window. Tokens that have either the HP Bar activated or where Player Visibility is active show up in this window. 
-
-**Currently a bug exists, where Items that are invisible in the scene are still displayed in the list. This will be fixed with the next patch. Meanwhile disable the HP Bar while you want the Item not be in this list.**
+The Player Action Window has reduced functionality compared to the GM Action Window. Tokens that have either the HP Bar activated or where Player Visibility is active show up in this window. Items that are invisible in the scene don't show up here!
 
 For tokens that have the Player Visibility set, name change option, values and statblock are shown. Otherwise just the dynamic-color background ist there to indicate current status of the creature.
 
@@ -180,6 +178,4 @@ For the GM all options except for Name and statblock are available:
 
 For the Players it is only available for items where the player visibility is activated. Also the Toggle buttons are not available.
 
-![Popover GM](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/popover_player.png)
-
-
+![Popover Player](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/popover_player.png)

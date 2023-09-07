@@ -42,7 +42,7 @@ export const DraggableTokenList = React.memo(function DraggableTokenList(props: 
                                         {...provided.dragHandleProps}
                                     >
                                         <Token
-                                            id={token.id}
+                                            item={token}
                                             data={data}
                                             popover={false}
                                             selected={props.selected.includes(token.id)}
@@ -72,7 +72,7 @@ export const PlayerTokenList = (props: TokenListProps) => {
                     return (
                         <Token
                             key={token.id}
-                            id={token.id}
+                            item={token}
                             data={data}
                             popover={false}
                             selected={props.selected.includes(token.id)}
