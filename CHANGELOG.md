@@ -1,3 +1,7 @@
+# 1.3.3
+
++ Fix documentation with the amazing help of Andrew
+
 # 1.3.2
 
 + Fixed Context Menu Icons to only appear for Image Elements

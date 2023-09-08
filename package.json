@@ -8,6 +8,9 @@
         "build": "tsc && vite build",
         "preview": "vite preview"
     },
+    "engines": {
+        "node": ">=18"
+    },
     "prettier": "@bitperfect-software/prettier-config",
     "devDependencies": {
         "@bitperfect-software/prettier-config": "^2.0.1",
