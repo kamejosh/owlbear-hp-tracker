@@ -140,6 +140,16 @@ export const Token = (props: TokenProps) => {
                 } else if (key === "initiative") {
                     currentData.initiative = Number(value);
                     setData({ ...data, initiative: currentData.initiative });
+                } else if (key === "hpMaxHp") {
+                    currentData.maxHp = Math.max(Number(value), 0);
+                    currentData.hp = Number(value);
+                    updateHpBar(data.hpBar, props.item.id, { ...data, hp: currentData.hp, maxHp: currentData.maxHp });
+                    updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee && props.item.visible, props.item.id, {
+                        ...data,
+                        maxHp: currentData.maxHp,
+                        hp: currentData.hp,
+                    });
+                    setData({ ...data, hp: currentData.hp, maxHp: currentData.maxHp });
                 }
                 // just assigning currentData did not trigger onChange event. Spreading helps
                 item.metadata[characterMetadata] = { ...currentData };
@@ -155,7 +165,6 @@ export const Token = (props: TokenProps) => {
             currentSelection.splice(currentSelection.indexOf(props.item.id), 1);
             await OBR.player.select(currentSelection);
         } else {
-            console.log(e.metaKey, e.ctrlKey, e.shiftKey);
             if (e.metaKey || e.ctrlKey || e.shiftKey) {
                 currentSelection.push(props.item.id);
                 await OBR.player.select(currentSelection);
@@ -202,11 +211,18 @@ export const Token = (props: TokenProps) => {
             factor = input.startsWith("-") ? -1 : 1;
         }
         if (input.indexOf("+") > 0 || input.indexOf("-") > 0) {
-            value = evalString(input);
+            value = Number(evalString(input));
         } else {
             value = Number(input.replace(/[^0-9]/g, ""));
         }
-        const hp = Math.min(Number(value * factor), data.maxHp);
+        let hp = 0;
+        if (data.maxHp > 0) {
+            hp = Math.min(Number(value * factor), data.maxHp);
+        } else {
+            hp = Number(value * factor);
+            handleValueChange(hp, "hpMaxHp");
+            return null;
+        }
         return allowNegativNumbers ? hp : Math.max(hp, 0);
     };
 
@@ -290,8 +306,10 @@ export const Token = (props: TokenProps) => {
                     onBlur={(e) => {
                         const input = e.target.value;
                         const hp = getNewHpValue(input);
-                        e.target.value = hp.toString();
-                        handleValueChange(hp, "hp");
+                        if (hp !== null) {
+                            e.target.value = hp.toString();
+                            handleValueChange(hp, "hp");
+                        }
                     }}
                     onKeyDown={(e) => {
                         if (e.key === "ArrowUp") {
@@ -305,8 +323,10 @@ export const Token = (props: TokenProps) => {
                         } else if (e.key === "Enter") {
                             const input = e.currentTarget.value;
                             const hp = getNewHpValue(input);
-                            e.currentTarget.value = hp.toString();
-                            handleValueChange(hp, "hp");
+                            if (hp !== null) {
+                                e.currentTarget.value = hp.toString();
+                                handleValueChange(hp, "hp");
+                            }
                         }
                     }}
                 />

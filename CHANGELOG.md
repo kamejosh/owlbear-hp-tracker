@@ -1,3 +1,7 @@
+# 1.3.4
+
++ Allow setting of HP before max HP if max HP is still 0. Setting HP this way also sets max HP (see `Initializing Token` in help window).
+
 # 1.3.3
 
 + Fix documentation with the amazing help of Andrew
