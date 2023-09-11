@@ -10,6 +10,7 @@
     - [Token](#token)
       * [Toggle Buttons](#toggle-buttons)
       * [Changing Values](#changing-values)
+      * [Initializing Token](#initializing-token)
     - [Statblock](#statblock)
     - [Player Action Window](#player-action-window)
   + [Hp Tracker Popover](#hp-tracker-popover)
@@ -146,7 +147,19 @@ Values can be changed in a few different ways:
 + Entering a number: when focused on any field, you can delete its content and enter a new value. 
 + Rolling Initiative: When clicking the Initiative Button a random number between 1 and 20 is rolled and the dexterity modifier from the [Statblock](#statblock) (if selected) is added and entered as the final initiative value.
 
-**Note: The HP value can never exceed the maxHP value. It can also not be a negative number if the [Global Setting](#global-settings) for "Allow negative numbers" is not selected. All symbols except numbers will be removed to maintain a compatible value.**
+**Note: The HP value can never exceed the maxHP value ([except when maxHP is 0](#initializing-token)). It can also not be a negative number if the [Global Setting](#global-settings) for "Allow negative numbers" is not selected. All symbols except numbers will be removed to maintain a compatible value.**
+
+##### Initializing Token
+
+To initialize a Token there are two approaches:
+
+**Open5e Statblocks**
+
+If you are using a creature that is available on Open5e.com you can use the [statblock feature](#statblock).
+
+**Manual Initialization**
+
+When initializing manually you enter the 4 available fields manually. Normally the HP value cannot exceed the maxHP value but while maxHP is still 0 entering the HP value also sets the maxHP value. This allows for a quick initialization by pressing Tab to jump between the input fields.
 
 #### Statblock
 
