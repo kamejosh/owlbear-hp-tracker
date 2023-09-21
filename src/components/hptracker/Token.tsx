@@ -4,12 +4,12 @@ import React, { useEffect, useRef, useState } from "react";
 import OBR, { Item, Metadata } from "@owlbear-rodeo/sdk";
 import { characterMetadata, sceneMetadata } from "../../helper/variables.ts";
 import { useCharSheet } from "../../context/CharacterContext.ts";
-import { useGetOpen5eMonster } from "../../open5e/useOpen5e.ts";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { updateText } from "../../helper/textHelpers.ts";
 import { updateHpBar } from "../../helper/shapeHelpers.ts";
 import { evalString } from "../../helper/helpers.ts";
 import "./player-wrapper.scss";
+import { useTtrpgApiGetCreature } from "../../ttrpgapi/useTtrpgApi.ts";
 
 type TokenProps = {
     item: Item;
@@ -28,7 +28,7 @@ export const Token = (props: TokenProps) => {
     const { setId } = useCharSheet();
     const hpRef = useRef<HTMLInputElement>(null);
 
-    const sheetQuery = useGetOpen5eMonster(data.sheet ?? "");
+    const sheetQuery = useTtrpgApiGetCreature(data.sheet ?? "");
 
     const sheetData = sheetQuery.isSuccess ? sheetQuery.data : null;
 
@@ -391,7 +391,7 @@ export const Token = (props: TokenProps) => {
                     onClick={() => {
                         let dexBonus = 0;
                         if (sheetData) {
-                            dexBonus = Math.floor((sheetData.dexterity - 10) / 2);
+                            dexBonus = Math.floor((sheetData.stats.dexterity - 10) / 2);
                         }
                         handleValueChange(Math.floor(Math.random() * 20) + 1 + dexBonus, "initiative");
                     }}

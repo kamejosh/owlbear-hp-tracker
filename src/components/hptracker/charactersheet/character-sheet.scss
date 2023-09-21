@@ -134,20 +134,21 @@
                 flex-direction: column;
             }
 
-            .abilities {
+            .stats {
                 display: grid;
                 grid-template-columns: repeat(3, 1fr);
                 grid-area: abilities;
                 justify-content: space-between;
                 gap: 10px;
 
-                .ability {
+                .stat {
                     display: flex;
                     flex-direction: column;
                     text-align: center;
 
-                    .ability-name {
+                    .stat-name {
                         font-weight: 600;
+                        text-transform: uppercase;
                     }
                 }
             }
