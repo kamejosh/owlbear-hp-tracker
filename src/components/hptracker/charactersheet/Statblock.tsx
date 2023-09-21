@@ -36,8 +36,6 @@ const DndStatBlock = ({ slug }: { slug: string }) => {
         }
     }, [creatureQuery.isSuccess]);
 
-    console.log(creature);
-
     return creature ? (
         <>
             <div className={"what"}>
@@ -155,8 +153,6 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
         }
     }, [creatureQuery.isSuccess]);
 
-    console.log(creature);
-
     return creature ? (
         <>
             <div className={"what"}>
@@ -181,7 +177,7 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                         <div className={"stat"} key={stat}>
                             <div className={"stat-name"}>{stat.substring(0, 3)}</div>
                             <div className={"stat-value"}>
-                                {value} ({Math.floor((value - 10) / 2)})
+                                {value * 2 + 10} ({value})
                             </div>
                         </div>
                     );

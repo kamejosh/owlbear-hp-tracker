@@ -10,6 +10,7 @@ import { updateHpBar } from "../../helper/shapeHelpers.ts";
 import { evalString } from "../../helper/helpers.ts";
 import "./player-wrapper.scss";
 import { useTtrpgApiGetCreature } from "../../ttrpgapi/useTtrpgApi.ts";
+import { useFilter } from "../../context/FilterContext.ts";
 
 type TokenProps = {
     item: Item;
@@ -21,6 +22,7 @@ type TokenProps = {
 
 export const Token = (props: TokenProps) => {
     const playerContext = usePlayerContext();
+    const { ruleset } = useFilter();
     const [data, setData] = useState<HpTrackerMetadata>(props.data);
     const [editName, setEditName] = useState<boolean>(false);
     const [allowNegativNumbers, setAllowNegativeNumbers] = useState<boolean | undefined>(undefined);
@@ -391,7 +393,11 @@ export const Token = (props: TokenProps) => {
                     onClick={() => {
                         let dexBonus = 0;
                         if (sheetData) {
-                            dexBonus = Math.floor((sheetData.stats.dexterity - 10) / 2);
+                            if (ruleset === "5e") {
+                                dexBonus = Math.floor((sheetData.stats.dexterity - 10) / 2);
+                            } else {
+                                dexBonus = sheetData.stats.dexterity;
+                            }
                         }
                         handleValueChange(Math.floor(Math.random() * 20) + 1 + dexBonus, "initiative");
                     }}
