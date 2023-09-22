@@ -1,3 +1,7 @@
+# 1.3.5
+
++ Move domain to https://hp-tracker.bitperfect-software.com/manifest.json
+
 # 1.3.4
 
 + Allow setting of HP before max HP if max HP is still 0. Setting HP this way also sets max HP (see `Initializing Token` in help window).

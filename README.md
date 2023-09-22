@@ -6,7 +6,7 @@ This Repository contains an Extension for Owlbear Rodeo 2.0. This extension allo
 
 ## Installing
 
-The extension can be installed manually, by pasting the [manifest link](https://hp-tracker.onrender.com/manifest.json) in the Add Extension dialog.
+The extension can be installed manually, by pasting the [manifest link](https://hp-tracker.bitperfect-software.com/manifest.json) in the Add Extension dialog.
 
 ## How it works
 
