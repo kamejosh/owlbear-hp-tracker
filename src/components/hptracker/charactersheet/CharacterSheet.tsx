@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCharSheet } from "../../../context/CharacterContext.ts";
 import "./character-sheet.scss";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
