@@ -1,4 +1,4 @@
-# 1.3.6.1
+# 1.3.7
 
 + Fix error when trying to read HP Tracker version of uninitialized scene
 
