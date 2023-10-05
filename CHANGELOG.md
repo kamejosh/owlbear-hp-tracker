@@ -1,3 +1,8 @@
+# 1.3.6
+
++ Fix Drag And Drop on TokenList for new Scenes
++ Open changelog per default when a new version has been installed
+
 # 1.3.5
 
 + Move domain to https://hp-tracker.bitperfect-software.com/manifest.json
