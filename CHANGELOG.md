@@ -1,3 +1,7 @@
+# 1.3.6.1
+
++ Fix error when trying to read HP Tracker version of uninitialized scene
+
 # 1.3.6
 
 + Fix Drag And Drop on TokenList for new Scenes

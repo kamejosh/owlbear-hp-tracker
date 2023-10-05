@@ -50,7 +50,7 @@ const Content = () => {
 
         const sceneData = await OBR.scene.getMetadata();
         const metadata = sceneData[sceneMetadata] as SceneMetadata;
-        if (compare(metadata.version, version, "<")) {
+        if (metadata?.version && compare(metadata.version, version, "<")) {
             changelogRef.current?.showModal();
         }
         setCurrentSceneMetadata(metadata);
