@@ -50,6 +50,7 @@ const initScene = async () => {
             hpBarOffset: 0,
             allowNegativNumbers: false,
             id: uuidv4(),
+            groups: ["Default"],
         };
     } else {
         const sceneData = metadata[sceneMetadata] as SceneMetadata;
@@ -61,6 +62,9 @@ const initScene = async () => {
         if (typeof sceneData.groups === "string") {
             // @ts-ignore there might be some legacy issue where groups is still a string
             sceneData.groups = sceneData.groups.split(" ");
+        }
+        if (!sceneData.groups || sceneData.groups.length === 0) {
+            sceneData.groups = ["Default"];
         }
         if (sceneData.hpBarSegments === undefined) {
             sceneData.hpBarSegments = 0;

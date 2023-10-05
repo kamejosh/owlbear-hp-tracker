@@ -25,6 +25,7 @@ export type SceneMetadata = {
     hpBarSegments?: number;
     hpBarOffset?: number;
     groups?: Array<string>;
+    openChangeLog?: boolean;
 };
 
 export type TextItemChanges = {
