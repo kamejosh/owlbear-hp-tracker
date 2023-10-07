@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import OBR, { Item } from "@owlbear-rodeo/sdk";

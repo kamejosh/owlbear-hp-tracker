@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocalStorage } from "../../../helper/hooks.ts";
 import { ID, sceneMetadata } from "../../../helper/variables.ts";
 import OBR, { Metadata } from "@owlbear-rodeo/sdk";

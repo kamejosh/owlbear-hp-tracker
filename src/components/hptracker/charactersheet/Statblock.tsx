@@ -2,7 +2,7 @@ import { useCharSheet } from "../../../context/CharacterContext.ts";
 import OBR from "@owlbear-rodeo/sdk";
 import { characterMetadata } from "../../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../../helper/types.ts";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { DnDCreatureOut, PFCreatureOut, useTtrpgApiGetCreature } from "../../../ttrpgapi/useTtrpgApi.ts";
 
 const DndStatBlock = ({ slug }: { slug: string }) => {
@@ -170,6 +170,9 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                 <span className={"speed"}>
                     <b>Speed</b> {creature.speed}
                 </span>
+                <span className={"perception"}>
+                    <b>Perception</b> {creature.perception}
+                </span>
             </div>
             <div className={"stats"}>
                 {Object.entries(creature.stats).map(([stat, value]) => {
@@ -179,6 +182,16 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                             <div className={"stat-value"}>
                                 {value * 2 + 10} ({value})
                             </div>
+                        </div>
+                    );
+                })}
+            </div>
+            <div className={"skills"}>
+                {creature.skills?.map((skill) => {
+                    return (
+                        <div className={"stat"} key={skill.name}>
+                            <div className={"stat-name"}>{skill.name}</div>
+                            <div className={"stat-value"}>{skill.value}</div>
                         </div>
                     );
                 })}
