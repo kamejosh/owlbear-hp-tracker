@@ -2,6 +2,18 @@
 
 + Add ttrpg-api for 5e and pf
 
+# 1.3.7
+
++ Fix error when trying to read HP Tracker version of uninitialized scene
+
+# 1.3.6
+
++ Fix Drag And Drop on TokenList for new Scenes
++ Open changelog per default when a new version has been installed
+
+# 1.3.5
++ Move domain to https://hp-tracker.bitperfect-software.com/manifest.json
+
 # 1.3.4
 
 + Allow setting of HP before max HP if max HP is still 0. Setting HP this way also sets max HP (see `Initializing Token` in help window).

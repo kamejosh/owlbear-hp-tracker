@@ -16,6 +16,7 @@ import { sortItems } from "../../helper/helpers.ts";
 import changelog from "../../../CHANGELOG.md";
 import help from "../../../USAGE.md";
 import { Markdown } from "../general/Markdown.tsx";
+import { compare } from "compare-versions";
 
 export const HPTracker = () => {
     return (
@@ -49,6 +50,9 @@ const Content = () => {
 
         const sceneData = await OBR.scene.getMetadata();
         const metadata = sceneData[sceneMetadata] as SceneMetadata;
+        if (metadata?.version && compare(metadata.version, version, "<")) {
+            changelogRef.current?.showModal();
+        }
         setCurrentSceneMetadata(metadata);
     };
 
