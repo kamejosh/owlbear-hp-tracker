@@ -77,7 +77,7 @@ const initScene = async () => {
         }
         metadata[sceneMetadata] = sceneData;
     }
-    await OBR.scene.setMetadata(metadata);
+    await OBR.scene.setMetadata({ sceneMetadata: metadata[sceneMetadata] });
 };
 
 const setupContextMenu = async () => {
