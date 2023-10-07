@@ -1,5 +1,5 @@
 import { ContextWrapper } from "../ContextWrapper.tsx";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Token } from "../hptracker/Token.tsx";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
 import { characterMetadata, sceneMetadata } from "../../helper/variables.ts";

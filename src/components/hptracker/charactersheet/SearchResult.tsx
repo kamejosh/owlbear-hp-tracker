@@ -9,7 +9,6 @@ import {
     useTtrpgApiSearch5e,
     useTtrpgApiSearchPf,
 } from "../../../ttrpgapi/useTtrpgApi.ts";
-import React from "react";
 
 export const SearchResult5e = ({ search }: { search: string }) => {
     const { characterId } = useCharSheet();

@@ -1,6 +1,5 @@
 import { Droppable } from "react-beautiful-dnd";
 import { DraggableTokenList } from "./TokenList.tsx";
-import React from "react";
 import { Item } from "@owlbear-rodeo/sdk";
 import { SceneMetadata } from "../../helper/types.ts";
 

@@ -1,11 +1,11 @@
-import React, { useContext } from "react";
+import { createContext, useContext } from "react";
 
 export type PlayerContextType = {
     role: string | null;
     id: string | null;
 };
 
-export const PlayerContext = React.createContext<PlayerContextType | null>(null);
+export const PlayerContext = createContext<PlayerContextType | null>(null);
 
 export const usePlayerContext = (): PlayerContextType => {
     const playerContext = useContext(PlayerContext);

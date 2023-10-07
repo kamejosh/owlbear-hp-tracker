@@ -1,6 +1,6 @@
 import OBR from "@owlbear-rodeo/sdk";
 import { PlayerContext, PlayerContextType } from "../context/PlayerContext.ts";
-import React, { PropsWithChildren, useEffect, useState } from "react";
+import { PropsWithChildren, useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PluginGate } from "../context/PluginGateContext.tsx";
 
