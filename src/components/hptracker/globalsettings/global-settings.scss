@@ -22,6 +22,11 @@
         text-align: left;
     }
 
+    .ruleset {
+        display: flex;
+        gap: 1ch;
+    }
+
     .group-list {
         display: flex;
         flex-wrap: wrap;

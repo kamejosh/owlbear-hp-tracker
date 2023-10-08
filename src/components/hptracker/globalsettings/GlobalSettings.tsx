@@ -8,6 +8,8 @@ import { SceneReadyContext } from "../../../context/SceneReadyContext.ts";
 import { updateHpBarOffset } from "../../../helper/shapeHelpers.ts";
 import { updateTextOffset } from "../../../helper/textHelpers.ts";
 import { Groups } from "./Groups.tsx";
+import { Ruleset } from "../../../ttrpgapi/useTtrpgApi.ts";
+import { useFilter } from "../../../context/FilterContext.ts";
 
 export const GlobalSettings = ({ sceneId }: { sceneId: string }) => {
     const [offset, setOffset] = useLocalStorage<number>(`${ID}.offset`, 0);
@@ -16,6 +18,8 @@ export const GlobalSettings = ({ sceneId }: { sceneId: string }) => {
         `${ID}.allowNegativeNumbers`,
         false
     );
+    const [ruleset, setRuleset] = useLocalStorage<Ruleset>(`${ID}.ruleset`, "5e");
+    const filter = useFilter();
     const { isReady } = SceneReadyContext();
     const [hide, setHide] = useState<boolean>(true);
 
@@ -25,12 +29,13 @@ export const GlobalSettings = ({ sceneId }: { sceneId: string }) => {
             (metadata[sceneMetadata] as SceneMetadata).hpBarOffset = offset;
             (metadata[sceneMetadata] as SceneMetadata).hpBarSegments = segments;
             (metadata[sceneMetadata] as SceneMetadata).allowNegativeNumbers = allowNegativNumbers;
-            await OBR.scene.setMetadata(metadata);
+            (metadata[sceneMetadata] as SceneMetadata).ruleset = ruleset;
+            await OBR.scene.setMetadata({ sceneMetadata: metadata });
         };
         if (isReady) {
             setSceneMetadata();
         }
-    }, [offset, segments, allowNegativNumbers]);
+    }, [offset, segments, allowNegativNumbers, ruleset]);
 
     const handleOffsetChange = (value: number) => {
         updateHpBarOffset(value);
@@ -93,6 +98,43 @@ export const GlobalSettings = ({ sceneId }: { sceneId: string }) => {
                                 setAllowNegativeNumbers(!allowNegativNumbers);
                             }}
                         />
+                    </div>
+                    <div className={"ruleset setting"}>
+                        Choose ruleset for statblocks:
+                        <label>
+                            5e
+                            <input
+                                type={"radio"}
+                                value={"5e"}
+                                name={"source"}
+                                checked={ruleset === "5e"}
+                                onClick={() => {
+                                    setRuleset("5e");
+                                    filter.setRuleset("5e");
+                                }}
+                                onChange={(e) => {
+                                    setRuleset(e.currentTarget.checked ? "5e" : "pf2e");
+                                    filter.setRuleset(e.currentTarget.checked ? "5e" : "pf2e");
+                                }}
+                            />
+                        </label>
+                        <label>
+                            PF2e
+                            <input
+                                type={"radio"}
+                                value={"pf2e"}
+                                name={"source"}
+                                checked={ruleset === "pf2e"}
+                                onClick={() => {
+                                    setRuleset("pf2e");
+                                    filter.setRuleset("pf2e");
+                                }}
+                                onChange={(e) => {
+                                    setRuleset(e.currentTarget.checked ? "pf2e" : "5e");
+                                    filter.setRuleset(e.currentTarget.checked ? "pf2e" : "5e");
+                                }}
+                            />
+                        </label>
                     </div>
                     <Groups sceneId={sceneId} />
                 </>

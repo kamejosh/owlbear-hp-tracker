@@ -38,6 +38,10 @@
 
         h2 {
             text-align: left;
+
+            .note {
+                font-size: 12px;
+            }
         }
 
         .search-wrapper {
@@ -57,6 +61,13 @@
                 width: 20px;
                 height: 20px;
             }
+        }
+
+        .search-loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 25px;
         }
 
         .search-results {
@@ -82,6 +93,130 @@
 
                 &:hover {
                     box-shadow: -5px 5px 20px #00000059;
+                }
+            }
+        }
+
+        .pf-sheet {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px 30px;
+            margin-top: 30px;
+            text-align: left;
+
+            @include breakpoint.laptop {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            > * {
+                border-bottom: 2px solid white;
+                padding-bottom: 5px;
+            }
+
+            .saving-throws {
+                grid-column: span 1;
+
+                .saving-throw-list {
+                    padding: 0;
+                    list-style: none;
+
+                    .name {
+                        text-transform: capitalize;
+                    }
+                }
+            }
+
+            .what {
+                grid-column: span 1;
+
+                h3 {
+                    margin: 0 0 5px;
+                }
+            }
+
+            .values {
+                display: flex;
+                grid-column: span 1;
+                flex-direction: column;
+            }
+
+            .stats {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                grid-column: span 1;
+                justify-content: space-between;
+                gap: 10px;
+
+                .stat {
+                    display: flex;
+                    flex-direction: column;
+                    text-align: center;
+
+                    .stat-name {
+                        font-weight: 600;
+                        text-transform: uppercase;
+                    }
+                }
+            }
+
+            .skills {
+                display: flex;
+                grid-column: span 1;
+                flex-wrap: wrap;
+                justify-content: space-between;
+
+                @include breakpoint.laptop {
+                    grid-column: span 2;
+                }
+
+                .skill {
+                    display: flex;
+                    gap: 1ch;
+
+                    .skill-name {
+                        font-weight: 500;
+                    }
+                }
+            }
+
+            .actions,
+            .reactions,
+            .spells,
+            .special-abilities {
+                grid-column: span 1;
+
+                @include breakpoint.laptop {
+                    grid-column: span 2;
+                }
+            }
+
+            .ability-list {
+                display: flex;
+                flex-direction: column;
+                gap: 1ch;
+                padding: 0;
+                list-style: none;
+            }
+
+            .spells {
+                .spell-list {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 4px;
+
+                    .spell-name {
+                        display: flex;
+                        flex-direction: column;
+                        border-bottom: 1px solid white;
+
+                        &:first-child {
+                            border-top: 1px solid white;
+                        }
+
+                        &:last-child {
+                            border-bottom: none;
+                        }
+                    }
                 }
             }
         }

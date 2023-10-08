@@ -2,17 +2,17 @@ import { useEffect, useRef, useState } from "react";
 import { useCharSheet } from "../../../context/CharacterContext.ts";
 import "./character-sheet.scss";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
-import { characterMetadata } from "../../../helper/variables.ts";
+import { characterMetadata, ID } from "../../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../../helper/types.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { Ruleset } from "../../../ttrpgapi/useTtrpgApi.ts";
-import { useFilter } from "../../../context/FilterContext.ts";
 import { SearchResult5e, SearchResultPf } from "./SearchResult.tsx";
 import { Statblock } from "./Statblock.tsx";
+import { useLocalStorage } from "../../../helper/hooks.ts";
 
 export const CharacterSheet = () => {
     const { characterId, setId } = useCharSheet();
-    const { ruleset, setRuleset } = useFilter();
+    const [ruleset, _] = useLocalStorage<Ruleset>(`${ID}.ruleset`, "5e");
     const playerContext = usePlayerContext();
     const [token, setToken] = useState<Item | null>(null);
     const [data, setData] = useState<HpTrackerMetadata | null>(null);
@@ -69,31 +69,11 @@ export const CharacterSheet = () => {
             </button>
             {token && data ? (
                 <div className={"content"}>
-                    <h2>{data.name}</h2>
+                    <h2>
+                        {data.name} <span className={"note"}>(using {ruleset} Filter)</span>
+                    </h2>
                     {playerContext.role === "GM" ? (
                         <div className={"search-wrapper"}>
-                            <label>
-                                5e
-                                <input
-                                    type={"radio"}
-                                    value={"5e"}
-                                    name={"source"}
-                                    checked={ruleset === "5e"}
-                                    onClick={() => setRuleset("5e")}
-                                    onChange={(e) => setRuleset(e.currentTarget.checked ? "5e" : "pf2e")}
-                                />
-                            </label>
-                            <label>
-                                PF2e
-                                <input
-                                    type={"radio"}
-                                    value={"pf2e"}
-                                    name={"source"}
-                                    checked={ruleset === "pf2e"}
-                                    onClick={() => setRuleset("pf2e")}
-                                    onChange={(e) => setRuleset(e.currentTarget.checked ? "pf2e" : "5e")}
-                                />
-                            </label>
                             <input
                                 ref={searchRef}
                                 type={"text"}

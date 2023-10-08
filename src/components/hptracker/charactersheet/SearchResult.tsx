@@ -9,6 +9,7 @@ import {
     useTtrpgApiSearch5e,
     useTtrpgApiSearchPf,
 } from "../../../ttrpgapi/useTtrpgApi.ts";
+import { Loader } from "../../general/Loader.tsx";
 
 export const SearchResult5e = ({ search }: { search: string }) => {
     const { characterId } = useCharSheet();
@@ -28,7 +29,9 @@ export const SearchResult5e = ({ search }: { search: string }) => {
 
     const entries = searchQuery.isSuccess && searchQuery.data ? searchQuery.data.data : [];
 
-    return (
+    return searchQuery.isFetching ? (
+        <Loader className={"search-loader"} />
+    ) : searchQuery.isSuccess ? (
         <ul className={"search-results"}>
             {entries.map((entry: DnDCreatureOut) => {
                 return (
@@ -41,6 +44,8 @@ export const SearchResult5e = ({ search }: { search: string }) => {
                 );
             })}
         </ul>
+    ) : (
+        <div className={"error"}>An Error occurred please try again.</div>
     );
 };
 
@@ -62,7 +67,9 @@ export const SearchResultPf = ({ search }: { search: string }) => {
 
     const entries = searchQuery.isSuccess && searchQuery.data ? searchQuery.data.data : [];
 
-    return (
+    return searchQuery.isFetching ? (
+        <Loader className={"search-loader"} />
+    ) : searchQuery.isSuccess ? (
         <ul className={"search-results"}>
             {entries.map((entry: PFCreatureOut) => {
                 return (
@@ -75,5 +82,7 @@ export const SearchResultPf = ({ search }: { search: string }) => {
                 );
             })}
         </ul>
+    ) : (
+        <div className={"error"}>An Error occurred please try again.</div>
     );
 };

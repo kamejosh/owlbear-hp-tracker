@@ -1,3 +1,5 @@
+import { Ruleset } from "../ttrpgapi/useTtrpgApi.ts";
+
 export type HpTrackerMetadata = {
     name: string;
     hp: number;
@@ -24,6 +26,7 @@ export type SceneMetadata = {
     allowNegativeNumbers?: boolean;
     hpBarSegments?: number;
     hpBarOffset?: number;
+    ruleset?: Ruleset;
     groups?: Array<string>;
     openChangeLog?: boolean;
 };
