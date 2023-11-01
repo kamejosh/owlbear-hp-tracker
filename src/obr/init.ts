@@ -32,6 +32,7 @@ const initItems = async () => {
                     acOnMap: false,
                     hpBar: false,
                     initiative: 0,
+                    stats: { initiativeBonus: 0 },
                     sheet: "",
                 };
                 item.metadata[characterMetadata] = initialMetadata;
@@ -200,6 +201,9 @@ const setupContextMenu = async () => {
                                 hpBar: false,
                                 initiative: 0,
                                 sheet: "",
+                                stats: {
+                                    initiativeBonus: 0,
+                                },
                             };
                             item.metadata[characterMetadata] = defaultMetadata;
                         }

@@ -3,14 +3,15 @@
 .character-sheet {
     .back-button {
         display: flex;
-        position: absolute;
+        position: fixed;
         top: 30px;
         left: 30px;
         align-items: center;
         gap: 5px;
         cursor: pointer;
-        border: none;
-        background-color: transparent;
+        border: 1px solid white;
+        border-radius: 4px;
+        background-color: #1c1b22;
 
         &::before {
             transition: width 0.25s ease-in-out;

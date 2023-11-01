@@ -28,10 +28,6 @@ export const Token = (props: TokenProps) => {
     const { setId } = useCharSheet();
     const hpRef = useRef<HTMLInputElement>(null);
 
-    // const sheetQuery = useTtrpgApiGetCreature(data.sheet ?? "");
-    //
-    // const sheetData = sheetQuery.isSuccess ? sheetQuery.data : null;
-
     const handleMetadata = (metadata: Metadata) => {
         if (metadata && sceneMetadata in metadata) {
             const sceneData = metadata[sceneMetadata] as SceneMetadata;
@@ -389,15 +385,11 @@ export const Token = (props: TokenProps) => {
                     title={"Roll Initiative (including DEX modifier from statblock)"}
                     className={`toggle-button initiative-button`}
                     onClick={() => {
-                        let dexBonus = 0;
-                        // if (sheetData) {
-                        //     if (ruleset === "e5") {
-                        //         dexBonus = Math.floor((sheetData.stats.dexterity - 10) / 2);
-                        //     } else {
-                        //         dexBonus = sheetData.stats.dexterity;
-                        //     }
-                        // }
-                        handleValueChange(Math.floor(Math.random() * 20) + 1 + dexBonus, "initiative");
+                        console.log(data.stats);
+                        handleValueChange(
+                            Math.floor(Math.random() * 20) + 1 + data.stats.initiativeBonus,
+                            "initiative"
+                        );
                     }}
                 />
             </div>

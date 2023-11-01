@@ -10,6 +10,7 @@ export const migrateTo140 = async () => {
         (items) => {
             items.forEach((item) => {
                 (item.metadata[characterMetadata] as HpTrackerMetadata).ruleset = "e5";
+                (item.metadata[characterMetadata] as HpTrackerMetadata).stats = { initiativeBonus: 0 };
             });
         }
     );

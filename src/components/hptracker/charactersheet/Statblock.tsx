@@ -253,7 +253,8 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                         <div className={"stat"} key={stat}>
                             <div className={"stat-name"}>{stat.substring(0, 3)}</div>
                             <div className={"stat-value"}>
-                                {value * 2 + 10} ({value})
+                                {value * 2 + 10} (
+                                {Intl.NumberFormat("en-US", { signDisplay: "exceptZero" }).format(value)})
                             </div>
                         </div>
                     );

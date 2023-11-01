@@ -8,12 +8,17 @@ import { PfStatblock, usePfStatblockSearch } from "../../../ttrpgapi/pf/usePfApi
 
 export const SearchResult5e = ({ search }: { search: string }) => {
     const { characterId } = useCharSheet();
-    const setSheet = (slug: string) => {
+    const setSheet = (slug: string, bonus: number) => {
         if (characterId) {
             OBR.scene.items.updateItems([characterId], (items) => {
                 items.forEach((item) => {
                     const data = item.metadata[characterMetadata] as HpTrackerMetadata;
-                    item.metadata[characterMetadata] = { ...data, sheet: slug, ruleset: "e5" };
+                    item.metadata[characterMetadata] = {
+                        ...data,
+                        sheet: slug,
+                        ruleset: "e5",
+                        stats: { initiativeBonus: bonus },
+                    };
                 });
             });
         }
@@ -29,7 +34,11 @@ export const SearchResult5e = ({ search }: { search: string }) => {
         <ul className={"search-results"}>
             {entries.map((entry: E5Statblock) => {
                 return (
-                    <li className={"search-result"} key={entry.slug} onClick={() => setSheet(entry.slug)}>
+                    <li
+                        className={"search-result"}
+                        key={entry.slug}
+                        onClick={() => setSheet(entry.slug, Math.floor((entry.stats.dexterity - 10) / 2))}
+                    >
                         <span>
                             {entry.name}
                             {entry.source ? ` (${entry.source})` : null}
@@ -48,12 +57,17 @@ export const SearchResult5e = ({ search }: { search: string }) => {
 
 export const SearchResultPf = ({ search }: { search: string }) => {
     const { characterId } = useCharSheet();
-    const setSheet = (slug: string) => {
+    const setSheet = (slug: string, bonus: number) => {
         if (characterId) {
             OBR.scene.items.updateItems([characterId], (items) => {
                 items.forEach((item) => {
                     const data = item.metadata[characterMetadata] as HpTrackerMetadata;
-                    item.metadata[characterMetadata] = { ...data, sheet: slug, ruleset: "pf" };
+                    item.metadata[characterMetadata] = {
+                        ...data,
+                        sheet: slug,
+                        ruleset: "pf",
+                        stats: { initiativeBonus: bonus },
+                    };
                 });
             });
         }
@@ -69,7 +83,11 @@ export const SearchResultPf = ({ search }: { search: string }) => {
         <ul className={"search-results"}>
             {entries.map((entry: PfStatblock) => {
                 return (
-                    <li className={"search-result"} key={entry.slug} onClick={() => setSheet(entry.slug)}>
+                    <li
+                        className={"search-result"}
+                        key={entry.slug}
+                        onClick={() => setSheet(entry.slug, entry.stats.dexterity)}
+                    >
                         <span>{entry.name}</span>
                         <span>HP: {entry.hp.value}</span>
                         <span>AC: {entry.armor_class.value}</span>

@@ -10,6 +10,9 @@ export type HpTrackerMetadata = {
     hpBar: boolean;
     initiative: number;
     sheet: string;
+    stats: {
+        initiativeBonus: number;
+    };
     ruleset?: Ruleset;
     index?: number;
     group?: string;

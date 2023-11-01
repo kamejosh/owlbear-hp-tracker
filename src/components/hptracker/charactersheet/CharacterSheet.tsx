@@ -19,6 +19,15 @@ export const CharacterSheet = () => {
     const [forceSearch, setForceSearch] = useState<boolean>(false);
     const searchRef = useRef<HTMLInputElement>(null);
 
+    const getSearchString = (name: string): string => {
+        const nameParts = name.split(" ");
+        const lastToken = nameParts[nameParts.length - 1];
+        if (lastToken.length < 3 || /^\d+$/.test(lastToken) || /\d/.test(lastToken)) {
+            return nameParts.slice(0, nameParts.length - 1).join(" ");
+        }
+        return name;
+    };
+
     const initData = (items: Item[]) => {
         if (items.length > 0) {
             const item = items[0];
@@ -26,7 +35,7 @@ export const CharacterSheet = () => {
                 const d = item.metadata[characterMetadata] as HpTrackerMetadata;
                 setData(d);
                 if (!d.sheet) {
-                    setSearch(d.name);
+                    setSearch(getSearchString(d.name));
                 }
                 setToken(item);
             }
@@ -80,7 +89,7 @@ export const CharacterSheet = () => {
                             <input
                                 ref={searchRef}
                                 type={"text"}
-                                defaultValue={data.name}
+                                defaultValue={getSearchString(data.name)}
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter") {
                                         setSearch(e.currentTarget.value);
