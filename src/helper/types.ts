@@ -1,5 +1,3 @@
-import { Ruleset } from "../ttrpgapi/useTtrpgApi.ts";
-
 export type HpTrackerMetadata = {
     name: string;
     hp: number;
@@ -12,12 +10,9 @@ export type HpTrackerMetadata = {
     hpBar: boolean;
     initiative: number;
     sheet: string;
+    ruleset?: Ruleset;
     index?: number;
     group?: string;
-};
-
-export type HpTextMetadata = {
-    isHpText: boolean;
 };
 
 export type SceneMetadata = {
@@ -43,3 +38,5 @@ export type ShapeItemChanges = {
     visible?: boolean;
     position?: { x: number; y: number };
 };
+
+export type Ruleset = "e5" | "pf";

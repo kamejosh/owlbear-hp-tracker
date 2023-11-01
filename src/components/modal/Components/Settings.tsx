@@ -1,36 +1,39 @@
-import { useEffect, useState } from "react";
 import { useLocalStorage } from "../../../helper/hooks.ts";
-import { ID, sceneMetadata } from "../../../helper/variables.ts";
-import OBR, { Metadata } from "@owlbear-rodeo/sdk";
-import { SceneMetadata } from "../../../helper/types.ts";
-import "./global-settings.scss";
+import { ID, modalId, sceneMetadata } from "../../../helper/variables.ts";
+import { Ruleset, SceneMetadata } from "../../../helper/types.ts";
 import { SceneReadyContext } from "../../../context/SceneReadyContext.ts";
+import { useEffect, useState } from "react";
+import OBR, { Metadata } from "@owlbear-rodeo/sdk";
 import { updateHpBarOffset } from "../../../helper/shapeHelpers.ts";
 import { updateTextOffset } from "../../../helper/textHelpers.ts";
 import { Groups } from "./Groups.tsx";
-import { Ruleset } from "../../../ttrpgapi/useTtrpgApi.ts";
-import { useFilter } from "../../../context/FilterContext.ts";
+import "./global-settings.scss";
+import { Switch } from "../../general/Switch/Switch.tsx";
+import { dndSvg, pfSvg } from "./SwitchBackground.ts";
 
-export const GlobalSettings = ({ sceneId }: { sceneId: string }) => {
+export const Settings = () => {
     const [offset, setOffset] = useLocalStorage<number>(`${ID}.offset`, 0);
     const [segments, setSegments] = useLocalStorage<number>(`${ID}.hpSegments`, 0);
     const [allowNegativNumbers, setAllowNegativeNumbers] = useLocalStorage<boolean>(
         `${ID}.allowNegativeNumbers`,
         false
     );
-    const [ruleset, setRuleset] = useLocalStorage<Ruleset>(`${ID}.ruleset`, "5e");
-    const filter = useFilter();
+    const [ruleset, setStateRuleset] = useLocalStorage<Ruleset>(`${ID}.ruleset`, "e5");
     const { isReady } = SceneReadyContext();
-    const [hide, setHide] = useState<boolean>(true);
+    const [sceneId, setSceneId] = useState<string | null>(null);
 
     useEffect(() => {
         const setSceneMetadata = async () => {
             const metadata: Metadata = await OBR.scene.getMetadata();
-            (metadata[sceneMetadata] as SceneMetadata).hpBarOffset = offset;
-            (metadata[sceneMetadata] as SceneMetadata).hpBarSegments = segments;
-            (metadata[sceneMetadata] as SceneMetadata).allowNegativeNumbers = allowNegativNumbers;
-            (metadata[sceneMetadata] as SceneMetadata).ruleset = ruleset;
-            await OBR.scene.setMetadata({ sceneMetadata: metadata });
+            const hpTrackerSceneMetadata = metadata[sceneMetadata] as SceneMetadata;
+            hpTrackerSceneMetadata.hpBarOffset = offset;
+            hpTrackerSceneMetadata.hpBarSegments = segments;
+            hpTrackerSceneMetadata.allowNegativeNumbers = allowNegativNumbers;
+            hpTrackerSceneMetadata.ruleset = ruleset;
+            const ownMetadata: Metadata = {};
+            ownMetadata[sceneMetadata] = hpTrackerSceneMetadata;
+
+            await OBR.scene.setMetadata(ownMetadata);
         };
         if (isReady) {
             setSceneMetadata();
@@ -43,13 +46,40 @@ export const GlobalSettings = ({ sceneId }: { sceneId: string }) => {
         setOffset(value);
     };
 
+    const initSettings = async () => {
+        const sceneData = await OBR.scene.getMetadata();
+        setSceneId((sceneData[sceneMetadata] as SceneMetadata).id);
+    };
+
+    useEffect(() => {
+        if (isReady) {
+            initSettings();
+        }
+    }, [isReady]);
+
     return (
-        <div className={"global-setting"}>
-            <div className={"heading"}>
-                <h3>Global Settings</h3> <button onClick={() => setHide(!hide)}>{hide ? "Show" : "Hide"}</button>
-            </div>
-            {hide ? null : (
+        <>
+            <button className={"close-button"} onClick={async () => await OBR.modal.close(modalId)}>
+                X
+            </button>
+            <div className={"global-setting"}>
+                <h3>Global Settings</h3>
                 <>
+                    <div className={"ruleset setting"}>
+                        Statblock Game Rules:{" "}
+                        <Switch
+                            labels={{ left: "DnD", right: "PF" }}
+                            onChange={(checked) => {
+                                if (checked) {
+                                    setStateRuleset("pf");
+                                } else {
+                                    setStateRuleset("e5");
+                                }
+                            }}
+                            checked={ruleset === "pf"}
+                            backgroundImages={{ left: dndSvg, right: pfSvg }}
+                        />
+                    </div>
                     <div className={"hp-mode setting"}>
                         HP Bar Segments:{" "}
                         <input
@@ -99,46 +129,9 @@ export const GlobalSettings = ({ sceneId }: { sceneId: string }) => {
                             }}
                         />
                     </div>
-                    <div className={"ruleset setting"}>
-                        Choose ruleset for statblocks:
-                        <label>
-                            5e
-                            <input
-                                type={"radio"}
-                                value={"5e"}
-                                name={"source"}
-                                checked={ruleset === "5e"}
-                                onClick={() => {
-                                    setRuleset("5e");
-                                    filter.setRuleset("5e");
-                                }}
-                                onChange={(e) => {
-                                    setRuleset(e.currentTarget.checked ? "5e" : "pf2e");
-                                    filter.setRuleset(e.currentTarget.checked ? "5e" : "pf2e");
-                                }}
-                            />
-                        </label>
-                        <label>
-                            PF2e
-                            <input
-                                type={"radio"}
-                                value={"pf2e"}
-                                name={"source"}
-                                checked={ruleset === "pf2e"}
-                                onClick={() => {
-                                    setRuleset("pf2e");
-                                    filter.setRuleset("pf2e");
-                                }}
-                                onChange={(e) => {
-                                    setRuleset(e.currentTarget.checked ? "pf2e" : "5e");
-                                    filter.setRuleset(e.currentTarget.checked ? "pf2e" : "5e");
-                                }}
-                            />
-                        </label>
-                    </div>
-                    <Groups sceneId={sceneId} />
+                    {sceneId ? <Groups sceneId={sceneId} /> : null}
                 </>
-            )}
-        </div>
+            </div>
+        </>
     );
 };

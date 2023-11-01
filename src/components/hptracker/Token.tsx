@@ -9,8 +9,6 @@ import { updateText } from "../../helper/textHelpers.ts";
 import { updateHpBar } from "../../helper/shapeHelpers.ts";
 import { evalString } from "../../helper/helpers.ts";
 import "./player-wrapper.scss";
-import { useTtrpgApiGetCreature } from "../../ttrpgapi/useTtrpgApi.ts";
-import { useFilter } from "../../context/FilterContext.ts";
 
 type TokenProps = {
     item: Item;
@@ -22,7 +20,7 @@ type TokenProps = {
 
 export const Token = (props: TokenProps) => {
     const playerContext = usePlayerContext();
-    const { ruleset } = useFilter();
+    // const { ruleset } = useFilter();
     const [data, setData] = useState<HpTrackerMetadata>(props.data);
     const [editName, setEditName] = useState<boolean>(false);
     const [allowNegativNumbers, setAllowNegativeNumbers] = useState<boolean | undefined>(undefined);
@@ -30,9 +28,9 @@ export const Token = (props: TokenProps) => {
     const { setId } = useCharSheet();
     const hpRef = useRef<HTMLInputElement>(null);
 
-    const sheetQuery = useTtrpgApiGetCreature(data.sheet ?? "");
-
-    const sheetData = sheetQuery.isSuccess ? sheetQuery.data : null;
+    // const sheetQuery = useTtrpgApiGetCreature(data.sheet ?? "");
+    //
+    // const sheetData = sheetQuery.isSuccess ? sheetQuery.data : null;
 
     const handleMetadata = (metadata: Metadata) => {
         if (metadata && sceneMetadata in metadata) {
@@ -196,7 +194,7 @@ export const Token = (props: TokenProps) => {
 
     const getBgColor = () => {
         if (props.data.hp === 0 && props.data.maxHp === 0) {
-            return "#242424";
+            return "#1C1B22";
         }
 
         const percent = props.data.hp / props.data.maxHp;
@@ -207,7 +205,7 @@ export const Token = (props: TokenProps) => {
     };
 
     const getNewHpValue = (input: string) => {
-        let value = 0;
+        let value: number;
         let factor = 1;
         if (allowNegativNumbers) {
             factor = input.startsWith("-") ? -1 : 1;
@@ -217,7 +215,7 @@ export const Token = (props: TokenProps) => {
         } else {
             value = Number(input.replace(/[^0-9]/g, ""));
         }
-        let hp = 0;
+        let hp: number;
         if (data.maxHp > 0) {
             hp = Math.min(Number(value * factor), data.maxHp);
         } else {
@@ -233,7 +231,7 @@ export const Token = (props: TokenProps) => {
             className={`player-wrapper ${playerContext.role === "PLAYER" ? "player" : ""} ${
                 props.selected ? "selected" : ""
             }`}
-            style={{ background: `linear-gradient(to right, ${getBgColor()}, #242424 50%, #242424 )` }}
+            style={{ background: `linear-gradient(to right, ${getBgColor()}, #1C1B22 50%, #1C1B22 )` }}
         >
             {props.popover ? null : (
                 <div className={"player-name"}>
@@ -392,13 +390,13 @@ export const Token = (props: TokenProps) => {
                     className={`toggle-button initiative-button`}
                     onClick={() => {
                         let dexBonus = 0;
-                        if (sheetData) {
-                            if (ruleset === "5e") {
-                                dexBonus = Math.floor((sheetData.stats.dexterity - 10) / 2);
-                            } else {
-                                dexBonus = sheetData.stats.dexterity;
-                            }
-                        }
+                        // if (sheetData) {
+                        //     if (ruleset === "e5") {
+                        //         dexBonus = Math.floor((sheetData.stats.dexterity - 10) / 2);
+                        //     } else {
+                        //         dexBonus = sheetData.stats.dexterity;
+                        //     }
+                        // }
                         handleValueChange(Math.floor(Math.random() * 20) + 1 + dexBonus, "initiative");
                     }}
                 />

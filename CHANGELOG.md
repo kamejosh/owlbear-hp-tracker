@@ -1,6 +1,8 @@
 # 1.4.0
 
-+ Add ttrpg-api for 5e and pf
++ Add ttrpg-api for e5 and pf
++ Migrate Info, Changelog and Settings to Modal
++ UI Improvements
 
 # 1.3.7
 

@@ -13,4 +13,4 @@ clean:
 	rm -rf node_modules
 
 api:
-	openapi-typescript https://ttrpg_api-1-v7423234.deta.app/openapi.json -o src/ttrpgapi/schema.d.ts
+	openapi-typescript https://ttrpg-api.bitperfect-software.com/openapi.json -o src/ttrpgapi/schema.d.ts

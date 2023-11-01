@@ -13,7 +13,7 @@
 
     .change-log-button,
     .help-button,
-    .close-button {
+    .settings-button {
         display: flex;
         justify-content: center;
         transition: all ease-in-out 0.25s;
@@ -32,34 +32,6 @@
         &focus {
             background-color: white;
             color: #242424;
-        }
-    }
-
-    .changelog,
-    .help {
-        position: relative;
-        margin: 0;
-        outline: none;
-        border: none;
-        padding: 40px;
-        text-align: left;
-
-        h1 {
-            font-size: 2rem;
-        }
-
-        ul {
-            padding-left: 20px;
-        }
-
-        .close-button {
-            position: absolute;
-            top: 2ch;
-            right: 2ch;
-        }
-
-        img {
-            max-width: 100%;
         }
     }
 

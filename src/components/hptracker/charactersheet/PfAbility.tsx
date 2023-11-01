@@ -1,0 +1,83 @@
+import { components } from "../../../ttrpgapi/schema";
+import "./pfability.scss";
+import { useState } from "react";
+
+type Action = components["schemas"]["ActionOut"];
+type Reaction = components["schemas"]["Reaction"];
+type SpecialAbility = components["schemas"]["SpecialAbility"];
+
+export const PfAbility = ({ ability }: { ability: Action | Reaction | SpecialAbility }) => {
+    const [open, setOpen] = useState<boolean>(false);
+
+    const entries = Object.entries(ability);
+    const hasDetails = (): boolean => {
+        let has = false;
+        entries.forEach((entry) => {
+            const [key, value] = entry;
+            if (!["name", "type", "description", "value"].includes(key) && value) {
+                has = true;
+            }
+        });
+        return has;
+    };
+
+    const actionTypeConvert = (ability: Action | Reaction | SpecialAbility) => {
+        let actionType = "";
+        if (Object.keys(ability).includes("type")) {
+            const action = ability as Action;
+            if (action.type === "ONE") {
+                actionType = "(one action)";
+            } else if (action.type === "TWO") {
+                actionType = "(two actions)";
+            } else if (action.type === "THREE") {
+                actionType = "(three actions)";
+            } else if (action.type === "FREE") {
+                actionType = "(free action)";
+            } else {
+                return "";
+            }
+            return <span className={"action-type"}>{actionType}</span>;
+        }
+
+        return "";
+    };
+
+    const isAction = (ability: Action | Reaction | SpecialAbility) => {
+        if (Object.keys(ability).includes("type")) {
+            return true;
+        }
+        return false;
+    };
+
+    return (
+        <li key={ability.name} className={`pf-ability ${open ? "open" : ""}`}>
+            <div className={"main-info"}>
+                <b className={"ability-name"}>{ability.name}</b> {actionTypeConvert(ability)}
+                {Object.keys(ability).includes("description") && (ability as Action).description !== "" ? (
+                    <span className={`ability-description ${isAction(ability) ? "action" : "ability"}`}>
+                        {(ability as Action).description}
+                    </span>
+                ) : (
+                    ""
+                )}
+                {hasDetails() ? (
+                    <button className={`expand ${open ? "open" : ""}`} onClick={() => setOpen(!open)}></button>
+                ) : null}
+            </div>
+
+            <div className={`action-details-wrapper  ${open ? "open" : null}`}>
+                <ul className={`action-details`}>
+                    {Object.entries(ability).map(([key, value], index) => {
+                        if (value !== null && value !== "" && !["name", "type", "description", "value"].includes(key)) {
+                            return (
+                                <li key={index}>
+                                    <b>{key}</b>: {value}
+                                </li>
+                            );
+                        }
+                    })}
+                </ul>
+            </div>
+        </li>
+    );
+};

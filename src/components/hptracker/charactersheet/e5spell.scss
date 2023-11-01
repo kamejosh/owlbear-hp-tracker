@@ -1,0 +1,73 @@
+@use "../../../helper/breakpoint";
+
+.spells {
+    .spell-list {
+        padding: 0;
+        list-style: none;
+
+        .spell {
+            border-bottom: 1px dotted darkgrey;
+            padding-bottom: 20px;
+
+            .info {
+                display: grid;
+                grid-template-rows: repeat(3, auto);
+                grid-template-columns: 1fr;
+                justify-content: space-between;
+                align-items: flex-end;
+                gap: 10px;
+
+                @include breakpoint.laptop {
+                    grid-template-rows: auto;
+                    grid-template-columns: 1fr 1fr 0.2fr;
+                }
+
+                .left {
+                    display: flex;
+                    flex-direction: column;
+
+                    .spell-name {
+                        margin-bottom: 5px;
+                        font-size: 18px;
+                        text-transform: capitalize;
+                    }
+
+                    .spell-materials {
+                        white-space: wrap;
+
+                        .material-details {
+                            color: lightgray;
+                            font-size: 10px;
+                            hyphens: auto;
+                        }
+                    }
+                }
+
+                .right {
+                    display: flex;
+                    flex-direction: column;
+                }
+            }
+
+            .spell-more-info {
+                display: grid;
+                grid-template-rows: 0fr;
+                transition: 0.25s ease-in-out;
+
+                &.open {
+                    grid-template-rows: 1fr;
+
+                    .more-info-content {
+                        opacity: 1;
+                    }
+                }
+
+                .more-info-content {
+                    opacity: 0;
+                    transition: 0.25s ease-in-out;
+                    min-height: 0;
+                }
+            }
+        }
+    }
+}

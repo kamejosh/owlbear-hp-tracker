@@ -138,6 +138,11 @@
     "@babel/helper-validator-identifier" "^7.22.20"
     to-fast-properties "^2.0.0"
 
+"@bitperfect-packages/openapi-typescript-aliases@^1.0.3":
+  version "1.0.3"
+  resolved "https://gitlab.com/api/v4/projects/37481196/packages/npm/@bitperfect-packages/openapi-typescript-aliases/-/@bitperfect-packages/openapi-typescript-aliases-1.0.3.tgz#64d241eea6d1badff535580e312d0dc6ba16ba4b"
+  integrity sha1-ZNJB7qbRut/1NVgOMS0NxroWuks=
+
 "@bitperfect-software/prettier-config@^2.0.1":
   version "2.0.1"
   resolved "https://registry.npmjs.org/@bitperfect-software/prettier-config/-/prettier-config-2.0.1.tgz"

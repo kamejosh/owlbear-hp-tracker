@@ -1,0 +1,50 @@
+@use "../../../helper/breakpoint";
+
+.pf-ability {
+    .main-info {
+        display: flex;
+        flex-direction: column;
+        gap: 1ch;
+
+        @include breakpoint.laptop {
+            display: grid;
+            grid-template-columns: 90px 105px auto 30px;
+            grid-auto-flow: row;
+        }
+
+        .ability-name {
+            width: 90px;
+            hyphens: auto;
+        }
+
+        .action-type {
+            white-space: nowrap;
+        }
+
+        .ability-description {
+            &.ability {
+                grid-column: span 2;
+            }
+        }
+    }
+
+    .action-details-wrapper {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows 0.25s ease-in-out;
+
+        &.open {
+            grid-template-rows: 1fr;
+
+            .action-details {
+                opacity: 1;
+            }
+        }
+
+        .action-details {
+            opacity: 0;
+            transition: 0.25s ease-in-out;
+            min-height: 0;
+        }
+    }
+}

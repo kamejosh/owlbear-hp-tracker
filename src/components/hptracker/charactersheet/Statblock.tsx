@@ -1,15 +1,19 @@
 import { useCharSheet } from "../../../context/CharacterContext.ts";
 import OBR from "@owlbear-rodeo/sdk";
-import { characterMetadata } from "../../../helper/variables.ts";
-import { HpTrackerMetadata } from "../../../helper/types.ts";
+import { characterMetadata, ID } from "../../../helper/variables.ts";
+import { HpTrackerMetadata, Ruleset } from "../../../helper/types.ts";
 import { useEffect } from "react";
-import { DnDCreatureOut, PFCreatureOut, useTtrpgApiGetCreature } from "../../../ttrpgapi/useTtrpgApi.ts";
-import { Ability } from "./Ability.tsx";
+import { PfAbility } from "./PfAbility.tsx";
+import { useE5GetCreature } from "../../../ttrpgapi/e5/useE5Api.ts";
+import { usePfGetStatblock } from "../../../ttrpgapi/pf/usePfApi.ts";
+import { useLocalStorage } from "../../../helper/hooks.ts";
+import { E5Ability } from "./E5Ability.tsx";
+import { E5Spells } from "./E5Spells.tsx";
 
-const DndStatBlock = ({ slug }: { slug: string }) => {
-    const creatureQuery = useTtrpgApiGetCreature(slug);
+const E5StatBlock = ({ slug }: { slug: string }) => {
+    const creatureQuery = useE5GetCreature(slug);
 
-    const creature = creatureQuery.isSuccess && creatureQuery.data ? (creatureQuery.data as DnDCreatureOut) : null;
+    const creature = creatureQuery.isSuccess && creatureQuery.data ? creatureQuery.data : null;
 
     const { characterId } = useCharSheet();
 
@@ -42,16 +46,18 @@ const DndStatBlock = ({ slug }: { slug: string }) => {
             <div className={"what"}>
                 <h3>{creature.name}</h3>
                 <span>
-                    {creature.size} {creature.type} {creature.alignment ? `, ${creature.alignment}` : null}
+                    {creature.size} {creature.type} {creature.subtype ? `, ${creature.subtype}` : null}
+                    {creature.alignment ? `, ${creature.alignment}` : null}
+                    {creature.group ? `, ${creature.group}` : null}
                 </span>
             </div>
             <div className={"values"}>
                 <span className={"ac"}>
                     <b>Armor Class</b> {creature.armor_class.value}{" "}
-                    {creature.armor_class.special ? `(${creature.armor_class.special})` : null})
+                    {!!creature.armor_class.special ? `(${creature.armor_class.special})` : null}
                 </span>
                 <span className={"hp"}>
-                    <b>Hit Points</b> {creature.hp.value} {creature.hp.hit_dice ? `(${creature.hp.hit_dice})` : null})
+                    <b>Hit Points</b> {creature.hp.value} {creature.hp.hit_dice ? `(${creature.hp.hit_dice})` : null}
                 </span>
                 <span className={"speed"}>
                     <b>Speed</b>{" "}
@@ -72,7 +78,11 @@ const DndStatBlock = ({ slug }: { slug: string }) => {
                         <div className={"stat"} key={stat}>
                             <div className={"stat-name"}>{stat.substring(0, 3)}</div>
                             <div className={"stat-value"}>
-                                {value} ({Math.floor((value - 10) / 2)})
+                                {value} (
+                                {Intl.NumberFormat("en-US", { signDisplay: "exceptZero" }).format(
+                                    Math.floor((value - 10) / 2)
+                                )}
+                                )
                             </div>
                         </div>
                     );
@@ -84,7 +94,9 @@ const DndStatBlock = ({ slug }: { slug: string }) => {
                         <b>Saving Throws</b>{" "}
                         {Object.entries(creature.saving_throws)
                             .map(([key, value]) => {
-                                return `${key.substring(0, 3)} +${value}`;
+                                if (value) {
+                                    return `${key.substring(0, 3)} +${value}`;
+                                }
                             })
                             .filter((v) => !!v)
                             .join(", ")}
@@ -100,35 +112,79 @@ const DndStatBlock = ({ slug }: { slug: string }) => {
                     <b>Challenge</b> {creature.challenge_rating}
                 </div>
             </div>
-            <div className={"actions"}>
-                <h3>Actions</h3>
-                {creature.actions.map((action) => {
-                    return (
-                        <div key={action.name} className={"action"}>
-                            <b>{action.name}.</b> {action.desc}
-                        </div>
-                    );
-                })}
+            <div className={"resistances"}>
+                {creature.damage_vulnerabilities ? (
+                    <>
+                        <h3>Damage Vulnerabilities</h3> {creature.damage_vulnerabilities}
+                    </>
+                ) : null}
+                {creature.damage_resistances ? (
+                    <>
+                        <h3>Damage Resistances</h3> {creature.damage_resistances}
+                    </>
+                ) : null}
+                {creature.damage_immunities ? (
+                    <>
+                        <h3>Damage Immunities</h3> {creature.damage_immunities}
+                    </>
+                ) : null}
+                {creature.condition_immunities ? (
+                    <>
+                        <h3>Condition Immunities</h3> {creature.condition_immunities}
+                    </>
+                ) : null}
             </div>
-            <div className={"special-abilities"}>
-                <h3>Special Abilities</h3>
-                {creature.special_abilities.map((ability) => {
-                    return (
-                        <div key={ability.name} className={"action"}>
-                            <b>{ability.name}.</b> {ability.desc}
-                        </div>
-                    );
-                })}
-            </div>
+            {creature.actions && creature.actions.length > 0 ? (
+                <div className={"actions"}>
+                    <h3>Actions</h3>
+                    <ul className={"ability-list"}>
+                        {creature.actions.map((action, index) => (
+                            <E5Ability ability={action} key={action.name + index} />
+                        ))}
+                    </ul>
+                </div>
+            ) : null}
+            {creature.reactions && creature.reactions.length > 0 ? (
+                <div className={"reactions"}>
+                    <h3>Reactions</h3>
+                    <ul className={"ability-list"}>
+                        {creature.reactions?.map((reaction, index) => (
+                            <E5Ability ability={reaction} key={reaction.name + index} />
+                        ))}
+                    </ul>
+                </div>
+            ) : null}
+            {creature.special_abilities && creature.special_abilities.length > 0 ? (
+                <div className={"special-abilities"}>
+                    <h3>Special Abilities</h3>
+                    <ul className={"ability-list"}>
+                        {creature.special_abilities?.map((ability, index) => (
+                            <E5Ability ability={ability} key={ability.name + index} />
+                        ))}
+                    </ul>
+                </div>
+            ) : null}
+            {(creature.legendary_actions && creature.legendary_actions.length > 0) || !!creature.legendary_desc ? (
+                <div className={"legendary-actions"}>
+                    <h3>Legendary Actions</h3>
+                    {creature.legendary_desc}
+                    <ul className={"ability-list"}>
+                        {creature.legendary_actions?.map((legendary_action, index) => (
+                            <E5Ability ability={legendary_action} key={legendary_action.name + index} />
+                        ))}
+                    </ul>
+                </div>
+            ) : null}
+            {creature.spells && creature.spells.length > 0 ? <E5Spells spells={creature.spells} /> : null}
         </div>
     ) : null;
 };
 
 const PfStatBlock = ({ slug }: { slug: string }) => {
     const { characterId } = useCharSheet();
-    const creatureQuery = useTtrpgApiGetCreature(slug);
+    const creatureQuery = usePfGetStatblock(slug);
 
-    const creature = creatureQuery.isSuccess && creatureQuery.data ? (creatureQuery.data as PFCreatureOut) : null;
+    const creature = creatureQuery.isSuccess && creatureQuery.data ? creatureQuery.data : null;
 
     const updateValues = (maxHp: number, ac: number) => {
         if (characterId) {
@@ -231,22 +287,22 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                     );
                 })}
             </div>
-            {creature.items.length > 0 ? (
+            {creature.items?.length && creature.items.length > 0 ? (
                 <div className={"items"}>
                     <b>Items</b>: {creature.items.join(", ")}
                 </div>
             ) : null}
-            {creature.immunities.length > 0 ? (
+            {creature.immunities?.length && creature.immunities.length > 0 ? (
                 <div className={"immunities"}>
                     <b>Immunities</b>: {creature.immunities.join(", ")}
                 </div>
             ) : null}
-            {creature.weaknesses.length > 0 ? (
+            {creature.weaknesses?.length && creature.weaknesses.length > 0 ? (
                 <div className={"weaknesses"}>
                     <b>Weaknesses</b>: {creature.weaknesses.join(", ")}
                 </div>
             ) : null}
-            {creature.resistances.length > 0 ? (
+            {creature.resistances?.length && creature.resistances.length > 0 ? (
                 <div className={"resistances"}>
                     <b>Resistances</b>: {creature.resistances.join(", ")}
                 </div>
@@ -256,29 +312,31 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                 <h3>Actions</h3>
                 <ul className={"ability-list"}>
                     {creature.actions.map((action, index) => {
-                        return <Ability key={index} ability={action} />;
+                        return <PfAbility key={index} ability={action} />;
                     })}
                 </ul>
             </div>
-            <div className={"reactions"}>
-                <h3>Reactions</h3>
-                <ul className={"ability-list"}>
-                    {creature.reactions.map((reaction, index) => {
-                        return <Ability key={index} ability={reaction} />;
-                    })}
-                </ul>
-            </div>
+            {creature.reactions && creature.reactions.length > 0 ? (
+                <div className={"reactions"}>
+                    <h3>Reactions</h3>
+                    <ul className={"ability-list"}>
+                        {creature.reactions?.map((reaction, index) => {
+                            return <PfAbility key={index} ability={reaction} />;
+                        })}
+                    </ul>
+                </div>
+            ) : null}
             <div className={"special-abilities"}>
                 <h3>Special Abilities</h3>
                 <ul className={"ability-list"}>
-                    {creature.special_abilities.map((ability, index) => {
-                        return <Ability key={index} ability={ability} />;
+                    {creature.special_abilities?.map((ability, index) => {
+                        return <PfAbility key={index} ability={ability} />;
                     })}
                 </ul>
             </div>
             <div className={"spells"}>
                 <h3>Spells</h3>
-                {creature.spells.map((spells, index) => {
+                {creature.spells?.map((spells, index) => {
                     return (
                         <div key={index} className={"spell-list"}>
                             <span>
@@ -294,11 +352,11 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                             ) : null}
                             <div className={"spell-name-list"}>
                                 {spells.spell_lists
-                                    .sort((a, b) => {
-                                        if (a.type === "cantrip") {
+                                    ?.sort((a, b) => {
+                                        if (a.type === "CANTRIP") {
                                             return -1;
                                         }
-                                        if (b.type === "cantrip") {
+                                        if (b.type === "SPELL") {
                                             return 1;
                                         }
                                         if (parseInt(a.level) < parseInt(b.level)) {
@@ -311,13 +369,13 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                                         return (
                                             <div key={index} className={"spell-name"}>
                                                 <span>
-                                                    <b>Type</b>: {list.type}
+                                                    <b>Type</b>: {list.type.toLowerCase()}
                                                 </span>
                                                 <span>
                                                     <b>Level</b>: {list.level}
                                                 </span>
                                                 <span>
-                                                    <b>Spells</b>: {list.spells.join(", ")}
+                                                    <b>Spells</b>: {list.spells?.map((spell) => spell.name).join(", ")}
                                                 </span>
                                             </div>
                                         );
@@ -332,5 +390,6 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
 };
 
 export const Statblock = ({ slug }: { slug: string }) => {
-    return <>{slug.startsWith("5e") ? <DndStatBlock slug={slug} /> : <PfStatBlock slug={slug} />}</>;
+    const [ruleset, _] = useLocalStorage<Ruleset>(`${ID}.ruleset`, "e5");
+    return <>{ruleset === "e5" ? <E5StatBlock slug={slug} /> : <PfStatBlock slug={slug} />}</>;
 };

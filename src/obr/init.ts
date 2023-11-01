@@ -10,6 +10,7 @@ import { updateHpBar } from "../helper/shapeHelpers.ts";
 import { handleTextVisibility, updateText, updateTextChanges } from "../helper/textHelpers.ts";
 import { getAttachedItems } from "../helper/helpers.ts";
 import { v4 as uuidv4 } from "uuid";
+import { migrateTo140 } from "../migrations/v140.ts";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -43,8 +44,9 @@ const initItems = async () => {
 
 const initScene = async () => {
     const metadata: Metadata = await OBR.scene.getMetadata();
+    const ownMetadata: Metadata = {};
     if (!(sceneMetadata in metadata)) {
-        metadata[sceneMetadata] = {
+        ownMetadata[sceneMetadata] = {
             version: version,
             hpBarSegments: 0,
             hpBarOffset: 0,
@@ -75,9 +77,17 @@ const initScene = async () => {
         if (sceneData.allowNegativeNumbers === undefined) {
             sceneData.allowNegativeNumbers = false;
         }
-        metadata[sceneMetadata] = sceneData;
+        // @ts-ignore some beta version startet with using 5e
+        if (sceneData.ruleset === "5e") {
+            sceneData.ruleset = "e5";
+        }
+        // @ts-ignore some beta version startet with using pf2e
+        if (sceneData.ruleset === "pf2e") {
+            sceneData.ruleset = "pf";
+        }
+        ownMetadata[sceneMetadata] = sceneData;
     }
-    await OBR.scene.setMetadata({ sceneMetadata: metadata[sceneMetadata] });
+    await OBR.scene.setMetadata(ownMetadata);
 };
 
 const setupContextMenu = async () => {
@@ -216,6 +226,9 @@ const migrations = async () => {
         }
         if (compare(data.version, "1.1.3", "<")) {
             await migrate112To113();
+        }
+        if (compare(data.version, "1.4.0", "<")) {
+            await migrateTo140();
         }
     }
 };

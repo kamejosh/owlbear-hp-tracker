@@ -1,18 +1,17 @@
-import { useEffect, useRef, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import { useCharSheet } from "../../../context/CharacterContext.ts";
 import "./character-sheet.scss";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
 import { characterMetadata, ID } from "../../../helper/variables.ts";
-import { HpTrackerMetadata } from "../../../helper/types.ts";
+import { HpTrackerMetadata, Ruleset } from "../../../helper/types.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
-import { Ruleset } from "../../../ttrpgapi/useTtrpgApi.ts";
 import { SearchResult5e, SearchResultPf } from "./SearchResult.tsx";
 import { Statblock } from "./Statblock.tsx";
 import { useLocalStorage } from "../../../helper/hooks.ts";
 
 export const CharacterSheet = () => {
     const { characterId, setId } = useCharSheet();
-    const [ruleset, _] = useLocalStorage<Ruleset>(`${ID}.ruleset`, "5e");
+    const [ruleset, _] = useLocalStorage<Ruleset>(`${ID}.ruleset`, "e5");
     const playerContext = usePlayerContext();
     const [token, setToken] = useState<Item | null>(null);
     const [data, setData] = useState<HpTrackerMetadata | null>(null);
@@ -54,12 +53,16 @@ export const CharacterSheet = () => {
     }, []);
 
     useEffect(() => {
-        setForceSearch(false);
+        if (data?.sheet && data?.ruleset === ruleset) {
+            setForceSearch(false);
+        } else {
+            setForceSearch(true);
+        }
     }, [data?.sheet]);
 
-    const ruleSetMap = new Map<Ruleset, React.JSX.Element>([
-        ["pf2e", <SearchResultPf search={search} />],
-        ["5e", <SearchResult5e search={search} />],
+    const ruleSetMap = new Map<Ruleset, ReactElement>([
+        ["pf", <SearchResultPf search={search} />],
+        ["e5", <SearchResult5e search={search} />],
     ]);
 
     return (

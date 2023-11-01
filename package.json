@@ -13,6 +13,7 @@
     },
     "prettier": "@bitperfect-software/prettier-config",
     "devDependencies": {
+        "@bitperfect-packages/openapi-typescript-aliases": "^1.0.3",
         "@bitperfect-software/prettier-config": "^2.0.1",
         "@types/node": "^20.3.3",
         "@types/react": "^18.2.14",
