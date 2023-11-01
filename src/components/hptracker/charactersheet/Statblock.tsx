@@ -112,28 +112,50 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                     <b>Challenge</b> {creature.challenge_rating}
                 </div>
             </div>
-            <div className={"resistances"}>
-                {creature.damage_vulnerabilities ? (
-                    <>
-                        <h3>Damage Vulnerabilities</h3> {creature.damage_vulnerabilities}
-                    </>
-                ) : null}
-                {creature.damage_resistances ? (
-                    <>
-                        <h3>Damage Resistances</h3> {creature.damage_resistances}
-                    </>
-                ) : null}
-                {creature.damage_immunities ? (
-                    <>
-                        <h3>Damage Immunities</h3> {creature.damage_immunities}
-                    </>
-                ) : null}
-                {creature.condition_immunities ? (
-                    <>
-                        <h3>Condition Immunities</h3> {creature.condition_immunities}
-                    </>
-                ) : null}
-            </div>
+            {creature.skills ? (
+                <div className={"skills"}>
+                    <h3>Skills</h3>
+                    <ul className={"skill-list"}>
+                        {Object.entries(creature.skills).map(([key, value], index) => {
+                            if (value) {
+                                return (
+                                    <li key={index}>
+                                        <b>{key}</b>:{" "}
+                                        {Intl.NumberFormat("en-US", { signDisplay: "exceptZero" }).format(value)}
+                                    </li>
+                                );
+                            }
+                        })}
+                    </ul>
+                </div>
+            ) : null}
+            {creature.damage_vulnerabilities ||
+            creature.damage_resistances ||
+            creature.damage_immunities ||
+            creature.condition_immunities ? (
+                <div className={"resistances"}>
+                    {creature.damage_vulnerabilities ? (
+                        <>
+                            <h3>Damage Vulnerabilities</h3> {creature.damage_vulnerabilities}
+                        </>
+                    ) : null}
+                    {creature.damage_resistances ? (
+                        <>
+                            <h3>Damage Resistances</h3> {creature.damage_resistances}
+                        </>
+                    ) : null}
+                    {creature.damage_immunities ? (
+                        <>
+                            <h3>Damage Immunities</h3> {creature.damage_immunities}
+                        </>
+                    ) : null}
+                    {creature.condition_immunities ? (
+                        <>
+                            <h3>Condition Immunities</h3> {creature.condition_immunities}
+                        </>
+                    ) : null}
+                </div>
+            ) : null}
             {creature.actions && creature.actions.length > 0 ? (
                 <div className={"actions"}>
                     <h3>Actions</h3>

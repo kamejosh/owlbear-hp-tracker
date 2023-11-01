@@ -239,6 +239,7 @@
                 "values"
                 "abilities"
                 "tidbits"
+                "skills"
                 "resistances"
                 "actions"
                 "actions"
@@ -259,6 +260,7 @@
                 grid-template-areas:
                     "what values"
                     "abilities tidbits"
+                    "skills skills"
                     "resistances resistances"
                     "actions actions"
                     "reactions reactions"
@@ -319,6 +321,33 @@
 
             .tidbits {
                 grid-area: tidbits;
+            }
+
+            .skills {
+                grid-area: skills;
+
+                h3 {
+                    margin-bottom: 5px;
+                    border-bottom: 1px solid white;
+                    width: 100%;
+                }
+
+                ul {
+                    display: grid;
+                    grid-template-columns: 1fr;
+                    padding: 0;
+                    list-style: none;
+
+                    @include breakpoint.laptop {
+                        grid-template-columns: repeat(2, 1fr);
+                    }
+
+                    li {
+                        b {
+                            text-transform: capitalize;
+                        }
+                    }
+                }
             }
 
             .resistances {
