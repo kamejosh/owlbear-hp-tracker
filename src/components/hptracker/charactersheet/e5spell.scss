@@ -83,6 +83,7 @@
 
                     .more-info-content {
                         opacity: 1;
+                        overflow: visible;
                     }
                 }
 
@@ -93,6 +94,7 @@
                     opacity: 0;
                     transition: 0.25s ease-in-out;
                     min-height: 0;
+                    overflow: hidden;
 
                     .info-bits {
                         display: grid;
