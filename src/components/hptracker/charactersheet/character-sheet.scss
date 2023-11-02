@@ -5,13 +5,20 @@
         display: flex;
         position: fixed;
         top: 30px;
-        left: 30px;
+        left: 15px;
         align-items: center;
-        gap: 5px;
+        gap: 0;
         cursor: pointer;
         border: 1px solid white;
         border-radius: 4px;
         background-color: #1c1b22;
+        font-size: 0;
+
+        @include breakpoint.laptop {
+            left: 30px;
+            gap: 5px;
+            font-size: 12px;
+        }
 
         &::before {
             transition: width 0.25s ease-in-out;
@@ -400,6 +407,12 @@
                 h3 {
                     border-bottom: 1px solid white;
                     width: 100%;
+                }
+
+                .spell-list {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
                 }
             }
         }

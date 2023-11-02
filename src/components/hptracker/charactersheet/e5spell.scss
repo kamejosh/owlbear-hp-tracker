@@ -1,51 +1,75 @@
 @use "../../../helper/breakpoint";
 
 .spells {
+    .spell-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1ch;
+
+        .spell-filter {
+            cursor: pointer;
+
+            &.active,
+            &:hover {
+                background-color: rgba(255, 255, 255, 0.7);
+                color: black;
+            }
+        }
+    }
+
     .spell-list {
         padding: 0;
         list-style: none;
 
         .spell {
             border-bottom: 1px dotted darkgrey;
-            padding-bottom: 20px;
+            padding-bottom: 5px;
 
-            .info {
-                display: grid;
-                grid-template-rows: repeat(3, auto);
-                grid-template-columns: 1fr;
+            .spell-main {
+                display: flex;
                 justify-content: space-between;
                 align-items: flex-end;
-                gap: 10px;
+                margin-bottom: 10px;
 
-                @include breakpoint.laptop {
-                    grid-template-rows: auto;
-                    grid-template-columns: 1fr 1fr 0.2fr;
-                }
-
-                .left {
+                .spell-info {
                     display: flex;
                     flex-direction: column;
+                    gap: 5px;
 
-                    .spell-name {
-                        margin-bottom: 5px;
-                        font-size: 18px;
-                        text-transform: capitalize;
+                    .spell-header {
+                        display: flex;
+                        align-items: flex-start;
+                        gap: 1ch;
+
+                        .spell-name {
+                            margin: 0;
+                            font-size: 18px;
+                            line-height: 1;
+                            text-transform: capitalize;
+                        }
+
+                        .spell-level {
+                            color: lightgrey;
+                            font-size: 12px;
+                        }
                     }
 
-                    .spell-materials {
-                        white-space: wrap;
+                    .spell-damage {
+                        font-size: 14px;
+                    }
+
+                    .spell-components {
+                        display: flex;
+                        padding-right: 10px;
+                        font-size: 14px;
+                        line-height: 1;
 
                         .material-details {
                             color: lightgray;
-                            font-size: 10px;
+                            font-size: 12px;
                             hyphens: auto;
                         }
                     }
-                }
-
-                .right {
-                    display: flex;
-                    flex-direction: column;
                 }
             }
 
@@ -63,9 +87,22 @@
                 }
 
                 .more-info-content {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
                     opacity: 0;
                     transition: 0.25s ease-in-out;
                     min-height: 0;
+
+                    .info-bits {
+                        display: grid;
+                        grid-template-columns: 1fr;
+                        column-gap: 10px;
+
+                        @include breakpoint.laptop {
+                            grid-template-columns: repeat(2, 1fr);
+                        }
+                    }
                 }
             }
         }

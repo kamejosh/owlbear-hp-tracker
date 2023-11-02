@@ -3,7 +3,7 @@ import OBR from "@owlbear-rodeo/sdk";
 import { characterMetadata } from "../../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../../helper/types.ts";
 import { Loader } from "../../general/Loader.tsx";
-import { E5Statblock, useE5SearchCreature } from "../../../ttrpgapi/e5/useE5Api.ts";
+import { E5Statblock, useE5SearchStatblock } from "../../../ttrpgapi/e5/useE5Api.ts";
 import { PfStatblock, usePfStatblockSearch } from "../../../ttrpgapi/pf/usePfApi.ts";
 
 export const SearchResult5e = ({ search }: { search: string }) => {
@@ -24,7 +24,7 @@ export const SearchResult5e = ({ search }: { search: string }) => {
         }
     };
 
-    const searchQuery = useE5SearchCreature(search, 10, 0);
+    const searchQuery = useE5SearchStatblock(search, 10, 0);
 
     const entries = searchQuery.isSuccess && searchQuery.data ? searchQuery.data : [];
 

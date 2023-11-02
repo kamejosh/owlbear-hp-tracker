@@ -96,3 +96,10 @@ export const generateSlug = (string: string) => {
 
     return str;
 };
+
+export const getDamage = (text: string) => {
+    const regex = /\d+d\d+/gi;
+    const dice = regex.exec(text);
+
+    return dice && dice.length > 0 ? dice[0] : null;
+};

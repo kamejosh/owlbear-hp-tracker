@@ -4,16 +4,16 @@ import { characterMetadata, ID } from "../../../helper/variables.ts";
 import { HpTrackerMetadata, Ruleset } from "../../../helper/types.ts";
 import { useEffect } from "react";
 import { PfAbility } from "./PfAbility.tsx";
-import { useE5GetCreature } from "../../../ttrpgapi/e5/useE5Api.ts";
+import { useE5GetStatblock } from "../../../ttrpgapi/e5/useE5Api.ts";
 import { usePfGetStatblock } from "../../../ttrpgapi/pf/usePfApi.ts";
 import { useLocalStorage } from "../../../helper/hooks.ts";
 import { E5Ability } from "./E5Ability.tsx";
 import { E5Spells } from "./E5Spells.tsx";
 
 const E5StatBlock = ({ slug }: { slug: string }) => {
-    const creatureQuery = useE5GetCreature(slug);
+    const statblockQuery = useE5GetStatblock(slug);
 
-    const creature = creatureQuery.isSuccess && creatureQuery.data ? creatureQuery.data : null;
+    const statblock = statblockQuery.isSuccess && statblockQuery.data ? statblockQuery.data : null;
 
     const { characterId } = useCharSheet();
 
@@ -36,32 +36,32 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
     };
 
     useEffect(() => {
-        if (creatureQuery.isSuccess && creature) {
-            updateValues(creature.hp.value, creature.armor_class.value);
+        if (statblockQuery.isSuccess && statblock) {
+            updateValues(statblock.hp.value, statblock.armor_class.value);
         }
-    }, [creatureQuery.isSuccess]);
+    }, [statblockQuery.isSuccess]);
 
-    return creature ? (
+    return statblock ? (
         <div className={"open5e-sheet"}>
             <div className={"what"}>
-                <h3>{creature.name}</h3>
+                <h3>{statblock.name}</h3>
                 <span>
-                    {creature.size} {creature.type} {creature.subtype ? `, ${creature.subtype}` : null}
-                    {creature.alignment ? `, ${creature.alignment}` : null}
-                    {creature.group ? `, ${creature.group}` : null}
+                    {statblock.size} {statblock.type} {statblock.subtype ? `, ${statblock.subtype}` : null}
+                    {statblock.alignment ? `, ${statblock.alignment}` : null}
+                    {statblock.group ? `, ${statblock.group}` : null}
                 </span>
             </div>
             <div className={"values"}>
                 <span className={"ac"}>
-                    <b>Armor Class</b> {creature.armor_class.value}{" "}
-                    {!!creature.armor_class.special ? `(${creature.armor_class.special})` : null}
+                    <b>Armor Class</b> {statblock.armor_class.value}{" "}
+                    {!!statblock.armor_class.special ? `(${statblock.armor_class.special})` : null}
                 </span>
                 <span className={"hp"}>
-                    <b>Hit Points</b> {creature.hp.value} {creature.hp.hit_dice ? `(${creature.hp.hit_dice})` : null}
+                    <b>Hit Points</b> {statblock.hp.value} {statblock.hp.hit_dice ? `(${statblock.hp.hit_dice})` : null}
                 </span>
                 <span className={"speed"}>
                     <b>Speed</b>{" "}
-                    {Object.entries(creature.speed)
+                    {Object.entries(statblock.speed)
                         .map(([key, value]) => {
                             if (value) {
                                 return `${key} ${value}`;
@@ -73,7 +73,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                 </span>
             </div>
             <div className={"stats"}>
-                {Object.entries(creature.stats).map(([stat, value]) => {
+                {Object.entries(statblock.stats).map(([stat, value]) => {
                     return (
                         <div className={"stat"} key={stat}>
                             <div className={"stat-name"}>{stat.substring(0, 3)}</div>
@@ -89,10 +89,10 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                 })}
             </div>
             <div className={"tidbits"}>
-                {Object.entries(creature.saving_throws).filter((st) => !!st[1]).length > 0 ? (
+                {Object.entries(statblock.saving_throws).filter((st) => !!st[1]).length > 0 ? (
                     <div className={"tidbit"}>
                         <b>Saving Throws</b>{" "}
-                        {Object.entries(creature.saving_throws)
+                        {Object.entries(statblock.saving_throws)
                             .map(([key, value]) => {
                                 if (value) {
                                     return `${key.substring(0, 3)} +${value}`;
@@ -103,20 +103,20 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                     </div>
                 ) : null}
                 <div className={"tidbit"}>
-                    <b>Senses</b> {creature.senses?.join(", ")}
+                    <b>Senses</b> {statblock.senses?.join(", ")}
                 </div>
                 <div className={"tidbit"}>
-                    <b>Languages</b> {creature.languages?.join(", ")}
+                    <b>Languages</b> {statblock.languages?.join(", ")}
                 </div>
                 <div className={"tidbit"}>
-                    <b>Challenge</b> {creature.challenge_rating}
+                    <b>Challenge</b> {statblock.challenge_rating}
                 </div>
             </div>
-            {creature.skills ? (
+            {statblock.skills ? (
                 <div className={"skills"}>
                     <h3>Skills</h3>
                     <ul className={"skill-list"}>
-                        {Object.entries(creature.skills).map(([key, value], index) => {
+                        {Object.entries(statblock.skills).map(([key, value], index) => {
                             if (value) {
                                 return (
                                     <li key={index}>
@@ -129,75 +129,75 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                     </ul>
                 </div>
             ) : null}
-            {creature.damage_vulnerabilities ||
-            creature.damage_resistances ||
-            creature.damage_immunities ||
-            creature.condition_immunities ? (
+            {statblock.damage_vulnerabilities ||
+            statblock.damage_resistances ||
+            statblock.damage_immunities ||
+            statblock.condition_immunities ? (
                 <div className={"resistances"}>
-                    {creature.damage_vulnerabilities ? (
+                    {statblock.damage_vulnerabilities ? (
                         <>
-                            <h3>Damage Vulnerabilities</h3> {creature.damage_vulnerabilities}
+                            <h3>Damage Vulnerabilities</h3> {statblock.damage_vulnerabilities}
                         </>
                     ) : null}
-                    {creature.damage_resistances ? (
+                    {statblock.damage_resistances ? (
                         <>
-                            <h3>Damage Resistances</h3> {creature.damage_resistances}
+                            <h3>Damage Resistances</h3> {statblock.damage_resistances}
                         </>
                     ) : null}
-                    {creature.damage_immunities ? (
+                    {statblock.damage_immunities ? (
                         <>
-                            <h3>Damage Immunities</h3> {creature.damage_immunities}
+                            <h3>Damage Immunities</h3> {statblock.damage_immunities}
                         </>
                     ) : null}
-                    {creature.condition_immunities ? (
+                    {statblock.condition_immunities ? (
                         <>
-                            <h3>Condition Immunities</h3> {creature.condition_immunities}
+                            <h3>Condition Immunities</h3> {statblock.condition_immunities}
                         </>
                     ) : null}
                 </div>
             ) : null}
-            {creature.actions && creature.actions.length > 0 ? (
+            {statblock.actions && statblock.actions.length > 0 ? (
                 <div className={"actions"}>
                     <h3>Actions</h3>
                     <ul className={"ability-list"}>
-                        {creature.actions.map((action, index) => (
+                        {statblock.actions.map((action, index) => (
                             <E5Ability ability={action} key={action.name + index} />
                         ))}
                     </ul>
                 </div>
             ) : null}
-            {creature.reactions && creature.reactions.length > 0 ? (
+            {statblock.reactions && statblock.reactions.length > 0 ? (
                 <div className={"reactions"}>
                     <h3>Reactions</h3>
                     <ul className={"ability-list"}>
-                        {creature.reactions?.map((reaction, index) => (
+                        {statblock.reactions?.map((reaction, index) => (
                             <E5Ability ability={reaction} key={reaction.name + index} />
                         ))}
                     </ul>
                 </div>
             ) : null}
-            {creature.special_abilities && creature.special_abilities.length > 0 ? (
+            {statblock.special_abilities && statblock.special_abilities.length > 0 ? (
                 <div className={"special-abilities"}>
                     <h3>Special Abilities</h3>
                     <ul className={"ability-list"}>
-                        {creature.special_abilities?.map((ability, index) => (
+                        {statblock.special_abilities?.map((ability, index) => (
                             <E5Ability ability={ability} key={ability.name + index} />
                         ))}
                     </ul>
                 </div>
             ) : null}
-            {(creature.legendary_actions && creature.legendary_actions.length > 0) || !!creature.legendary_desc ? (
+            {(statblock.legendary_actions && statblock.legendary_actions.length > 0) || !!statblock.legendary_desc ? (
                 <div className={"legendary-actions"}>
                     <h3>Legendary Actions</h3>
-                    {creature.legendary_desc}
+                    {statblock.legendary_desc}
                     <ul className={"ability-list"}>
-                        {creature.legendary_actions?.map((legendary_action, index) => (
+                        {statblock.legendary_actions?.map((legendary_action, index) => (
                             <E5Ability ability={legendary_action} key={legendary_action.name + index} />
                         ))}
                     </ul>
                 </div>
             ) : null}
-            {creature.spells && creature.spells.length > 0 ? <E5Spells spells={creature.spells} /> : null}
+            {statblock.spells && statblock.spells.length > 0 ? <E5Spells spells={statblock.spells} /> : null}
         </div>
     ) : null;
 };

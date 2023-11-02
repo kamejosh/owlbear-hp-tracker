@@ -33,7 +33,7 @@ const fetchE5Search = (
         });
 };
 
-const fetchCreature = (slug: string, apiKey?: string): Promise<E5Statblock | null> => {
+const fetchStatblock = (slug: string, apiKey?: string): Promise<E5Statblock | null> => {
     let headers = {};
     if (apiKey) {
         headers = {
@@ -55,7 +55,7 @@ const fetchCreature = (slug: string, apiKey?: string): Promise<E5Statblock | nul
         });
 };
 
-export const useE5SearchCreature = (search_string: string, take: number, skip: number, apiKey?: string) => {
+export const useE5SearchStatblock = (search_string: string, take: number, skip: number, apiKey?: string) => {
     return useQuery<Array<E5Statblock>>({
         queryKey: ["search", search_string, take, skip],
         queryFn: () => fetchE5Search(search_string, take, skip, apiKey),
@@ -63,10 +63,10 @@ export const useE5SearchCreature = (search_string: string, take: number, skip: n
     });
 };
 
-export const useE5GetCreature = (slug: string, apiKey?: string) => {
+export const useE5GetStatblock = (slug: string, apiKey?: string) => {
     return useQuery<E5Statblock | null>({
         queryKey: ["slug", slug],
-        queryFn: () => fetchCreature(slug, apiKey),
+        queryFn: () => fetchStatblock(slug, apiKey),
         enabled: slug !== "",
     });
 };

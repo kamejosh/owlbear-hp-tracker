@@ -13,5 +13,6 @@
 + Add dice roller
 + Make Text elements, e.g. 3d10 rolable
 + Make Group Hide and Show Collapse Arrows
++ Scale HP Bar height with Token Size
 + Make first HP Bar Segment only worth 1 HP (see [here](https://github.com/kamejosh/owlbear-hp-tracker/issues/23))
 + Battleround and Effect tracking (low prio)
