@@ -38,6 +38,7 @@
 
             .action-details {
                 opacity: 1;
+                overflow: auto;
             }
         }
 
@@ -45,6 +46,7 @@
             opacity: 0;
             transition: 0.25s ease-in-out;
             min-height: 0;
+            overflow: hidden;
         }
     }
 }

@@ -91,7 +91,7 @@ export const SearchResultPf = ({ search }: { search: string }) => {
                         <span>{entry.name}</span>
                         <span>HP: {entry.hp.value}</span>
                         <span>AC: {entry.armor_class.value}</span>
-                        <span>CR: {entry.level}</span>
+                        <span>Level: {entry.level}</span>
                     </li>
                 );
             })}

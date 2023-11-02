@@ -168,21 +168,24 @@
             }
 
             .skills {
-                display: flex;
                 grid-column: span 1;
-                flex-wrap: wrap;
-                justify-content: space-between;
 
                 @include breakpoint.laptop {
                     grid-column: span 2;
                 }
 
-                .skill {
+                .skill-list {
                     display: flex;
-                    gap: 1ch;
+                    flex-wrap: wrap;
+                    justify-content: space-between;
 
-                    .skill-name {
-                        font-weight: 500;
+                    .skill {
+                        display: flex;
+                        gap: 1ch;
+
+                        .skill-name {
+                            font-weight: 500;
+                        }
                     }
                 }
             }

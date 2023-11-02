@@ -204,9 +204,9 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
 
 const PfStatBlock = ({ slug }: { slug: string }) => {
     const { characterId } = useCharSheet();
-    const creatureQuery = usePfGetStatblock(slug);
+    const statblockQuery = usePfGetStatblock(slug);
 
-    const creature = creatureQuery.isSuccess && creatureQuery.data ? creatureQuery.data : null;
+    const statblock = statblockQuery.isSuccess && statblockQuery.data ? statblockQuery.data : null;
 
     const updateValues = (maxHp: number, ac: number) => {
         if (characterId) {
@@ -227,50 +227,50 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
     };
 
     useEffect(() => {
-        if (creatureQuery.isSuccess && creature) {
-            updateValues(creature.hp.value, creature.armor_class.value);
+        if (statblockQuery.isSuccess && statblock) {
+            updateValues(statblock.hp.value, statblock.armor_class.value);
         }
-    }, [creatureQuery.isSuccess]);
+    }, [statblockQuery.isSuccess]);
 
-    return creature ? (
+    return statblock ? (
         <div className={"pf-sheet"}>
             <div className={"what"}>
-                <h3>{creature.name}</h3>
+                <h3>{statblock.name}</h3>
                 <i>
-                    Type: {creature.type}, Level: {creature.level}
+                    Type: {statblock.type}, Level: {statblock.level}
                 </i>
                 <span>
-                    {creature.senses && creature.senses.length > 0 ? (
+                    {statblock.senses && statblock.senses.length > 0 ? (
                         <div className={"senses"}>
-                            <b>Senses</b>: {creature.senses.join(", ")}
+                            <b>Senses</b>: {statblock.senses.join(", ")}
                         </div>
                     ) : null}
                 </span>
                 <span>
-                    {creature.languages && creature.languages.length > 0 ? (
+                    {statblock.languages && statblock.languages.length > 0 ? (
                         <div className={"languages"}>
-                            <b>Languages</b>: {creature.languages.join(", ")}
+                            <b>Languages</b>: {statblock.languages.join(", ")}
                         </div>
                     ) : null}
                 </span>
             </div>
             <div className={"values"}>
                 <span className={"ac"}>
-                    <b>Armor Class</b> {creature.armor_class.value}{" "}
-                    {creature.armor_class.special ? `(${creature.armor_class.special})` : null})
+                    <b>Armor Class</b> {statblock.armor_class.value}{" "}
+                    {statblock.armor_class.special ? `(${statblock.armor_class.special})` : null})
                 </span>
                 <span className={"hp"}>
-                    <b>Hit Points</b> {creature.hp.value} {creature.hp.special ? `(${creature.hp.special})` : null})
+                    <b>Hit Points</b> {statblock.hp.value} {statblock.hp.special ? `(${statblock.hp.special})` : null})
                 </span>
                 <span className={"speed"}>
-                    <b>Speed</b> {creature.speed}
+                    <b>Speed</b> {statblock.speed}
                 </span>
                 <span className={"perception"}>
-                    <b>Perception</b> {creature.perception}
+                    <b>Perception</b> {statblock.perception}
                 </span>
             </div>
             <div className={"stats"}>
-                {Object.entries(creature.stats).map(([stat, value]) => {
+                {Object.entries(statblock.stats).map(([stat, value]) => {
                     return (
                         <div className={"stat"} key={stat}>
                             <div className={"stat-name"}>{stat.substring(0, 3)}</div>
@@ -283,11 +283,11 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                 })}
             </div>
             <div className={"saving-throws"}>
-                {Object.entries(creature.saving_throws).filter((st) => !!st[1]).length > 0 ? (
+                {Object.entries(statblock.saving_throws).filter((st) => !!st[1]).length > 0 ? (
                     <>
                         <b>Saving Throws</b>
                         <ul className={"saving-throw-list"}>
-                            {Object.entries(creature.saving_throws).map(([key, value], index) => {
+                            {Object.entries(statblock.saving_throws).map(([key, value], index) => {
                                 if (value) {
                                     return (
                                         <li key={index}>
@@ -300,50 +300,55 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                     </>
                 ) : null}
             </div>
-            <div className={"skills"}>
-                {creature.skills?.map((skill) => {
-                    return (
-                        <div className={"skill"} key={skill.name}>
-                            <div className={"skill-name"}>{skill.name}</div>
-                            <div className={"skill-value"}>{skill.value}</div>
-                        </div>
-                    );
-                })}
-            </div>
-            {creature.items?.length && creature.items.length > 0 ? (
+            {statblock.skills && statblock.skills.length > 0 ? (
+                <div className={"skills"}>
+                    <h3>Skills</h3>
+                    <div className={"skill-list"}>
+                        {statblock.skills?.map((skill) => {
+                            return (
+                                <div className={"skill"} key={skill.name}>
+                                    <div className={"skill-name"}>{skill.name}</div>
+                                    <div className={"skill-value"}>{skill.value}</div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            ) : null}
+            {statblock.items?.length && statblock.items.length > 0 ? (
                 <div className={"items"}>
-                    <b>Items</b>: {creature.items.join(", ")}
+                    <b>Items</b>: {statblock.items.join(", ")}
                 </div>
             ) : null}
-            {creature.immunities?.length && creature.immunities.length > 0 ? (
+            {statblock.immunities?.length && statblock.immunities.length > 0 ? (
                 <div className={"immunities"}>
-                    <b>Immunities</b>: {creature.immunities.join(", ")}
+                    <b>Immunities</b>: {statblock.immunities.join(", ")}
                 </div>
             ) : null}
-            {creature.weaknesses?.length && creature.weaknesses.length > 0 ? (
+            {statblock.weaknesses?.length && statblock.weaknesses.length > 0 ? (
                 <div className={"weaknesses"}>
-                    <b>Weaknesses</b>: {creature.weaknesses.join(", ")}
+                    <b>Weaknesses</b>: {statblock.weaknesses.join(", ")}
                 </div>
             ) : null}
-            {creature.resistances?.length && creature.resistances.length > 0 ? (
+            {statblock.resistances?.length && statblock.resistances.length > 0 ? (
                 <div className={"resistances"}>
-                    <b>Resistances</b>: {creature.resistances.join(", ")}
+                    <b>Resistances</b>: {statblock.resistances.join(", ")}
                 </div>
             ) : null}
 
             <div className={"actions"}>
                 <h3>Actions</h3>
                 <ul className={"ability-list"}>
-                    {creature.actions.map((action, index) => {
+                    {statblock.actions.map((action, index) => {
                         return <PfAbility key={index} ability={action} />;
                     })}
                 </ul>
             </div>
-            {creature.reactions && creature.reactions.length > 0 ? (
+            {statblock.reactions && statblock.reactions.length > 0 ? (
                 <div className={"reactions"}>
                     <h3>Reactions</h3>
                     <ul className={"ability-list"}>
-                        {creature.reactions?.map((reaction, index) => {
+                        {statblock.reactions?.map((reaction, index) => {
                             return <PfAbility key={index} ability={reaction} />;
                         })}
                     </ul>
@@ -352,14 +357,14 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
             <div className={"special-abilities"}>
                 <h3>Special Abilities</h3>
                 <ul className={"ability-list"}>
-                    {creature.special_abilities?.map((ability, index) => {
+                    {statblock.special_abilities?.map((ability, index) => {
                         return <PfAbility key={index} ability={ability} />;
                     })}
                 </ul>
             </div>
             <div className={"spells"}>
                 <h3>Spells</h3>
-                {creature.spells?.map((spells, index) => {
+                {statblock.spells?.map((spells, index) => {
                     return (
                         <div key={index} className={"spell-list"}>
                             <span>
