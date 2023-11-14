@@ -1,6 +1,6 @@
 {
     "name": "Dungeon Master - HP Tracker",
-    "version": "1.3.7",
+    "version": "1.3.8",
     "manifest_version": 1,
     "author": "Joshua Hercher",
     "description": "A tool to keep track of N/PC HP and more. Visibility for players can be toggled for each token.",
