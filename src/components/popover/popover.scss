@@ -7,18 +7,26 @@
 
         .popover {
             .player-wrapper {
-                grid-template-rows: 1fr;
-                grid-template-columns: 1fr repeat(3, 0.5fr);
-                justify-items: flex-start;
+                grid-template-areas:
+                    "hp init"
+                    "settings ac";
+                justify-content: flex-start;
                 gap: 12px;
                 border-bottom: none;
-                height: 30px;
+                padding: 10px 10px 0;
 
                 &.player {
-                    grid-template-columns: 1fr 0.5fr 0.5fr;
+                    grid-template-areas:
+                        "hp ac"
+                        "init init";
+                }
+
+                .settings {
+                    grid-area: settings;
                 }
 
                 .current-hp {
+                    grid-area: hp;
                     align-items: center;
                     &::before {
                         display: block;
@@ -27,6 +35,7 @@
                 }
 
                 .armor-class {
+                    grid-area: ac;
                     align-items: center;
                     min-width: unset;
 
@@ -37,6 +46,7 @@
                 }
 
                 .initiative-wrapper {
+                    grid-area: init;
                     align-items: center;
                     &::before {
                         display: block;
