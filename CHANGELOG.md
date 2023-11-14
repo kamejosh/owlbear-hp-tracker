@@ -4,6 +4,11 @@
 + Migrate Info, Changelog and Settings to Modal
 + UI Improvements
 
+# 1.3.8
+
++ Update Owlbear SDK
++ Move Popover to embeded container
+
 # 1.3.7
 
 + Fix error when trying to read HP Tracker version of uninitialized scene
@@ -14,6 +19,7 @@
 + Open changelog per default when a new version has been installed
 
 # 1.3.5
+
 + Move domain to https://hp-tracker.bitperfect-software.com/manifest.json
 
 # 1.3.4
