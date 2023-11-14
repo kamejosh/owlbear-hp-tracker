@@ -235,10 +235,10 @@
   dependencies:
     "@octokit/openapi-types" "^18.0.0"
 
-"@owlbear-rodeo/sdk@1.3.10":
-  version "1.3.10"
-  resolved "https://registry.yarnpkg.com/@owlbear-rodeo/sdk/-/sdk-1.3.10.tgz#a640376997a4992d41b1e722730b25b6375a269c"
-  integrity sha512-Kt5ewOfs71C8bBZwp60eLzXLyhoOJUsALilGOwxdG8qk4q2BS+vgR76bnX8Aa7rw4ZK0Dl6FLJdO8xkte9S9JQ==
+"@owlbear-rodeo/sdk@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@owlbear-rodeo/sdk/-/sdk-2.1.0.tgz#25a321d795c20405e7d4cd5d095c2818163e5d3d"
+  integrity sha512-f4OI0SI5szby9Dc0+uARqc/7amtDe/HFu2m3rbOLxzO0IhaI59aOMIDkfZbXWqTDMIG0out35sm35F8qBP8Bxw==
   dependencies:
     events "^3.3.0"
     immer "^9.0.15"
@@ -531,7 +531,7 @@ escape-string-regexp@^5.0.0:
 
 events@^3.3.0:
   version "3.3.0"
-  resolved "https://registry.npmjs.org/events/-/events-3.3.0.tgz"
+  resolved "https://registry.yarnpkg.com/events/-/events-3.3.0.tgz#31a95ad0a924e2d2c419a813aeb2c4e878ea7400"
   integrity sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==
 
 extend@^3.0.0:
@@ -586,7 +586,7 @@ hoist-non-react-statics@^3.3.0, hoist-non-react-statics@^3.3.2:
 
 immer@^9.0.15:
   version "9.0.21"
-  resolved "https://registry.npmjs.org/immer/-/immer-9.0.21.tgz"
+  resolved "https://registry.yarnpkg.com/immer/-/immer-9.0.21.tgz#1e025ea31a40f24fb064f1fef23e931496330176"
   integrity sha512-bc4NBHqOqSfRW7POMkHd51LvClaeMXpm8dx0e8oE2GORbq5aRK7Bxl4FyzVLdGtLmvLKL7BTDBG5ACQm4HWjTA==
 
 immutable@^4.0.0:
@@ -640,7 +640,7 @@ is-plain-object@^5.0.0:
 
 js-base64@^3.7.5:
   version "3.7.5"
-  resolved "https://registry.npmjs.org/js-base64/-/js-base64-3.7.5.tgz"
+  resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-3.7.5.tgz#21e24cf6b886f76d6f5f165bfcd69cc55b9e3fca"
   integrity sha512-3MEt5DTINKqfScXKfJFrRbxkrnk2AxPWGBL/ycjz4dK8iqiSJ06UxD8jh8xuh6p10TX4t2+7FsBYVxxQbMg+qA==
 
 "js-tokens@^3.0.0 || ^4.0.0":

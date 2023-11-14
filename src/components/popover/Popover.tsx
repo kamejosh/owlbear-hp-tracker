@@ -1,22 +1,35 @@
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import React, { useEffect, useState } from "react";
 import { Token } from "../hptracker/Token.tsx";
-import OBR, { Item } from "@owlbear-rodeo/sdk";
+import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
 import { characterMetadata, sceneMetadata } from "../../helper/variables.ts";
 import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
 import "./popover.scss";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 
 export const Popover = () => {
-    return (
-        <ContextWrapper>
-            <Content />
-        </ContextWrapper>
-    );
+    const [id, setId] = useState<string | null>(null);
+    const { isReady } = SceneReadyContext();
+
+    const initPopover = async () => {
+        const selection = await OBR.player.getSelection();
+        if (selection && selection.length === 1) {
+            const items = await OBR.scene.items.getItems<Image>(selection);
+            setId(items[0].id);
+        }
+    };
+
+    useEffect(() => {
+        if (isReady) {
+            initPopover();
+        }
+    }, [isReady]);
+
+    return <ContextWrapper>{id ? <Content id={id} /> : null}</ContextWrapper>;
 };
 
-const Content = () => {
-    const id = new URLSearchParams(window.location.search).get("id") ?? null;
+const Content = (props: { id: string }) => {
+    const id = props.id;
     const [data, setData] = useState<HpTrackerMetadata | null>(null);
     const [currentSceneMetadata, setCurrentSceneMetadata] = useState<SceneMetadata | null>(null);
     const [item, setItem] = useState<Item | null>(null);
