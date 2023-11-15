@@ -6,6 +6,7 @@ import { characterMetadata, sceneMetadata } from "../../helper/variables.ts";
 import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
 import "./popover.scss";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
+import { Loader } from "../general/Loader.tsx";
 
 export const Popover = () => {
     const [id, setId] = useState<string | null>(null);
@@ -25,7 +26,7 @@ export const Popover = () => {
         }
     }, [isReady]);
 
-    return <ContextWrapper>{id ? <Content id={id} /> : null}</ContextWrapper>;
+    return <ContextWrapper>{id ? <Content id={id} /> : <Loader className={"popover-spinner"} />}</ContextWrapper>;
 };
 
 const Content = (props: { id: string }) => {
