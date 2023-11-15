@@ -1,3 +1,8 @@
+# 1.3.8
+
++ Update Owlbear SDK
++ Move Popover to embeded container
+
 # 1.3.7
 
 + Fix error when trying to read HP Tracker version of uninitialized scene

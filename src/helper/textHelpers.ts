@@ -96,24 +96,27 @@ export const updateText = async (show: boolean, visible: boolean, tokenId: strin
 
 export const updateTextChanges = async (changes: Map<string, TextItemChanges>) => {
     if (changes.size > 0) {
-        await OBR.scene.items.updateItems(isText, (texts) => {
-            texts.forEach((text) => {
-                if (changes.has(text.id)) {
-                    const change = changes.get(text.id);
-                    if (change) {
-                        if (change.text) {
-                            text.text.plainText = change.text;
-                        }
-                        if (change.visible !== undefined) {
-                            text.visible = change.visible;
-                        }
-                        if (change.position) {
-                            text.position = change.position;
+        await OBR.scene.items.updateItems(
+            (item): item is Text => isText(item) && changes.has(item.id),
+            (texts) => {
+                texts.forEach((text) => {
+                    if (changes.has(text.id)) {
+                        const change = changes.get(text.id);
+                        if (change) {
+                            if (change.text) {
+                                text.text.plainText = change.text;
+                            }
+                            if (change.visible !== undefined) {
+                                text.visible = change.visible;
+                            }
+                            if (change.position) {
+                                text.position = change.position;
+                            }
                         }
                     }
-                }
-            });
-        });
+                });
+            }
+        );
     }
 };
 
@@ -161,12 +164,13 @@ export const handleTextVisibility = async (
             if (infoMetadata in attachment.metadata) {
                 const change = changeMap.get(attachment.id) ?? {};
                 if (
-                    (!character.visible && character.visible !== attachment.visible) ||
-                    (character.visible && data.canPlayersSee)
+                    ((!character.visible && character.visible !== attachment.visible) ||
+                        (character.visible && data.canPlayersSee)) &&
+                    character.visible != attachment.visible
                 ) {
                     change.visible = character.visible;
+                    changeMap.set(attachment.id, change);
                 }
-                changeMap.set(attachment.id, change);
             }
         });
     }

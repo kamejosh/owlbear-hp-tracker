@@ -86,21 +86,16 @@ const setupContextMenu = async () => {
         icons: [
             {
                 icon: "/iconPopover.svg",
-                label: "HP Tracker Popover",
+                label: "HP Tracker",
                 filter: {
                     every: [{ key: ["metadata", `${characterMetadata}`, "hpTrackerActive"], value: true }],
                     roles: ["GM"],
                 },
             },
         ],
-        onClick: (context, elementId) => {
-            OBR.popover.open({
-                id: `${ID}/popover`,
-                url: `/popover.html?id=${context.items[0].id}`,
-                height: 40,
-                width: 490,
-                anchorElementId: elementId,
-            });
+        embed: {
+            url: "/popover.html",
+            height: 90,
         },
     });
 
@@ -109,7 +104,7 @@ const setupContextMenu = async () => {
         icons: [
             {
                 icon: "/iconPopover.svg",
-                label: "HP Tracker Popover",
+                label: "HP Tracker",
                 filter: {
                     every: [
                         { key: ["metadata", `${characterMetadata}`, "hpTrackerActive"], value: true },
@@ -123,14 +118,9 @@ const setupContextMenu = async () => {
                 },
             },
         ],
-        onClick: (context, elementId) => {
-            OBR.popover.open({
-                id: `${ID}/popover`,
-                url: `/popover.html?id=${context.items[0].id}`,
-                height: 40,
-                width: 300,
-                anchorElementId: elementId,
-            });
+        embed: {
+            url: "/popover.html",
+            height: 90,
         },
     });
 
