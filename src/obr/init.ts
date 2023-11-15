@@ -86,7 +86,7 @@ const setupContextMenu = async () => {
         icons: [
             {
                 icon: "/iconPopover.svg",
-                label: "HP Tracker Popover",
+                label: "HP Tracker",
                 filter: {
                     every: [{ key: ["metadata", `${characterMetadata}`, "hpTrackerActive"], value: true }],
                     roles: ["GM"],
@@ -104,7 +104,7 @@ const setupContextMenu = async () => {
         icons: [
             {
                 icon: "/iconPopover.svg",
-                label: "HP Tracker Popover",
+                label: "HP Tracker",
                 filter: {
                     every: [
                         { key: ["metadata", `${characterMetadata}`, "hpTrackerActive"], value: true },

@@ -3,31 +3,24 @@
         margin: 0;
         padding: 0;
         height: 100%;
-        //overflow: hidden;
 
         .popover {
             .player-wrapper {
-                grid-template-areas:
-                    "hp init"
-                    "settings ac";
-                justify-content: flex-start;
-                gap: 12px;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                gap: 1ch;
                 border-bottom: none;
-                padding: 10px 10px 0;
-
-                &.player {
-                    grid-template-areas:
-                        "hp ac"
-                        "init init";
-                }
+                padding: 10px 10px;
+                height: 70px;
 
                 .settings {
-                    grid-area: settings;
+                    order: 2;
                 }
 
                 .current-hp {
-                    grid-area: hp;
                     align-items: center;
+                    order: 0;
                     &::before {
                         display: block;
                         content: "HP: ";
@@ -35,8 +28,8 @@
                 }
 
                 .armor-class {
-                    grid-area: ac;
                     align-items: center;
+                    order: 3;
                     min-width: unset;
 
                     &::before {
@@ -46,12 +39,22 @@
                 }
 
                 .initiative-wrapper {
-                    grid-area: init;
                     align-items: center;
+                    order: 1;
+                    width: auto;
+
+                    .toggle-button {
+                        display: none;
+                    }
+
                     &::before {
                         display: block;
                         content: "Init: ";
                     }
+                }
+
+                input[type="text"] {
+                    width: 28px;
                 }
             }
         }
