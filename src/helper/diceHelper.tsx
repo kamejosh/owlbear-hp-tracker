@@ -1,6 +1,6 @@
 export const highlightDice = (text: string) => {
     const regex = /\d+d\d+/gi;
-    const dice = regex.exec(text);
+    const dice = text.match(regex);
     const parts = text.split(regex);
     return (
         <span>

@@ -3,6 +3,7 @@
 + Add ttrpg-api for e5 and pf
 + Migrate Info, Changelog and Settings to Modal
 + UI Improvements
++ Add Button to order Tokens by initiative
 
 # 1.3.8
 

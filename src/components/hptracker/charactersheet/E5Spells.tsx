@@ -91,9 +91,11 @@ const Spell = (props: { spell: Spell }) => {
                     <div className={"spell-description"}>
                         <b>Description</b>: {highlightDice(spell.desc)}
                     </div>
-                    <div className={"spell-higher-level"}>
-                        <b>Higher Levels</b>: {highlightDice(spell.higher_level)}
-                    </div>
+                    {!!spell.higher_level ? (
+                        <div className={"spell-higher-level"}>
+                            <b>Higher Levels</b>: {highlightDice(spell.higher_level)}
+                        </div>
+                    ) : null}
                 </div>
             </div>
         </li>

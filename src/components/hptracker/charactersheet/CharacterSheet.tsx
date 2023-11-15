@@ -2,7 +2,7 @@ import { ReactElement, useEffect, useRef, useState } from "react";
 import { useCharSheet } from "../../../context/CharacterContext.ts";
 import "./character-sheet.scss";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
-import { characterMetadata, ID } from "../../../helper/variables.ts";
+import { changelogModal, characterMetadata, helpModal, ID, settingsModal } from "../../../helper/variables.ts";
 import { HpTrackerMetadata, Ruleset } from "../../../helper/types.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { SearchResult5e, SearchResultPf } from "./SearchResult.tsx";
@@ -79,6 +79,19 @@ export const CharacterSheet = () => {
             <button className={"back-button"} onClick={() => setId(null)}>
                 Back
             </button>
+            <div className={"help-buttons"}>
+                {playerContext.role == "GM" ? (
+                    <button className={"settings-button"} onClick={async () => await OBR.modal.open(settingsModal)}>
+                        ⛭
+                    </button>
+                ) : null}
+                <button className={"change-log-button"} onClick={async () => await OBR.modal.open(changelogModal)}>
+                    i
+                </button>
+                <button className={"help-button"} onClick={async () => await OBR.modal.open(helpModal)}>
+                    ?
+                </button>
+            </div>
             {token && data ? (
                 <div className={"content"}>
                     <h2>

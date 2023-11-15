@@ -1,15 +1,9 @@
-.hp-tracker {
+.help-buttons {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
-
-    .help-buttons {
-        display: flex;
-        position: absolute;
-        top: 2ch;
-        right: 2ch;
-        gap: 1ch;
-    }
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    gap: 1ch;
 
     .change-log-button,
     .help-button,
@@ -20,7 +14,7 @@
         cursor: pointer;
         border: 1px solid white;
         border-radius: 5px;
-        background-color: transparent;
+        background-color: #1c1b22;
         width: 20px;
         text-align: center;
 
@@ -34,6 +28,12 @@
             color: #242424;
         }
     }
+}
+
+.hp-tracker {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 
     .title {
         align-self: flex-start;

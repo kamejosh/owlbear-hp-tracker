@@ -112,7 +112,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                     <b>Challenge</b> {statblock.challenge_rating}
                 </div>
             </div>
-            {statblock.skills ? (
+            {statblock.skills && Object.entries(statblock.skills).filter(([_, value]) => !!value).length > 0 ? (
                 <div className={"skills"}>
                     <h3>Skills</h3>
                     <ul className={"skill-list"}>
