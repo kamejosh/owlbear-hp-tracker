@@ -385,7 +385,6 @@ export const Token = (props: TokenProps) => {
                     title={"Roll Initiative (including DEX modifier from statblock)"}
                     className={`toggle-button initiative-button`}
                     onClick={() => {
-                        console.log(data.stats);
                         handleValueChange(
                             Math.floor(Math.random() * 20) + 1 + data.stats.initiativeBonus,
                             "initiative"

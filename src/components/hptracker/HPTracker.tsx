@@ -166,6 +166,25 @@ const Content = () => {
         reorder(tokenLists.get(result.destination.droppableId) ?? [], result.source.index, result.destination.index);
     };
 
+    const orderByInitiative = () => {
+        tokenLists.forEach((tokenList) => {
+            const reordered = Array.from(tokenList);
+            reordered.sort((a, b) => {
+                const aData = a.metadata[characterMetadata] as HpTrackerMetadata;
+                const bData = b.metadata[characterMetadata] as HpTrackerMetadata;
+                if (bData.initiative === aData.initiative) {
+                    return (
+                        bData.stats.initiativeBonus +
+                        bData.initiative -
+                        (aData.stats.initiativeBonus + aData.initiative)
+                    );
+                }
+                return bData.initiative - aData.initiative;
+            });
+            reorderMetadataIndex(reordered);
+        });
+    };
+
     return playerContext.role ? (
         characterId ? (
             <CharacterSheet />
@@ -192,7 +211,16 @@ const Content = () => {
                     {playerContext.role === "GM" ? <span>Settings</span> : null}
                     <span className={"current-hp"}>HP / MAX</span>
                     <span className={"armor-class"}>AC</span>
-                    <span className={"initiative-wrapper"}>INIT</span>
+                    <span className={"initiative-wrapper"}>
+                        INIT{" "}
+                        <button
+                            className={"sort-button settings-button"}
+                            title={"Order By Initiative"}
+                            onClick={orderByInitiative}
+                        >
+                            ↓
+                        </button>
+                    </span>
                     <span className={"character-sheet"}>INFO</span>
                 </div>
                 {playerContext.role === "GM" && currentSceneMetadata ? (
