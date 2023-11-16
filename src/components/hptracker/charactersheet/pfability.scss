@@ -7,9 +7,8 @@
         gap: 1ch;
 
         @include breakpoint.laptop {
-            display: grid;
-            grid-template-columns: 90px 105px auto 30px;
-            grid-auto-flow: row;
+            flex-direction: row;
+            justify-content: space-between;
         }
 
         .ability-name {
@@ -18,6 +17,8 @@
         }
 
         .action-type {
+            color: lightgrey;
+            font-size: 12px;
             white-space: nowrap;
         }
 
@@ -45,8 +46,16 @@
         .action-details {
             opacity: 0;
             transition: 0.25s ease-in-out;
+            margin-left: 2ch;
+            border-left: 1px solid white;
+            padding-left: 1ch;
             min-height: 0;
             overflow: hidden;
+            list-style: none;
+
+            b {
+                text-transform: capitalize;
+            }
         }
     }
 }

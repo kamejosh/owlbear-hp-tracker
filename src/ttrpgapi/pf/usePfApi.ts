@@ -4,6 +4,7 @@ import { components } from "../schema";
 import { TTRPG_URL } from "../../config.ts";
 
 export type PfStatblock = components["schemas"]["PFStatblockOut"];
+export type PfSpell = components["schemas"]["src__types__pf__Spell"];
 
 const fetchPfSearch = (
     search_string: string,
@@ -55,9 +56,31 @@ const fetchPfStatblock = (slug: string, apiKey?: string): Promise<PfStatblock | 
         });
 };
 
+const fetchPfSpell = (slug: string, apiKey?: string): Promise<PfSpell | null> => {
+    let headers = {};
+    if (apiKey) {
+        headers = {
+            Authorization: `Bearer ${apiKey}`,
+        };
+    }
+    return axios
+        .request({
+            url: `${TTRPG_URL}/pf/spell/${slug}`,
+            headers: headers,
+            method: "GET",
+        })
+        .then((response) => {
+            if (!response.data) {
+                return null;
+            } else {
+                return response.data as PfSpell;
+            }
+        });
+};
+
 export const usePfStatblockSearch = (search_string: string, take: number, skip: number, apiKey?: string) => {
     return useQuery<Array<PfStatblock>>({
-        queryKey: ["search", search_string, take, skip],
+        queryKey: [search_string, take, skip, "search"],
         queryFn: () => fetchPfSearch(search_string, take, skip, apiKey),
         enabled: search_string !== "",
     });
@@ -65,8 +88,16 @@ export const usePfStatblockSearch = (search_string: string, take: number, skip: 
 
 export const usePfGetStatblock = (slug: string, apiKey?: string) => {
     return useQuery<PfStatblock | null>({
-        queryKey: ["slug", slug],
+        queryKey: [slug, "slug"],
         queryFn: () => fetchPfStatblock(slug, apiKey),
+        enabled: slug !== "",
+    });
+};
+
+export const usePfGetSpell = (slug: string, apiKey?: string) => {
+    return useQuery<PfSpell | null>({
+        queryKey: [slug, "slug"],
+        queryFn: () => fetchPfSpell(slug, apiKey),
         enabled: slug !== "",
     });
 };

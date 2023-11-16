@@ -4,6 +4,7 @@
 + Migrate Info, Changelog and Settings to Modal
 + UI Improvements
 + Add Button to order Tokens by initiative
++ Search field removes Numbering extensions like "A", "B", "1", "2" from token names.
 
 # 1.3.8
 

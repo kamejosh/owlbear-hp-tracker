@@ -77,13 +77,15 @@
                 display: grid;
                 grid-template-rows: 0fr;
                 transition: 0.25s ease-in-out;
+                margin-left: 1ch;
+                border-left: 1px solid white;
+                padding-left: 1ch;
 
                 &.open {
                     grid-template-rows: 1fr;
 
                     .more-info-content {
                         opacity: 1;
-                        overflow: visible;
                     }
                 }
 

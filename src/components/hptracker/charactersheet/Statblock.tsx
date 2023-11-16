@@ -9,6 +9,7 @@ import { usePfGetStatblock } from "../../../ttrpgapi/pf/usePfApi.ts";
 import { useLocalStorage } from "../../../helper/hooks.ts";
 import { E5Ability } from "./E5Ability.tsx";
 import { E5Spells } from "./E5Spells.tsx";
+import { PfSpells } from "./PfSpells.tsx";
 
 const E5StatBlock = ({ slug }: { slug: string }) => {
     const statblockQuery = useE5GetStatblock(slug);
@@ -257,10 +258,10 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
             <div className={"values"}>
                 <span className={"ac"}>
                     <b>Armor Class</b> {statblock.armor_class.value}{" "}
-                    {statblock.armor_class.special ? `(${statblock.armor_class.special})` : null})
+                    {statblock.armor_class.special ? `(${statblock.armor_class.special})` : null}
                 </span>
                 <span className={"hp"}>
-                    <b>Hit Points</b> {statblock.hp.value} {statblock.hp.special ? `(${statblock.hp.special})` : null})
+                    <b>Hit Points</b> {statblock.hp.value} {statblock.hp.special ? `(${statblock.hp.special})` : null}
                 </span>
                 <span className={"speed"}>
                     <b>Speed</b> {statblock.speed}
@@ -354,65 +355,17 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                     </ul>
                 </div>
             ) : null}
-            <div className={"special-abilities"}>
-                <h3>Special Abilities</h3>
-                <ul className={"ability-list"}>
-                    {statblock.special_abilities?.map((ability, index) => {
-                        return <PfAbility key={index} ability={ability} />;
-                    })}
-                </ul>
-            </div>
-            <div className={"spells"}>
-                <h3>Spells</h3>
-                {statblock.spells?.map((spells, index) => {
-                    return (
-                        <div key={index} className={"spell-list"}>
-                            <span>
-                                <b>{spells.name}</b>
-                            </span>
-                            <span>
-                                <b>DC</b>: {spells.dc}
-                            </span>
-                            {spells.attack ? (
-                                <span>
-                                    <b> Attack</b>: {spells.attack}
-                                </span>
-                            ) : null}
-                            <div className={"spell-name-list"}>
-                                {spells.spell_lists
-                                    ?.sort((a, b) => {
-                                        if (a.type === "CANTRIP") {
-                                            return -1;
-                                        }
-                                        if (b.type === "SPELL") {
-                                            return 1;
-                                        }
-                                        if (parseInt(a.level) < parseInt(b.level)) {
-                                            return -1;
-                                        } else {
-                                            return 1;
-                                        }
-                                    })
-                                    .map((list, index) => {
-                                        return (
-                                            <div key={index} className={"spell-name"}>
-                                                <span>
-                                                    <b>Type</b>: {list.type.toLowerCase()}
-                                                </span>
-                                                <span>
-                                                    <b>Level</b>: {list.level}
-                                                </span>
-                                                <span>
-                                                    <b>Spells</b>: {list.spells?.map((spell) => spell.name).join(", ")}
-                                                </span>
-                                            </div>
-                                        );
-                                    })}
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
+            {statblock.special_abilities && statblock.special_abilities.length > 0 ? (
+                <div className={"special-abilities"}>
+                    <h3>Special Abilities</h3>
+                    <ul className={"ability-list"}>
+                        {statblock.special_abilities?.map((ability, index) => {
+                            return <PfAbility key={index} ability={ability} />;
+                        })}
+                    </ul>
+                </div>
+            ) : null}
+            {statblock.spells && statblock.spells.length > 0 ? <PfSpells spells={statblock.spells} /> : null}
         </div>
     ) : null;
 };

@@ -1,6 +1,7 @@
 import { components } from "../../../ttrpgapi/schema";
 import "./pfability.scss";
 import { useState } from "react";
+import { highlightDice } from "../../../helper/diceHelper.tsx";
 
 type Action = components["schemas"]["ActionOut"];
 type Reaction = components["schemas"]["Reaction"];
@@ -52,14 +53,14 @@ export const PfAbility = ({ ability }: { ability: Action | Reaction | SpecialAbi
     return (
         <li key={ability.name} className={`pf-ability ${open ? "open" : ""}`}>
             <div className={"main-info"}>
-                <b className={"ability-name"}>{ability.name}</b> {actionTypeConvert(ability)}
-                {Object.keys(ability).includes("description") && (ability as Action).description !== "" ? (
-                    <span className={`ability-description ${isAction(ability) ? "action" : "ability"}`}>
-                        {(ability as Action).description}
-                    </span>
-                ) : (
-                    ""
-                )}
+                <div className={"name-and-description"}>
+                    <b className={"ability-name"}>{ability.name}</b> {actionTypeConvert(ability)}
+                    {Object.keys(ability).includes("description") && (ability as Action).description !== "" ? (
+                        <div className={`ability-description ${isAction(ability) ? "action" : "ability"}`}>
+                            {(ability as Action).description}
+                        </div>
+                    ) : null}
+                </div>
                 {hasDetails() ? (
                     <button className={`expand ${open ? "open" : ""}`} onClick={() => setOpen(!open)}></button>
                 ) : null}
@@ -71,7 +72,7 @@ export const PfAbility = ({ ability }: { ability: Action | Reaction | SpecialAbi
                         if (value !== null && value !== "" && !["name", "type", "description", "value"].includes(key)) {
                             return (
                                 <li key={index}>
-                                    <b>{key}</b>: {value}
+                                    <b>{key}</b>: {highlightDice(value)}
                                 </li>
                             );
                         }

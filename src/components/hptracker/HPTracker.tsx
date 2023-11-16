@@ -212,14 +212,16 @@ const Content = () => {
                     <span className={"current-hp"}>HP / MAX</span>
                     <span className={"armor-class"}>AC</span>
                     <span className={"initiative-wrapper"}>
-                        INIT{" "}
-                        <button
-                            className={"sort-button settings-button"}
-                            title={"Order By Initiative"}
-                            onClick={orderByInitiative}
-                        >
-                            ↓
-                        </button>
+                        INIT
+                        {playerContext.role === "GM" ? (
+                            <button
+                                className={"sort-button settings-button"}
+                                title={"Order By Initiative"}
+                                onClick={orderByInitiative}
+                            >
+                                ↓
+                            </button>
+                        ) : null}
                     </span>
                     <span className={"character-sheet"}>INFO</span>
                 </div>

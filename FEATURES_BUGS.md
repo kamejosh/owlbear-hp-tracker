@@ -11,6 +11,7 @@
 + Support generic statblocks to support other [game systems](https://discord.com/channels/795808973743194152/1157319743196364971/1157319743196364971)
 + Temporary HP Changes (see [here](https://discord.com/channels/795808973743194152/1136777520868507728/1141625692820340736))
 + Add dice roller
++ Add Statblock Action Window (might be a new extension)
 + Make Text elements, e.g. 3d10 rolable
 + Add default settings for Visibility Buttons
 + Make Group Hide and Show Collapse Arrows

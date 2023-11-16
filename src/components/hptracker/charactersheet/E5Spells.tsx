@@ -3,8 +3,9 @@ import "./e5spell.scss";
 import { useState } from "react";
 import { highlightDice } from "../../../helper/diceHelper.tsx";
 import { getDamage } from "../../../helper/helpers.ts";
+import { SpellFilter } from "./SpellFilter.tsx";
 
-type Spell = components["schemas"]["Spell"];
+type Spell = components["schemas"]["src__types__e5__Spell"];
 
 const Spell = (props: { spell: Spell }) => {
     const [open, setOpen] = useState<boolean>(false);
@@ -141,49 +142,7 @@ export const E5Spells = (props: { spells: Array<Spell> }) => {
     return (
         <div className={"spells"}>
             <h3>Spells</h3>
-            <div className={"spell-filters"}>
-                {filters.map((filter) => {
-                    let active = false;
-                    if (filter === "All" && spellFilter.length === 0) {
-                        active = true;
-                    } else if (filter === "Cant" && spellFilter.indexOf(0) >= 0) {
-                        active = true;
-                    } else {
-                        active = spellFilter.indexOf(parseInt(filter)) >= 0;
-                    }
-
-                    return (
-                        <button
-                            className={`button spell-filter ${active ? "active" : null}`}
-                            key={filter}
-                            onClick={() => {
-                                if (filter === "All") {
-                                    setSpellFilter([]);
-                                } else if (filter === "Cant") {
-                                    const currentFilter = Array.from(spellFilter);
-                                    if (currentFilter.indexOf(0) >= 0) {
-                                        currentFilter.splice(currentFilter.indexOf(0), 1);
-                                    } else {
-                                        currentFilter.push(0);
-                                    }
-                                    setSpellFilter(currentFilter);
-                                } else {
-                                    const buttonFilter = parseInt(filter);
-                                    const currentFilter = Array.from(spellFilter);
-                                    if (currentFilter.indexOf(buttonFilter) >= 0) {
-                                        currentFilter.splice(currentFilter.indexOf(buttonFilter), 1);
-                                    } else {
-                                        currentFilter.push(buttonFilter);
-                                    }
-                                    setSpellFilter(currentFilter);
-                                }
-                            }}
-                        >
-                            {filter}
-                        </button>
-                    );
-                })}
-            </div>
+            <SpellFilter filters={filters} spellFilter={spellFilter} setSpellFilter={setSpellFilter} />
             <ul className={"spell-list"}>
                 {props.spells
                     .sort((a, b) => a.level - b.level)
