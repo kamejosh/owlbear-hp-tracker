@@ -53,6 +53,10 @@ export interface paths {
     /** Create Spell */
     post: operations["create_spell_api_v1_pf_spell__post"];
   };
+  "/api/v1/pf/spell/{slug}": {
+    /** Get Pf Spells Slug */
+    get: operations["get_pf_spells_slug_api_v1_pf_spell__slug__get"];
+  };
   "/api/v1/e5/statblock/": {
     /** List E5 Statblocks */
     get: operations["list_e5_statblocks_api_v1_e5_statblock__get"];
@@ -1424,6 +1428,28 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": components["schemas"]["src__types__pf__SpellIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["src__types__pf__Spell"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Get Pf Spells Slug */
+  get_pf_spells_slug_api_v1_pf_spell__slug__get: {
+    parameters: {
+      path: {
+        slug: string;
       };
     };
     responses: {
