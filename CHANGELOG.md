@@ -1,8 +1,13 @@
 # 1.4.0
 
+### This update uses a new statblock backend. This means previously selected statblocks can't be accessed anymore and statblocks need to be relinked manually. Sorry for any inconvenience but this prepares HP Tracker for custom statblocks coming in one of the next versions.
+
 + Add ttrpg-api for e5 and pf
 + Migrate Info, Changelog and Settings to Modal
 + UI Improvements
+  + Global Settings moved to Help Buttons
+  + Help Buttons are fixed and can be accessed from anywhere in the Window
+  + Small QoL improvements
 + Add Button to order Tokens by initiative
 + Search field removes Numbering extensions like "A", "B", "1", "2" from token names.
 

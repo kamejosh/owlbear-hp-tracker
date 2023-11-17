@@ -1,4 +1,12 @@
 #app {
+    .multiselection {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding-inline: 10px;
+        height: 90px;
+    }
+
     &.popover-app {
         margin: 0;
         padding: 0;

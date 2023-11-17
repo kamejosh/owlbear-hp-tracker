@@ -17,7 +17,7 @@
 
 # HP Tracker - Owlbear Plugin
 
-Designed around the Dungeons & Dragons game mechanics of Hit Points (HP) and Armor Class (AC), this extension allows tracking and changing multiple Creatures' settings while dynamically hiding and showing this information to players.
+Designed around the TTRPG game mechanics of Hit Points (HP) and Armor Class (AC), this extension allows tracking and changing multiple Creatures' settings while dynamically hiding and showing this information to players. 
 
 ![hp-tracker example](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/HP_Tracker.png)
 
@@ -45,13 +45,11 @@ When first clicked all the initial information is added to the tokens metadata, 
 
 Once the HP Tracker is active you can remove the token from the HP Tracker again by clicking the Remove HP Tracker Icon in the Context Menu:
 
-![Context Menu3](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/context_menu3.png)
+![Context Menu 2](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/context_menu2.png)
 
 Once a Token is deleted from a scene all the attached metadata is also removed so this cannot be undone.
 
 In case you have a creature token multiple times within the same scene, it's easiest to setup one token and then copy it as often as you need, because the HP Tracker information will be copied as well. This saves a lot of time when setting up scenes.
-
-![Context Menu 2](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/context_menu2.png)
 
 This does not remove the Tokens metadata so in case you want to reactivate the HP Tracker all previous information is still stored with the token.
 
@@ -63,7 +61,8 @@ The Action Window can be opened by clicking the HP Tracker Action Icon in the Ow
 
 ![Action Window Top](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/action_window_top.png)
 
-At the top of the action window the current version of the extension is displayed as well as two buttons:
+At the top of the action window the current version of the extension is displayed as well as three system buttons. All buttons open a new modal (changelog and help are opened in fullscreen mode):
++ The [⛭] buttons opens the global settings.
 + The [i] button opens the changelog so you can see recent changes
 + The [?] button opens the help menu which displays the same help information you are currently reading
 
@@ -75,6 +74,7 @@ The global settings can be used to modify features affecting every token in the 
 
 The following settings are available:
 
++ Statblock Game Rules: You can choose between DnD 5e and Pathfinder 2e as source for your statblocks. This will impact what statblocks are found, how they are displayed, and the content (including spells).
 + HP Bar Segments: This setting can be used to obfuscate the real HP loss of a creature. E.g. when set to "2" the HP Bar differentiates between 3 states: Full HP, less than half HP, and 0 HP. When changing the settings HP Bars are not updated until the HP value is changed at least once.
 + Text and Bar Offset: To have a more flexible positioning of the HP Bar and Text, a value can be entered (negative or positive number) and the position of the HP Bar and Text is then adjusted by this value
 + Allow negative HP/AC: By default negative HP and AC are not allowed but when this settings is checked then HP and AC can be set to negative numbers. The HP Bar will always display negative HP the same as when it is 0.
@@ -85,6 +85,8 @@ The following settings are available:
 ![Action Window Token List](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/action_window_token_list.png)
 
 The Token List consists of the column headings, groups and tokens associated with each group. By default all groups are expanded when opening a scene, to ensure no hidden/forgotten tokens. Collapsing a group hides the tokens it contains in the list, but they are still tracked by the HP Tracker and the [Popover](#hp-tracker-popover) is still available.
+
+When clicking the button next to INIT in the header all Tokens will be ordered by there initiative value. This is done per group so Tokens in different groups will not be changing positions.
 
 Tokens can be moved between groups or reordered inside a group by dragging and dropping. This has no effect on the [Player Action Window](#player-action-window)
 
@@ -153,9 +155,9 @@ Values can be changed in a few different ways:
 
 To initialize a Token there are two approaches:
 
-**Open5e Statblocks**
+**TTRPG-API Statblocks**
 
-If you are using a creature that is available on Open5e.com you can use the [statblock feature](#statblock).
+If you are using a creature that is available on ttrpg-api.bitperfect-software.com you can use the [statblock feature](#statblock). The statblocks from the TTRPG API include most of the statblocks that use the OGL. This includes DnD 5e and Pathfinder 2E statblocks. For switching between rulesets see [global settings](#global-settings).
 
 **Manual Initialization**
 
@@ -163,7 +165,7 @@ When initializing manually you enter the 4 available fields manually. Normally t
 
 #### Statblock
 
-The statblock offers a search field for creature statblocks on Open5e.com. By default the Token Name is used to make an initial search. 
+The statblock offers a search field for creature statblocks on ttrpg-api.bitperfect-software.com. By default the Token Name is used to make an initial search. If the Token name has a modifier like A, B, A1, C, 1, 3, or similar at the end it will be automatically ignored for the search.
 
 All results for the current search are displayed with their HP, AC and CR visible.
 
@@ -173,7 +175,7 @@ By clicking on one of the options this statblock is selected for the Token. If t
 
 ![Statblock Selected](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/statblock_selected.png)
 
-The statblock shows the most important information of a creature as seen in the Picture.
+The statblock shows all the creature information including available spells and spell detailed spell information.
 
 #### Player Action Window
 
@@ -183,9 +185,9 @@ The Player Action Window has reduced functionality compared to the GM Action Win
 
 For tokens that have the Player Visibility set, their name change option, values, and statblock are shown. Otherwise just the dynamic-color background is there to indicate the current status of the creature.
 
-### Hp Tracker Popover
+### Hp Tracker Context Item
 
-The HP Tracker Popover is a simplified version of the Action Window [Token](#token)
+The HP Tracker Context Item is a simplified version of the Action Window [Token](#token)
 
 For the GM all options except name and statblock are available:
 

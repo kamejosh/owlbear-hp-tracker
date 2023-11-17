@@ -6,6 +6,7 @@
 
 ## Feature Ideas
 
++ Pagination for statblocks
 + editable statblock (would probably require own hosting/database to not clog up players owlbear space)
 + Tooltips for mobile devices
 + Support generic statblocks to support other [game systems](https://discord.com/channels/795808973743194152/1157319743196364971/1157319743196364971)

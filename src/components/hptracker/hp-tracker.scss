@@ -4,29 +4,29 @@
     top: 2rem;
     right: 2rem;
     gap: 1ch;
+}
 
-    .change-log-button,
-    .help-button,
-    .settings-button {
-        display: flex;
-        justify-content: center;
-        transition: all ease-in-out 0.25s;
-        cursor: pointer;
-        border: 1px solid white;
-        border-radius: 5px;
-        background-color: #1c1b22;
-        width: 20px;
-        text-align: center;
+.change-log-button,
+.help-button,
+.settings-button {
+    display: flex;
+    justify-content: center;
+    transition: all ease-in-out 0.25s;
+    cursor: pointer;
+    border: 1px solid white;
+    border-radius: 5px;
+    background-color: #1c1b22;
+    width: 20px;
+    text-align: center;
 
-        &.close {
-            top: 4.5ch;
-        }
+    &.close {
+        top: 4.5ch;
+    }
 
-        &:hover,
-        &focus {
-            background-color: white;
-            color: #242424;
-        }
+    &:hover,
+    &focus {
+        background-color: white;
+        color: #242424;
     }
 }
 

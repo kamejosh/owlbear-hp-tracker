@@ -99,12 +99,17 @@
                     overflow: hidden;
 
                     .info-bits {
-                        display: grid;
-                        grid-template-columns: 1fr;
-                        column-gap: 10px;
+                        display: flex;
+                        column-gap: 20px;
+                        flex-direction: column;
+                        flex-wrap: wrap;
+                        column-fill: auto;
+                        column-count: 2;
+                        height: 150px;
 
-                        @include breakpoint.laptop {
-                            grid-template-columns: repeat(2, 1fr);
+                        span {
+                            width: 230px;
+                            text-overflow: ellipsis;
                         }
                     }
                 }
