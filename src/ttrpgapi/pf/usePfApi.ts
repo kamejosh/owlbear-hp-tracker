@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { components } from "../schema";
 import { TTRPG_URL } from "../../config.ts";
+import { plausibleEvent } from "../../helper/helpers.ts";
 
 export type PfStatblock = components["schemas"]["PFStatblockOut"];
 export type PfSpell = components["schemas"]["src__types__pf__Spell"];
@@ -79,6 +80,7 @@ const fetchPfSpell = (slug: string, apiKey?: string): Promise<PfSpell | null> =>
 };
 
 export const usePfStatblockSearch = (search_string: string, take: number, skip: number, apiKey?: string) => {
+    plausibleEvent("search-pf", search_string);
     return useQuery<Array<PfStatblock>>({
         queryKey: [search_string, take, skip, "search"],
         queryFn: () => fetchPfSearch(search_string, take, skip, apiKey),

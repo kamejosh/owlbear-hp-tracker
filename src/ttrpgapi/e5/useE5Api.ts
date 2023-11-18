@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { components } from "../schema";
 import { TTRPG_URL } from "../../config.ts";
+import { plausibleEvent } from "../../helper/helpers.ts";
 
 export type E5Statblock = components["schemas"]["E5StatblockOut"];
 
@@ -56,6 +57,7 @@ const fetchStatblock = (slug: string, apiKey?: string): Promise<E5Statblock | nu
 };
 
 export const useE5SearchStatblock = (search_string: string, take: number, skip: number, apiKey?: string) => {
+    plausibleEvent("search-e5", search_string);
     return useQuery<Array<E5Statblock>>({
         queryKey: ["search", search_string, take, skip],
         queryFn: () => fetchE5Search(search_string, take, skip, apiKey),

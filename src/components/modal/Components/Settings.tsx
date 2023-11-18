@@ -10,6 +10,7 @@ import { Groups } from "./Groups.tsx";
 import "./global-settings.scss";
 import { Switch } from "../../general/Switch/Switch.tsx";
 import { dndSvg, pfSvg } from "./SwitchBackground.ts";
+import { plausibleEvent } from "../../../helper/helpers.ts";
 
 export const Settings = () => {
     const [offset, setOffset] = useLocalStorage<number>(`${ID}.offset`, 0);
@@ -72,8 +73,10 @@ export const Settings = () => {
                             onChange={(checked) => {
                                 if (checked) {
                                     setStateRuleset("pf");
+                                    plausibleEvent("ruleset", "pf");
                                 } else {
                                     setStateRuleset("e5");
+                                    plausibleEvent("ruleset", "e5");
                                 }
                             }}
                             checked={ruleset === "pf"}
@@ -89,12 +92,15 @@ export const Settings = () => {
                             onChange={(e) => {
                                 const nValue = Number(e.target.value.replace(/[^0-9]/g, ""));
                                 setSegments(nValue);
+                                plausibleEvent("segments", nValue.toString());
                             }}
                             onKeyDown={(e) => {
                                 if (e.key === "ArrowUp") {
                                     setSegments(segments + 1);
+                                    plausibleEvent("segmentsUp", `${segments + 1}`);
                                 } else if (e.key === "ArrowDown") {
                                     setSegments(segments - 1);
+                                    plausibleEvent("segmentsDown", `${segments - 1}`);
                                 }
                             }}
                         />
@@ -109,12 +115,15 @@ export const Settings = () => {
                                 const factor = e.target.value.startsWith("-") ? -1 : 1;
                                 const nValue = Number(e.target.value.replace(/[^0-9]/g, ""));
                                 handleOffsetChange(nValue * factor);
+                                plausibleEvent("offset", `${nValue * factor}`);
                             }}
                             onKeyDown={(e) => {
                                 if (e.key === "ArrowUp") {
                                     handleOffsetChange(offset + 1);
+                                    plausibleEvent("offsetUp", `${offset + 1}`);
                                 } else if (e.key === "ArrowDown") {
                                     handleOffsetChange(offset - 1);
+                                    plausibleEvent("offsetDown", `${offset - 1}`);
                                 }
                             }}
                         />
@@ -126,6 +135,7 @@ export const Settings = () => {
                             checked={allowNegativNumbers}
                             onChange={() => {
                                 setAllowNegativeNumbers(!allowNegativNumbers);
+                                plausibleEvent("negative-numbers", (!allowNegativNumbers).toString());
                             }}
                         />
                     </div>
