@@ -1,7 +1,6 @@
 import remarkGfm from "remark-gfm";
 import { generateSlug } from "../../helper/helpers.ts";
 import ReactMarkdown from "react-markdown";
-import React from "react";
 
 export const Markdown = ({ text }: { text: string }) => {
     return (

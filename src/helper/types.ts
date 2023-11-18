@@ -10,12 +10,12 @@ export type HpTrackerMetadata = {
     hpBar: boolean;
     initiative: number;
     sheet: string;
+    stats: {
+        initiativeBonus: number;
+    };
+    ruleset?: Ruleset;
     index?: number;
     group?: string;
-};
-
-export type HpTextMetadata = {
-    isHpText: boolean;
 };
 
 export type SceneMetadata = {
@@ -24,6 +24,7 @@ export type SceneMetadata = {
     allowNegativeNumbers?: boolean;
     hpBarSegments?: number;
     hpBarOffset?: number;
+    ruleset?: Ruleset;
     groups?: Array<string>;
     openChangeLog?: boolean;
 };
@@ -40,3 +41,5 @@ export type ShapeItemChanges = {
     visible?: boolean;
     position?: { x: number; y: number };
 };
+
+export type Ruleset = "e5" | "pf";

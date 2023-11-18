@@ -1,8 +1,24 @@
 #app {
+    .multiselection {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding-inline: 10px;
+        height: 90px;
+    }
+
     &.popover-app {
         margin: 0;
         padding: 0;
+        width: 100%;
         height: 100%;
+
+        .popover-spinner {
+            margin: auto;
+            padding: 15px;
+            width: 60px;
+            height: 100%;
+        }
 
         .popover {
             .player-wrapper {

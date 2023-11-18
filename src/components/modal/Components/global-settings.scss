@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 5px;
+    gap: 10px;
     margin-bottom: 10px;
 
     .heading {
@@ -19,7 +19,15 @@
         display: grid;
         grid-template-columns: 4fr 1fr;
         justify-content: flex-start;
+        border-bottom: 1px solid white;
+        padding-bottom: 10px;
         text-align: left;
+    }
+
+    .ruleset {
+        display: flex;
+        align-items: center;
+        gap: 1ch;
     }
 
     .group-list {

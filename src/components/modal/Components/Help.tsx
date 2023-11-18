@@ -1,0 +1,23 @@
+import { useEffect, useState } from "react";
+import help from "../../../../USAGE.md";
+import { Markdown } from "../../general/Markdown.tsx";
+import { modalId } from "../../../helper/variables.ts";
+import OBR from "@owlbear-rodeo/sdk";
+
+export const Help = () => {
+    const [helpText, setHelpText] = useState<string>("");
+
+    useEffect(() => {
+        fetch(help)
+            .then((res) => res.text())
+            .then((text) => setHelpText(text));
+    }, []);
+    return (
+        <>
+            <button className={"close-button"} onClick={async () => await OBR.modal.close(modalId)}>
+                X
+            </button>
+            <Markdown text={helpText} />
+        </>
+    );
+};

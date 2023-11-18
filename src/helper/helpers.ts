@@ -96,3 +96,32 @@ export const generateSlug = (string: string) => {
 
     return str;
 };
+
+export const getDamage = (text: string) => {
+    const regex = /\d+d\d+/gi;
+    const dice = regex.exec(text);
+
+    return dice && dice.length > 0 ? dice[0] : null;
+};
+
+export const plausibleEvent = (event: string, props: string | undefined = undefined) => {
+    // @ts-ignore
+    window.plausible =
+        // @ts-ignore
+        window.plausible ||
+        function () {
+            // @ts-ignore
+            if (!window.plausible) window.plausible = { q: [] };
+            // @ts-ignore
+            (window.plausible.q = window.plausible.q || []).push(arguments);
+        };
+
+    // @ts-ignore
+    const plausible = window.plausible;
+
+    if (props !== undefined) {
+        plausible(event, { props: { name: props } });
+    } else {
+        plausible(event);
+    }
+};

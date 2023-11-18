@@ -1,21 +1,24 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
-import { characterMetadata, sceneMetadata, version } from "../../helper/variables.ts";
+import {
+    changelogModal,
+    characterMetadata,
+    helpModal,
+    sceneMetadata,
+    settingsModal,
+    version,
+} from "../../helper/variables.ts";
 import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
 import { DragDropContext, DraggableLocation, DropResult } from "react-beautiful-dnd";
 import "./hp-tracker.scss";
 import { PlayerTokenList } from "./TokenList.tsx";
 import { useCharSheet } from "../../context/CharacterContext.ts";
 import { CharacterSheet } from "./charactersheet/CharacterSheet.tsx";
-import { GlobalSettings } from "./globalsettings/GlobalSettings.tsx";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { DropGroup } from "./DropGroup.tsx";
 import { sortItems } from "../../helper/helpers.ts";
-import changelog from "../../../CHANGELOG.md";
-import help from "../../../USAGE.md";
-import { Markdown } from "../general/Markdown.tsx";
 import { compare } from "compare-versions";
 
 export const HPTracker = () => {
@@ -32,10 +35,6 @@ const Content = () => {
     const [selectedTokens, setSelectedTokens] = useState<Array<string>>([]);
     const [tokenLists, setTokenLists] = useState<Map<string, Array<Item>>>(new Map());
     const [currentSceneMetadata, setCurrentSceneMetadata] = useState<SceneMetadata | null>(null);
-    const [changelogText, setChangelogText] = useState<string>("");
-    const [helpText, setHelpText] = useState<string>("");
-    const changelogRef = useRef<HTMLDialogElement>(null);
-    const helpRef = useRef<HTMLDialogElement>(null);
     const { isReady } = SceneReadyContext();
     const { characterId } = useCharSheet();
 
@@ -51,7 +50,12 @@ const Content = () => {
         const sceneData = await OBR.scene.getMetadata();
         const metadata = sceneData[sceneMetadata] as SceneMetadata;
         if (metadata?.version && compare(metadata.version, version, "<")) {
-            changelogRef.current?.showModal();
+            await OBR.modal.open({
+                ...changelogModal,
+                fullScreen: false,
+                height: 600,
+                width: 600,
+            });
         }
         setCurrentSceneMetadata(metadata);
     };
@@ -81,12 +85,6 @@ const Content = () => {
         OBR.player.onChange((player) => {
             setSelectedTokens(player.selection ?? []);
         });
-        fetch(changelog)
-            .then((res) => res.text())
-            .then((text) => setChangelogText(text));
-        fetch(help)
-            .then((res) => res.text())
-            .then((text) => setHelpText(text));
     }, []);
 
     useEffect(() => {
@@ -168,43 +166,63 @@ const Content = () => {
         reorder(tokenLists.get(result.destination.droppableId) ?? [], result.source.index, result.destination.index);
     };
 
+    const orderByInitiative = () => {
+        tokenLists.forEach((tokenList) => {
+            const reordered = Array.from(tokenList);
+            reordered.sort((a, b) => {
+                const aData = a.metadata[characterMetadata] as HpTrackerMetadata;
+                const bData = b.metadata[characterMetadata] as HpTrackerMetadata;
+                if (bData.initiative === aData.initiative) {
+                    return (
+                        bData.stats.initiativeBonus +
+                        bData.initiative -
+                        (aData.stats.initiativeBonus + aData.initiative)
+                    );
+                }
+                return bData.initiative - aData.initiative;
+            });
+            reorderMetadataIndex(reordered);
+        });
+    };
+
     return playerContext.role ? (
         characterId ? (
             <CharacterSheet />
         ) : (
             <div className={"hp-tracker"}>
                 <div className={"help-buttons"}>
-                    <button className={"change-log-button"} onClick={() => changelogRef.current?.showModal()}>
+                    {playerContext.role == "GM" ? (
+                        <button className={"settings-button"} onClick={async () => await OBR.modal.open(settingsModal)}>
+                            ⛭
+                        </button>
+                    ) : null}
+                    <button className={"change-log-button"} onClick={async () => await OBR.modal.open(changelogModal)}>
                         i
                     </button>
-                    <button className={"help-button"} onClick={() => helpRef.current?.showModal()}>
+                    <button className={"help-button"} onClick={async () => await OBR.modal.open(helpModal)}>
                         ?
                     </button>
                 </div>
-                <dialog ref={changelogRef} className={"changelog"}>
-                    <button className={"close-button"} onClick={() => changelogRef.current?.close()}>
-                        X
-                    </button>
-                    <Markdown text={changelogText} />
-                </dialog>
-                <dialog ref={helpRef} className={"help"}>
-                    <button className={"close-button"} onClick={() => helpRef.current?.close()}>
-                        X
-                    </button>
-                    <Markdown text={helpText} />
-                </dialog>
                 <h1 className={"title"}>
                     HP Tracker<span className={"small"}>{version}</span>
                 </h1>
-                {playerContext.role === "GM" && !!currentSceneMetadata?.id ? (
-                    <GlobalSettings sceneId={currentSceneMetadata.id} />
-                ) : null}
                 <div className={`player-wrapper headings ${playerContext.role === "PLAYER" ? "player" : ""}`}>
                     <span>Name</span>
                     {playerContext.role === "GM" ? <span>Settings</span> : null}
                     <span className={"current-hp"}>HP / MAX</span>
                     <span className={"armor-class"}>AC</span>
-                    <span className={"initiative-wrapper"}>INIT</span>
+                    <span className={"initiative-wrapper"}>
+                        INIT
+                        {playerContext.role === "GM" ? (
+                            <button
+                                className={"sort-button settings-button"}
+                                title={"Order By Initiative"}
+                                onClick={orderByInitiative}
+                            >
+                                ↓
+                            </button>
+                        ) : null}
+                    </span>
                     <span className={"character-sheet"}>INFO</span>
                 </div>
                 {playerContext.role === "GM" && currentSceneMetadata ? (

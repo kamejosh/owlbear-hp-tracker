@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import OBR from "@owlbear-rodeo/sdk";
 import { SceneReadyContext } from "./SceneReadyContext.ts";
 
-export const PluginGate = ({ children }: { children: React.ReactNode }) => {
+export const PluginGate = ({ children }: { children: ReactNode }) => {
     const [ready, setReady] = useState(false);
     const { setIsReady } = SceneReadyContext();
 

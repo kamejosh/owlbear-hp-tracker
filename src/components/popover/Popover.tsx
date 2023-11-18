@@ -1,14 +1,16 @@
 import { ContextWrapper } from "../ContextWrapper.tsx";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Token } from "../hptracker/Token.tsx";
 import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
 import { characterMetadata, sceneMetadata } from "../../helper/variables.ts";
 import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
 import "./popover.scss";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
+import { Loader } from "../general/Loader.tsx";
 
 export const Popover = () => {
     const [id, setId] = useState<string | null>(null);
+    const [multiSelection, setMultiSelection] = useState<boolean>(false);
     const { isReady } = SceneReadyContext();
 
     const initPopover = async () => {
@@ -16,6 +18,9 @@ export const Popover = () => {
         if (selection && selection.length === 1) {
             const items = await OBR.scene.items.getItems<Image>(selection);
             setId(items[0].id);
+            setMultiSelection(false);
+        } else if (selection && selection.length > 1) {
+            setMultiSelection(true);
         }
     };
 
@@ -25,7 +30,17 @@ export const Popover = () => {
         }
     }, [isReady]);
 
-    return <ContextWrapper>{id ? <Content id={id} /> : null}</ContextWrapper>;
+    return (
+        <ContextWrapper>
+            {id ? (
+                <Content id={id} />
+            ) : multiSelection ? (
+                <span className={"multiselection"}>Context menu only available when one Token is selected</span>
+            ) : (
+                <Loader className={"popover-spinner"} />
+            )}
+        </ContextWrapper>
+    );
 };
 
 const Content = (props: { id: string }) => {

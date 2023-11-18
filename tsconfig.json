@@ -17,7 +17,7 @@
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
         "allowSyntheticDefaultImports": true,
-        "jsx": "react",
+        "jsx": "react-jsx",
         "noImplicitAny": true,
         "noImplicitThis": true,
         "strictNullChecks": true,
