@@ -11,9 +11,11 @@ import "./global-settings.scss";
 import { Switch } from "../../general/Switch/Switch.tsx";
 import { dndSvg, pfSvg } from "./SwitchBackground.ts";
 import { plausibleEvent } from "../../../helper/helpers.ts";
+import { updateAcOffset } from "../../../helper/acHelper.ts";
 
 export const Settings = () => {
     const [offset, setOffset] = useLocalStorage<number>(`${ID}.offset`, 0);
+    const [acOffset, setAcOffset] = useLocalStorage<{ x: number; y: number }>(`${ID}.acOffset`, { x: 0, y: 0 });
     const [segments, setSegments] = useLocalStorage<number>(`${ID}.hpSegments`, 0);
     const [allowNegativNumbers, setAllowNegativeNumbers] = useLocalStorage<boolean>(
         `${ID}.allowNegativeNumbers`,
@@ -26,8 +28,10 @@ export const Settings = () => {
     useEffect(() => {
         const setSceneMetadata = async () => {
             const metadata: Metadata = await OBR.scene.getMetadata();
+            // We use version and id from the saved metadata, no need to refresh this
             const hpTrackerSceneMetadata = metadata[sceneMetadata] as SceneMetadata;
             hpTrackerSceneMetadata.hpBarOffset = offset;
+            hpTrackerSceneMetadata.acOffset = acOffset;
             hpTrackerSceneMetadata.hpBarSegments = segments;
             hpTrackerSceneMetadata.allowNegativeNumbers = allowNegativNumbers;
             hpTrackerSceneMetadata.ruleset = ruleset;
@@ -39,12 +43,17 @@ export const Settings = () => {
         if (isReady) {
             setSceneMetadata();
         }
-    }, [offset, segments, allowNegativNumbers, ruleset]);
+    }, [offset, segments, allowNegativNumbers, ruleset, acOffset]);
 
     const handleOffsetChange = (value: number) => {
         updateHpBarOffset(value);
         updateTextOffset(value);
         setOffset(value);
+    };
+
+    const handleAcOffsetChange = (x: number, y: number) => {
+        updateAcOffset({ x: x, y: y });
+        setAcOffset({ x: x, y: y });
     };
 
     const initSettings = async () => {
@@ -125,6 +134,30 @@ export const Settings = () => {
                                     handleOffsetChange(offset - 1);
                                     plausibleEvent("offsetDown", `${offset - 1}`);
                                 }
+                            }}
+                        />
+                    </div>
+                    <div className={"ac-position setting"}>
+                        AC Offset X:{" "}
+                        <input
+                            type={"text"}
+                            size={2}
+                            value={acOffset.x}
+                            onChange={(e) => {
+                                const factor = e.target.value.startsWith("-") ? -1 : 1;
+                                const nValue = Number(e.target.value.replace(/[^0-9]/g, ""));
+                                handleAcOffsetChange(nValue * factor, acOffset.y);
+                            }}
+                        />
+                        AC Offset Y:{" "}
+                        <input
+                            type={"text"}
+                            size={2}
+                            value={acOffset.y}
+                            onChange={(e) => {
+                                const factor = e.target.value.startsWith("-") ? -1 : 1;
+                                const nValue = Number(e.target.value.replace(/[^0-9]/g, ""));
+                                handleAcOffsetChange(acOffset.x, nValue * factor);
                             }}
                         />
                     </div>

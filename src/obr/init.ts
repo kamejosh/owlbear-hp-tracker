@@ -51,6 +51,7 @@ const initScene = async () => {
             version: version,
             hpBarSegments: 0,
             hpBarOffset: 0,
+            acOffset: { x: 0, y: 0 },
             allowNegativNumbers: false,
             id: uuidv4(),
             groups: ["Default"],
@@ -85,6 +86,9 @@ const initScene = async () => {
         // @ts-ignore some beta version startet with using pf2e
         if (sceneData.ruleset === "pf2e") {
             sceneData.ruleset = "pf";
+        }
+        if (!sceneData.acOffset) {
+            sceneData.acOffset = { x: 0, y: 0 };
         }
         ownMetadata[sceneMetadata] = sceneData;
     }
@@ -142,7 +146,10 @@ const setupContextMenu = async () => {
                 icon: "/icon.svg",
                 label: "Activate HP Tracker",
                 filter: {
-                    every: [{ key: "type", value: "IMAGE" }],
+                    every: [
+                        { key: "type", value: "IMAGE", coordinator: "||" },
+                        { key: "type", value: "SHAPE" },
+                    ],
                     some: [
                         { key: ["metadata", `${characterMetadata}`], value: undefined, coordinator: "||" },
                         {
@@ -239,7 +246,7 @@ const registerEvents = () => {
         const changeMap = new Map<string, TextItemChanges>();
         const tokens = items.filter((item) => characterMetadata in item.metadata);
         for (const token of tokens) {
-            const texts = await getAttachedItems(token.id, "TEXT");
+            const texts = await getAttachedItems(token.id, ["TEXT"]);
             await handleTextVisibility(token, texts as Array<Text>, changeMap);
         }
         await updateTextChanges(changeMap);

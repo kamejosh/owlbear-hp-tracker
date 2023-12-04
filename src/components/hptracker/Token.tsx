@@ -1,4 +1,5 @@
 import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
+
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import { useEffect, useRef, useState } from "react";
 import OBR, { Item, Metadata } from "@owlbear-rodeo/sdk";
@@ -9,6 +10,7 @@ import { updateText } from "../../helper/textHelpers.ts";
 import { updateHpBar } from "../../helper/shapeHelpers.ts";
 import { evalString } from "../../helper/helpers.ts";
 import "./player-wrapper.scss";
+import { updateAc } from "../../helper/acHelper.ts";
 
 type TokenProps = {
     item: Item;
@@ -27,6 +29,7 @@ export const Token = (props: TokenProps) => {
     const { isReady } = SceneReadyContext();
     const { setId } = useCharSheet();
     const hpRef = useRef<HTMLInputElement>(null);
+    const maxHpRef = useRef<HTMLInputElement>(null);
 
     const handleMetadata = (metadata: Metadata) => {
         if (metadata && sceneMetadata in metadata) {
@@ -41,6 +44,7 @@ export const Token = (props: TokenProps) => {
 
     useEffect(() => {
         if (hpRef && hpRef.current) {
+            console.log();
             hpRef.current.value = props.data.hp.toString();
         }
     }, [props.data.hp]);
@@ -53,7 +57,8 @@ export const Token = (props: TokenProps) => {
         if (isReady) {
             initMetadataValues();
             updateHpBar(data.hpBar, props.item.id, data);
-            updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee && props.item.visible, props.item.id, data);
+            updateText(data.hpOnMap, data.canPlayersSee && props.item.visible, props.item.id, data);
+            updateAc(data.acOnMap, data.canPlayersSee && props.item.visible, props.item.id, data);
         }
     }, [isReady]);
 
@@ -73,7 +78,7 @@ export const Token = (props: TokenProps) => {
         }
     }, [allowNegativNumbers]);
 
-    const handleValueChange = (value: string | number | boolean, key: string, updateHp: boolean = false) => {
+    const handleValueChange = (value: string | number | boolean, key: string) => {
         OBR.scene.items.updateItems([props.item.id], (items) => {
             items.forEach((item) => {
                 const currentData: HpTrackerMetadata = item.metadata[characterMetadata] as HpTrackerMetadata;
@@ -82,21 +87,25 @@ export const Token = (props: TokenProps) => {
                     setData({ ...data, name: currentData.name });
                 } else if (key === "players") {
                     currentData.canPlayersSee = !!value;
-                    updateText(data.hpOnMap || data.acOnMap, !!value && props.item.visible, props.item.id, {
+                    updateText(data.hpOnMap, !!value && props.item.visible, props.item.id, {
+                        ...data,
+                        canPlayersSee: !!value,
+                    });
+                    updateAc(data.acOnMap, !!value && props.item.visible, props.item.id, {
                         ...data,
                         canPlayersSee: !!value,
                     });
                     setData({ ...data, canPlayersSee: currentData.canPlayersSee });
                 } else if (key === "acOnMap") {
                     currentData.acOnMap = !!value;
-                    updateText(data.hpOnMap || !!value, data.canPlayersSee && props.item.visible, props.item.id, {
+                    updateAc(!!value, data.canPlayersSee && props.item.visible, props.item.id, {
                         ...data,
                         acOnMap: !!value,
                     });
                     setData({ ...data, acOnMap: currentData.acOnMap });
                 } else if (key === "hpOnMap") {
                     currentData.hpOnMap = !!value;
-                    updateText(!!value || data.acOnMap, data.canPlayersSee && props.item.visible, props.item.id, {
+                    updateText(!!value, data.canPlayersSee && props.item.visible, props.item.id, {
                         ...data,
                         hpOnMap: !!value,
                     });
@@ -107,32 +116,60 @@ export const Token = (props: TokenProps) => {
                     setData({ ...data, hpBar: currentData.hpBar });
                 } else if (key === "armorClass") {
                     currentData.armorClass = allowNegativNumbers ? Number(value) : Math.max(Number(value), 0);
-                    updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee && props.item.visible, props.item.id, {
+                    updateAc(data.acOnMap, data.canPlayersSee && props.item.visible, props.item.id, {
                         ...data,
                         armorClass: currentData.armorClass,
                     });
                     setData({ ...data, armorClass: currentData.armorClass });
                 } else if (key === "maxHP") {
                     currentData.maxHp = Math.max(Number(value), 0);
-                    if (updateHp && currentData.maxHp < currentData.hp) {
+                    if (currentData.maxHp < currentData.hp) {
                         currentData.hp = currentData.maxHp;
                         setData({ ...data, hp: currentData.hp });
                     }
                     updateHpBar(data.hpBar, props.item.id, { ...data, hp: currentData.hp, maxHp: currentData.maxHp });
-                    updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee && props.item.visible, props.item.id, {
+                    updateText(data.hpOnMap, data.canPlayersSee && props.item.visible, props.item.id, {
                         ...data,
                         maxHp: currentData.maxHp,
                         hp: currentData.hp,
                     });
                     setData({ ...data, maxHp: currentData.maxHp });
                 } else if (key === "hp") {
-                    currentData.hp = allowNegativNumbers ? Number(value) : Math.max(Number(value), 0);
+                    const newHp = Number(value);
+                    if (newHp < currentData.hp && currentData.stats.tempHp && currentData.stats.tempHp > 0) {
+                        currentData.stats.tempHp = Math.max(currentData.stats.tempHp - (currentData.hp - newHp), 0);
+                        if (maxHpRef.current) {
+                            maxHpRef.current.value = maxHpOutput(data.maxHp, currentData.stats.tempHp);
+                        }
+                    }
+                    currentData.hp = allowNegativNumbers ? newHp : Math.max(newHp, 0);
                     updateHpBar(data.hpBar, props.item.id, { ...data, hp: currentData.hp });
-                    updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee && props.item.visible, props.item.id, {
+                    updateText(data.hpOnMap, data.canPlayersSee && props.item.visible, props.item.id, {
                         ...data,
                         hp: currentData.hp,
                     });
                     setData({ ...data, hp: currentData.hp });
+                } else if (key === "tempHP") {
+                    const { maxHp, tempHp } = getTempHp(value.toString());
+                    if (tempHp !== 0) {
+                        if (currentData.stats.tempHp) {
+                            currentData.hp += tempHp - currentData.stats.tempHp;
+                        } else {
+                            currentData.hp += tempHp;
+                        }
+                    }
+                    currentData.hp = Math.min(currentData.hp, maxHp + tempHp);
+                    currentData.stats.tempHp = tempHp;
+                    updateHpBar(data.hpBar, props.item.id, { ...data, hp: currentData.hp });
+                    updateText(data.hpOnMap, data.canPlayersSee && props.item.visible, props.item.id, {
+                        ...data,
+                        hp: currentData.hp,
+                    });
+                    setData({
+                        ...data,
+                        hp: currentData.hp,
+                        stats: { ...currentData.stats, tempHp: currentData.stats.tempHp },
+                    });
                 } else if (key === "initiative") {
                     currentData.initiative = Number(value);
                     setData({ ...data, initiative: currentData.initiative });
@@ -140,7 +177,7 @@ export const Token = (props: TokenProps) => {
                     currentData.maxHp = Math.max(Number(value), 0);
                     currentData.hp = Number(value);
                     updateHpBar(data.hpBar, props.item.id, { ...data, hp: currentData.hp, maxHp: currentData.maxHp });
-                    updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee && props.item.visible, props.item.id, {
+                    updateText(data.hpOnMap, data.canPlayersSee && props.item.visible, props.item.id, {
                         ...data,
                         maxHp: currentData.maxHp,
                         hp: currentData.hp,
@@ -193,7 +230,7 @@ export const Token = (props: TokenProps) => {
             return "#1C1B22";
         }
 
-        const percent = props.data.hp / props.data.maxHp;
+        const percent = props.data.hp / (data.stats.tempHp ? data.stats.tempHp + data.maxHp : data.maxHp);
 
         const g = 255 * percent;
         const r = 255 - 255 * percent;
@@ -213,13 +250,39 @@ export const Token = (props: TokenProps) => {
         }
         let hp: number;
         if (data.maxHp > 0) {
-            hp = Math.min(Number(value * factor), data.maxHp);
+            hp = Math.min(Number(value * factor), data.stats.tempHp ? data.maxHp + data.stats.tempHp : data.maxHp);
         } else {
             hp = Number(value * factor);
             handleValueChange(hp, "hpMaxHp");
             return null;
         }
         return allowNegativNumbers ? hp : Math.max(hp, 0);
+    };
+
+    const getTempHp = (input: string) => {
+        if (input.indexOf("+") > 0) {
+            const parts = input.split("+");
+            const max = Number(parts[0].replace(/[^0-9]/g, ""));
+            if (max === 0) {
+                return { maxHp: 0, tempHp: 0 };
+            } else {
+                return { maxHp: max, tempHp: Number(parts[1].replace(/[^0-9]/g, "")) };
+            }
+        } else if (input.indexOf("-") > 0) {
+            const parts = input.split("-");
+            const max = Number(parts[0].replace(/[^0-9]/g, ""));
+            if (max === 0) {
+                return { maxHp: 0, tempHp: 0 };
+            } else {
+                return { maxHp: max, tempHp: Number(parts[1].replace(/[^0-9]/g, "")) };
+            }
+        } else {
+            return { maxHp: Number(input.replace(/[^0-9]/g, "")), tempHp: 0 };
+        }
+    };
+
+    const maxHpOutput = (max: number, temp: number | undefined) => {
+        return temp && temp !== 0 ? `${max} ${temp > 0 ? "+" : "-"} ${Math.abs(temp)}` : max.toString();
     };
 
     return display() ? (
@@ -280,7 +343,7 @@ export const Token = (props: TokenProps) => {
                     <button
                         title={"Toggle AC displayed on Map"}
                         className={`toggle-button ac ${data.acOnMap ? "on" : "off"}`}
-                        onClick={() => {
+                        onClick={async () => {
                             handleValueChange(!data.acOnMap, "acOnMap");
                         }}
                     />
@@ -309,11 +372,17 @@ export const Token = (props: TokenProps) => {
                     }}
                     onKeyDown={(e) => {
                         if (e.key === "ArrowUp") {
-                            const hp = Math.min(data.hp + 1, data.maxHp);
+                            const hp = Math.min(
+                                data.hp + 1,
+                                data.stats.tempHp ? data.maxHp + data.stats.tempHp : data.maxHp
+                            );
                             handleValueChange(hp, "hp");
                             e.currentTarget.value = hp.toString();
                         } else if (e.key === "ArrowDown") {
-                            const hp = Math.min(data.hp - 1, data.maxHp);
+                            const hp = Math.min(
+                                data.hp - 1,
+                                data.stats.tempHp ? data.maxHp + data.stats.tempHp : data.maxHp
+                            );
                             handleValueChange(hp, "hp");
                             e.currentTarget.value = hp.toString();
                         } else if (e.key === "Enter") {
@@ -330,21 +399,33 @@ export const Token = (props: TokenProps) => {
                 <input
                     type={"text"}
                     size={3}
-                    value={data.maxHp}
-                    onChange={(e) => {
-                        const value = Number(e.target.value.replace(/[^0-9]/g, ""));
-                        handleValueChange(Number(value), "maxHP", false);
-                    }}
+                    ref={maxHpRef}
+                    defaultValue={maxHpOutput(data.maxHp, data.stats.tempHp)}
                     onKeyDown={(e) => {
                         if (e.key === "ArrowUp") {
-                            handleValueChange(data.maxHp + 1, "maxHP", true);
+                            handleValueChange(data.maxHp + 1, "maxHP");
+                            e.currentTarget.value = maxHpOutput(data.maxHp + 1, data.stats.tempHp);
                         } else if (e.key === "ArrowDown") {
-                            handleValueChange(data.maxHp - 1, "maxHP", true);
+                            if (data.stats.tempHp && data.stats.tempHp > 0) {
+                                handleValueChange(maxHpOutput(data.maxHp, data.stats.tempHp - 1), "tempHP");
+                                e.currentTarget.value = maxHpOutput(data.maxHp, data.stats.tempHp - 1);
+                            } else {
+                                handleValueChange(data.maxHp - 1, "maxHP");
+                                e.currentTarget.value = maxHpOutput(data.maxHp - 1, data.stats.tempHp);
+                            }
+                        } else if (e.key === "Enter") {
+                            const value = getTempHp(e.currentTarget.value);
+                            handleValueChange(Number(value.maxHp), "maxHP");
+                            handleValueChange(e.currentTarget.value, "tempHP");
+                            e.currentTarget.value = maxHpOutput(value.maxHp, value.tempHp);
                         }
                     }}
                     onBlur={(e) => {
-                        const value = Number(e.target.value.replace(/[^0-9]/g, ""));
-                        handleValueChange(Number(value), "maxHP", true);
+                        const value = getTempHp(e.target.value);
+                        console.log(value);
+                        handleValueChange(Number(value.maxHp), "maxHP");
+                        handleValueChange(e.target.value, "tempHP");
+                        e.currentTarget.value = maxHpOutput(value.maxHp, value.tempHp);
                     }}
                 />
             </div>

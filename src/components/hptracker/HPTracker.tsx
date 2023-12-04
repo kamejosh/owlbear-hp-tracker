@@ -41,7 +41,6 @@ const Content = () => {
     const initHpTracker = async () => {
         const initialItems = await OBR.scene.items.getItems(
             (item) =>
-                (item.layer === "CHARACTER" || item.layer === "MOUNT") &&
                 characterMetadata in item.metadata &&
                 (item.metadata[characterMetadata] as HpTrackerMetadata).hpTrackerActive
         );
@@ -70,7 +69,6 @@ const Content = () => {
         OBR.scene.items.onChange(async (items) => {
             const filteredItems = items.filter(
                 (item) =>
-                    (item.layer === "CHARACTER" || item.layer === "MOUNT") &&
                     characterMetadata in item.metadata &&
                     (item.metadata[characterMetadata] as HpTrackerMetadata).hpTrackerActive
             );

@@ -1,11 +1,18 @@
 import OBR, { buildShape, Image, isShape, Item, Shape } from "@owlbear-rodeo/sdk";
 import { HpTrackerMetadata, ShapeItemChanges } from "./types.ts";
-import { calculatePercentage, deleteAttachments, getAttachedItems, getImageBounds, getYOffset } from "./helpers.ts";
+import {
+    attachmentFilter,
+    calculatePercentage,
+    deleteAttachments,
+    getAttachedItems,
+    getImageBounds,
+    getYOffset,
+} from "./helpers.ts";
 import { infoMetadata } from "./variables.ts";
 
 export const createShape = async (percentage: number, token: Image) => {
-    const height = 31;
     const bounds = await getImageBounds(token);
+    const height = Math.ceil(bounds.height / 4.85);
     const position = {
         x: bounds.position.x,
         y: bounds.position.y + bounds.height - height + (await getYOffset(bounds.height)),
@@ -44,8 +51,8 @@ export const createShape = async (percentage: number, token: Image) => {
         .visible(token.visible)
         .build();
 
-    backgroundShape.metadata[infoMetadata] = { isHpText: true };
-    hpShape.metadata[infoMetadata] = { isHpText: true };
+    backgroundShape.metadata[infoMetadata] = { isHpText: true, attachmentType: "BAR" };
+    hpShape.metadata[infoMetadata] = { isHpText: true, attachmentType: "BAR" };
     return [backgroundShape, hpShape];
 };
 
@@ -58,7 +65,7 @@ const handleHpBarOffsetUpdate = async (offset: number, hpBar: Item) => {
             const bounds = await getImageBounds(token as Image);
             const offsetFactor = bounds.height / 150;
             offset *= offsetFactor;
-            const height = 31;
+            const height = Math.ceil(bounds.height / 4.85);
             if (hpBar.name === "hp") {
                 change.position = {
                     x: bounds.position.x + 2,
@@ -87,7 +94,7 @@ export const updateHpBarOffset = async (offset: number) => {
 };
 
 export const updateHpBar = async (show: boolean, tokenId: string, data: HpTrackerMetadata) => {
-    const shapeAttachments = await getAttachedItems(tokenId, "SHAPE");
+    const shapeAttachments = (await getAttachedItems(tokenId, ["SHAPE"])).filter((a) => attachmentFilter(a, "BAR"));
 
     if (!show) {
         await deleteAttachments(shapeAttachments);
@@ -105,27 +112,30 @@ export const updateHpBar = async (show: boolean, tokenId: string, data: HpTracke
 
 const updateShapeChanges = async (changes: Map<string, ShapeItemChanges>) => {
     if (changes.size > 0) {
-        await OBR.scene.items.updateItems(isShape, (shapes) => {
-            shapes.forEach((shape) => {
-                if (changes.has(shape.id)) {
-                    const change = changes.get(shape.id);
-                    if (change) {
-                        if (change.width !== undefined) {
-                            shape.width = change.width;
-                        }
-                        if (change.visible !== undefined) {
-                            shape.visible = change.visible;
-                        }
-                        if (change.color) {
-                            shape.style.fillColor = change.color;
-                        }
-                        if (change.position) {
-                            shape.position = change.position;
+        await OBR.scene.items.updateItems(
+            (item): item is Shape => isShape(item) && changes.has(item.id),
+            (shapes) => {
+                shapes.forEach((shape) => {
+                    if (changes.has(shape.id)) {
+                        const change = changes.get(shape.id);
+                        if (change) {
+                            if (change.width !== undefined) {
+                                shape.width = change.width;
+                            }
+                            if (change.visible !== undefined) {
+                                shape.visible = change.visible;
+                            }
+                            if (change.color) {
+                                shape.style.fillColor = change.color;
+                            }
+                            if (change.position) {
+                                shape.position = change.position;
+                            }
                         }
                     }
-                }
-            });
-        });
+                });
+            }
+        );
     }
 };
 export const saveOrChangeShape = async (

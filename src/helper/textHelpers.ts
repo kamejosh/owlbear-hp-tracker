@@ -1,5 +1,5 @@
 import { HpTrackerMetadata, ShapeItemChanges, TextItemChanges } from "./types.ts";
-import { deleteAttachments, getAttachedItems, getImageBounds, getYOffset } from "./helpers.ts";
+import { attachmentFilter, deleteAttachments, getAttachedItems, getImageBounds, getYOffset } from "./helpers.ts";
 import OBR, { buildText, Image, isText, Item, Text } from "@owlbear-rodeo/sdk";
 import { characterMetadata, infoMetadata } from "./variables.ts";
 
@@ -43,7 +43,7 @@ export const createText = async (text: string, token: Image) => {
         .visible(token.visible)
         .build();
 
-    textItem.metadata[infoMetadata] = { isHpText: true };
+    textItem.metadata[infoMetadata] = { isHpText: true, attachmentType: "HP" };
     return textItem;
 };
 
@@ -79,7 +79,7 @@ export const updateTextOffset = async (offset: number) => {
 };
 
 export const updateText = async (show: boolean, visible: boolean, tokenId: string, data: HpTrackerMetadata) => {
-    const textAttachments = await getAttachedItems(tokenId, "TEXT");
+    const textAttachments = (await getAttachedItems(tokenId, ["TEXT"])).filter((a) => attachmentFilter(a, "HP"));
 
     if (!show) {
         await deleteAttachments(textAttachments);
@@ -132,19 +132,13 @@ export const saveOrChangeText = async (
             if (infoMetadata in attachment.metadata) {
                 const change = changeMap.get(attachment.id) ?? {};
 
-                change.text =
-                    (data.hpOnMap ? `HP:${data.hp}/${data.maxHp}` : "") +
-                    (data.hpOnMap && data.acOnMap ? " " : "") +
-                    (data.acOnMap ? `AC:${data.armorClass}` : "");
+                change.text = data.hpOnMap ? `HP:${data.hp}/${data.maxHp}` : "";
                 change.visible = visible;
                 changeMap.set(attachment.id, change);
             }
         });
     } else {
-        const textContent =
-            (data.hpOnMap ? `HP:${data.hp}/${data.maxHp}` : "") +
-            (data.hpOnMap && data.acOnMap ? " " : "") +
-            (data.acOnMap ? `AC:${data.armorClass}` : "");
+        const textContent = data.hpOnMap ? `HP:${data.hp}/${data.maxHp}` : "";
         const text = await createText(textContent, character as Image);
         if (text) {
             text.visible = visible;

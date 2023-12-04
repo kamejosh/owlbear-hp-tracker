@@ -1,3 +1,7 @@
+# 1.4.1
+
++ Shapes can now be used as HP Tracker Tokens
+
 # 1.4.0
 
 ### This update uses a new statblock backend. This means previously selected statblocks can't be accessed anymore and statblocks need to be relinked manually. Sorry for any inconvenience but this prepares HP Tracker for custom statblocks coming in one of the next versions.
