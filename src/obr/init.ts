@@ -1,16 +1,15 @@
-import OBR, { Item, Text, Metadata } from "@owlbear-rodeo/sdk";
+import OBR, { Item, Metadata } from "@owlbear-rodeo/sdk";
 import { ID, characterMetadata, sceneMetadata, version } from "../helper/variables.ts";
 import { migrate102To103 } from "../migrations/v103.ts";
 import { migrate105To106 } from "../migrations/v106.ts";
 import { compare } from "compare-versions";
-import { HpTrackerMetadata, SceneMetadata, TextItemChanges } from "../helper/types.ts";
+import { HpTrackerMetadata, SceneMetadata } from "../helper/types.ts";
 import { migrate111To112 } from "../migrations/v112.ts";
 import { migrate112To113 } from "../migrations/v113.ts";
-import { updateHpBar } from "../helper/shapeHelpers.ts";
-import { handleTextVisibility, updateText, updateTextChanges } from "../helper/textHelpers.ts";
-import { getAttachedItems } from "../helper/helpers.ts";
+import { updateHp, updateTextVisibility } from "../helper/hpHelpers.ts";
 import { v4 as uuidv4 } from "uuid";
 import { migrateTo140 } from "../migrations/v140.ts";
+import { updateAc, updateAcVisibility } from "../helper/acHelper.ts";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -52,6 +51,7 @@ const initScene = async () => {
             hpBarSegments: 0,
             hpBarOffset: 0,
             acOffset: { x: 0, y: 0 },
+            acShield: true,
             allowNegativNumbers: false,
             id: uuidv4(),
             groups: ["Default"],
@@ -89,6 +89,9 @@ const initScene = async () => {
         }
         if (!sceneData.acOffset) {
             sceneData.acOffset = { x: 0, y: 0 };
+        }
+        if (!sceneData.acShield) {
+            sceneData.acShield = true;
         }
         ownMetadata[sceneMetadata] = sceneData;
     }
@@ -175,13 +178,8 @@ const setupContextMenu = async () => {
                     items.forEach((item) => {
                         if (characterMetadata in item.metadata) {
                             const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
-                            updateText(
-                                (metadata.hpOnMap || metadata.acOnMap) && !metadata.hpTrackerActive,
-                                metadata.canPlayersSee && item.visible,
-                                item.id,
-                                { ...metadata }
-                            );
-                            updateHpBar(metadata.hpBar && !metadata.hpTrackerActive, item.id, { ...metadata });
+                            updateHp(item, { ...metadata });
+                            updateAc(item, { ...metadata });
                             metadata.hpTrackerActive = !metadata.hpTrackerActive;
                             item.metadata[characterMetadata] = metadata;
                         } else {
@@ -240,16 +238,18 @@ const sceneReady = async () => {
     await initScene();
 };
 
-const registerEvents = () => {
+const initTokens = async () => {
     // Triggers everytime any item is changed
     OBR.scene.items.onChange(async (items) => {
-        const changeMap = new Map<string, TextItemChanges>();
-        const tokens = items.filter((item) => characterMetadata in item.metadata);
-        for (const token of tokens) {
-            const texts = await getAttachedItems(token.id, ["TEXT"]);
-            await handleTextVisibility(token, texts as Array<Text>, changeMap);
-        }
-        await updateTextChanges(changeMap);
+        const tokens = items.filter((item) => {
+            return (
+                characterMetadata in item.metadata &&
+                (item.metadata[characterMetadata] as HpTrackerMetadata).hpTrackerActive
+            );
+        });
+
+        await updateTextVisibility(tokens);
+        await updateAcVisibility(tokens);
     });
 };
 
@@ -267,5 +267,5 @@ OBR.onReady(async () => {
         await sceneReady();
     }
 
-    registerEvents();
+    await initTokens();
 });

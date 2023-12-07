@@ -4,8 +4,7 @@ import { Ruleset, SceneMetadata } from "../../../helper/types.ts";
 import { SceneReadyContext } from "../../../context/SceneReadyContext.ts";
 import { useEffect, useState } from "react";
 import OBR, { Metadata } from "@owlbear-rodeo/sdk";
-import { updateHpBarOffset } from "../../../helper/shapeHelpers.ts";
-import { updateTextOffset } from "../../../helper/textHelpers.ts";
+import { updateHpOffset } from "../../../helper/hpHelpers.ts";
 import { Groups } from "./Groups.tsx";
 import "./global-settings.scss";
 import { Switch } from "../../general/Switch/Switch.tsx";
@@ -16,6 +15,7 @@ import { updateAcOffset } from "../../../helper/acHelper.ts";
 export const Settings = () => {
     const [offset, setOffset] = useLocalStorage<number>(`${ID}.offset`, 0);
     const [acOffset, setAcOffset] = useLocalStorage<{ x: number; y: number }>(`${ID}.acOffset`, { x: 0, y: 0 });
+    // const [acShield, setAcShield] = useLocalStorage<boolean>(`${ID}.acShield`, true);
     const [segments, setSegments] = useLocalStorage<number>(`${ID}.hpSegments`, 0);
     const [allowNegativNumbers, setAllowNegativeNumbers] = useLocalStorage<boolean>(
         `${ID}.allowNegativeNumbers`,
@@ -32,6 +32,7 @@ export const Settings = () => {
             const hpTrackerSceneMetadata = metadata[sceneMetadata] as SceneMetadata;
             hpTrackerSceneMetadata.hpBarOffset = offset;
             hpTrackerSceneMetadata.acOffset = acOffset;
+            // hpTrackerSceneMetadata.acShield = acShield;
             hpTrackerSceneMetadata.hpBarSegments = segments;
             hpTrackerSceneMetadata.allowNegativeNumbers = allowNegativNumbers;
             hpTrackerSceneMetadata.ruleset = ruleset;
@@ -46,8 +47,7 @@ export const Settings = () => {
     }, [offset, segments, allowNegativNumbers, ruleset, acOffset]);
 
     const handleOffsetChange = (value: number) => {
-        updateHpBarOffset(value);
-        updateTextOffset(value);
+        updateHpOffset(value);
         setOffset(value);
     };
 
@@ -137,29 +137,42 @@ export const Settings = () => {
                             }}
                         />
                     </div>
-                    <div className={"ac-position setting"}>
-                        AC Offset X:{" "}
-                        <input
-                            type={"text"}
-                            size={2}
-                            value={acOffset.x}
-                            onChange={(e) => {
-                                const factor = e.target.value.startsWith("-") ? -1 : 1;
-                                const nValue = Number(e.target.value.replace(/[^0-9]/g, ""));
-                                handleAcOffsetChange(nValue * factor, acOffset.y);
-                            }}
-                        />
-                        AC Offset Y:{" "}
-                        <input
-                            type={"text"}
-                            size={2}
-                            value={acOffset.y}
-                            onChange={(e) => {
-                                const factor = e.target.value.startsWith("-") ? -1 : 1;
-                                const nValue = Number(e.target.value.replace(/[^0-9]/g, ""));
-                                handleAcOffsetChange(acOffset.x, nValue * factor);
-                            }}
-                        />
+                    <div className={"ac setting"}>
+                        <h4>Armorclass</h4>
+                        <div className={"ac-position"}>
+                            AC Offset: X{" "}
+                            <input
+                                type={"text"}
+                                size={2}
+                                value={acOffset.x}
+                                onChange={(e) => {
+                                    const factor = e.target.value.startsWith("-") ? -1 : 1;
+                                    const nValue = Number(e.target.value.replace(/[^0-9]/g, ""));
+                                    handleAcOffsetChange(nValue * factor, acOffset.y);
+                                }}
+                            />
+                            Y{" "}
+                            <input
+                                type={"text"}
+                                size={2}
+                                value={acOffset.y}
+                                onChange={(e) => {
+                                    const factor = e.target.value.startsWith("-") ? -1 : 1;
+                                    const nValue = Number(e.target.value.replace(/[^0-9]/g, ""));
+                                    handleAcOffsetChange(acOffset.x, nValue * factor);
+                                }}
+                            />
+                        </div>
+                        {/*<div className={"ac-shield setting"}>
+                            Show Shield:
+                            <input
+                                type={"checkbox"}
+                                checked={acShield}
+                                onChange={() => {
+                                    setAcShield(!acShield);
+                                }}
+                            />
+                        </div>*/}
                     </div>
                     <div className={"negative-numbers setting"}>
                         Allow negative HP/AC:

@@ -6,8 +6,7 @@ import OBR, { Item, Metadata } from "@owlbear-rodeo/sdk";
 import { characterMetadata, sceneMetadata } from "../../helper/variables.ts";
 import { useCharSheet } from "../../context/CharacterContext.ts";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
-import { updateText } from "../../helper/textHelpers.ts";
-import { updateHpBar } from "../../helper/shapeHelpers.ts";
+import { updateHp } from "../../helper/hpHelpers.ts";
 import { evalString } from "../../helper/helpers.ts";
 import "./player-wrapper.scss";
 import { updateAc } from "../../helper/acHelper.ts";
@@ -44,7 +43,6 @@ export const Token = (props: TokenProps) => {
 
     useEffect(() => {
         if (hpRef && hpRef.current) {
-            console.log();
             hpRef.current.value = props.data.hp.toString();
         }
     }, [props.data.hp]);
@@ -56,9 +54,8 @@ export const Token = (props: TokenProps) => {
         };
         if (isReady) {
             initMetadataValues();
-            updateHpBar(data.hpBar, props.item.id, data);
-            updateText(data.hpOnMap, data.canPlayersSee && props.item.visible, props.item.id, data);
-            updateAc(data.acOnMap, data.canPlayersSee && props.item.visible, props.item.id, data);
+            updateHp(props.item, data);
+            updateAc(props.item, data);
         }
     }, [isReady]);
 
@@ -87,36 +84,30 @@ export const Token = (props: TokenProps) => {
                     setData({ ...data, name: currentData.name });
                 } else if (key === "players") {
                     currentData.canPlayersSee = !!value;
-                    updateText(data.hpOnMap, !!value && props.item.visible, props.item.id, {
-                        ...data,
-                        canPlayersSee: !!value,
-                    });
-                    updateAc(data.acOnMap, !!value && props.item.visible, props.item.id, {
+                    updateHp(props.item, { ...data, canPlayersSee: !!value });
+                    updateAc(props.item, {
                         ...data,
                         canPlayersSee: !!value,
                     });
                     setData({ ...data, canPlayersSee: currentData.canPlayersSee });
                 } else if (key === "acOnMap") {
                     currentData.acOnMap = !!value;
-                    updateAc(!!value, data.canPlayersSee && props.item.visible, props.item.id, {
+                    updateAc(props.item, {
                         ...data,
                         acOnMap: !!value,
                     });
                     setData({ ...data, acOnMap: currentData.acOnMap });
                 } else if (key === "hpOnMap") {
                     currentData.hpOnMap = !!value;
-                    updateText(!!value, data.canPlayersSee && props.item.visible, props.item.id, {
-                        ...data,
-                        hpOnMap: !!value,
-                    });
+                    updateHp(props.item, { ...data, hpOnMap: !!value });
                     setData({ ...data, hpOnMap: currentData.hpOnMap });
                 } else if (key === "hpBar") {
                     currentData.hpBar = !!value;
-                    updateHpBar(!!value, props.item.id, data);
+                    updateHp(props.item, { ...data, hpBar: !!value });
                     setData({ ...data, hpBar: currentData.hpBar });
                 } else if (key === "armorClass") {
                     currentData.armorClass = allowNegativNumbers ? Number(value) : Math.max(Number(value), 0);
-                    updateAc(data.acOnMap, data.canPlayersSee && props.item.visible, props.item.id, {
+                    updateAc(props.item, {
                         ...data,
                         armorClass: currentData.armorClass,
                     });
@@ -127,11 +118,10 @@ export const Token = (props: TokenProps) => {
                         currentData.hp = currentData.maxHp;
                         setData({ ...data, hp: currentData.hp });
                     }
-                    updateHpBar(data.hpBar, props.item.id, { ...data, hp: currentData.hp, maxHp: currentData.maxHp });
-                    updateText(data.hpOnMap, data.canPlayersSee && props.item.visible, props.item.id, {
+                    updateHp(props.item, {
                         ...data,
-                        maxHp: currentData.maxHp,
                         hp: currentData.hp,
+                        maxHp: currentData.maxHp,
                     });
                     setData({ ...data, maxHp: currentData.maxHp });
                 } else if (key === "hp") {
@@ -143,11 +133,7 @@ export const Token = (props: TokenProps) => {
                         }
                     }
                     currentData.hp = allowNegativNumbers ? newHp : Math.max(newHp, 0);
-                    updateHpBar(data.hpBar, props.item.id, { ...data, hp: currentData.hp });
-                    updateText(data.hpOnMap, data.canPlayersSee && props.item.visible, props.item.id, {
-                        ...data,
-                        hp: currentData.hp,
-                    });
+                    updateHp(props.item, { ...data, hp: currentData.hp });
                     setData({ ...data, hp: currentData.hp });
                 } else if (key === "tempHP") {
                     const { maxHp, tempHp } = getTempHp(value.toString());
@@ -160,11 +146,7 @@ export const Token = (props: TokenProps) => {
                     }
                     currentData.hp = Math.min(currentData.hp, maxHp + tempHp);
                     currentData.stats.tempHp = tempHp;
-                    updateHpBar(data.hpBar, props.item.id, { ...data, hp: currentData.hp });
-                    updateText(data.hpOnMap, data.canPlayersSee && props.item.visible, props.item.id, {
-                        ...data,
-                        hp: currentData.hp,
-                    });
+                    updateHp(props.item, { ...data, hp: currentData.hp });
                     setData({
                         ...data,
                         hp: currentData.hp,
@@ -176,12 +158,7 @@ export const Token = (props: TokenProps) => {
                 } else if (key === "hpMaxHp") {
                     currentData.maxHp = Math.max(Number(value), 0);
                     currentData.hp = Number(value);
-                    updateHpBar(data.hpBar, props.item.id, { ...data, hp: currentData.hp, maxHp: currentData.maxHp });
-                    updateText(data.hpOnMap, data.canPlayersSee && props.item.visible, props.item.id, {
-                        ...data,
-                        maxHp: currentData.maxHp,
-                        hp: currentData.hp,
-                    });
+                    updateHp(props.item, { ...data, hp: currentData.hp, maxHp: currentData.maxHp });
                     setData({ ...data, hp: currentData.hp, maxHp: currentData.maxHp });
                 }
                 // just assigning currentData did not trigger onChange event. Spreading helps
@@ -422,7 +399,6 @@ export const Token = (props: TokenProps) => {
                     }}
                     onBlur={(e) => {
                         const value = getTempHp(e.target.value);
-                        console.log(value);
                         handleValueChange(Number(value.maxHp), "maxHP");
                         handleValueChange(e.target.value, "tempHP");
                         e.currentTarget.value = maxHpOutput(value.maxHp, value.tempHp);

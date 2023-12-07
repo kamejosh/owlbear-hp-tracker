@@ -1,7 +1,7 @@
 import OBR, { buildCurve, buildText, Curve, Image, isCurve, isText, Item, Text } from "@owlbear-rodeo/sdk";
 import { ACItemChanges, HpTrackerMetadata, TextItemChanges } from "./types.ts";
 import { attachmentFilter, deleteAttachments, getACOffset, getAttachedItems, getImageBounds } from "./helpers.ts";
-import { infoMetadata } from "./variables.ts";
+import { characterMetadata, infoMetadata } from "./variables.ts";
 
 export const createAC = async (ac: number, token: Image) => {
     const bounds = await getImageBounds(token);
@@ -39,8 +39,8 @@ export const createAC = async (ac: number, token: Image) => {
     const acText = buildText()
         .textType("PLAIN")
         .width(width)
-        .height(height - 10)
-        .position({ x: position.x, y: position.y + 10 })
+        .height(height * 0.8)
+        .position({ x: position.x, y: position.y + height * 0.2 })
         .attachedTo(acShape.id)
         .locked(true)
         .plainText(ac.toString())
@@ -88,13 +88,15 @@ export const updateAcOffset = async (offset: { x: number; y: number }) => {
     await updateAcChanges(changeMap);
 };
 
-export const updateAc = async (show: boolean, visible: boolean, tokenId: string, data: HpTrackerMetadata) => {
-    const acAttachment = (await getAttachedItems(tokenId, ["CURVE"])).filter((a) => attachmentFilter(a, "AC"));
+export const updateAc = async (token: Item, data: HpTrackerMetadata) => {
+    const acAttachment = (await getAttachedItems(token.id, ["CURVE"])).filter((a) => attachmentFilter(a, "AC"));
 
+    const show = data.acOnMap && data.hpTrackerActive;
+    const visible = data.canPlayersSee && token.visible;
     if (!show) {
         await deleteAttachments(acAttachment);
     } else {
-        const characters = await OBR.scene.items.getItems([tokenId]);
+        const characters = await OBR.scene.items.getItems([token.id]);
         if (characters.length > 0) {
             const character = characters[0];
             const changes = new Map<string, TextItemChanges>();
@@ -171,4 +173,21 @@ const saveOrChangeAC = async (
         ac.forEach((item) => (item.visible = visible));
         await OBR.scene.items.addItems(ac);
     }
+};
+
+export const updateAcVisibility = async (tokens: Array<Item>) => {
+    const acChanges = new Map<string, ACItemChanges>();
+    for (const token of tokens) {
+        const acAttachments = (await getAttachedItems(token.id, ["CURVE"])).filter((a) => attachmentFilter(a, "AC"));
+        const data = token.metadata[characterMetadata] as HpTrackerMetadata;
+
+        acAttachments.forEach((curve) => {
+            const change = acChanges.get(curve.id) ?? {};
+            if (curve.visible != (token.visible && data.canPlayersSee)) {
+                change.visible = token.visible && data.canPlayersSee;
+                acChanges.set(curve.id, change);
+            }
+        });
+    }
+    updateAcChanges(acChanges);
 };

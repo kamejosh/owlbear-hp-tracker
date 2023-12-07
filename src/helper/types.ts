@@ -26,6 +26,7 @@ export type SceneMetadata = {
     hpBarSegments?: number;
     hpBarOffset?: number;
     acOffset?: { x: number; y: number };
+    acShield?: boolean;
     ruleset?: Ruleset;
     groups?: Array<string>;
     openChangeLog?: boolean;
@@ -42,7 +43,7 @@ export type TextItemChanges = {
     position?: { x: number; y: number };
 };
 
-export type ShapeItemChanges = {
+export type BarItemChanges = {
     color?: string;
     width?: number;
     visible?: boolean;
