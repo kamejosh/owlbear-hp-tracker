@@ -10,13 +10,14 @@ import {
 } from "./helpers.ts";
 import { characterMetadata, infoMetadata } from "./variables.ts";
 
-export const createBar = async (percentage: number, token: Image) => {
+export const createBar = async (percentage: number, tempHpPercentage: number, token: Image) => {
     const bounds = await getImageBounds(token);
     const height = Math.ceil(bounds.height / 4.85);
     const position = {
         x: bounds.position.x,
         y: bounds.position.y + bounds.height - height + (await getYOffset(bounds.height)),
     };
+    const border = Math.floor(bounds.width / 75);
 
     const backgroundShape = buildShape()
         .width(bounds.width)
@@ -35,14 +36,14 @@ export const createBar = async (percentage: number, token: Image) => {
         .build();
 
     const hpShape = buildShape()
-        .width(percentage === 0 ? 0 : (bounds.width - 4) * percentage)
-        .height(height - 4)
+        .width(percentage === 0 ? 0 : (bounds.width - border * 2) * percentage)
+        .height(height - border * 2)
         .shapeType("RECTANGLE")
         .fillColor("red")
         .fillOpacity(0.5)
         .strokeWidth(0)
         .strokeOpacity(0)
-        .position({ x: position.x + 2, y: position.y + 2 })
+        .position({ x: position.x + border, y: position.y + border })
         .attachedTo(token.id)
         .layer("ATTACHMENT")
         .locked(true)
@@ -51,9 +52,27 @@ export const createBar = async (percentage: number, token: Image) => {
         .visible(token.visible)
         .build();
 
+    const tempHp = buildShape()
+        .width(tempHpPercentage === 0 ? 0 : (bounds.width - border * 2) * tempHpPercentage)
+        .height(height - border * 2)
+        .shapeType("RECTANGLE")
+        .fillColor("blue")
+        .fillOpacity(0.8)
+        .strokeWidth(0)
+        .strokeOpacity(0)
+        .position({ x: position.x + border, y: position.y + border })
+        .attachedTo(token.id)
+        .layer("ATTACHMENT")
+        .locked(true)
+        .name("temp-hp")
+        .disableAttachmentBehavior(["ROTATION"])
+        .visible(token.visible)
+        .build();
+
     backgroundShape.metadata[infoMetadata] = { isHpText: true, attachmentType: "BAR" };
     hpShape.metadata[infoMetadata] = { isHpText: true, attachmentType: "BAR" };
-    return [backgroundShape, hpShape];
+    tempHp.metadata[infoMetadata] = { isHpText: true, attachmentType: "BAR" };
+    return [backgroundShape, hpShape, tempHp];
 };
 
 const createText = async (text: string, token: Image) => {
@@ -76,8 +95,8 @@ const createText = async (text: string, token: Image) => {
         .fontWeight(600)
         .fillColor("white")
         .strokeColor("black")
-        .strokeWidth(height / 20)
-        .fontSize(height)
+        .strokeWidth(height / 30)
+        .fontSize(height * 0.8)
         .disableAttachmentBehavior(["ROTATION", "VISIBLE"])
         .visible(token.visible)
         .build();
@@ -96,10 +115,11 @@ const handleHpOffsetUpdate = async (offset: number, hp: Item) => {
             const offsetFactor = bounds.height / 150;
             offset *= offsetFactor;
             const height = Math.ceil(bounds.height / 4.85);
+            const border = Math.floor(bounds.width / 75);
             if (hp.name === "hp") {
                 change.position = {
-                    x: bounds.position.x + 2,
-                    y: bounds.position.y + bounds.height - height + offset + 2,
+                    x: bounds.position.x + border,
+                    y: bounds.position.y + bounds.height - height + offset + border,
                 };
             } else if (hp.name === "hp-text") {
                 change.position = {
@@ -248,8 +268,8 @@ const saveOrChangeBar = async (
             }
         }
     } else {
-        const percentage = await calculatePercentage(data);
-        const bar = await createBar(percentage, character as Image);
+        const { hpPercentage, tempHpPercentage } = await calculatePercentage(data);
+        const bar = await createBar(hpPercentage, tempHpPercentage, character as Image);
         await OBR.scene.items.addItems(bar);
     }
 };
@@ -260,12 +280,12 @@ const saveOrChangeText = async (
     attachments: Array<Item>,
     textChanges: Map<string, TextItemChanges>
 ) => {
+    const hpText = `${data.hp}/${data.maxHp}${!!data.stats.tempHp ? "(" + data.stats.tempHp + ")" : ""}`;
     if (attachments.length > 0) {
         for (const a of attachments) {
             const change = textChanges.get(a.id) ?? {};
-            const text = `${data.hp}/${data.maxHp}`;
-            if ((a as Text).text.plainText !== text) {
-                change.text = text;
+            if ((a as Text).text.plainText !== hpText) {
+                change.text = hpText;
             }
             if (a.visible !== (character.visible && data.canPlayersSee)) {
                 change.visible = character.visible && data.canPlayersSee;
@@ -275,7 +295,7 @@ const saveOrChangeText = async (
             }
         }
     } else {
-        const text = await createText(`${data.hp}/${data.maxHp}`, character as Image);
+        const text = await createText(hpText, character as Image);
         text.visible = character.visible && data.canPlayersSee;
         await OBR.scene.items.addItems([text]);
     }
@@ -290,16 +310,29 @@ const handleBarAttachment = async (
     const shape = attachment as Shape;
     const bounds = await getImageBounds(character);
     const width = bounds.width;
+    const border = Math.floor(bounds.width / 75);
 
     if (attachment.name === "hp" && infoMetadata in attachment.metadata) {
         const change = changeMap.get(attachment.id) ?? {};
-        const percentage = await calculatePercentage(data);
-        if (percentage === 0) {
+        const { hpPercentage } = await calculatePercentage(data);
+        if (hpPercentage === 0) {
             change.color = "black";
         } else {
             change.color = "red";
         }
-        change.width = percentage === 0 ? 0 : (width - 4) * percentage;
+        change.width = hpPercentage === 0 ? 0 : (width - border * 2) * hpPercentage;
+        if (shape.width != change.width || shape.style.fillColor != change.color) {
+            return change;
+        }
+    } else if (attachment.name === "temp-hp" && infoMetadata in attachment.metadata) {
+        const change = changeMap.get(attachment.id) ?? {};
+        const { tempHpPercentage } = await calculatePercentage(data);
+        if (tempHpPercentage === 0) {
+            change.color = "black";
+        } else {
+            change.color = "blue";
+        }
+        change.width = tempHpPercentage === 0 ? 0 : (width - border * 2) * tempHpPercentage;
         if (shape.width != change.width || shape.style.fillColor != change.color) {
             return change;
         }

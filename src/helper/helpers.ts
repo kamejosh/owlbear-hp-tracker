@@ -40,14 +40,18 @@ export const calculatePercentage = async (data: HpTrackerMetadata) => {
     const sceneData = metadata[sceneMetadata] as SceneMetadata;
     const segments = sceneData.hpBarSegments ?? 0;
 
-    const percentage = data.maxHp === 0 || data.hp === 0 || data.hp < 0 ? 0 : data.hp / data.maxHp;
+    const tempHp = data.stats.tempHp ?? 0;
+
+    const percentage = data.maxHp === 0 || data.hp === 0 || data.hp < 0 ? 0 : (data.hp - tempHp) / data.maxHp;
+    const tempPercentage = data.maxHp === 0 || tempHp === 0 ? 0 : tempHp / data.maxHp;
 
     if (segments === 0) {
-        return percentage;
+        return { hpPercentage: percentage, tempHpPercentage: tempPercentage };
     } else {
         const minStep = 100 / segments;
-        const numSteps = Math.ceil((percentage * 100) / minStep);
-        return (numSteps * minStep) / 100;
+        const numStepsHp = Math.ceil((percentage * 100) / minStep);
+        const numStepsTempHp = Math.ceil((tempPercentage * 100) / minStep);
+        return { hpPercentage: (numStepsHp * minStep) / 100, tempHpPercentage: (numStepsTempHp * minStep) / 100 };
     }
 };
 

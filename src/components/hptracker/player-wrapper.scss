@@ -16,12 +16,12 @@
 
     @include breakpoint.laptop {
         grid-template-rows: 1fr;
-        grid-template-columns: repeat(2, 1fr) 0.5fr 0.25fr 0.5fr 0.25fr;
+        grid-template-columns: repeat(2, 1fr) 0.5fr 0.25fr 0.25fr 0.5fr 0.25fr;
         justify-items: flex-start;
-        gap: 12px;
+        gap: 1ch;
 
         &.player {
-            grid-template-columns: 1fr 0.5fr 0.25fr 0.5fr 0.25fr;
+            grid-template-columns: 1fr 0.5fr 0.25fr 0.25fr 0.5fr 0.25fr;
         }
     }
 
@@ -139,7 +139,7 @@
 
     .current-hp {
         display: flex;
-        gap: 5px;
+        gap: 2px;
         white-space: nowrap;
 
         input {
