@@ -1,6 +1,13 @@
 # 1.4.1
 
-+ Shapes can now be used as HP Tracker Tokens
++ Rework Scene display of HP and AC
+  + AC is not displayed above it's own shape
+  + bot AC and HP Shapes and Text scale with token size
++ Improve update logic for more performance
++ Add Temporary Hitpoint Feature
+  + Adding Temp HP automatically adds HP
+  + losing HP automatically reduces Temp HP
+  + Blue Bar to indicate that someone has temporary hitpoints.
 
 # 1.4.0
 
