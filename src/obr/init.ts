@@ -10,6 +10,7 @@ import { updateHp, updateTextVisibility } from "../helper/hpHelpers.ts";
 import { v4 as uuidv4 } from "uuid";
 import { migrateTo140 } from "../migrations/v140.ts";
 import { updateAc, updateAcVisibility } from "../helper/acHelper.ts";
+import { migrateTo141 } from "../migrations/v141.ts";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -228,6 +229,9 @@ const migrations = async () => {
         }
         if (compare(data.version, "1.4.0", "<")) {
             await migrateTo140();
+        }
+        if (compare(data.version, "1.4.1", "<")) {
+            await migrateTo141();
         }
     }
 };

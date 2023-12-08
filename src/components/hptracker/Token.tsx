@@ -375,9 +375,9 @@ export const Token = (props: TokenProps) => {
                     ref={tempHpRef}
                     onKeyDown={(e) => {
                         if (e.key === "ArrowUp") {
-                            changeTempHp(data.maxHp + 1);
+                            changeTempHp((data.stats.tempHp || 0) + 1);
                         } else if (e.key === "ArrowDown") {
-                            changeTempHp(data.maxHp - 1);
+                            changeTempHp((data.stats.tempHp || 0) - 1);
                         } else if (e.key === "Enter") {
                             const value = Number(e.currentTarget.value.replace(/[^0-9]/g, ""));
                             changeTempHp(value);

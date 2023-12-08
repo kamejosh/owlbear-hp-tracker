@@ -22,11 +22,9 @@ export const getACOffset = async (height: number, width: number) => {
 
 export const getAttachedItems = async (id: string, itemTypes: Array<string>) => {
     const items = await OBR.scene.items.getItemAttachments([id]);
-    // why am I not using .filter() because if I do there is a bug and I can't find it
+    // why am I not using .filter()? because if I do there is a bug and I can't find it
     const attachments: Item[] = [];
     items.forEach((item) => {
-        if (itemTypes.indexOf("TEXT") >= 0) {
-        }
         if (infoMetadata in item.metadata && itemTypes.indexOf(item.type) >= 0) {
             attachments.push(item);
         }
@@ -74,6 +72,7 @@ export const getImageBounds = async (item: Image) => {
 };
 
 export const deleteAttachments = async (attachments: Item[]) => {
+    console.log(attachments);
     if (attachments.length > 0) {
         await OBR.scene.items.deleteItems(attachments.map((attachment) => attachment.id));
     }
