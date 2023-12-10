@@ -173,14 +173,14 @@ const setupContextMenu = async () => {
                 },
             },
         ],
-        onClick: (context) => {
+        onClick: async (context) => {
+            const tokenIds: Array<string> = [];
             const initTokens = async () => {
-                OBR.scene.items.updateItems(context.items, (items) => {
+                await OBR.scene.items.updateItems(context.items, (items) => {
                     items.forEach((item) => {
+                        tokenIds.push(item.id);
                         if (characterMetadata in item.metadata) {
                             const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
-                            updateHp(item, { ...metadata });
-                            updateAc(item, { ...metadata });
                             metadata.hpTrackerActive = !metadata.hpTrackerActive;
                             item.metadata[characterMetadata] = metadata;
                         } else {
@@ -206,7 +206,16 @@ const setupContextMenu = async () => {
                     });
                 });
             };
-            initTokens();
+
+            await initTokens();
+            const tokens = await OBR.scene.items.getItems(tokenIds);
+            tokens.forEach((token) => {
+                if (characterMetadata in token.metadata) {
+                    const metadata = token.metadata[characterMetadata] as HpTrackerMetadata;
+                    updateHp(token, metadata);
+                    updateAc(token, metadata);
+                }
+            });
         },
     });
 };

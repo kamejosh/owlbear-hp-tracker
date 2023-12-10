@@ -72,7 +72,6 @@ export const getImageBounds = async (item: Image) => {
 };
 
 export const deleteAttachments = async (attachments: Item[]) => {
-    console.log(attachments);
     if (attachments.length > 0) {
         await OBR.scene.items.deleteItems(attachments.map((attachment) => attachment.id));
     }
