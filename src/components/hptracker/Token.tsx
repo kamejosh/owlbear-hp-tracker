@@ -215,6 +215,9 @@ export const Token = (props: TokenProps) => {
             updateHp(props.item, newData);
             setData(newData);
             handleValueChange(newData);
+            if (maxHpRef && maxHpRef.current) {
+                maxHpRef.current.value = newData.maxHp.toString();
+            }
             return null;
         }
         return allowNegativNumbers ? hp : Math.max(hp, 0);
