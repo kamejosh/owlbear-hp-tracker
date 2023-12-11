@@ -4,11 +4,18 @@
     top: 2rem;
     right: 2rem;
     gap: 1ch;
+
+    .patreon-button {
+        padding: 2px 3px;
+        width: 11px;
+        height: 15px;
+    }
 }
 
 .change-log-button,
 .help-button,
-.settings-button {
+.settings-button,
+.patreon-button {
     display: flex;
     justify-content: center;
     transition: all ease-in-out 0.25s;
