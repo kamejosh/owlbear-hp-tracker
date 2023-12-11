@@ -18,7 +18,7 @@ import { useCharSheet } from "../../context/CharacterContext.ts";
 import { CharacterSheet } from "./charactersheet/CharacterSheet.tsx";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { DropGroup } from "./DropGroup.tsx";
-import { sortItems } from "../../helper/helpers.ts";
+import { plausibleEvent, sortItems } from "../../helper/helpers.ts";
 import { compare } from "compare-versions";
 
 export const HPTracker = () => {
@@ -189,7 +189,14 @@ const Content = () => {
         ) : (
             <div className={"hp-tracker"}>
                 <div className={"help-buttons"}>
-                    <a href={"https://www.patreon.com/TTRPGAPI"} className={"patreon-button"} target={"_blank"}>
+                    <a
+                        href={"https://www.patreon.com/TTRPGAPI"}
+                        className={"patreon-button"}
+                        target={"_blank"}
+                        onClick={() => {
+                            plausibleEvent("patreon-click");
+                        }}
+                    >
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 436 476">
                             <path
                                 data-fill="1"
