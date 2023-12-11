@@ -1,46 +1,64 @@
-import OBR, { Item, Metadata } from "@owlbear-rodeo/sdk";
+import OBR, { Metadata } from "@owlbear-rodeo/sdk";
 import { ID, characterMetadata, sceneMetadata, version } from "../helper/variables.ts";
 import { migrate102To103 } from "../migrations/v103.ts";
 import { migrate105To106 } from "../migrations/v106.ts";
 import { compare } from "compare-versions";
-import { HpTrackerMetadata, SceneMetadata } from "../helper/types.ts";
+import { ACItemChanges, BarItemChanges, HpTrackerMetadata, SceneMetadata, TextItemChanges } from "../helper/types.ts";
 import { migrate111To112 } from "../migrations/v112.ts";
 import { migrate112To113 } from "../migrations/v113.ts";
-import { updateHp, updateTextVisibility } from "../helper/hpHelpers.ts";
+import {
+    saveOrChangeBar,
+    saveOrChangeText,
+    updateBarChanges,
+    updateHp,
+    updateTextChanges,
+    updateTextVisibility,
+} from "../helper/hpHelpers.ts";
 import { v4 as uuidv4 } from "uuid";
 import { migrateTo140 } from "../migrations/v140.ts";
-import { updateAc, updateAcVisibility } from "../helper/acHelper.ts";
+import { saveOrChangeAC, updateAc, updateAcChanges, updateAcVisibility } from "../helper/acHelper.ts";
 import { migrateTo141 } from "../migrations/v141.ts";
+import { attachmentFilter, getAttachedItems } from "../helper/helpers.ts";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
  * This ensures that further handling can be done properly
  */
 const initItems = async () => {
-    const addMetaData = (items: Item[]) => {
-        items.forEach((item) => {
-            if (!(characterMetadata in item.metadata)) {
-                // initializing a variable gives us type safety
-                const initialMetadata: HpTrackerMetadata = {
-                    name: item.name,
-                    hp: 0,
-                    maxHp: 0,
-                    armorClass: 0,
-                    hpTrackerActive: false,
-                    canPlayersSee: false,
-                    hpOnMap: false,
-                    acOnMap: false,
-                    hpBar: false,
-                    initiative: 0,
-                    stats: { initiativeBonus: 0 },
-                    sheet: "",
-                };
-                item.metadata[characterMetadata] = initialMetadata;
-            }
-        });
-    };
+    const tokens = await OBR.scene.items.getItems(
+        (item) =>
+            characterMetadata in item.metadata &&
+            (item.metadata[characterMetadata] as HpTrackerMetadata).hpTrackerActive
+    );
 
-    await OBR.scene.items.updateItems((item) => item.layer === "CHARACTER" || item.layer === "MOUNT", addMetaData);
+    const barChanges = new Map<string, BarItemChanges>();
+    const textChanges = new Map<string, TextItemChanges>();
+    const acChanges = new Map<string, ACItemChanges>();
+
+    for (const token of tokens) {
+        const data = token.metadata[characterMetadata] as HpTrackerMetadata;
+        const barAttachments = (await getAttachedItems(token.id, ["SHAPE"])).filter((a) => attachmentFilter(a, "BAR"));
+        const textAttachments = (await getAttachedItems(token.id, ["TEXT"])).filter((a) => attachmentFilter(a, "HP"));
+        const acAttachments = (await getAttachedItems(token.id, ["CURVE"])).filter((a) => attachmentFilter(a, "AC"));
+
+        if (data.hpBar) {
+            await saveOrChangeBar(token, data, barAttachments, barChanges);
+        }
+        if (data.hpOnMap) {
+            await saveOrChangeText(token, data, textAttachments, textChanges);
+        }
+        await saveOrChangeAC(
+            token,
+            data,
+            acAttachments,
+            acChanges,
+            token.visible && data.canPlayersSee && data.acOnMap
+        );
+    }
+
+    await updateAcChanges(acChanges);
+    await updateBarChanges(barChanges);
+    await updateTextChanges(textChanges);
 };
 
 const initScene = async () => {
@@ -260,7 +278,6 @@ const initTokens = async () => {
                 (item.metadata[characterMetadata] as HpTrackerMetadata).hpTrackerActive
             );
         });
-
         await updateTextVisibility(tokens);
         await updateAcVisibility(tokens);
     });

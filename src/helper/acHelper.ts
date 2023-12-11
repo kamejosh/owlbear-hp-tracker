@@ -1,5 +1,5 @@
 import OBR, { buildCurve, buildText, Curve, Image, isCurve, isText, Item, Text } from "@owlbear-rodeo/sdk";
-import { ACItemChanges, HpTrackerMetadata, TextItemChanges } from "./types.ts";
+import { ACItemChanges, HpTrackerMetadata } from "./types.ts";
 import { attachmentFilter, deleteAttachments, getACOffset, getAttachedItems, getImageBounds } from "./helpers.ts";
 import { characterMetadata, infoMetadata } from "./variables.ts";
 
@@ -99,14 +99,14 @@ export const updateAc = async (token: Item, data: HpTrackerMetadata) => {
         const characters = await OBR.scene.items.getItems([token.id]);
         if (characters.length > 0) {
             const character = characters[0];
-            const changes = new Map<string, TextItemChanges>();
+            const changes = new Map<string, ACItemChanges>();
             await saveOrChangeAC(character, data, acAttachment, changes, visible);
             await updateAcChanges(changes);
         }
     }
 };
 
-const updateAcChanges = async (changes: Map<string, ACItemChanges>) => {
+export const updateAcChanges = async (changes: Map<string, ACItemChanges>) => {
     if (changes.size > 0) {
         await OBR.scene.items.updateItems(
             (item): item is Curve => isCurve(item) && changes.has(item.id),
@@ -142,7 +142,7 @@ const updateAcChanges = async (changes: Map<string, ACItemChanges>) => {
     }
 };
 
-const saveOrChangeAC = async (
+export const saveOrChangeAC = async (
     character: Item,
     data: HpTrackerMetadata,
     attachments: Item[],
@@ -189,5 +189,5 @@ export const updateAcVisibility = async (tokens: Array<Item>) => {
             }
         });
     }
-    updateAcChanges(acChanges);
+    await updateAcChanges(acChanges);
 };

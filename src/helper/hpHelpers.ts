@@ -199,7 +199,7 @@ export const updateHp = async (token: Item, data: HpTrackerMetadata) => {
     }
 };
 
-const updateBarChanges = async (changes: Map<string, BarItemChanges>) => {
+export const updateBarChanges = async (changes: Map<string, BarItemChanges>) => {
     if (changes.size > 0) {
         await OBR.scene.items.updateItems(
             (item): item is Shape => isShape(item) && changes.has(item.id),
@@ -228,7 +228,7 @@ const updateBarChanges = async (changes: Map<string, BarItemChanges>) => {
     }
 };
 
-const updateTextChanges = async (changes: Map<string, TextItemChanges>) => {
+export const updateTextChanges = async (changes: Map<string, TextItemChanges>) => {
     if (changes.size > 0) {
         await OBR.scene.items.updateItems(
             (item): item is Text => isText(item) && changes.has(item.id),
@@ -254,7 +254,7 @@ const updateTextChanges = async (changes: Map<string, TextItemChanges>) => {
     }
 };
 
-const saveOrChangeBar = async (
+export const saveOrChangeBar = async (
     character: Item,
     data: HpTrackerMetadata,
     attachments: Item[],
@@ -274,7 +274,7 @@ const saveOrChangeBar = async (
     }
 };
 
-const saveOrChangeText = async (
+export const saveOrChangeText = async (
     character: Item,
     data: HpTrackerMetadata,
     attachments: Array<Item>,
@@ -360,5 +360,5 @@ export const updateTextVisibility = async (tokens: Array<Item>) => {
             }
         });
     }
-    updateTextChanges(textChanges);
+    await updateTextChanges(textChanges);
 };

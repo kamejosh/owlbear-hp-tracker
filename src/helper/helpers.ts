@@ -5,7 +5,7 @@ import { AttachmentMetadata, HpTrackerMetadata, SceneMetadata } from "./types.ts
 export const getYOffset = async (height: number) => {
     const metadata = (await OBR.scene.getMetadata()) as Metadata;
     const sceneData = metadata[sceneMetadata] as SceneMetadata;
-    let offset = sceneData.hpBarOffset ?? 0;
+    let offset = sceneData ? sceneData.hpBarOffset ?? 0 : 0;
     const offsetFactor = height / 150;
     offset *= offsetFactor;
     return offset;
@@ -14,7 +14,7 @@ export const getYOffset = async (height: number) => {
 export const getACOffset = async (height: number, width: number) => {
     const metadata = (await OBR.scene.getMetadata()) as Metadata;
     const sceneData = metadata[sceneMetadata] as SceneMetadata;
-    let offset = sceneData.acOffset ?? { x: 0, y: 0 };
+    let offset = sceneData ? sceneData.acOffset ?? { x: 0, y: 0 } : { x: 0, y: 0 };
     offset.x = offset.x * (width / 150);
     offset.y = offset.y * (height / 150);
     return offset;

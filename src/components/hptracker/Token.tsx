@@ -54,8 +54,6 @@ export const Token = (props: TokenProps) => {
         };
         if (isReady) {
             initMetadataValues();
-            updateHp(props.item, data);
-            updateAc(props.item, data);
         }
     }, [isReady]);
 
