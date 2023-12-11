@@ -59,6 +59,7 @@ const initItems = async () => {
     await updateAcChanges(acChanges);
     await updateBarChanges(barChanges);
     await updateTextChanges(textChanges);
+    console.log("HP Tracker - Token initialization done");
 };
 
 const initScene = async () => {

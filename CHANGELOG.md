@@ -1,8 +1,10 @@
 # 1.4.1
 
++ Consider supporting me on [Patreon](https://patreon.com/TTRPGAPI?utm_medium=clipboard_copy&utm_source=copyLink&utm_campaign=creatorshare_creator&utm_content=join_link) so I can spend more time improving HP Tracker.
 + Rework Scene display of HP and AC
   + AC is not displayed above it's own shape
   + bot AC and HP Shapes and Text scale with token size
+  + *If There are problems when loading the scene try to reload or toggle settings for items that are no properly displayed*
 + Improve update logic for more performance
 + Add Temporary Hitpoint Feature
   + Adding Temp HP automatically adds HP
