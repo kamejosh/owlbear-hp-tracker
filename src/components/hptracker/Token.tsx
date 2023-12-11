@@ -93,8 +93,12 @@ export const Token = (props: TokenProps) => {
     const changeMaxHp = (newMax: number) => {
         const newData = { ...data };
         newData.maxHp = Math.max(newMax, 0);
-        if (newData.maxHp < newData.hp) {
-            newData.hp = newData.maxHp;
+        let maxHp = newData.maxHp;
+        if (newData.stats.tempHp) {
+            maxHp += newData.stats.tempHp;
+        }
+        if (maxHp < newData.hp) {
+            newData.hp = maxHp;
         }
         updateHp(props.item, newData);
         setData(newData);
