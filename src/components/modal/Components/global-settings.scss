@@ -19,9 +19,28 @@
         display: grid;
         grid-template-columns: 4fr 1fr;
         justify-content: flex-start;
+        gap: 1ch;
         border-bottom: 1px solid white;
         padding-bottom: 10px;
         text-align: left;
+
+        &.ac {
+            display: flex;
+            flex-direction: column;
+
+            h4 {
+                margin: 0;
+                font-size: 1.1rem;
+            }
+
+            .ac-position {
+                display: flex;
+                gap: 2px;
+            }
+            .ac-shield {
+                border-bottom: none;
+            }
+        }
     }
 
     .ruleset {

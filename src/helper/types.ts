@@ -12,6 +12,7 @@ export type HpTrackerMetadata = {
     sheet: string;
     stats: {
         initiativeBonus: number;
+        tempHp?: number;
     };
     ruleset?: Ruleset;
     index?: number;
@@ -24,9 +25,16 @@ export type SceneMetadata = {
     allowNegativeNumbers?: boolean;
     hpBarSegments?: number;
     hpBarOffset?: number;
+    acOffset?: { x: number; y: number };
+    acShield?: boolean;
     ruleset?: Ruleset;
     groups?: Array<string>;
     openChangeLog?: boolean;
+};
+
+export type AttachmentMetadata = {
+    attachmentType: "BAR" | "AC" | "HP";
+    isHpText: boolean;
 };
 
 export type TextItemChanges = {
@@ -35,10 +43,16 @@ export type TextItemChanges = {
     position?: { x: number; y: number };
 };
 
-export type ShapeItemChanges = {
+export type BarItemChanges = {
     color?: string;
     width?: number;
     visible?: boolean;
+    position?: { x: number; y: number };
+};
+
+export type ACItemChanges = {
+    visible?: boolean;
+    text?: string;
     position?: { x: number; y: number };
 };
 

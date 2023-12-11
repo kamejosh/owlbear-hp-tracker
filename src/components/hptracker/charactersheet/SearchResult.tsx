@@ -37,7 +37,16 @@ export const SearchResult5e = ({ search }: { search: string }) => {
                     <li
                         className={"search-result"}
                         key={entry.slug}
-                        onClick={() => setSheet(entry.slug, Math.floor((entry.stats.dexterity - 10) / 2))}
+                        onClick={() =>
+                            setSheet(
+                                entry.slug,
+                                entry.perception
+                                    ? entry.perception
+                                    : entry.skills?.perception
+                                    ? entry.skills.perception
+                                    : 0
+                            )
+                        }
                     >
                         <span>
                             {entry.name}

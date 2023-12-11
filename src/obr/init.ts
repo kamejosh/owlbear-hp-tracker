@@ -1,46 +1,65 @@
-import OBR, { Item, Text, Metadata } from "@owlbear-rodeo/sdk";
+import OBR, { Metadata } from "@owlbear-rodeo/sdk";
 import { ID, characterMetadata, sceneMetadata, version } from "../helper/variables.ts";
 import { migrate102To103 } from "../migrations/v103.ts";
 import { migrate105To106 } from "../migrations/v106.ts";
 import { compare } from "compare-versions";
-import { HpTrackerMetadata, SceneMetadata, TextItemChanges } from "../helper/types.ts";
+import { ACItemChanges, BarItemChanges, HpTrackerMetadata, SceneMetadata, TextItemChanges } from "../helper/types.ts";
 import { migrate111To112 } from "../migrations/v112.ts";
 import { migrate112To113 } from "../migrations/v113.ts";
-import { updateHpBar } from "../helper/shapeHelpers.ts";
-import { handleTextVisibility, updateText, updateTextChanges } from "../helper/textHelpers.ts";
-import { getAttachedItems } from "../helper/helpers.ts";
+import {
+    saveOrChangeBar,
+    saveOrChangeText,
+    updateBarChanges,
+    updateHp,
+    updateTextChanges,
+    updateTextVisibility,
+} from "../helper/hpHelpers.ts";
 import { v4 as uuidv4 } from "uuid";
 import { migrateTo140 } from "../migrations/v140.ts";
+import { saveOrChangeAC, updateAc, updateAcChanges, updateAcVisibility } from "../helper/acHelper.ts";
+import { migrateTo141 } from "../migrations/v141.ts";
+import { attachmentFilter, getAttachedItems } from "../helper/helpers.ts";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
  * This ensures that further handling can be done properly
  */
 const initItems = async () => {
-    const addMetaData = (items: Item[]) => {
-        items.forEach((item) => {
-            if (!(characterMetadata in item.metadata)) {
-                // initializing a variable gives us type safety
-                const initialMetadata: HpTrackerMetadata = {
-                    name: item.name,
-                    hp: 0,
-                    maxHp: 0,
-                    armorClass: 0,
-                    hpTrackerActive: false,
-                    canPlayersSee: false,
-                    hpOnMap: false,
-                    acOnMap: false,
-                    hpBar: false,
-                    initiative: 0,
-                    stats: { initiativeBonus: 0 },
-                    sheet: "",
-                };
-                item.metadata[characterMetadata] = initialMetadata;
-            }
-        });
-    };
+    const tokens = await OBR.scene.items.getItems(
+        (item) =>
+            characterMetadata in item.metadata &&
+            (item.metadata[characterMetadata] as HpTrackerMetadata).hpTrackerActive
+    );
 
-    await OBR.scene.items.updateItems((item) => item.layer === "CHARACTER" || item.layer === "MOUNT", addMetaData);
+    const barChanges = new Map<string, BarItemChanges>();
+    const textChanges = new Map<string, TextItemChanges>();
+    const acChanges = new Map<string, ACItemChanges>();
+
+    for (const token of tokens) {
+        const data = token.metadata[characterMetadata] as HpTrackerMetadata;
+        const barAttachments = (await getAttachedItems(token.id, ["SHAPE"])).filter((a) => attachmentFilter(a, "BAR"));
+        const textAttachments = (await getAttachedItems(token.id, ["TEXT"])).filter((a) => attachmentFilter(a, "HP"));
+        const acAttachments = (await getAttachedItems(token.id, ["CURVE"])).filter((a) => attachmentFilter(a, "AC"));
+
+        if (data.hpBar) {
+            await saveOrChangeBar(token, data, barAttachments, barChanges);
+        }
+        if (data.hpOnMap) {
+            await saveOrChangeText(token, data, textAttachments, textChanges);
+        }
+        await saveOrChangeAC(
+            token,
+            data,
+            acAttachments,
+            acChanges,
+            token.visible && data.canPlayersSee && data.acOnMap
+        );
+    }
+
+    await updateAcChanges(acChanges);
+    await updateBarChanges(barChanges);
+    await updateTextChanges(textChanges);
+    console.log("HP Tracker - Token initialization done");
 };
 
 const initScene = async () => {
@@ -51,6 +70,8 @@ const initScene = async () => {
             version: version,
             hpBarSegments: 0,
             hpBarOffset: 0,
+            acOffset: { x: 0, y: 0 },
+            acShield: true,
             allowNegativNumbers: false,
             id: uuidv4(),
             groups: ["Default"],
@@ -85,6 +106,12 @@ const initScene = async () => {
         // @ts-ignore some beta version startet with using pf2e
         if (sceneData.ruleset === "pf2e") {
             sceneData.ruleset = "pf";
+        }
+        if (!sceneData.acOffset) {
+            sceneData.acOffset = { x: 0, y: 0 };
+        }
+        if (!sceneData.acShield) {
+            sceneData.acShield = true;
         }
         ownMetadata[sceneMetadata] = sceneData;
     }
@@ -142,7 +169,10 @@ const setupContextMenu = async () => {
                 icon: "/icon.svg",
                 label: "Activate HP Tracker",
                 filter: {
-                    every: [{ key: "type", value: "IMAGE" }],
+                    every: [
+                        { key: "type", value: "IMAGE", coordinator: "||" },
+                        { key: "type", value: "SHAPE" },
+                    ],
                     some: [
                         { key: ["metadata", `${characterMetadata}`], value: undefined, coordinator: "||" },
                         {
@@ -162,19 +192,14 @@ const setupContextMenu = async () => {
                 },
             },
         ],
-        onClick: (context) => {
+        onClick: async (context) => {
+            const tokenIds: Array<string> = [];
             const initTokens = async () => {
-                OBR.scene.items.updateItems(context.items, (items) => {
+                await OBR.scene.items.updateItems(context.items, (items) => {
                     items.forEach((item) => {
+                        tokenIds.push(item.id);
                         if (characterMetadata in item.metadata) {
                             const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
-                            updateText(
-                                (metadata.hpOnMap || metadata.acOnMap) && !metadata.hpTrackerActive,
-                                metadata.canPlayersSee && item.visible,
-                                item.id,
-                                { ...metadata }
-                            );
-                            updateHpBar(metadata.hpBar && !metadata.hpTrackerActive, item.id, { ...metadata });
                             metadata.hpTrackerActive = !metadata.hpTrackerActive;
                             item.metadata[characterMetadata] = metadata;
                         } else {
@@ -200,7 +225,16 @@ const setupContextMenu = async () => {
                     });
                 });
             };
-            initTokens();
+
+            await initTokens();
+            const tokens = await OBR.scene.items.getItems(tokenIds);
+            tokens.forEach((token) => {
+                if (characterMetadata in token.metadata) {
+                    const metadata = token.metadata[characterMetadata] as HpTrackerMetadata;
+                    updateHp(token, metadata);
+                    updateAc(token, metadata);
+                }
+            });
         },
     });
 };
@@ -224,6 +258,9 @@ const migrations = async () => {
         if (compare(data.version, "1.4.0", "<")) {
             await migrateTo140();
         }
+        if (compare(data.version, "1.4.1", "<")) {
+            await migrateTo141();
+        }
     }
 };
 
@@ -233,16 +270,17 @@ const sceneReady = async () => {
     await initScene();
 };
 
-const registerEvents = () => {
+const initTokens = async () => {
     // Triggers everytime any item is changed
     OBR.scene.items.onChange(async (items) => {
-        const changeMap = new Map<string, TextItemChanges>();
-        const tokens = items.filter((item) => characterMetadata in item.metadata);
-        for (const token of tokens) {
-            const texts = await getAttachedItems(token.id, "TEXT");
-            await handleTextVisibility(token, texts as Array<Text>, changeMap);
-        }
-        await updateTextChanges(changeMap);
+        const tokens = items.filter((item) => {
+            return (
+                characterMetadata in item.metadata &&
+                (item.metadata[characterMetadata] as HpTrackerMetadata).hpTrackerActive
+            );
+        });
+        await updateTextVisibility(tokens);
+        await updateAcVisibility(tokens);
     });
 };
 
@@ -260,5 +298,5 @@ OBR.onReady(async () => {
         await sceneReady();
     }
 
-    registerEvents();
+    await initTokens();
 });

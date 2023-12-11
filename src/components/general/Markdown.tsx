@@ -14,6 +14,7 @@ export const Markdown = ({ text }: { text: string }) => {
                 h5: ({ node, ...props }) => <h5 id={generateSlug(props.children[0] as string)} {...props}></h5>,
             }}
             children={text}
+            linkTarget={"_blank"}
         />
     );
 };

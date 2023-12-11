@@ -1,22 +1,31 @@
 import OBR, { Image, Item, Metadata } from "@owlbear-rodeo/sdk";
 import { characterMetadata, infoMetadata, sceneMetadata } from "./variables.ts";
-import { HpTrackerMetadata, SceneMetadata } from "./types.ts";
+import { AttachmentMetadata, HpTrackerMetadata, SceneMetadata } from "./types.ts";
 
 export const getYOffset = async (height: number) => {
     const metadata = (await OBR.scene.getMetadata()) as Metadata;
     const sceneData = metadata[sceneMetadata] as SceneMetadata;
-    let offset = sceneData.hpBarOffset ?? 0;
+    let offset = sceneData ? sceneData.hpBarOffset ?? 0 : 0;
     const offsetFactor = height / 150;
     offset *= offsetFactor;
     return offset;
 };
 
-export const getAttachedItems = async (id: string, itemType: string) => {
+export const getACOffset = async (height: number, width: number) => {
+    const metadata = (await OBR.scene.getMetadata()) as Metadata;
+    const sceneData = metadata[sceneMetadata] as SceneMetadata;
+    let offset = sceneData ? sceneData.acOffset ?? { x: 0, y: 0 } : { x: 0, y: 0 };
+    offset.x = offset.x * (width / 150);
+    offset.y = offset.y * (height / 150);
+    return offset;
+};
+
+export const getAttachedItems = async (id: string, itemTypes: Array<string>) => {
     const items = await OBR.scene.items.getItemAttachments([id]);
-    // why am I not using .filter() because if I do there is a bug and I can't find it
+    // why am I not using .filter()? because if I do there is a bug and I can't find it
     const attachments: Item[] = [];
     items.forEach((item) => {
-        if (infoMetadata in item.metadata && itemType === item.type) {
+        if (infoMetadata in item.metadata && itemTypes.indexOf(item.type) >= 0) {
             attachments.push(item);
         }
     });
@@ -27,16 +36,20 @@ export const getAttachedItems = async (id: string, itemType: string) => {
 export const calculatePercentage = async (data: HpTrackerMetadata) => {
     const metadata = (await OBR.scene.getMetadata()) as Metadata;
     const sceneData = metadata[sceneMetadata] as SceneMetadata;
-    const segments = sceneData.hpBarSegments ?? 0;
+    const segments = sceneData ? sceneData.hpBarSegments ?? 0 : 0;
 
-    const percentage = data.maxHp === 0 || data.hp === 0 || data.hp < 0 ? 0 : data.hp / data.maxHp;
+    const tempHp = data.stats.tempHp ?? 0;
+
+    const percentage = data.maxHp === 0 || data.hp === 0 || data.hp < 0 ? 0 : (data.hp - tempHp) / data.maxHp;
+    const tempPercentage = data.maxHp === 0 || tempHp === 0 ? 0 : tempHp / data.maxHp;
 
     if (segments === 0) {
-        return percentage;
+        return { hpPercentage: percentage, tempHpPercentage: tempPercentage };
     } else {
         const minStep = 100 / segments;
-        const numSteps = Math.ceil((percentage * 100) / minStep);
-        return (numSteps * minStep) / 100;
+        const numStepsHp = Math.ceil((percentage * 100) / minStep);
+        const numStepsTempHp = Math.ceil((tempPercentage * 100) / minStep);
+        return { hpPercentage: (numStepsHp * minStep) / 100, tempHpPercentage: (numStepsTempHp * minStep) / 100 };
     }
 };
 
@@ -102,6 +115,14 @@ export const getDamage = (text: string) => {
     const dice = regex.exec(text);
 
     return dice && dice.length > 0 ? dice[0] : null;
+};
+
+export const attachmentFilter = (attachment: Item, attachmentType: "BAR" | "HP" | "AC") => {
+    if (infoMetadata in attachment.metadata) {
+        const metadata = attachment.metadata[infoMetadata] as AttachmentMetadata;
+        return metadata.isHpText && metadata.attachmentType === attachmentType;
+    }
+    return false;
 };
 
 export const plausibleEvent = (event: string, props: string | undefined = undefined) => {

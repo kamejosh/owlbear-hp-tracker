@@ -1,14 +1,15 @@
 import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
+
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import { useEffect, useRef, useState } from "react";
 import OBR, { Item, Metadata } from "@owlbear-rodeo/sdk";
 import { characterMetadata, sceneMetadata } from "../../helper/variables.ts";
 import { useCharSheet } from "../../context/CharacterContext.ts";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
-import { updateText } from "../../helper/textHelpers.ts";
-import { updateHpBar } from "../../helper/shapeHelpers.ts";
+import { updateHp } from "../../helper/hpHelpers.ts";
 import { evalString } from "../../helper/helpers.ts";
 import "./player-wrapper.scss";
+import { updateAc } from "../../helper/acHelper.ts";
 
 type TokenProps = {
     item: Item;
@@ -20,13 +21,14 @@ type TokenProps = {
 
 export const Token = (props: TokenProps) => {
     const playerContext = usePlayerContext();
-    // const { ruleset } = useFilter();
     const [data, setData] = useState<HpTrackerMetadata>(props.data);
     const [editName, setEditName] = useState<boolean>(false);
     const [allowNegativNumbers, setAllowNegativeNumbers] = useState<boolean | undefined>(undefined);
     const { isReady } = SceneReadyContext();
     const { setId } = useCharSheet();
     const hpRef = useRef<HTMLInputElement>(null);
+    const maxHpRef = useRef<HTMLInputElement>(null);
+    const tempHpRef = useRef<HTMLInputElement>(null);
 
     const handleMetadata = (metadata: Metadata) => {
         if (metadata && sceneMetadata in metadata) {
@@ -52,8 +54,6 @@ export const Token = (props: TokenProps) => {
         };
         if (isReady) {
             initMetadataValues();
-            updateHpBar(data.hpBar, props.item.id, data);
-            updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee && props.item.visible, props.item.id, data);
         }
     }, [isReady]);
 
@@ -65,90 +65,87 @@ export const Token = (props: TokenProps) => {
         // could be undefined so we check for boolean
         if (allowNegativNumbers === false) {
             if (data.hp < 0) {
-                handleValueChange(0, "hp");
+                changeHp(0);
             }
             if (data.armorClass < 0) {
-                handleValueChange(0, "armorClass");
+                changeArmorClass(0);
             }
         }
     }, [allowNegativNumbers]);
 
-    const handleValueChange = (value: string | number | boolean, key: string, updateHp: boolean = false) => {
-        OBR.scene.items.updateItems([props.item.id], (items) => {
+    const changeHp = (newHp: number) => {
+        const newData = { ...data };
+        if (newHp < data.hp && data.stats.tempHp && data.stats.tempHp > 0) {
+            newData.stats.tempHp = Math.max(data.stats.tempHp - (data.hp - newHp), 0);
+            if (tempHpRef && tempHpRef.current) {
+                tempHpRef.current.value = newData.stats.tempHp.toString();
+            }
+        }
+        newData.hp = allowNegativNumbers ? newHp : Math.max(newHp, 0);
+        updateHp(props.item, newData);
+        setData(newData);
+        handleValueChange(newData);
+        if (hpRef && hpRef.current) {
+            hpRef.current.value = newData.hp.toString();
+        }
+    };
+
+    const changeMaxHp = (newMax: number) => {
+        const newData = { ...data };
+        newData.maxHp = Math.max(newMax, 0);
+        let maxHp = newData.maxHp;
+        if (newData.stats.tempHp) {
+            maxHp += newData.stats.tempHp;
+        }
+        if (maxHp < newData.hp) {
+            newData.hp = maxHp;
+        }
+        updateHp(props.item, newData);
+        setData(newData);
+        handleValueChange(newData);
+        if (maxHpRef && maxHpRef.current) {
+            maxHpRef.current.value = newMax.toString();
+        }
+    };
+
+    const changeArmorClass = (newAc: number) => {
+        if (!allowNegativNumbers) {
+            newAc = Math.max(newAc, 0);
+        }
+        const newData = { ...data, armorClass: newAc };
+        updateAc(props.item, newData);
+        setData(newData);
+        handleValueChange(newData);
+    };
+
+    const changeTempHp = (newTempHp: number) => {
+        // temporary hitpoints can't be negative
+        newTempHp = Math.max(newTempHp, 0);
+        const newData = { ...data, stats: { ...data.stats, tempHp: newTempHp } };
+        if (newTempHp > 0) {
+            if (!data.stats.tempHp) {
+                newData.hp += newTempHp;
+            } else {
+                newData.hp += newTempHp - data.stats.tempHp;
+            }
+        }
+        newData.hp = Math.min(newData.hp, newData.maxHp + newData.stats.tempHp);
+        updateHp(props.item, newData);
+        setData(newData);
+        handleValueChange(newData);
+        if (hpRef && hpRef.current) {
+            hpRef.current.value = newData.hp.toString();
+        }
+        if (tempHpRef && tempHpRef.current) {
+            tempHpRef.current.value = newData.stats.tempHp.toString();
+        }
+    };
+
+    const handleValueChange = (newData: HpTrackerMetadata) => {
+        OBR.scene.items.updateItems([props.item], (items) => {
             items.forEach((item) => {
-                const currentData: HpTrackerMetadata = item.metadata[characterMetadata] as HpTrackerMetadata;
-                if (key === "name") {
-                    currentData.name = String(value);
-                    setData({ ...data, name: currentData.name });
-                } else if (key === "players") {
-                    currentData.canPlayersSee = !!value;
-                    updateText(data.hpOnMap || data.acOnMap, !!value && props.item.visible, props.item.id, {
-                        ...data,
-                        canPlayersSee: !!value,
-                    });
-                    setData({ ...data, canPlayersSee: currentData.canPlayersSee });
-                } else if (key === "acOnMap") {
-                    currentData.acOnMap = !!value;
-                    updateText(data.hpOnMap || !!value, data.canPlayersSee && props.item.visible, props.item.id, {
-                        ...data,
-                        acOnMap: !!value,
-                    });
-                    setData({ ...data, acOnMap: currentData.acOnMap });
-                } else if (key === "hpOnMap") {
-                    currentData.hpOnMap = !!value;
-                    updateText(!!value || data.acOnMap, data.canPlayersSee && props.item.visible, props.item.id, {
-                        ...data,
-                        hpOnMap: !!value,
-                    });
-                    setData({ ...data, hpOnMap: currentData.hpOnMap });
-                } else if (key === "hpBar") {
-                    currentData.hpBar = !!value;
-                    updateHpBar(!!value, props.item.id, data);
-                    setData({ ...data, hpBar: currentData.hpBar });
-                } else if (key === "armorClass") {
-                    currentData.armorClass = allowNegativNumbers ? Number(value) : Math.max(Number(value), 0);
-                    updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee && props.item.visible, props.item.id, {
-                        ...data,
-                        armorClass: currentData.armorClass,
-                    });
-                    setData({ ...data, armorClass: currentData.armorClass });
-                } else if (key === "maxHP") {
-                    currentData.maxHp = Math.max(Number(value), 0);
-                    if (updateHp && currentData.maxHp < currentData.hp) {
-                        currentData.hp = currentData.maxHp;
-                        setData({ ...data, hp: currentData.hp });
-                    }
-                    updateHpBar(data.hpBar, props.item.id, { ...data, hp: currentData.hp, maxHp: currentData.maxHp });
-                    updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee && props.item.visible, props.item.id, {
-                        ...data,
-                        maxHp: currentData.maxHp,
-                        hp: currentData.hp,
-                    });
-                    setData({ ...data, maxHp: currentData.maxHp });
-                } else if (key === "hp") {
-                    currentData.hp = allowNegativNumbers ? Number(value) : Math.max(Number(value), 0);
-                    updateHpBar(data.hpBar, props.item.id, { ...data, hp: currentData.hp });
-                    updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee && props.item.visible, props.item.id, {
-                        ...data,
-                        hp: currentData.hp,
-                    });
-                    setData({ ...data, hp: currentData.hp });
-                } else if (key === "initiative") {
-                    currentData.initiative = Number(value);
-                    setData({ ...data, initiative: currentData.initiative });
-                } else if (key === "hpMaxHp") {
-                    currentData.maxHp = Math.max(Number(value), 0);
-                    currentData.hp = Number(value);
-                    updateHpBar(data.hpBar, props.item.id, { ...data, hp: currentData.hp, maxHp: currentData.maxHp });
-                    updateText(data.hpOnMap || data.acOnMap, data.canPlayersSee && props.item.visible, props.item.id, {
-                        ...data,
-                        maxHp: currentData.maxHp,
-                        hp: currentData.hp,
-                    });
-                    setData({ ...data, hp: currentData.hp, maxHp: currentData.maxHp });
-                }
                 // just assigning currentData did not trigger onChange event. Spreading helps
-                item.metadata[characterMetadata] = { ...currentData };
+                item.metadata[characterMetadata] = { ...newData };
             });
         });
     };
@@ -193,7 +190,7 @@ export const Token = (props: TokenProps) => {
             return "#1C1B22";
         }
 
-        const percent = props.data.hp / props.data.maxHp;
+        const percent = props.data.hp / (data.stats.tempHp ? data.stats.tempHp + data.maxHp : data.maxHp);
 
         const g = 255 * percent;
         const r = 255 - 255 * percent;
@@ -213,10 +210,16 @@ export const Token = (props: TokenProps) => {
         }
         let hp: number;
         if (data.maxHp > 0) {
-            hp = Math.min(Number(value * factor), data.maxHp);
+            hp = Math.min(Number(value * factor), data.stats.tempHp ? data.maxHp + data.stats.tempHp : data.maxHp);
         } else {
             hp = Number(value * factor);
-            handleValueChange(hp, "hpMaxHp");
+            const newData = { ...data, hp: hp, maxHp: Math.max(value, 0) };
+            updateHp(props.item, newData);
+            setData(newData);
+            handleValueChange(newData);
+            if (maxHpRef && maxHpRef.current) {
+                maxHpRef.current.value = newData.maxHp.toString();
+            }
             return null;
         }
         return allowNegativNumbers ? hp : Math.max(hp, 0);
@@ -237,7 +240,9 @@ export const Token = (props: TokenProps) => {
                             type={"text"}
                             value={data.name}
                             onChange={(e) => {
-                                handleValueChange(e.target.value, "name");
+                                const newData = { ...data, name: e.target.value };
+                                setData(newData);
+                                handleValueChange(newData);
                             }}
                         />
                     ) : (
@@ -267,28 +272,41 @@ export const Token = (props: TokenProps) => {
                         title={"Toggle HP Bar visibility for GM and Players"}
                         className={`toggle-button hp ${data.hpBar ? "on" : "off"}`}
                         onClick={() => {
-                            handleValueChange(!data.hpBar, "hpBar");
+                            const newData = { ...data, hpBar: !data.hpBar };
+                            setData(newData);
+                            handleValueChange(newData);
+                            updateHp(props.item, newData);
                         }}
                     />
                     <button
                         title={"Toggle HP displayed on Map"}
                         className={`toggle-button map ${data.hpOnMap ? "on" : "off"}`}
                         onClick={() => {
-                            handleValueChange(!data.hpOnMap, "hpOnMap");
+                            const newData = { ...data, hpOnMap: !data.hpOnMap };
+                            setData(newData);
+                            handleValueChange(newData);
+                            updateHp(props.item, newData);
                         }}
                     />
                     <button
                         title={"Toggle AC displayed on Map"}
                         className={`toggle-button ac ${data.acOnMap ? "on" : "off"}`}
-                        onClick={() => {
-                            handleValueChange(!data.acOnMap, "acOnMap");
+                        onClick={async () => {
+                            const newData = { ...data, acOnMap: !data.acOnMap };
+                            setData(newData);
+                            handleValueChange(newData);
+                            updateAc(props.item, newData);
                         }}
                     />
                     <button
                         title={"Toggle HP/AC visibility for players"}
                         className={`toggle-button players ${data.canPlayersSee ? "on" : "off"}`}
                         onClick={() => {
-                            handleValueChange(!data.canPlayersSee, "players");
+                            const newData = { ...data, canPlayersSee: !data.canPlayersSee };
+                            setData(newData);
+                            handleValueChange(newData);
+                            updateHp(props.item, newData);
+                            updateAc(props.item, newData);
                         }}
                     />{" "}
                 </div>
@@ -304,24 +322,30 @@ export const Token = (props: TokenProps) => {
                         const hp = getNewHpValue(input);
                         if (hp !== null) {
                             e.target.value = hp.toString();
-                            handleValueChange(hp, "hp");
+                            changeHp(hp);
                         }
                     }}
                     onKeyDown={(e) => {
                         if (e.key === "ArrowUp") {
-                            const hp = Math.min(data.hp + 1, data.maxHp);
-                            handleValueChange(hp, "hp");
+                            const hp = Math.min(
+                                data.hp + 1,
+                                data.stats.tempHp ? data.maxHp + data.stats.tempHp : data.maxHp
+                            );
+                            changeHp(hp);
                             e.currentTarget.value = hp.toString();
                         } else if (e.key === "ArrowDown") {
-                            const hp = Math.min(data.hp - 1, data.maxHp);
-                            handleValueChange(hp, "hp");
+                            const hp = Math.min(
+                                data.hp - 1,
+                                data.stats.tempHp ? data.maxHp + data.stats.tempHp : data.maxHp
+                            );
+                            changeHp(hp);
                             e.currentTarget.value = hp.toString();
                         } else if (e.key === "Enter") {
                             const input = e.currentTarget.value;
                             const hp = getNewHpValue(input);
                             if (hp !== null) {
                                 e.currentTarget.value = hp.toString();
-                                handleValueChange(hp, "hp");
+                                changeHp(hp);
                             }
                         }
                     }}
@@ -330,21 +354,43 @@ export const Token = (props: TokenProps) => {
                 <input
                     type={"text"}
                     size={3}
-                    value={data.maxHp}
-                    onChange={(e) => {
-                        const value = Number(e.target.value.replace(/[^0-9]/g, ""));
-                        handleValueChange(Number(value), "maxHP", false);
-                    }}
+                    ref={maxHpRef}
+                    defaultValue={data.maxHp}
                     onKeyDown={(e) => {
                         if (e.key === "ArrowUp") {
-                            handleValueChange(data.maxHp + 1, "maxHP", true);
+                            changeMaxHp(data.maxHp + 1);
                         } else if (e.key === "ArrowDown") {
-                            handleValueChange(data.maxHp - 1, "maxHP", true);
+                            changeMaxHp(data.maxHp - 1);
+                        } else if (e.key === "Enter") {
+                            const value = Number(e.currentTarget.value.replace(/[^0-9]/g, ""));
+                            changeMaxHp(value);
                         }
                     }}
                     onBlur={(e) => {
                         const value = Number(e.target.value.replace(/[^0-9]/g, ""));
-                        handleValueChange(Number(value), "maxHP", true);
+                        changeMaxHp(value);
+                    }}
+                />
+            </div>
+            <div className={"temp-hp"}>
+                <input
+                    type={"text"}
+                    size={1}
+                    defaultValue={data.stats.tempHp}
+                    ref={tempHpRef}
+                    onKeyDown={(e) => {
+                        if (e.key === "ArrowUp") {
+                            changeTempHp((data.stats.tempHp || 0) + 1);
+                        } else if (e.key === "ArrowDown") {
+                            changeTempHp((data.stats.tempHp || 0) - 1);
+                        } else if (e.key === "Enter") {
+                            const value = Number(e.currentTarget.value.replace(/[^0-9]/g, ""));
+                            changeTempHp(value);
+                        }
+                    }}
+                    onBlur={(e) => {
+                        const value = Number(e.target.value.replace(/[^0-9]/g, ""));
+                        changeTempHp(value);
                     }}
                 />
             </div>
@@ -359,13 +405,13 @@ export const Token = (props: TokenProps) => {
                             factor = e.target.value.startsWith("-") ? -1 : 1;
                         }
                         const value = Number(e.target.value.replace(/[^0-9]/g, ""));
-                        handleValueChange(value * factor, "armorClass");
+                        changeArmorClass(value * factor);
                     }}
                     onKeyDown={(e) => {
                         if (e.key === "ArrowUp") {
-                            handleValueChange(data.armorClass + 1, "armorClass");
+                            changeArmorClass(data.armorClass + 1);
                         } else if (e.key === "ArrowDown") {
-                            handleValueChange(data.armorClass - 1, "armorClass");
+                            changeArmorClass(data.armorClass - 1);
                         }
                     }}
                 />
@@ -377,7 +423,9 @@ export const Token = (props: TokenProps) => {
                     value={data.initiative}
                     onChange={(e) => {
                         const value = Number(e.target.value.replace(/[^0-9]/g, ""));
-                        handleValueChange(value, "initiative");
+                        const newData = { ...data, initiative: value };
+                        setData(newData);
+                        handleValueChange(newData);
                     }}
                     className={"initiative"}
                 />
@@ -385,10 +433,10 @@ export const Token = (props: TokenProps) => {
                     title={"Roll Initiative (including DEX modifier from statblock)"}
                     className={`toggle-button initiative-button`}
                     onClick={() => {
-                        handleValueChange(
-                            Math.floor(Math.random() * 20) + 1 + data.stats.initiativeBonus,
-                            "initiative"
-                        );
+                        const value = Math.floor(Math.random() * 20) + 1 + data.stats.initiativeBonus;
+                        const newData = { ...data, initiative: value };
+                        setData(newData);
+                        handleValueChange(newData);
                     }}
                 />
             </div>
