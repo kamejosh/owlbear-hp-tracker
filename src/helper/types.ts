@@ -30,6 +30,7 @@ export type SceneMetadata = {
     ruleset?: Ruleset;
     groups?: Array<string>;
     openChangeLog?: boolean;
+    playerSort: boolean;
 };
 
 export type AttachmentMetadata = {

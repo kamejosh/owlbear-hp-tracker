@@ -6,7 +6,7 @@ export const characterMetadata = `${ID}/data`;
 export const infoMetadata = `${ID}/text`;
 
 export const modalId = `${ID}/modal`;
-export const version = "1.4.1";
+export const version = "1.4.2";
 
 export const changelogModal: Modal = {
     id: modalId,
@@ -24,5 +24,5 @@ export const settingsModal: Modal = {
     id: modalId,
     url: "/modal.html?content=settings",
     width: 400,
-    height: 500,
+    height: 600,
 };

@@ -1,3 +1,10 @@
+# 1.4.2
+
++ Add Setting to toggle Token Sorting in the Player Action Window
+  + When Sorting is active Tokens will be sorted by their Initiative value
+  + When Sorting is inactive Tokens will appear in the same order as they were dropped into the scene
++ Small UI Improvements to make HP Tracker look the same in different browsers
+
 # 1.4.1
 
 + Consider supporting me on [Patreon](https://patreon.com/TTRPGAPI?utm_medium=clipboard_copy&utm_source=copyLink&utm_campaign=creatorshare_creator&utm_content=join_link) so I can spend more time improving HP Tracker.

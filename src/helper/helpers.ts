@@ -99,6 +99,21 @@ export const sortItems = (a: Item, b: Item) => {
     return 0;
 };
 
+export const sortItemsInitiative = (a: Item, b: Item) => {
+    const aData = a.metadata[characterMetadata] as HpTrackerMetadata;
+    const bData = b.metadata[characterMetadata] as HpTrackerMetadata;
+    if (aData && bData && aData.initiative !== undefined && bData.initiative !== undefined) {
+        if (aData.initiative < bData.initiative) {
+            return 1;
+        } else if (aData.initiative > bData.initiative) {
+            return -1;
+        } else {
+            return 0;
+        }
+    }
+    return 0;
+};
+
 export const generateSlug = (string: string) => {
     let str = string.replace(/^\s+|\s+$/g, "");
     str = str.toLowerCase();
