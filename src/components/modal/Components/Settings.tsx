@@ -22,6 +22,7 @@ export const Settings = () => {
         false
     );
     const [ruleset, setStateRuleset] = useLocalStorage<Ruleset>(`${ID}.ruleset`, "e5");
+    const [playerSort, setPlayerSort] = useLocalStorage<boolean>(`${ID}.playerSort`, false);
     const { isReady } = SceneReadyContext();
     const [sceneId, setSceneId] = useState<string | null>(null);
 
@@ -36,6 +37,7 @@ export const Settings = () => {
             hpTrackerSceneMetadata.hpBarSegments = segments;
             hpTrackerSceneMetadata.allowNegativeNumbers = allowNegativNumbers;
             hpTrackerSceneMetadata.ruleset = ruleset;
+            hpTrackerSceneMetadata.playerSort = playerSort;
             const ownMetadata: Metadata = {};
             ownMetadata[sceneMetadata] = hpTrackerSceneMetadata;
 
@@ -44,7 +46,7 @@ export const Settings = () => {
         if (isReady) {
             setSceneMetadata();
         }
-    }, [offset, segments, allowNegativNumbers, ruleset, acOffset]);
+    }, [offset, segments, allowNegativNumbers, ruleset, acOffset, playerSort]);
 
     const handleOffsetChange = (value: number) => {
         updateHpOffset(value);
@@ -163,16 +165,6 @@ export const Settings = () => {
                                 }}
                             />
                         </div>
-                        {/*<div className={"ac-shield setting"}>
-                            Show Shield:
-                            <input
-                                type={"checkbox"}
-                                checked={acShield}
-                                onChange={() => {
-                                    setAcShield(!acShield);
-                                }}
-                            />
-                        </div>*/}
                     </div>
                     <div className={"negative-numbers setting"}>
                         Allow negative HP/AC:
@@ -182,6 +174,17 @@ export const Settings = () => {
                             onChange={() => {
                                 setAllowNegativeNumbers(!allowNegativNumbers);
                                 plausibleEvent("negative-numbers", (!allowNegativNumbers).toString());
+                            }}
+                        />
+                    </div>
+                    <div className={"player-sort setting"}>
+                        Sort Tokens in Player View:
+                        <input
+                            type={"checkbox"}
+                            checked={playerSort}
+                            onChange={() => {
+                                setPlayerSort(!playerSort);
+                                plausibleEvent("player-sort", (!playerSort).toString());
                             }}
                         />
                     </div>

@@ -75,6 +75,7 @@ const initScene = async () => {
             allowNegativNumbers: false,
             id: uuidv4(),
             groups: ["Default"],
+            playerSort: false,
         };
     } else {
         const sceneData = metadata[sceneMetadata] as SceneMetadata;
@@ -112,6 +113,9 @@ const initScene = async () => {
         }
         if (!sceneData.acShield) {
             sceneData.acShield = true;
+        }
+        if (!sceneData.playerSort) {
+            sceneData.playerSort = false;
         }
         ownMetadata[sceneMetadata] = sceneData;
     }

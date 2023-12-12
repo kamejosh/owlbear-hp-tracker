@@ -18,7 +18,7 @@ import { useCharSheet } from "../../context/CharacterContext.ts";
 import { CharacterSheet } from "./charactersheet/CharacterSheet.tsx";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { DropGroup } from "./DropGroup.tsx";
-import { plausibleEvent, sortItems } from "../../helper/helpers.ts";
+import { plausibleEvent, sortItems, sortItemsInitiative } from "../../helper/helpers.ts";
 import { compare } from "compare-versions";
 
 export const HPTracker = () => {
@@ -32,6 +32,7 @@ export const HPTracker = () => {
 const Content = () => {
     const playerContext = usePlayerContext();
     const [tokens, setTokens] = useState<Item[] | undefined>(undefined);
+    const [playerTokens, setPlayerTokens] = useState<Array<Item>>([]);
     const [selectedTokens, setSelectedTokens] = useState<Array<string>>([]);
     const [tokenLists, setTokenLists] = useState<Map<string, Array<Item>>>(new Map());
     const [currentSceneMetadata, setCurrentSceneMetadata] = useState<SceneMetadata | null>(null);
@@ -102,6 +103,15 @@ const Content = () => {
 
         setTokenLists(tokenMap);
     }, [currentSceneMetadata?.groups, tokens]);
+
+    useEffect(() => {
+        if (currentSceneMetadata?.playerSort && tokens) {
+            const localTokens = [...tokens];
+            setPlayerTokens(localTokens.sort(sortItemsInitiative));
+        } else {
+            setPlayerTokens(tokens ?? []);
+        }
+    }, [currentSceneMetadata?.playerSort, tokens]);
 
     const reorderMetadataIndex = (list: Array<Item>, group?: string) => {
         OBR.scene.items.updateItems(list, (items) => {
@@ -265,7 +275,7 @@ const Content = () => {
                         )}
                     </DragDropContext>
                 ) : (
-                    <PlayerTokenList tokens={tokens ?? []} selected={selectedTokens} metadata={currentSceneMetadata!} />
+                    <PlayerTokenList tokens={playerTokens} selected={selectedTokens} metadata={currentSceneMetadata!} />
                 )}
             </div>
         )
