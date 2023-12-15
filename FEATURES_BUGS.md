@@ -2,7 +2,7 @@
 
 ## Bugs
 
-+ 
++ Mirrored Tokens have the HP Bar mirrored as well
 
 ## Feature Ideas
 

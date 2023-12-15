@@ -47,13 +47,9 @@ const initItems = async () => {
         if (data.hpOnMap) {
             await saveOrChangeText(token, data, textAttachments, textChanges);
         }
-        await saveOrChangeAC(
-            token,
-            data,
-            acAttachments,
-            acChanges,
-            token.visible && data.canPlayersSee && data.acOnMap
-        );
+        if (data.acOnMap) {
+            await saveOrChangeAC(token, data, acAttachments, acChanges, token.visible && data.canPlayersSee);
+        }
     }
 
     await updateAcChanges(acChanges);

@@ -1,3 +1,7 @@
+# 1.4.3
+
++ Fix AC is automatically added to all tokens
+
 # 1.4.2
 
 + Add Setting to toggle Token Sorting in the Player Action Window

@@ -171,6 +171,7 @@ export const saveOrChangeAC = async (
     } else {
         const ac = await createAC(data.armorClass, character as Image);
         ac.forEach((item) => (item.visible = visible));
+        console.log(ac);
         await OBR.scene.items.addItems(ac);
     }
 };
