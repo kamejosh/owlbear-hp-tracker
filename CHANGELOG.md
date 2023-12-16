@@ -1,3 +1,8 @@
+# 1.4.4
+
++ Fix shapes are created correctly when Token is mirrored
++ Offset for Shapes and text is calculated without errors when Token is mirrored
+
 # 1.4.3
 
 + Fix AC is automatically added to all tokens

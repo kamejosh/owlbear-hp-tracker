@@ -12,15 +12,16 @@ import { characterMetadata, infoMetadata } from "./variables.ts";
 
 export const createBar = async (percentage: number, tempHpPercentage: number, token: Image) => {
     const bounds = await getImageBounds(token);
-    const height = Math.ceil(bounds.height / 4.85);
+    const height = Math.abs(Math.ceil(bounds.height / 4.85));
+    const width = Math.abs(bounds.width);
     const position = {
-        x: bounds.position.x,
+        x: bounds.width < 0 ? bounds.position.x - width : bounds.position.x,
         y: bounds.position.y + bounds.height - height + (await getYOffset(bounds.height)),
     };
-    const border = Math.floor(bounds.width / 75);
+    const border = Math.floor(width / 75);
 
     const backgroundShape = buildShape()
-        .width(bounds.width)
+        .width(width)
         .height(height)
         .shapeType("RECTANGLE")
         .fillColor("black")
@@ -36,7 +37,7 @@ export const createBar = async (percentage: number, tempHpPercentage: number, to
         .build();
 
     const hpShape = buildShape()
-        .width(percentage === 0 ? 0 : (bounds.width - border * 2) * percentage)
+        .width(percentage === 0 ? 0 : (width - border * 2) * percentage)
         .height(height - border * 2)
         .shapeType("RECTANGLE")
         .fillColor("red")
@@ -53,7 +54,7 @@ export const createBar = async (percentage: number, tempHpPercentage: number, to
         .build();
 
     const tempHp = buildShape()
-        .width(tempHpPercentage === 0 ? 0 : (bounds.width - border * 2) * tempHpPercentage)
+        .width(tempHpPercentage === 0 ? 0 : (width - border * 2) * tempHpPercentage)
         .height(height - border * 2)
         .shapeType("RECTANGLE")
         .fillColor("blue")
@@ -77,14 +78,16 @@ export const createBar = async (percentage: number, tempHpPercentage: number, to
 
 const createText = async (text: string, token: Image) => {
     const bounds = await getImageBounds(token);
-    const height = Math.ceil(bounds.height / 4.85);
+    const height = Math.abs(Math.ceil(bounds.height / 4.85));
+    const width = Math.abs(bounds.width);
     const position = {
-        x: bounds.position.x,
+        x: bounds.width < 0 ? bounds.position.x - width : bounds.position.x,
         y: bounds.position.y + bounds.height - height + (await getYOffset(bounds.height)),
     };
+
     const textItem = buildText()
         .textType("PLAIN")
-        .width(bounds.width)
+        .width(width)
         .height(height * 0.8) // because of text lines leaving space below we have to move it to the middle manually
         .position({ ...position, y: position.y + height * 0.2 })
         .attachedTo(token.id)
@@ -99,6 +102,7 @@ const createText = async (text: string, token: Image) => {
         .fontSize(height * 0.8)
         .disableAttachmentBehavior(["ROTATION", "VISIBLE"])
         .visible(token.visible)
+        .name("hp-text")
         .build();
 
     textItem.metadata[infoMetadata] = { isHpText: true, attachmentType: "HP" };
@@ -112,23 +116,26 @@ const handleHpOffsetUpdate = async (offset: number, hp: Item) => {
         if (tokens.length > 0) {
             const token = tokens[0];
             const bounds = await getImageBounds(token as Image);
-            const offsetFactor = bounds.height / 150;
+            const offsetFactor = Math.abs(bounds.height / 150);
             offset *= offsetFactor;
-            const height = Math.ceil(bounds.height / 4.85);
-            const border = Math.floor(bounds.width / 75);
+            const height = Math.abs(Math.ceil(bounds.height / 4.85));
+            const width = Math.abs(bounds.width);
+            const border = Math.floor(width / 75);
+            const x = bounds.width < 0 ? bounds.position.x - width : bounds.position.x;
+
             if (hp.name === "hp") {
                 change.position = {
-                    x: bounds.position.x + border,
+                    x: x + border,
                     y: bounds.position.y + bounds.height - height + offset + border,
                 };
             } else if (hp.name === "hp-text") {
                 change.position = {
-                    x: bounds.position.x + 2,
+                    x: x + 2,
                     y: bounds.position.y + bounds.height - height + offset + height * 0.2,
                 };
             } else {
                 change.position = {
-                    x: bounds.position.x,
+                    x: x,
                     y: bounds.position.y + bounds.height - height + offset,
                 };
             }
@@ -309,8 +316,8 @@ const handleBarAttachment = async (
 ): Promise<BarItemChanges> => {
     const shape = attachment as Shape;
     const bounds = await getImageBounds(character);
-    const width = bounds.width;
-    const border = Math.floor(bounds.width / 75);
+    const width = Math.abs(bounds.width);
+    const border = Math.floor(width / 75);
 
     if (attachment.name === "hp" && infoMetadata in attachment.metadata) {
         const change = changeMap.get(attachment.id) ?? {};
