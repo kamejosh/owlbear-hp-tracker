@@ -2,7 +2,7 @@
 
 ## Bugs
 
-+ Mirrored Tokens have the HP Bar mirrored as well
++ When flipping a Token the Shapes and Texts need to be toggled to be in the right position
 
 ## Feature Ideas
 
