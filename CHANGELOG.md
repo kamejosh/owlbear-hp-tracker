@@ -1,3 +1,7 @@
+# 1.4.5
+
++ Fix text color is black on some elements when system theme is set to light
+
 # 1.4.4
 
 + Fix shapes are created correctly when Token is mirrored
