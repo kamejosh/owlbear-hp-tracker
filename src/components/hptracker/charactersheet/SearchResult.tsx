@@ -37,16 +37,7 @@ export const SearchResult5e = ({ search }: { search: string }) => {
                     <li
                         className={"search-result"}
                         key={entry.slug}
-                        onClick={() =>
-                            setSheet(
-                                entry.slug,
-                                entry.perception
-                                    ? entry.perception
-                                    : entry.skills?.perception
-                                    ? entry.skills.perception
-                                    : 0
-                            )
-                        }
+                        onClick={() => setSheet(entry.slug, Math.floor((entry.stats.dexterity - 10) / 2))}
                     >
                         <span>
                             {entry.name}
@@ -67,6 +58,7 @@ export const SearchResult5e = ({ search }: { search: string }) => {
 export const SearchResultPf = ({ search }: { search: string }) => {
     const { characterId } = useCharSheet();
     const setSheet = (slug: string, bonus: number) => {
+        console.log(bonus);
         if (characterId) {
             OBR.scene.items.updateItems([characterId], (items) => {
                 items.forEach((item) => {
@@ -95,7 +87,7 @@ export const SearchResultPf = ({ search }: { search: string }) => {
                     <li
                         className={"search-result"}
                         key={entry.slug}
-                        onClick={() => setSheet(entry.slug, entry.stats.dexterity)}
+                        onClick={() => setSheet(entry.slug, entry.perception ? parseInt(entry.perception) : 0)}
                     >
                         <span>{entry.name}</span>
                         <span>HP: {entry.hp.value}</span>

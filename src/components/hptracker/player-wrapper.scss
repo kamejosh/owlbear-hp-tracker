@@ -149,7 +149,22 @@
         }
 
         &::before {
+            margin-right: calc(1ch - 2px);
             content: "HP: ";
+
+            @include breakpoint.laptop {
+                display: none;
+            }
+        }
+    }
+
+    .temp-hp {
+        display: flex;
+        align-items: center;
+        gap: 1ch;
+
+        &::before {
+            content: "Temp HP: ";
 
             @include breakpoint.laptop {
                 display: none;
@@ -159,7 +174,6 @@
 
     .armor-class {
         display: flex;
-        justify-self: flex-end;
         gap: 5px;
         min-width: 20px;
         text-align: right;
@@ -206,8 +220,11 @@
     .info-button-wrapper {
         display: flex;
         align-items: center;
-        justify-self: flex-end;
         gap: 5px;
+
+        @include breakpoint.laptop {
+            justify-self: flex-end;
+        }
 
         &::before {
             content: "Statblock: ";
