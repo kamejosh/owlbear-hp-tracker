@@ -14,8 +14,6 @@ export const createAC = async (ac: number, token: Image) => {
         y: bounds.position.y + bounds.height - (height + barHeight) + offset.y,
     };
 
-    console.log(bounds, position);
-
     const acShape = buildCurve()
         .points([
             { x: 0, y: 0 },

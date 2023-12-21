@@ -58,7 +58,6 @@ export const SearchResult5e = ({ search }: { search: string }) => {
 export const SearchResultPf = ({ search }: { search: string }) => {
     const { characterId } = useCharSheet();
     const setSheet = (slug: string, bonus: number) => {
-        console.log(bonus);
         if (characterId) {
             OBR.scene.items.updateItems([characterId], (items) => {
                 items.forEach((item) => {
