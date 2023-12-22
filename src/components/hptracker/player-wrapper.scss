@@ -161,7 +161,7 @@
     .temp-hp {
         display: flex;
         align-items: center;
-        gap: 1ch;
+        gap: 2px;
 
         &::before {
             content: "Temp HP: ";
@@ -174,7 +174,7 @@
 
     .armor-class {
         display: flex;
-        gap: 5px;
+        gap: 2px;
         min-width: 20px;
         text-align: right;
 
@@ -196,7 +196,7 @@
         justify-content: flex-start;
         align-items: center;
         align-self: center;
-        gap: 5px;
+        gap: 2px;
         width: 100%;
         height: 22px;
 
