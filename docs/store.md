@@ -24,6 +24,7 @@ learn-more: https://github.com/kamejosh/owlbear-hp-tracker
     - [Token](#token)
       * [Toggle Buttons](#toggle-buttons)
       * [Changing Values](#changing-values)
+      * [Temporary Hitpoints](#temporary-hitpoints)
       * [Initializing Token](#initializing-token)
     - [Statblock](#statblock)
     - [Player Action Window](#player-action-window)
@@ -40,7 +41,7 @@ Designed around the TTRPG game mechanics of Hit Points (HP) and Armor Class (AC)
 The extension has two windows:
 
 + [Hp Tracker action window](#hp-tracker-action-window)
-+ [Hp Tracker popover](#hp-tracker-popover)
++ [Hp Tracker Context Menu](#hp-tracker-popover)
 
 As well as the following on-scene information:
 
@@ -50,7 +51,7 @@ As well as the following on-scene information:
 
 ### Adding Tokens to the HP Tracker
 
-Tokens that have not yet been added to the HP Tracker have the following icon present when their context menu is open:
+Tokens that have not yet been added to the HP Tracker have the following icon present when their context menu is open (right click on token):
 
 ![Context Menu](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/context_menu.png)
 
@@ -91,7 +92,9 @@ The following settings are available:
 + Statblock Game Rules: You can choose between DnD 5e and Pathfinder 2e as source for your statblocks. This will impact what statblocks are found, how they are displayed, and the content (including spells).
 + HP Bar Segments: This setting can be used to obfuscate the real HP loss of a creature. E.g. when set to "2" the HP Bar differentiates between 3 states: Full HP, less than half HP, and 0 HP. When changing the settings HP Bars are not updated until the HP value is changed at least once.
 + Text and Bar Offset: To have a more flexible positioning of the HP Bar and Text, a value can be entered (negative or positive number) and the position of the HP Bar and Text is then adjusted by this value
++ Armorclass Icon and Text Offset: To have a more flexible positioning of the AC Background and Text a offset for the X- and Y-Axis can be added. This value is scaled considering the Token size.
 + Allow negative HP/AC: By default negative HP and AC are not allowed but when this settings is checked then HP and AC can be set to negative numbers. The HP Bar will always display negative HP the same as when it is 0.
++ Sort Tokens in Player View: When active, the [Player Action Window](#player-action-window) will display Tokens ordered by their initiative value. If not active, Tokens will have the same order as they were added to the scene (so kind of random).
 + Groups: This setting allows you to define different Groups used for ordering Tokens. There is a permanent "Default" group. The groups can be rearranged by dragging and dropping them in the desired order. To add a group use the text input below the group list. Press "Enter" to add a group to the list. Tokens in the HP Tracker remember their group association (if the group is deleted) but are added into the default group until they are moved to a different group. So deleting and re-adding the same group restores the previously associated tokens to that same group.
 
 #### Token List
@@ -131,6 +134,7 @@ A token in the HP Tracker represents a single Owlbear scene item where the HP Tr
 + Values
   + Current HP
   + Max HP
+  + Temporary HP
   + AC
   + Initiative
 + Roll initiative
@@ -165,6 +169,13 @@ Values can be changed in a few different ways:
 
 **Note: The HP value can never exceed the maxHP value ([except when maxHP is 0](#initializing-token)). It can also not be a negative number if the [Global Setting](#global-settings) for "Allow negative numbers" is not selected. All symbols except numbers will be removed to maintain a compatible value.**
 
+##### Temporary Hitpoints
+
+Temporary Hitpoints follow these rules:
+
++ Adding temporary hitpoints increases the current hitpoint maximum as well as the current hitpoints.
++ Once temporary hitpoints are active, decreasing normal hitpoints removes the same amount of temporary hitpoints. E.g. if a token has 5 temporary HP, and takes 3 HP damage, the temporary HP are now at 2.
+
 ##### Initializing Token
 
 To initialize a Token there are two approaches:
@@ -198,6 +209,8 @@ The statblock shows all the creature information including available spells and 
 The Player Action Window has reduced functionality compared to the GM Action Window. Tokens that have either the HP Bar or Player Visibility enabled show up in this window. Items that are invisible (hidden) within the scene don't show up here!
 
 For tokens that have the Player Visibility set, their name change option, values, and statblock are shown. Otherwise just the dynamic-color background is there to indicate the current status of the creature.
+
+Tokens don't follow the drag and drop order in the [GM Action Window](#hp-tracker-action-window). But when activated in the [Settings](#global-settings) Tokens will be ordered by their initiative value.
 
 ### Hp Tracker Context Item
 
