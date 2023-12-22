@@ -1,3 +1,9 @@
+# 1.4.6
+
++ Fix some styling issues on mobile and embedded
++ Fix negative numbers not always working
++ Fix PF2 and 5E Statblocks sometimes not loading the correct initiative modifier
+
 # 1.4.5
 
 + Fix text color is black on some elements when system theme is set to light
