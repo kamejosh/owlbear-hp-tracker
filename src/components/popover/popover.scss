@@ -23,12 +23,13 @@
         .popover {
             .player-wrapper {
                 display: flex;
+                column-gap: 1ch;
+                row-gap: 2px;
                 flex-wrap: wrap;
                 justify-content: space-between;
-                gap: 1ch;
                 border-bottom: none;
                 padding: 10px 10px;
-                height: 70px;
+                height: 80px;
 
                 .settings {
                     order: 2;
@@ -39,6 +40,8 @@
                     order: 0;
                     &::before {
                         display: block;
+                        margin: 0;
+                        min-width: 26px;
                         content: "HP: ";
                     }
                 }
@@ -50,6 +53,7 @@
 
                     &::before {
                         display: block;
+                        min-width: 26px;
                         content: "AC: ";
                     }
                 }
@@ -65,6 +69,7 @@
 
                     &::before {
                         display: block;
+                        min-width: 26px;
                         content: "Init: ";
                     }
                 }

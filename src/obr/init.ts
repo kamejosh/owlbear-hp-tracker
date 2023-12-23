@@ -47,13 +47,9 @@ const initItems = async () => {
         if (data.hpOnMap) {
             await saveOrChangeText(token, data, textAttachments, textChanges);
         }
-        await saveOrChangeAC(
-            token,
-            data,
-            acAttachments,
-            acChanges,
-            token.visible && data.canPlayersSee && data.acOnMap
-        );
+        if (data.acOnMap) {
+            await saveOrChangeAC(token, data, acAttachments, acChanges, token.visible && data.canPlayersSee);
+        }
     }
 
     await updateAcChanges(acChanges);
@@ -72,7 +68,7 @@ const initScene = async () => {
             hpBarOffset: 0,
             acOffset: { x: 0, y: 0 },
             acShield: true,
-            allowNegativNumbers: false,
+            allowNegativeNumbers: false,
             id: uuidv4(),
             groups: ["Default"],
             playerSort: false,
@@ -137,7 +133,7 @@ const setupContextMenu = async () => {
         ],
         embed: {
             url: "/popover.html",
-            height: 90,
+            height: 100,
         },
     });
 

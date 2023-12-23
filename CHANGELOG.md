@@ -1,3 +1,22 @@
+# 1.4.6
+
++ Fix some styling issues on mobile and embedded
++ Fix negative numbers not always working
++ Fix PF2 and 5E Statblocks sometimes not loading the correct initiative modifier
+
+# 1.4.5
+
++ Fix text color is black on some elements when system theme is set to light
+
+# 1.4.4
+
++ Fix shapes are created correctly when Token is mirrored
++ Offset for Shapes and text is calculated without errors when Token is mirrored
+
+# 1.4.3
+
++ Fix AC is automatically added to all tokens
+
 # 1.4.2
 
 + Add Setting to toggle Token Sorting in the Player Action Window

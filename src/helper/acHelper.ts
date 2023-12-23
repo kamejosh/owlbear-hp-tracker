@@ -6,11 +6,11 @@ import { characterMetadata, infoMetadata } from "./variables.ts";
 export const createAC = async (ac: number, token: Image) => {
     const bounds = await getImageBounds(token);
     const barHeight = Math.ceil(bounds.height / 4.85);
-    const height = bounds.height / 2.3;
-    const width = bounds.width / 3;
+    const height = Math.abs(bounds.height / 2.3);
+    const width = Math.abs(bounds.width / 3);
     const offset = await getACOffset(bounds.height, bounds.width);
     const position = {
-        x: bounds.position.x + bounds.width - width / 2 + offset.x,
+        x: bounds.position.x + (bounds.width < 0 ? 0 : bounds.width) - width / 2 + offset.x,
         y: bounds.position.y + bounds.height - (height + barHeight) + offset.y,
     };
 
@@ -67,9 +67,9 @@ const handleACOffsetUpdate = async (offset: { x: number; y: number }, ac: Item) 
             const bounds = await getImageBounds(token as Image);
             const barHeight = Math.ceil(bounds.height / 4.85);
             const height = bounds.height / 2.3;
-            const width = bounds.width / 3;
+            const width = Math.abs(bounds.width / 3);
             change.position = {
-                x: bounds.position.x + bounds.width - width / 2 + offset.x,
+                x: bounds.position.x + (bounds.width < 0 ? 0 : bounds.width) - width / 2 + offset.x,
                 y: bounds.position.y + bounds.height - (height + barHeight) + offset.y,
             };
         }

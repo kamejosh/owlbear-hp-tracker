@@ -6,7 +6,7 @@ export const characterMetadata = `${ID}/data`;
 export const infoMetadata = `${ID}/text`;
 
 export const modalId = `${ID}/modal`;
-export const version = "1.4.2";
+export const version = "1.4.6";
 
 export const changelogModal: Modal = {
     id: modalId,
