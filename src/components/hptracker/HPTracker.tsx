@@ -8,6 +8,7 @@ import {
     helpModal,
     sceneMetadata,
     settingsModal,
+    statblockPopover,
     version,
 } from "../../helper/variables.ts";
 import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
@@ -36,10 +37,15 @@ const Content = () => {
     const [selectedTokens, setSelectedTokens] = useState<Array<string>>([]);
     const [tokenLists, setTokenLists] = useState<Map<string, Array<Item>>>(new Map());
     const [currentSceneMetadata, setCurrentSceneMetadata] = useState<SceneMetadata | null>(null);
+    const [viewport, setViewport] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
     const { isReady } = SceneReadyContext();
     const { characterId } = useCharSheet();
 
     const initHpTracker = async () => {
+        const width = await OBR.viewport.getWidth();
+        const height = await OBR.viewport.getHeight();
+        setViewport({ width: width, height: height });
+
         const initialItems = await OBR.scene.items.getItems(
             (item) =>
                 characterMetadata in item.metadata &&
@@ -201,11 +207,12 @@ const Content = () => {
                 <div className={"help-buttons"}>
                     <a
                         href={"https://www.patreon.com/TTRPGAPI"}
-                        className={"patreon-button"}
+                        className={"patreon-button top-button"}
                         target={"_blank"}
                         onClick={() => {
                             plausibleEvent("patreon-click");
                         }}
+                        title={"Patreon Link"}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 436 476">
                             <path
@@ -215,15 +222,39 @@ const Content = () => {
                             ></path>
                         </svg>
                     </a>
+                    <button
+                        className={"statblock-button top-button"}
+                        onClick={async () => {
+                            await OBR.popover.open({
+                                ...statblockPopover,
+                                width: Math.min(500, viewport.width),
+                                height: Math.min(600, viewport.height),
+                                anchorPosition: { top: 55, left: viewport.width - 70 },
+                            });
+                        }}
+                        title={"Statblocks"}
+                    ></button>
                     {playerContext.role == "GM" ? (
-                        <button className={"settings-button"} onClick={async () => await OBR.modal.open(settingsModal)}>
+                        <button
+                            className={"settings-button top-button"}
+                            onClick={async () => await OBR.modal.open(settingsModal)}
+                            title={"Settings"}
+                        >
                             ⛭
                         </button>
                     ) : null}
-                    <button className={"change-log-button"} onClick={async () => await OBR.modal.open(changelogModal)}>
+                    <button
+                        className={"change-log-button top-button"}
+                        onClick={async () => await OBR.modal.open(changelogModal)}
+                        title={"Changelog"}
+                    >
                         i
                     </button>
-                    <button className={"help-button"} onClick={async () => await OBR.modal.open(helpModal)}>
+                    <button
+                        className={"help-button top-button"}
+                        onClick={async () => await OBR.modal.open(helpModal)}
+                        title={"Help"}
+                    >
                         ?
                     </button>
                 </div>

@@ -434,6 +434,7 @@ export const Token = (props: TokenProps) => {
                     className={`toggle-button initiative-button`}
                     onClick={() => {
                         const value = Math.floor(Math.random() * 20) + 1 + data.stats.initiativeBonus;
+                        console.log(data.stats.initiativeBonus);
                         const newData = { ...data, initiative: value };
                         setData(newData);
                         handleValueChange(newData);
