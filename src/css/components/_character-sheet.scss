@@ -1,0 +1,459 @@
+@use "../utilities/breakpoint";
+
+.character-sheet {
+    .back-button {
+        display: flex;
+        position: fixed;
+        top: 30px;
+        left: 15px;
+        align-items: center;
+        gap: 0;
+        cursor: pointer;
+        border: 1px solid white;
+        border-radius: 4px;
+        background-color: #1c1b22;
+        font-size: 0;
+
+        @include breakpoint.laptop {
+            left: 30px;
+            gap: 5px;
+            font-size: 12px;
+        }
+
+        &::before {
+            transition: width 0.25s ease-in-out;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 -960 960 960' preserveAspectRatio='none'%3E%3Cpath d='M359-242 120-481l239-239 43 43-166 166h604v60H236l166 166-43 43Z' fill='white'/%3E%3C/svg%3E");
+            background-position: center;
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            width: 20px;
+            height: 20px;
+            content: "";
+        }
+
+        &:hover {
+            &::before {
+                width: 25px;
+            }
+        }
+    }
+
+    .content {
+        display: flex;
+        flex-direction: column;
+        margin-top: 30px;
+        width: 100%;
+
+        h2 {
+            text-align: left;
+
+            .note {
+                font-size: 12px;
+            }
+        }
+
+        .search-wrapper {
+            display: flex;
+            align-items: center;
+            align-self: flex-end;
+            gap: 5px;
+
+            .search {
+                cursor: pointer;
+                border: none;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='48' viewBox='0 -960 960 960' width='48'%3E%3Cpath d='M796-121 533-384q-30 26-69.959 40.5T378-329q-108.162 0-183.081-75Q120-479 120-585t75-181q75-75 181.5-75t181 75Q632-691 632-584.85 632-542 618-502q-14 40-42 75l264 262-44 44ZM377-389q81.25 0 138.125-57.5T572-585q0-81-56.875-138.5T377-781q-82.083 0-139.542 57.5Q180-666 180-585t57.458 138.5Q294.917-389 377-389Z' fill='white' /%3E%3C/svg%3E");
+                background-position: center;
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-color: transparent;
+                width: 20px;
+                height: 20px;
+            }
+        }
+
+        .search-loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 25px;
+        }
+
+        .search-results {
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+
+            .search-result {
+                display: grid;
+                grid-template-columns: 1fr repeat(3, 0.5fr);
+                justify-content: stretch;
+                gap: 15px;
+                cursor: pointer;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+                padding: 2px;
+                text-align: left;
+
+                > * {
+                    white-space: nowrap;
+
+                    &:not(:first-child) {
+                        text-align: right;
+                    }
+                }
+
+                &:hover {
+                    box-shadow: -5px 5px 20px #00000059;
+                }
+            }
+        }
+    }
+}
+
+.pf-sheet {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px 30px;
+    margin-top: 30px;
+    text-align: left;
+
+    @include breakpoint.laptop {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    > * {
+        border-bottom: 2px solid white;
+        padding-bottom: 5px;
+    }
+
+    .saving-throws {
+        grid-column: span 1;
+
+        .saving-throw-list {
+            padding: 0;
+            list-style: none;
+
+            .name {
+                text-transform: capitalize;
+            }
+        }
+    }
+
+    .what {
+        grid-column: span 1;
+
+        h3 {
+            margin: 0 0 5px;
+        }
+    }
+
+    .values {
+        display: flex;
+        grid-column: span 1;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-column: span 1;
+        justify-content: space-between;
+        gap: 10px;
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+
+            .stat-name {
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+        }
+    }
+
+    .skills {
+        grid-column: span 1;
+
+        @include breakpoint.laptop {
+            grid-column: span 2;
+        }
+
+        .skill-list {
+            display: flex;
+            column-gap: 30px;
+            flex-wrap: wrap;
+
+            .skill {
+                display: flex;
+                gap: 1ch;
+                min-width: 250px;
+
+                .skill-name {
+                    font-weight: 500;
+                }
+            }
+        }
+    }
+
+    .actions,
+    .reactions,
+    .spells,
+    .special-abilities {
+        grid-column: span 1;
+
+        @include breakpoint.laptop {
+            grid-column: span 2;
+        }
+    }
+
+    .ability-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1ch;
+        padding: 0;
+        list-style: none;
+    }
+
+    .spells {
+        .spell-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            .spell-name-list {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+
+                .spell-name {
+                    display: flex;
+                    flex-direction: column;
+                    border-bottom: 1px solid white;
+                    padding-bottom: 10px;
+                    text-transform: capitalize;
+
+                    &:first-child {
+                        border-top: 1px solid white;
+                        padding-top: 10px;
+                    }
+
+                    &:last-child {
+                        border-bottom: none;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.open5e-sheet {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+        "what"
+        "values"
+        "abilities"
+        "tidbits"
+        "skills"
+        "resistances"
+        "actions"
+        "actions"
+        "reactions"
+        "reactions"
+        "specials"
+        "specials"
+        "legendary"
+        "legendary"
+        "spells"
+        "spells";
+    gap: 10px 30px;
+    margin-top: 30px;
+    text-align: left;
+
+    @include breakpoint.laptop {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-areas:
+            "what values"
+            "abilities tidbits"
+            "skills skills"
+            "resistances resistances"
+            "actions actions"
+            "reactions reactions"
+            "specials specials"
+            "legendary legendary"
+            "spells spells";
+    }
+
+    > * {
+        border-bottom: 2px solid white;
+        padding-bottom: 5px;
+    }
+
+    .ability-list {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        padding: 0;
+        list-style: none;
+    }
+
+    .what {
+        grid-area: what;
+
+        h3 {
+            margin: 0 0 5px;
+        }
+
+        :not(h3) {
+            font-style: italic;
+        }
+    }
+
+    .values {
+        display: flex;
+        grid-area: values;
+        flex-direction: column;
+    }
+
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-area: abilities;
+        justify-content: space-between;
+        gap: 10px;
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+
+            .stat-name {
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+        }
+    }
+
+    .tidbits {
+        grid-area: tidbits;
+    }
+
+    .skills {
+        grid-area: skills;
+
+        h3 {
+            margin-bottom: 5px;
+            border-bottom: 1px solid white;
+            width: 100%;
+        }
+
+        ul {
+            display: grid;
+            grid-template-columns: 1fr;
+            padding: 0;
+            list-style: none;
+
+            @include breakpoint.laptop {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            li {
+                b {
+                    text-transform: capitalize;
+                }
+            }
+        }
+    }
+
+    .resistances {
+        grid-area: resistances;
+
+        h3 {
+            margin-bottom: 5px;
+        }
+    }
+
+    .actions {
+        grid-area: actions;
+
+        h3 {
+            border-bottom: 1px solid white;
+            width: 100%;
+        }
+    }
+
+    .reactions {
+        grid-area: reactions;
+
+        h3 {
+            border-bottom: 1px solid white;
+            width: 100%;
+        }
+    }
+
+    .special-abilities {
+        grid-area: specials;
+
+        h3 {
+            border-bottom: 1px solid white;
+            width: 100%;
+        }
+    }
+
+    .legendary-actions {
+        grid-area: legendary;
+
+        h3 {
+            border-bottom: 1px solid white;
+            width: 100%;
+        }
+    }
+
+    .spells {
+        grid-area: spells;
+
+        h3 {
+            border-bottom: 1px solid white;
+            width: 100%;
+        }
+
+        .spell-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+    }
+}
+
+.expand {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+
+    &::after {
+        display: block;
+        transition: all 0.25s ease-in-out;
+        cursor: pointer;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 -960 960 960' width='24' fill='white'%3E%3Cpath d='M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z'/%3E%3C/svg%3E");
+        background-position: center;
+        background-size: contain;
+        background-repeat: no-repeat;
+        width: 24px;
+        height: 24px;
+        content: "";
+    }
+
+    &.open {
+        &::after {
+            transform: rotate(90deg);
+        }
+    }
+}
+
+b {
+    font-weight: 800;
+}

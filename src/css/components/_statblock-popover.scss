@@ -1,0 +1,59 @@
+.statblock-app {
+    width: calc(100% - 2rem);
+    .statblock-popover {
+        position: relative;
+
+        &::before {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: var(--bg-color);
+            width: 100%;
+            height: calc(30px + 1rem);
+            content: "";
+        }
+
+        .help-buttons {
+            z-index: 10;
+        }
+        .statblock-list {
+            position: sticky;
+            top: calc(30px + 1rem);
+            margin-top: calc(10px + 1rem);
+            background-color: var(--bg-color);
+            padding: 0;
+            overflow: hidden;
+            list-style: none;
+
+            .statblock-name {
+                transition: all 0.25s ease-in-out;
+                cursor: pointer;
+                border: 1px solid white;
+                padding-inline: 1ch;
+                width: 100px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+
+                &:first-child {
+                    border-right: none;
+                }
+
+                &:last-child {
+                    border-left: none;
+                }
+
+                &:hover,
+                &:focus-visible {
+                    background-color: dimgrey;
+                }
+
+                &.active {
+                    border-bottom: none;
+                    text-decoration: underline;
+                }
+            }
+        }
+    }
+}

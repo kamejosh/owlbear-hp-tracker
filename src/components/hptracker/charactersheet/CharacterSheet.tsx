@@ -1,6 +1,5 @@
 import { ReactElement, useEffect, useRef, useState } from "react";
 import { useCharSheet } from "../../../context/CharacterContext.ts";
-import "./character-sheet.scss";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
 import { changelogModal, characterMetadata, helpModal, ID, settingsModal } from "../../../helper/variables.ts";
 import { HpTrackerMetadata, Ruleset } from "../../../helper/types.ts";

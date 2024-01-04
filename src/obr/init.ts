@@ -71,6 +71,7 @@ const initScene = async () => {
             allowNegativeNumbers: false,
             id: uuidv4(),
             groups: ["Default"],
+            openGroups: ["Default"],
             playerSort: false,
         };
     } else {
@@ -86,6 +87,9 @@ const initScene = async () => {
         }
         if (!sceneData.groups || sceneData.groups.length === 0) {
             sceneData.groups = ["Default"];
+        }
+        if (sceneData.openGroups === undefined) {
+            sceneData.openGroups = ["Default"];
         }
         if (sceneData.hpBarSegments === undefined) {
             sceneData.hpBarSegments = 0;

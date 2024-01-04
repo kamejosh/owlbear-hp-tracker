@@ -1,5 +1,4 @@
 import { components } from "../../../ttrpgapi/schema";
-import "./e5spell.scss";
 import { useState } from "react";
 import { highlightDice } from "../../../helper/diceHelper.tsx";
 import { getDamage } from "../../../helper/helpers.ts";

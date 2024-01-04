@@ -1,5 +1,3 @@
-import "./e5spell.scss";
-import "./pfspell.scss";
 import { useState } from "react";
 import { highlightDice } from "../../../helper/diceHelper.tsx";
 import { getDamage } from "../../../helper/helpers.ts";

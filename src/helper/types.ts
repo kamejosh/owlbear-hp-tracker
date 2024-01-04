@@ -29,6 +29,7 @@ export type SceneMetadata = {
     acShield?: boolean;
     ruleset?: Ruleset;
     groups?: Array<string>;
+    openGroups?: Array<string>;
     openChangeLog?: boolean;
     playerSort: boolean;
 };

@@ -8,7 +8,6 @@ import { useCharSheet } from "../../context/CharacterContext.ts";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { updateHp } from "../../helper/hpHelpers.ts";
 import { evalString } from "../../helper/helpers.ts";
-import "./player-wrapper.scss";
 import { updateAc } from "../../helper/acHelper.ts";
 
 type TokenProps = {

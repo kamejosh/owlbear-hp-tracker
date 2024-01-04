@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import OBR, { Metadata } from "@owlbear-rodeo/sdk";
 import { updateHpOffset } from "../../../helper/hpHelpers.ts";
 import { Groups } from "./Groups.tsx";
-import "./global-settings.scss";
 import { Switch } from "../../general/Switch/Switch.tsx";
 import { dndSvg, pfSvg } from "./SwitchBackground.ts";
 import { plausibleEvent } from "../../../helper/helpers.ts";
