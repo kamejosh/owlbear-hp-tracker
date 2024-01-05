@@ -7,6 +7,8 @@
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
 
+    max-width: 100%;
+
     color: var(--text-color);
     font-weight: 400;
 
@@ -26,7 +28,7 @@ body {
 
 #app {
     padding: 1rem;
-    width: calc(100vw - 2rem);
+    width: calc(100% - 2rem);
     max-width: 1280px;
     text-align: center;
 }

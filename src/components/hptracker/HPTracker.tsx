@@ -2,15 +2,7 @@ import { useEffect, useState } from "react";
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
-import {
-    changelogModal,
-    characterMetadata,
-    helpModal,
-    sceneMetadata,
-    settingsModal,
-    statblockPopover,
-    version,
-} from "../../helper/variables.ts";
+import { changelogModal, characterMetadata, sceneMetadata, version } from "../../helper/variables.ts";
 import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
 import { DragDropContext, DraggableLocation, DropResult } from "react-beautiful-dnd";
 import { PlayerTokenList } from "./TokenList.tsx";
@@ -18,8 +10,9 @@ import { useCharSheet } from "../../context/CharacterContext.ts";
 import { CharacterSheet } from "./charactersheet/CharacterSheet.tsx";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { DropGroup } from "./DropGroup.tsx";
-import { plausibleEvent, sortItems, sortItemsInitiative } from "../../helper/helpers.ts";
+import { sortItems, sortItemsInitiative } from "../../helper/helpers.ts";
 import { compare } from "compare-versions";
+import { Helpbuttons } from "../general/Helpbuttons/Helpbuttons.tsx";
 
 export const HPTracker = () => {
     return (
@@ -36,15 +29,10 @@ const Content = () => {
     const [selectedTokens, setSelectedTokens] = useState<Array<string>>([]);
     const [tokenLists, setTokenLists] = useState<Map<string, Array<Item>>>(new Map());
     const [currentSceneMetadata, setCurrentSceneMetadata] = useState<SceneMetadata | null>(null);
-    const [viewport, setViewport] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
     const { isReady } = SceneReadyContext();
     const { characterId } = useCharSheet();
 
     const initHpTracker = async () => {
-        const width = await OBR.viewport.getWidth();
-        const height = await OBR.viewport.getHeight();
-        setViewport({ width: width, height: height });
-
         const initialItems = await OBR.scene.items.getItems(
             (item) =>
                 characterMetadata in item.metadata &&
@@ -203,60 +191,7 @@ const Content = () => {
             <CharacterSheet />
         ) : (
             <div className={"hp-tracker"}>
-                <div className={"help-buttons"}>
-                    <a
-                        href={"https://www.patreon.com/TTRPGAPI"}
-                        className={"patreon-button top-button"}
-                        target={"_blank"}
-                        onClick={() => {
-                            plausibleEvent("patreon-click");
-                        }}
-                        title={"Patreon Link"}
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 436 476">
-                            <path
-                                data-fill="1"
-                                d="M436 143c-.084-60.778-47.57-110.591-103.285-128.565C263.528-7.884 172.279-4.649 106.214 26.424 26.142 64.089.988 146.596.051 228.883c-.77 67.653 6.004 245.841 106.83 247.11 74.917.948 86.072-95.279 120.737-141.623 24.662-32.972 56.417-42.285 95.507-51.929C390.309 265.865 436.097 213.011 436 143Z"
-                                fill={"#dddddd"}
-                            ></path>
-                        </svg>
-                    </a>
-                    <button
-                        className={"statblock-button top-button"}
-                        onClick={async () => {
-                            await OBR.popover.open({
-                                ...statblockPopover,
-                                width: Math.min(500, viewport.width),
-                                height: Math.min(600, viewport.height),
-                                anchorPosition: { top: 55, left: viewport.width - 70 },
-                            });
-                        }}
-                        title={"Statblocks"}
-                    ></button>
-                    {playerContext.role == "GM" ? (
-                        <button
-                            className={"settings-button top-button"}
-                            onClick={async () => await OBR.modal.open(settingsModal)}
-                            title={"Settings"}
-                        >
-                            ⛭
-                        </button>
-                    ) : null}
-                    <button
-                        className={"change-log-button top-button"}
-                        onClick={async () => await OBR.modal.open(changelogModal)}
-                        title={"Changelog"}
-                    >
-                        i
-                    </button>
-                    <button
-                        className={"help-button top-button"}
-                        onClick={async () => await OBR.modal.open(helpModal)}
-                        title={"Help"}
-                    >
-                        ?
-                    </button>
-                </div>
+                <Helpbuttons />
                 <h1 className={"title"}>
                     HP Tracker<span className={"small"}>{version}</span>
                 </h1>

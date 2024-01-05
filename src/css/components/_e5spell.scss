@@ -100,16 +100,24 @@
 
                     .info-bits {
                         display: flex;
-                        column-gap: 20px;
+                        column-gap: 5px;
                         flex-direction: column;
                         flex-wrap: wrap;
                         column-fill: auto;
                         column-count: 2;
                         height: 150px;
 
+                        @include breakpoint.laptop {
+                            column-gap: 20px;
+                        }
+
                         span {
-                            width: 230px;
+                            width: calc(50% - 5px);
                             text-overflow: ellipsis;
+
+                            @include breakpoint.laptop {
+                                width: calc(50% - 20px);
+                            }
                         }
                     }
                 }

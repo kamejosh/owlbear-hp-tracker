@@ -20,6 +20,7 @@ export const StatblockList = (props: { minimized: boolean; tokens: Array<Item> }
                 modules={[FreeMode]}
                 freeMode={true}
             >
+                <SwiperSlide className={"pre"}> </SwiperSlide>
                 {props.tokens.map((token) => {
                     const data = token.metadata[characterMetadata] as HpTrackerMetadata;
                     return (
@@ -27,11 +28,13 @@ export const StatblockList = (props: { minimized: boolean; tokens: Array<Item> }
                             className={`statblock-name ${slug === data.sheet ? "active" : ""}`}
                             onClick={() => setSlug(data.sheet)}
                             key={token.id}
+                            title={data.name}
                         >
                             {data.name}
                         </SwiperSlide>
                     );
                 })}
+                <SwiperSlide className={"post"}> </SwiperSlide>
             </Swiper>
             {props.minimized ? null : (
                 <div className={"statblock-sheet"}>{slug ? <Statblock slug={slug} /> : null}</div>
