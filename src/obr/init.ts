@@ -72,6 +72,7 @@ const initScene = async () => {
             id: uuidv4(),
             groups: ["Default"],
             openGroups: ["Default"],
+            statblockPopover: { width: 500, height: 600 },
             playerSort: false,
         };
     } else {
@@ -113,6 +114,9 @@ const initScene = async () => {
         }
         if (!sceneData.acShield) {
             sceneData.acShield = true;
+        }
+        if (sceneData.statblockPopover === undefined) {
+            sceneData.statblockPopover = { width: 500, height: 600 };
         }
         if (!sceneData.playerSort) {
             sceneData.playerSort = false;

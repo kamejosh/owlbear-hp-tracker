@@ -1,17 +1,15 @@
 import { ReactElement, useEffect, useRef, useState } from "react";
 import { useCharSheet } from "../../../context/CharacterContext.ts";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
-import { characterMetadata, ID } from "../../../helper/variables.ts";
-import { HpTrackerMetadata, Ruleset } from "../../../helper/types.ts";
+import { characterMetadata } from "../../../helper/variables.ts";
+import { HpTrackerMetadata, Ruleset, SceneMetadata } from "../../../helper/types.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { SearchResult5e, SearchResultPf } from "./SearchResult.tsx";
 import { Statblock } from "./Statblock.tsx";
-import { useLocalStorage } from "../../../helper/hooks.ts";
 import { Helpbuttons } from "../../general/Helpbuttons/Helpbuttons.tsx";
 
-export const CharacterSheet = () => {
+export const CharacterSheet = (props: { currentSceneMetadata: SceneMetadata | null }) => {
     const { characterId, setId } = useCharSheet();
-    const [ruleset, _] = useLocalStorage<Ruleset>(`${ID}.ruleset`, "e5");
     const playerContext = usePlayerContext();
     const [token, setToken] = useState<Item | null>(null);
     const [data, setData] = useState<HpTrackerMetadata | null>(null);
@@ -62,7 +60,7 @@ export const CharacterSheet = () => {
     }, []);
 
     useEffect(() => {
-        if (data?.sheet && data?.ruleset === ruleset) {
+        if (data?.sheet && data?.ruleset === props.currentSceneMetadata?.ruleset) {
             setForceSearch(false);
         } else {
             setForceSearch(true);
@@ -79,11 +77,11 @@ export const CharacterSheet = () => {
             <button className={"back-button"} onClick={() => setId(null)}>
                 Back
             </button>
-            <Helpbuttons />
+            <Helpbuttons currentSceneMetadata={props.currentSceneMetadata} />
             {token && data ? (
                 <div className={"content"}>
                     <h2>
-                        {data.name} <span className={"note"}>(using {ruleset} Filter)</span>
+                        {data.name} <span className={"note"}>(using {props.currentSceneMetadata?.ruleset} Filter)</span>
                     </h2>
                     {playerContext.role === "GM" ? (
                         <div className={"search-wrapper"}>
@@ -114,7 +112,7 @@ export const CharacterSheet = () => {
                     {data.sheet && !forceSearch ? (
                         <Statblock slug={data.sheet} />
                     ) : search !== "" ? (
-                        ruleSetMap.get(ruleset)
+                        ruleSetMap.get(props.currentSceneMetadata?.ruleset || "e5")
                     ) : (
                         <></>
                     )}

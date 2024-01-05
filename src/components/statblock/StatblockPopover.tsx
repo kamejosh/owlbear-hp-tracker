@@ -1,19 +1,16 @@
-import { characterMetadata, statblockPopoverId } from "../../helper/variables.ts";
+import { characterMetadata, sceneMetadata, statblockPopoverId } from "../../helper/variables.ts";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
 import { useEffect, useState } from "react";
 import { StatblockList } from "./StatblockList.tsx";
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
-import { HpTrackerMetadata } from "../../helper/types.ts";
+import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
 import { sortItems } from "../../helper/helpers.ts";
 
 export const StatblockPopover = () => {
-    window.addEventListener("resize", () => {
-        console.log("resizing");
-    });
-
     const [minimized, setMinimized] = useState<boolean>(false);
     const [tokens, setTokens] = useState<Array<Item>>([]);
+    const [currentSceneMetadata, setCurrentSceneMetadata] = useState<SceneMetadata | null>(null);
     const { isReady } = SceneReadyContext();
 
     const initPopover = async () => {
@@ -25,6 +22,10 @@ export const StatblockPopover = () => {
         );
         setTokens(initialItems.sort(sortItems));
 
+        const sceneData = await OBR.scene.getMetadata();
+        const metadata = sceneData[sceneMetadata] as SceneMetadata;
+        setCurrentSceneMetadata(metadata);
+
         OBR.scene.items.onChange(async (items) => {
             const filteredItems = items.filter(
                 (item) =>
@@ -33,6 +34,15 @@ export const StatblockPopover = () => {
                     (item.metadata[characterMetadata] as HpTrackerMetadata).sheet !== ""
             );
             setTokens(Array.from(filteredItems.sort(sortItems)));
+        });
+
+        OBR.scene.onMetadataChange((sceneData) => {
+            const metadata = sceneData[sceneMetadata] as SceneMetadata;
+            if (metadata) {
+                setCurrentSceneMetadata(metadata);
+                OBR.popover.setHeight(statblockPopoverId, metadata.statblockPopover?.height || 600);
+                OBR.popover.setWidth(statblockPopoverId, metadata.statblockPopover?.width || 500);
+            }
         });
     };
 
@@ -50,7 +60,10 @@ export const StatblockPopover = () => {
                         className={"top-button"}
                         onClick={() => {
                             if (minimized) {
-                                OBR.popover.setHeight(statblockPopoverId, 600);
+                                OBR.popover.setHeight(
+                                    statblockPopoverId,
+                                    currentSceneMetadata?.statblockPopover?.height || 600
+                                );
                             } else {
                                 OBR.popover.setHeight(statblockPopoverId, 100);
                             }

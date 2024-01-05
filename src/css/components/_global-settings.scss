@@ -49,6 +49,18 @@
         gap: 1ch;
     }
 
+    .statblock-popover {
+        display: block;
+        .small {
+            display: block;
+        }
+
+        label {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+        }
+    }
+
     .group-list {
         display: flex;
         flex-wrap: wrap;
@@ -76,5 +88,9 @@
                 }
             }
         }
+    }
+
+    .small {
+        font-size: 0.7em;
     }
 }

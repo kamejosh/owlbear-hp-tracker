@@ -2,8 +2,9 @@ import { plausibleEvent } from "../../../helper/helpers.ts";
 import OBR from "@owlbear-rodeo/sdk";
 import { changelogModal, helpModal, settingsModal, statblockPopover } from "../../../helper/variables.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
+import { SceneMetadata } from "../../../helper/types.ts";
 
-export const Helpbuttons = () => {
+export const Helpbuttons = (props: { currentSceneMetadata: SceneMetadata | null }) => {
     const playerContext = usePlayerContext();
 
     return (
@@ -32,8 +33,8 @@ export const Helpbuttons = () => {
                     const height = await OBR.viewport.getHeight();
                     await OBR.popover.open({
                         ...statblockPopover,
-                        width: Math.min(500, width),
-                        height: Math.min(600, height),
+                        width: Math.min(props.currentSceneMetadata?.statblockPopover?.width || 500, width),
+                        height: Math.min(props.currentSceneMetadata?.statblockPopover?.height || 600, height),
                         anchorPosition: { top: 55, left: width - 70 },
                     });
                 }}
