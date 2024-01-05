@@ -13,8 +13,8 @@ export const StatblockList = (props: { minimized: boolean; tokens: Array<Item> }
     return (
         <>
             <Swiper
-                className="statblock-list"
-                direction={"horizontal"}
+                className={`statblock-list ${props.minimized ? "minimized" : ""}`}
+                direction={`horizontal`}
                 slidesPerView={"auto"}
                 spaceBetween={0}
                 modules={[FreeMode]}

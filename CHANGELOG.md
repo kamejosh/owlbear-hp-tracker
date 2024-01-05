@@ -1,3 +1,10 @@
+# 1.5.0
+
++ Add Statblock Popover
++ Add Setting to change Statblock Popover dimensions
++ Fix styling issues in Statblocks
++ Refactor styling and help buttons
+
 # 1.4.6
 
 + Fix some styling issues on mobile and embedded

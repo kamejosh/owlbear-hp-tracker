@@ -26,6 +26,10 @@
             overflow: hidden;
             list-style: none;
 
+            &.minimized {
+                padding: 0;
+            }
+
             .swiper-slide {
                 border-bottom: 1px solid white;
             }
