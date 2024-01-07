@@ -1,5 +1,4 @@
 import { components } from "../../../ttrpgapi/schema";
-import "./e5ability.scss";
 
 type Ability = components["schemas"]["Action-Output"];
 

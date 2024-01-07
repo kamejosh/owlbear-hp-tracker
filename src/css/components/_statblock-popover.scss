@@ -1,0 +1,119 @@
+body:has(.statblock-app) {
+    overflow-y: scroll;
+}
+
+.statblock-app {
+    .statblock-popover {
+        position: relative;
+
+        &::before {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: var(--bg-color);
+            width: 100%;
+            height: calc(30px + 1rem);
+            content: "";
+        }
+
+        .help-buttons {
+            z-index: 10;
+        }
+
+        .statblock-list {
+            position: sticky;
+            top: calc(30px + 1rem);
+            margin-top: calc(10px + 1rem);
+            background: linear-gradient(to top, #ffffff00, var(--bg-color) 20px);
+            padding: 0 0 20px;
+            overflow: hidden;
+            list-style: none;
+
+            &.minimized {
+                padding: 0;
+            }
+
+            .swiper-slide {
+                border-bottom: 1px solid white;
+            }
+
+            .pre,
+            .post {
+                display: block;
+                align-self: flex-end;
+                width: 10px;
+                height: 10px;
+            }
+
+            .statblock-name {
+                transition: all 0.25s ease-in-out;
+                cursor: pointer;
+                border-top-right-radius: 5px;
+                border-top-left-radius: 5px;
+                padding-inline: 1ch;
+                padding-top: 3px;
+                width: 100px;
+                overflow: hidden;
+                color: gray;
+                font-weight: 600;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+
+                &:first-child {
+                    border-right: none;
+                }
+
+                &:last-child {
+                    border-left: none;
+                }
+
+                &:hover,
+                &:focus-visible {
+                    background-color: dimgrey;
+                }
+
+                &.active {
+                    display: flex;
+                    justify-content: space-between;
+                    gap: 1ch;
+                    border: 1px solid white;
+                    border-bottom: none;
+                    color: white;
+
+                    &:hover,
+                    &:focus-visible {
+                        background: linear-gradient(to bottom, dimgray 90%, var(--bg-color));
+                    }
+                }
+
+                .name {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                .pin {
+                    border: none;
+                    background-color: transparent;
+                    padding-inline: 0;
+                    height: 18px;
+                    font-size: 0;
+
+                    svg {
+                        padding-block: 2px;
+                        height: 100%;
+                        color: gray;
+                    }
+
+                    &:hover,
+                    &.pinned {
+                        svg {
+                            color: white;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

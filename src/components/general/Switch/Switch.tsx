@@ -1,4 +1,3 @@
-import "./switch.scss";
 import { CSSProperties } from "react";
 
 type SwitchProps = {

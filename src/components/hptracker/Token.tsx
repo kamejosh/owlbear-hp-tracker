@@ -8,7 +8,6 @@ import { useCharSheet } from "../../context/CharacterContext.ts";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { updateHp } from "../../helper/hpHelpers.ts";
 import { evalString } from "../../helper/helpers.ts";
-import "./player-wrapper.scss";
 import { updateAc } from "../../helper/acHelper.ts";
 
 type TokenProps = {
@@ -434,6 +433,7 @@ export const Token = (props: TokenProps) => {
                     className={`toggle-button initiative-button`}
                     onClick={() => {
                         const value = Math.floor(Math.random() * 20) + 1 + data.stats.initiativeBonus;
+                        console.log(data.stats.initiativeBonus);
                         const newData = { ...data, initiative: value };
                         setData(newData);
                         handleValueChange(newData);

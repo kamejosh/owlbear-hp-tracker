@@ -2,24 +2,17 @@ import { useEffect, useState } from "react";
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
-import {
-    changelogModal,
-    characterMetadata,
-    helpModal,
-    sceneMetadata,
-    settingsModal,
-    version,
-} from "../../helper/variables.ts";
+import { changelogModal, characterMetadata, sceneMetadata, version } from "../../helper/variables.ts";
 import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
 import { DragDropContext, DraggableLocation, DropResult } from "react-beautiful-dnd";
-import "./hp-tracker.scss";
 import { PlayerTokenList } from "./TokenList.tsx";
 import { useCharSheet } from "../../context/CharacterContext.ts";
 import { CharacterSheet } from "./charactersheet/CharacterSheet.tsx";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { DropGroup } from "./DropGroup.tsx";
-import { plausibleEvent, sortItems, sortItemsInitiative } from "../../helper/helpers.ts";
+import { sortItems, sortItemsInitiative } from "../../helper/helpers.ts";
 import { compare } from "compare-versions";
+import { Helpbuttons } from "../general/Helpbuttons/Helpbuttons.tsx";
 
 export const HPTracker = () => {
     return (
@@ -195,38 +188,10 @@ const Content = () => {
 
     return playerContext.role ? (
         characterId ? (
-            <CharacterSheet />
+            <CharacterSheet currentSceneMetadata={currentSceneMetadata} />
         ) : (
             <div className={"hp-tracker"}>
-                <div className={"help-buttons"}>
-                    <a
-                        href={"https://www.patreon.com/TTRPGAPI"}
-                        className={"patreon-button"}
-                        target={"_blank"}
-                        onClick={() => {
-                            plausibleEvent("patreon-click");
-                        }}
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 436 476">
-                            <path
-                                data-fill="1"
-                                d="M436 143c-.084-60.778-47.57-110.591-103.285-128.565C263.528-7.884 172.279-4.649 106.214 26.424 26.142 64.089.988 146.596.051 228.883c-.77 67.653 6.004 245.841 106.83 247.11 74.917.948 86.072-95.279 120.737-141.623 24.662-32.972 56.417-42.285 95.507-51.929C390.309 265.865 436.097 213.011 436 143Z"
-                                fill={"#dddddd"}
-                            ></path>
-                        </svg>
-                    </a>
-                    {playerContext.role == "GM" ? (
-                        <button className={"settings-button"} onClick={async () => await OBR.modal.open(settingsModal)}>
-                            ⛭
-                        </button>
-                    ) : null}
-                    <button className={"change-log-button"} onClick={async () => await OBR.modal.open(changelogModal)}>
-                        i
-                    </button>
-                    <button className={"help-button"} onClick={async () => await OBR.modal.open(helpModal)}>
-                        ?
-                    </button>
-                </div>
+                <Helpbuttons currentSceneMetadata={currentSceneMetadata} />
                 <h1 className={"title"}>
                     HP Tracker<span className={"small"}>{version}</span>
                 </h1>

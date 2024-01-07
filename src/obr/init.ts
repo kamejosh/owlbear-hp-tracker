@@ -71,6 +71,8 @@ const initScene = async () => {
             allowNegativeNumbers: false,
             id: uuidv4(),
             groups: ["Default"],
+            openGroups: ["Default"],
+            statblockPopover: { width: 500, height: 600 },
             playerSort: false,
         };
     } else {
@@ -86,6 +88,9 @@ const initScene = async () => {
         }
         if (!sceneData.groups || sceneData.groups.length === 0) {
             sceneData.groups = ["Default"];
+        }
+        if (sceneData.openGroups === undefined) {
+            sceneData.openGroups = ["Default"];
         }
         if (sceneData.hpBarSegments === undefined) {
             sceneData.hpBarSegments = 0;
@@ -109,6 +114,9 @@ const initScene = async () => {
         }
         if (!sceneData.acShield) {
             sceneData.acShield = true;
+        }
+        if (sceneData.statblockPopover === undefined) {
+            sceneData.statblockPopover = { width: 500, height: 600 };
         }
         if (!sceneData.playerSort) {
             sceneData.playerSort = false;

@@ -4,7 +4,6 @@ import { Token } from "../hptracker/Token.tsx";
 import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
 import { characterMetadata, sceneMetadata } from "../../helper/variables.ts";
 import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
-import "./popover.scss";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { Loader } from "../general/Loader.tsx";
 

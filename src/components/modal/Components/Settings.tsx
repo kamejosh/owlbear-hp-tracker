@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import OBR, { Metadata } from "@owlbear-rodeo/sdk";
 import { updateHpOffset } from "../../../helper/hpHelpers.ts";
 import { Groups } from "./Groups.tsx";
-import "./global-settings.scss";
 import { Switch } from "../../general/Switch/Switch.tsx";
 import { dndSvg, pfSvg } from "./SwitchBackground.ts";
 import { plausibleEvent } from "../../../helper/helpers.ts";
@@ -22,6 +21,10 @@ export const Settings = () => {
         false
     );
     const [ruleset, setStateRuleset] = useLocalStorage<Ruleset>(`${ID}.ruleset`, "e5");
+    const [statblockPopover, setStatblockPopover] = useLocalStorage<{ width: number; height: number }>(
+        `${ID}.statblockPopover`,
+        { width: 500, height: 600 }
+    );
     const [playerSort, setPlayerSort] = useLocalStorage<boolean>(`${ID}.playerSort`, false);
     const { isReady } = SceneReadyContext();
     const [sceneId, setSceneId] = useState<string | null>(null);
@@ -37,6 +40,7 @@ export const Settings = () => {
             hpTrackerSceneMetadata.hpBarSegments = segments;
             hpTrackerSceneMetadata.allowNegativeNumbers = allowNegativNumbers;
             hpTrackerSceneMetadata.ruleset = ruleset;
+            hpTrackerSceneMetadata.statblockPopover = statblockPopover;
             hpTrackerSceneMetadata.playerSort = playerSort;
             const ownMetadata: Metadata = {};
             ownMetadata[sceneMetadata] = hpTrackerSceneMetadata;
@@ -46,7 +50,7 @@ export const Settings = () => {
         if (isReady) {
             setSceneMetadata();
         }
-    }, [offset, segments, allowNegativNumbers, ruleset, acOffset, playerSort]);
+    }, [offset, segments, allowNegativNumbers, ruleset, acOffset, statblockPopover, playerSort]);
 
     const handleOffsetChange = (value: number) => {
         updateHpOffset(value);
@@ -187,6 +191,62 @@ export const Settings = () => {
                                 plausibleEvent("player-sort", (!playerSort).toString());
                             }}
                         />
+                    </div>
+                    <div className={"statblock-popover setting"}>
+                        Statblock Popover dimensions{" "}
+                        <span className={"small"}>(bigger than the current viewport is not possible)</span>
+                        <label>
+                            width{" "}
+                            <input
+                                type={"number"}
+                                defaultValue={statblockPopover.width}
+                                onBlur={(e) => {
+                                    setStatblockPopover({
+                                        ...statblockPopover,
+                                        width: Math.max(parseInt(e.target.value), 200),
+                                    });
+                                    e.currentTarget.value = Math.max(200, parseInt(e.currentTarget.value)).toString();
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        setStatblockPopover({
+                                            ...statblockPopover,
+                                            width: Math.max(parseInt(e.currentTarget.value), 200),
+                                        });
+                                        e.currentTarget.value = Math.max(
+                                            200,
+                                            parseInt(e.currentTarget.value)
+                                        ).toString();
+                                    }
+                                }}
+                            />
+                        </label>
+                        <label>
+                            height{" "}
+                            <input
+                                type={"number"}
+                                defaultValue={statblockPopover.height}
+                                onChange={(e) => {
+                                    setStatblockPopover({
+                                        ...statblockPopover,
+                                        height: Math.max(200, parseInt(e.target.value)),
+                                    });
+                                    e.currentTarget.value = Math.max(200, parseInt(e.target.value)).toString();
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        setStatblockPopover({
+                                            ...statblockPopover,
+                                            height: Math.max(parseInt(e.currentTarget.value)),
+                                        });
+                                        e.currentTarget.value = Math.max(
+                                            200,
+                                            parseInt(e.currentTarget.value)
+                                        ).toString();
+                                    }
+                                }}
+                            />
+                        </label>
                     </div>
                     {sceneId ? <Groups sceneId={sceneId} /> : null}
                 </>
