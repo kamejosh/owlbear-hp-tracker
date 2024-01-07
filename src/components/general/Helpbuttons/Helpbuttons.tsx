@@ -26,28 +26,30 @@ export const Helpbuttons = (props: { currentSceneMetadata: SceneMetadata | null 
                     ></path>
                 </svg>
             </a>
-            <button
-                className={"statblock-button top-button"}
-                onClick={async () => {
-                    const width = await OBR.viewport.getWidth();
-                    const height = await OBR.viewport.getHeight();
-                    await OBR.popover.open({
-                        ...statblockPopover,
-                        width: Math.min(props.currentSceneMetadata?.statblockPopover?.width || 500, width),
-                        height: Math.min(props.currentSceneMetadata?.statblockPopover?.height || 600, height),
-                        anchorPosition: { top: 55, left: width - 70 },
-                    });
-                }}
-                title={"Statblocks"}
-            ></button>
             {playerContext.role == "GM" ? (
-                <button
-                    className={"settings-button top-button"}
-                    onClick={async () => await OBR.modal.open(settingsModal)}
-                    title={"Settings"}
-                >
-                    ⛭
-                </button>
+                <>
+                    <button
+                        className={"statblock-button top-button"}
+                        onClick={async () => {
+                            const width = await OBR.viewport.getWidth();
+                            const height = await OBR.viewport.getHeight();
+                            await OBR.popover.open({
+                                ...statblockPopover,
+                                width: Math.min(props.currentSceneMetadata?.statblockPopover?.width || 500, width),
+                                height: Math.min(props.currentSceneMetadata?.statblockPopover?.height || 600, height),
+                                anchorPosition: { top: 55, left: width - 70 },
+                            });
+                        }}
+                        title={"Statblocks"}
+                    ></button>
+                    <button
+                        className={"settings-button top-button"}
+                        onClick={async () => await OBR.modal.open(settingsModal)}
+                        title={"Settings"}
+                    >
+                        ⛭
+                    </button>
+                </>
             ) : null}
             <button
                 className={"change-log-button top-button"}

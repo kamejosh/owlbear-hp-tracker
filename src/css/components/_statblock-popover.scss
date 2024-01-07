@@ -1,3 +1,7 @@
+body:has(.statblock-app) {
+    overflow-y: scroll;
+}
+
 .statblock-app {
     .statblock-popover {
         position: relative;
@@ -51,6 +55,7 @@
                 padding-top: 3px;
                 width: 100px;
                 overflow: hidden;
+                color: gray;
                 font-weight: 600;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -69,8 +74,44 @@
                 }
 
                 &.active {
+                    display: flex;
+                    justify-content: space-between;
+                    gap: 1ch;
                     border: 1px solid white;
                     border-bottom: none;
+                    color: white;
+
+                    &:hover,
+                    &:focus-visible {
+                        background: linear-gradient(to bottom, dimgray 90%, var(--bg-color));
+                    }
+                }
+
+                .name {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                .pin {
+                    border: none;
+                    background-color: transparent;
+                    padding-inline: 0;
+                    height: 18px;
+                    font-size: 0;
+
+                    svg {
+                        padding-block: 2px;
+                        height: 100%;
+                        color: gray;
+                    }
+
+                    &:hover,
+                    &.pinned {
+                        svg {
+                            color: white;
+                        }
+                    }
                 }
             }
         }

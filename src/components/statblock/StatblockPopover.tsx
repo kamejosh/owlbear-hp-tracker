@@ -11,6 +11,8 @@ export const StatblockPopover = () => {
     const [minimized, setMinimized] = useState<boolean>(false);
     const [tokens, setTokens] = useState<Array<Item>>([]);
     const [currentSceneMetadata, setCurrentSceneMetadata] = useState<SceneMetadata | null>(null);
+    const [pinned, setPinned] = useState<boolean>(false);
+    const [slug, setSlug] = useState<string | null>(null);
     const { isReady } = SceneReadyContext();
 
     const initPopover = async () => {
@@ -40,8 +42,23 @@ export const StatblockPopover = () => {
             const metadata = sceneData[sceneMetadata] as SceneMetadata;
             if (metadata) {
                 setCurrentSceneMetadata(metadata);
-                OBR.popover.setHeight(statblockPopoverId, metadata.statblockPopover?.height || 600);
-                OBR.popover.setWidth(statblockPopoverId, metadata.statblockPopover?.width || 500);
+                if (!minimized) {
+                    OBR.popover.setHeight(statblockPopoverId, metadata.statblockPopover?.height || 600);
+                    OBR.popover.setWidth(statblockPopoverId, metadata.statblockPopover?.width || 500);
+                }
+            }
+        });
+
+        OBR.player.onChange(async (player) => {
+            if (player.selection && player.selection.length === 1) {
+                const items = await OBR.scene.items.getItems(player.selection);
+                if (items.length > 0) {
+                    const metadata = items[0].metadata;
+                    if (characterMetadata in metadata) {
+                        const data = metadata[characterMetadata] as HpTrackerMetadata;
+                        setSlug(data.sheet);
+                    }
+                }
             }
         });
     };
@@ -81,7 +98,13 @@ export const StatblockPopover = () => {
                         X
                     </button>
                 </div>
-                <StatblockList minimized={minimized} tokens={tokens} />
+                <StatblockList
+                    minimized={minimized}
+                    tokens={tokens}
+                    pinned={pinned}
+                    setPinned={setPinned}
+                    slug={slug}
+                />
             </div>
         </ContextWrapper>
     );
