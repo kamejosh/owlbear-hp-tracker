@@ -4,6 +4,8 @@
 + Add Setting to change Statblock Popover dimensions
 + Fix styling issues in Statblocks
 + Refactor styling and help buttons
++ Add auto select of current statblock
++ Fix temp hp offset bug
 
 # 1.4.6
 

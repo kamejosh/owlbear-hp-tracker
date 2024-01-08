@@ -12,33 +12,89 @@
     }
 
     .group-wrapper {
-        &.hidden {
+        .drop-list-wrapper {
+            display: grid;
+            grid-template-rows: 1fr;
+            transition: all 0.25s ease-in-out;
+            overflow: hidden;
+
             .drop-list {
-                display: none;
+                min-height: 0;
+            }
+        }
+        &.hidden {
+            .drop-list-wrapper {
+                grid-template-rows: 0fr;
             }
 
             .group-title {
                 .hide-group {
-                    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 -960 960 960' width='24'%3E%3Cpath d='M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z' fill='white'/%3E%3C/svg%3E");
+                    rotate: 0deg;
                 }
             }
         }
 
         .group-title {
-            display: flex;
+            display: grid;
+            grid-template-rows: 1fr;
+            grid-template-columns: repeat(3, 1fr) 0.5fr 0.25fr;
+            grid-template-areas: "name settings . init hide";
             align-items: center;
+            justify-items: flex-start;
             gap: 1ch;
+            padding-block: 5px;
             font-weight: 600;
             text-align: left;
 
-            &::before {
-                content: "Group: ";
+            .group-name {
+                display: flex;
+                grid-area: name;
+                align-items: center;
+                gap: 1ch;
+                margin-left: 1ch;
+                max-width: 130px;
+
+                span {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                &::before {
+                    display: inline-block;
+                    flex-shrink: 0;
+                    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 -960 960 960' width='24'%3E%3Cpath d='M0-240v-63q0-43 44-70t116-27q13 0 25 .5t23 2.5q-14 21-21 44t-7 48v65H0Zm240 0v-65q0-32 17.5-58.5T307-410q32-20 76.5-30t96.5-10q53 0 97.5 10t76.5 30q32 20 49 46.5t17 58.5v65H240Zm540 0v-65q0-26-6.5-49T754-397q11-2 22.5-2.5t23.5-.5q72 0 116 26.5t44 70.5v63H780Zm-455-80h311q-10-20-55.5-35T480-370q-55 0-100.5 15T325-320ZM160-440q-33 0-56.5-23.5T80-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T160-440Zm640 0q-33 0-56.5-23.5T720-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T800-440Zm-320-40q-50 0-85-35t-35-85q0-51 35-85.5t85-34.5q51 0 85.5 34.5T600-600q0 50-34.5 85T480-480Zm0-80q17 0 28.5-11.5T520-600q0-17-11.5-28.5T480-640q-17 0-28.5 11.5T440-600q0 17 11.5 28.5T480-560Zm1 240Zm-1-280Z' fill='white'/%3E%3C/svg%3E");
+                    background-position: center;
+                    background-size: contain;
+                    background-repeat: no-repeat;
+                    width: 20px;
+                    height: 20px;
+                    content: "";
+                }
+            }
+
+            .toggle-button {
+                width: 20px;
+                height: 20px;
+            }
+
+            .settings {
+                grid-area: settings;
+            }
+
+            .initiative-button {
+                grid-area: init;
+                justify-self: center;
             }
 
             .hide-group {
+                grid-area: hide;
+                justify-self: center;
+                rotate: 90deg;
+                transition: all 0.25s ease-in-out;
                 cursor: pointer;
                 border: none;
-                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 -960 960 960' width='24'%3E%3Cpath d='m644-428-58-58q9-47-27-88t-93-32l-58-58q17-8 34.5-12t37.5-4q75 0 127.5 52.5T660-500q0 20-4 37.5T644-428Zm128 126-58-56q38-29 67.5-63.5T832-500q-50-101-143.5-160.5T480-720q-29 0-57 4t-55 12l-62-62q41-17 84-25.5t90-8.5q151 0 269 83.5T920-500q-23 59-60.5 109.5T772-302Zm20 246L624-222q-35 11-70.5 16.5T480-200q-151 0-269-83.5T40-500q21-53 53-98.5t73-81.5L56-792l56-56 736 736-56 56ZM222-624q-29 26-53 57t-41 67q50 101 143.5 160.5T480-280q20 0 39-2.5t39-5.5l-36-38q-11 3-21 4.5t-21 1.5q-75 0-127.5-52.5T300-500q0-11 1.5-21t4.5-21l-84-82Zm319 93Zm-151 75Z' fill='white'/%3E%3C/svg%3E");
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 -960 960 960' width='24' fill='white'%3E%3Cpath d='M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z'/%3E%3C/svg%3E");
                 background-position: center;
                 background-size: contain;
                 background-repeat: no-repeat;
@@ -47,6 +103,7 @@
                 height: 20px;
             }
         }
+
         .empty-group {
             opacity: 0.5;
             border-radius: 5px;
