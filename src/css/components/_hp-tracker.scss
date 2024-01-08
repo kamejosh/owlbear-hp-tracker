@@ -29,7 +29,9 @@
 
             .group-title {
                 .hide-group {
-                    rotate: 0deg;
+                    &::after {
+                        rotate: 0deg;
+                    }
                 }
             }
         }
@@ -88,19 +90,32 @@
             }
 
             .hide-group {
+                display: flex;
                 grid-area: hide;
+                align-items: center;
                 justify-self: center;
-                rotate: 90deg;
-                transition: all 0.25s ease-in-out;
                 cursor: pointer;
+                outline: 1px solid white;
                 border: none;
-                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 -960 960 960' width='24' fill='white'%3E%3Cpath d='M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z'/%3E%3C/svg%3E");
-                background-position: center;
-                background-size: contain;
-                background-repeat: no-repeat;
-                background-color: transparent;
-                width: 20px;
-                height: 20px;
+                padding: 0;
+
+                &:hover {
+                    outline-offset: 1px;
+                }
+
+                &::after {
+                    display: block;
+                    rotate: 90deg;
+                    transition: all 0.25s ease-in-out;
+                    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 -960 960 960' width='24' fill='white'%3E%3Cpath d='M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z'/%3E%3C/svg%3E");
+                    background-position: center;
+                    background-size: contain;
+                    background-repeat: no-repeat;
+                    background-color: transparent;
+                    width: 20px;
+                    height: 20px;
+                    content: "";
+                }
             }
         }
 

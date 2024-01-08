@@ -6,6 +6,7 @@
 + Refactor styling and help buttons
 + Add auto select of current statblock
 + Fix temp hp offset bug
++ Add Group Settings that apply to all Tokens in a group
 
 # 1.4.6
 
