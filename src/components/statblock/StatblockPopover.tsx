@@ -104,6 +104,7 @@ export const StatblockPopover = () => {
                     pinned={pinned}
                     setPinned={setPinned}
                     slug={slug}
+                    currentSceneMetadata={currentSceneMetadata}
                 />
             </div>
         </ContextWrapper>

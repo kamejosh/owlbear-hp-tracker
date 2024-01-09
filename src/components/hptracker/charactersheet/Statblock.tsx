@@ -1,12 +1,11 @@
 import { useCharSheet } from "../../../context/CharacterContext.ts";
 import OBR from "@owlbear-rodeo/sdk";
-import { characterMetadata, ID } from "../../../helper/variables.ts";
-import { HpTrackerMetadata, Ruleset } from "../../../helper/types.ts";
+import { characterMetadata } from "../../../helper/variables.ts";
+import { HpTrackerMetadata, SceneMetadata } from "../../../helper/types.ts";
 import { useEffect } from "react";
 import { PfAbility } from "./PfAbility.tsx";
 import { useE5GetStatblock } from "../../../ttrpgapi/e5/useE5Api.ts";
 import { usePfGetStatblock } from "../../../ttrpgapi/pf/usePfApi.ts";
-import { useLocalStorage } from "../../../helper/hooks.ts";
 import { E5Ability } from "./E5Ability.tsx";
 import { E5Spells } from "./E5Spells.tsx";
 import { PfSpells } from "./PfSpells.tsx";
@@ -370,7 +369,14 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
     ) : null;
 };
 
-export const Statblock = ({ slug }: { slug: string }) => {
-    const [ruleset, _] = useLocalStorage<Ruleset>(`${ID}.ruleset`, "e5");
-    return <>{ruleset === "e5" ? <E5StatBlock slug={slug} /> : <PfStatBlock slug={slug} />}</>;
+export const Statblock = (props: { slug: string; currentSceneMetadata: SceneMetadata | null }) => {
+    return (
+        <>
+            {props.currentSceneMetadata && props.currentSceneMetadata.ruleset === "e5" ? (
+                <E5StatBlock slug={props.slug} />
+            ) : (
+                <PfStatBlock slug={props.slug} />
+            )}
+        </>
+    );
 };

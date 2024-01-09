@@ -6,7 +6,7 @@ import "swiper/css/free-mode";
 import { Item } from "@owlbear-rodeo/sdk";
 import { useEffect, useState } from "react";
 import { characterMetadata } from "../../helper/variables.ts";
-import { HpTrackerMetadata } from "../../helper/types.ts";
+import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
 import SwiperClass from "swiper/types/swiper-class";
 
 type StatblockListProps = {
@@ -15,6 +15,7 @@ type StatblockListProps = {
     pinned: boolean;
     setPinned: (pinned: boolean) => void;
     slug: string | null;
+    currentSceneMetadata: SceneMetadata | null;
 };
 export const StatblockList = (props: StatblockListProps) => {
     const [slug, setSlug] = useState<string | null>(null);
@@ -83,7 +84,9 @@ export const StatblockList = (props: StatblockListProps) => {
                 <SwiperSlide className={"post"}> </SwiperSlide>
             </Swiper>
             {props.minimized ? null : (
-                <div className={"statblock-sheet"}>{slug ? <Statblock slug={slug} /> : null}</div>
+                <div className={"statblock-sheet"}>
+                    {slug ? <Statblock slug={slug} currentSceneMetadata={props.currentSceneMetadata} /> : null}
+                </div>
             )}
         </>
     );

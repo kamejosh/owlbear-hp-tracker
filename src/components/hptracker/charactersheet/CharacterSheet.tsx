@@ -110,7 +110,7 @@ export const CharacterSheet = (props: { currentSceneMetadata: SceneMetadata | nu
                         </div>
                     ) : null}
                     {data.sheet && !forceSearch ? (
-                        <Statblock slug={data.sheet} />
+                        <Statblock slug={data.sheet} currentSceneMetadata={props.currentSceneMetadata} />
                     ) : search !== "" ? (
                         ruleSetMap.get(props.currentSceneMetadata?.ruleset || "e5")
                     ) : (
