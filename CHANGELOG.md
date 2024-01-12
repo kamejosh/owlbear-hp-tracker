@@ -8,6 +8,7 @@
 + Fix temp hp offset bug
 + Add Group Settings that apply to all Tokens in a group
 + Make Initiative dice customizable in Settings
++ Add Multiselect and Multidrag to Tokenlist
 
 # 1.4.6
 

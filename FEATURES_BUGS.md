@@ -17,5 +17,3 @@
 + Battleround and Effect tracking (low prio)
 
 ## Development Ideas
-
-+ move the 4 settings button inside a single settings button which opens a dialog
