@@ -115,7 +115,7 @@ export const DropGroup = (props: DropGroupProps) => {
         await OBR.scene.items.updateItems(props.list, (items) => {
             items.forEach((item) => {
                 const value =
-                    Math.floor(Math.random() * 20) +
+                    Math.floor(Math.random() * (props.metadata.initiativeDice ?? 20)) +
                     1 +
                     (item.metadata[characterMetadata] as HpTrackerMetadata).stats.initiativeBonus;
                 (item.metadata[characterMetadata] as HpTrackerMetadata).initiative = value;

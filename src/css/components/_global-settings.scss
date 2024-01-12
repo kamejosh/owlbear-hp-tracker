@@ -49,6 +49,14 @@
         gap: 1ch;
     }
 
+    .initiative-dice {
+        display: flex;
+
+        input {
+            max-width: 4ch;
+        }
+    }
+
     .statblock-popover {
         display: block;
         .small {
@@ -58,6 +66,10 @@
         label {
             display: grid;
             grid-template-columns: 1fr 3fr;
+        }
+
+        input {
+            max-width: 7ch;
         }
     }
 

@@ -72,6 +72,7 @@ const initScene = async () => {
             id: uuidv4(),
             groups: ["Default"],
             openGroups: ["Default"],
+            initiativeDice: 20,
             statblockPopover: { width: 500, height: 600 },
             playerSort: false,
         };
@@ -114,6 +115,9 @@ const initScene = async () => {
         }
         if (!sceneData.acShield) {
             sceneData.acShield = true;
+        }
+        if (!sceneData.initiativeDice) {
+            sceneData.initiativeDice = 20;
         }
         if (sceneData.statblockPopover === undefined) {
             sceneData.statblockPopover = { width: 500, height: 600 };

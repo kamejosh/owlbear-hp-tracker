@@ -21,6 +21,7 @@ export const Settings = () => {
         false
     );
     const [ruleset, setStateRuleset] = useLocalStorage<Ruleset>(`${ID}.ruleset`, "e5");
+    const [initiativeDice, setInitiativeDice] = useLocalStorage<number>(`${ID}.initiativeDice`, 20);
     const [statblockPopover, setStatblockPopover] = useLocalStorage<{ width: number; height: number }>(
         `${ID}.statblockPopover`,
         { width: 500, height: 600 }
@@ -40,6 +41,7 @@ export const Settings = () => {
             hpTrackerSceneMetadata.hpBarSegments = segments;
             hpTrackerSceneMetadata.allowNegativeNumbers = allowNegativNumbers;
             hpTrackerSceneMetadata.ruleset = ruleset;
+            hpTrackerSceneMetadata.initiativeDice = initiativeDice;
             hpTrackerSceneMetadata.statblockPopover = statblockPopover;
             hpTrackerSceneMetadata.playerSort = playerSort;
             const ownMetadata: Metadata = {};
@@ -50,7 +52,7 @@ export const Settings = () => {
         if (isReady) {
             setSceneMetadata();
         }
-    }, [offset, segments, allowNegativNumbers, ruleset, acOffset, statblockPopover, playerSort]);
+    }, [offset, segments, allowNegativNumbers, ruleset, acOffset, statblockPopover, playerSort, initiativeDice]);
 
     const handleOffsetChange = (value: number) => {
         updateHpOffset(value);
@@ -189,6 +191,17 @@ export const Settings = () => {
                             onChange={() => {
                                 setPlayerSort(!playerSort);
                                 plausibleEvent("player-sort", (!playerSort).toString());
+                            }}
+                        />
+                    </div>
+                    <div className={"initiative-dice setting"}>
+                        Set Initiative Dice:
+                        <input
+                            type={"number"}
+                            size={1}
+                            value={initiativeDice}
+                            onChange={(e) => {
+                                setInitiativeDice(parseInt(e.target.value));
                             }}
                         />
                     </div>

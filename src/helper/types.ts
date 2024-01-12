@@ -31,6 +31,7 @@ export type SceneMetadata = {
     groups?: Array<string>;
     openGroups?: Array<string>;
     openChangeLog?: boolean;
+    initiativeDice?: number;
     statblockPopover?: { width: number; height: number };
     playerSort: boolean;
 };
