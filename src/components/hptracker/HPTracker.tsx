@@ -148,16 +148,9 @@ const Content = () => {
             });
 
             localRemove = localRemove.concat(multiRemove);
-
-            console.log(localRemove, list);
-            console.log(endIndex);
-            console.log(result);
-
             localRemove.forEach((item) => {
                 result.splice(endIndex, 0, item);
             });
-
-            console.log(result);
         } else {
             result.splice(endIndex, 0, removed);
         }
