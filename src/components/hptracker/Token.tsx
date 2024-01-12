@@ -17,7 +17,7 @@ type TokenProps = {
     popover: boolean;
     selected: boolean;
     metadata: SceneMetadata;
-    tokenLists: Map<string, Array<Item>>;
+    tokenLists?: Map<string, Array<Item>>;
 };
 
 export const Token = (props: TokenProps) => {
@@ -156,7 +156,7 @@ export const Token = (props: TokenProps) => {
         const index = data.index!;
 
         if (currentGroup) {
-            const groupItems = props.tokenLists.get(currentGroup);
+            const groupItems = props.tokenLists?.get(currentGroup);
             if (groupItems) {
                 const selectedGroupItems = groupItems.filter((item) => currentSelection.includes(item.id));
 
