@@ -119,11 +119,48 @@ const Content = () => {
         });
     };
 
-    const reorder = (list: Item[], startIndex: number, endIndex: number) => {
+    const reorder = (
+        list: Item[],
+        startIndex: number,
+        endIndex: number,
+        dragItem: DropResult,
+        multiMove: boolean = false
+    ) => {
         const result = Array.from(list);
         result.sort(sortItems);
         const [removed] = result.splice(startIndex, 1);
-        result.splice(endIndex, 0, removed);
+        const multiRemove: Array<Item> = [removed];
+
+        if (multiMove) {
+            const alsoSelected = result.filter(
+                (item) => selectedTokens.includes(item.id) && item.id != dragItem.draggableId
+            );
+
+            let localRemove: Array<Item> = [];
+
+            alsoSelected.forEach((item) => {
+                localRemove = localRemove.concat(
+                    result.splice(
+                        result.findIndex((sourceItem) => sourceItem.id === item.id),
+                        1
+                    )
+                );
+            });
+
+            localRemove = localRemove.concat(multiRemove);
+
+            console.log(localRemove, list);
+            console.log(endIndex);
+            console.log(result);
+
+            localRemove.forEach((item) => {
+                result.splice(endIndex, 0, item);
+            });
+
+            console.log(result);
+        } else {
+            result.splice(endIndex, 0, removed);
+        }
         const tokens = result.filter((item) => item !== undefined);
 
         reorderMetadataIndex(tokens);
@@ -133,13 +170,39 @@ const Content = () => {
         source: Array<Item>,
         destination: Array<Item>,
         droppableSource: DraggableLocation,
-        droppableDestination: DraggableLocation
+        droppableDestination: DraggableLocation,
+        result: DropResult,
+        multiMove: boolean = false
     ) => {
         const sourceClone = Array.from(source);
         const destClone = Array.from(destination);
         const [removed] = sourceClone.splice(droppableSource.index, 1);
+        const multiRemove: Array<Item> = [removed];
 
-        destClone.splice(droppableDestination.index, 0, removed);
+        if (multiMove) {
+            const alsoSelected = source.filter(
+                (item) => selectedTokens.includes(item.id) && item.id != result.draggableId
+            );
+
+            let localRemove: Array<Item> = [];
+
+            alsoSelected.forEach((item) => {
+                localRemove = localRemove.concat(
+                    sourceClone.splice(
+                        sourceClone.findIndex((sourceItem) => sourceItem.id === item.id),
+                        1
+                    )
+                );
+            });
+
+            localRemove = localRemove.concat(multiRemove);
+
+            localRemove.forEach((item) => {
+                destClone.splice(droppableDestination.index, 0, item);
+            });
+        } else {
+            destClone.splice(droppableDestination.index, 0, removed);
+        }
 
         reorderMetadataIndex(sourceClone);
         reorderMetadataIndex(destClone, droppableDestination.droppableId);
@@ -155,7 +218,9 @@ const Content = () => {
                 tokenLists.get(result.source.droppableId) || [],
                 tokenLists.get(result.destination.droppableId) || [],
                 result.source,
-                result.destination
+                result.destination,
+                result,
+                selectedTokens.includes(result.draggableId)
             );
             return;
         }
@@ -164,7 +229,13 @@ const Content = () => {
             return;
         }
 
-        reorder(tokenLists.get(result.destination.droppableId) ?? [], result.source.index, result.destination.index);
+        reorder(
+            tokenLists.get(result.destination.droppableId) ?? [],
+            result.source.index,
+            result.destination.index,
+            result,
+            selectedTokens.includes(result.draggableId)
+        );
     };
 
     const orderByInitiative = () => {
