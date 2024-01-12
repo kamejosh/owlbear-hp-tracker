@@ -7,6 +7,7 @@
 + Add auto select of current statblock
 + Fix temp hp offset bug
 + Add Group Settings that apply to all Tokens in a group
++ Make Initiative dice customizable in Settings
 
 # 1.4.6
 

@@ -11,6 +11,7 @@ type DropGroupProps = {
     list: Array<Item>;
     selected: Array<string>;
     metadata: SceneMetadata;
+    tokenLists: Map<string, Array<Item>>;
 };
 
 export const DropGroup = (props: DropGroupProps) => {
@@ -186,6 +187,7 @@ export const DropGroup = (props: DropGroupProps) => {
                                     tokens={props.list}
                                     selected={props.selected}
                                     metadata={props.metadata}
+                                    tokenLists={props.tokenLists}
                                 />
                                 {provided.placeholder}
                             </div>

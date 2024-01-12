@@ -24,6 +24,7 @@ body {
     display: flex;
     margin: 0;
     background-color: var(--bg-color);
+    user-select: none;
 }
 
 #app {

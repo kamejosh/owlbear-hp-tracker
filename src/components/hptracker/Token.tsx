@@ -9,6 +9,7 @@ import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { updateHp } from "../../helper/hpHelpers.ts";
 import { evalString } from "../../helper/helpers.ts";
 import { updateAc } from "../../helper/acHelper.ts";
+import _ from "lodash";
 
 type TokenProps = {
     item: Item;
@@ -16,6 +17,7 @@ type TokenProps = {
     popover: boolean;
     selected: boolean;
     metadata: SceneMetadata;
+    tokenLists: Map<string, Array<Item>>;
 };
 
 export const Token = (props: TokenProps) => {
@@ -149,19 +151,80 @@ export const Token = (props: TokenProps) => {
         });
     };
 
+    const getGroupSelectRange = (currentSelection: Array<string>): Array<string> | null => {
+        const currentGroup = data.group;
+        const index = data.index!;
+
+        if (currentGroup) {
+            const groupItems = props.tokenLists.get(currentGroup);
+            if (groupItems) {
+                const selectedGroupItems = groupItems.filter((item) => currentSelection.includes(item.id));
+
+                const sortedByDistance = selectedGroupItems.sort((a, b) => {
+                    const aData = a.metadata[characterMetadata] as HpTrackerMetadata;
+                    const bData = b.metadata[characterMetadata] as HpTrackerMetadata;
+                    const aDelta = Math.abs(index - aData.index!);
+                    const bDelta = Math.abs(index - bData.index!);
+                    if (aDelta < bDelta) {
+                        return -1;
+                    } else if (bDelta < aDelta) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                });
+
+                if (sortedByDistance.length > 0) {
+                    const closestDistance = sortedByDistance[0];
+                    const cdData = closestDistance.metadata[characterMetadata] as HpTrackerMetadata;
+
+                    let indices: Array<number> = [];
+                    if (cdData.index! < index) {
+                        indices = _.range(cdData.index!, index);
+                    } else {
+                        indices = _.range(index, cdData.index);
+                    }
+                    const toSelect = groupItems.map((item) => {
+                        const itemData = item.metadata[characterMetadata] as HpTrackerMetadata;
+                        if (itemData.index) {
+                            if (indices.includes(itemData.index)) {
+                                return item.id;
+                            }
+                        }
+                    });
+
+                    return toSelect.filter((item): item is string => !!item);
+                }
+            }
+        }
+
+        return null;
+    };
+
     const handleOnPlayerClick = async (e: React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
         e.stopPropagation();
         const currentSelection = (await OBR.player.getSelection()) || [];
-        if (currentSelection.includes(props.item.id)) {
-            currentSelection.splice(currentSelection.indexOf(props.item.id), 1);
-            await OBR.player.select(currentSelection);
+        if (currentSelection.length === 0) {
+            await OBR.player.select([props.item.id]);
         } else {
-            if (e.metaKey || e.ctrlKey || e.shiftKey) {
-                currentSelection.push(props.item.id);
+            if (currentSelection.includes(props.item.id)) {
+                currentSelection.splice(currentSelection.indexOf(props.item.id), 1);
                 await OBR.player.select(currentSelection);
             } else {
-                await OBR.player.select([props.item.id]);
+                if (e.shiftKey) {
+                    const toSelect = getGroupSelectRange(currentSelection);
+                    if (toSelect) {
+                        const extendedSelection = currentSelection.concat(toSelect);
+                        extendedSelection.push(props.item.id);
+                        await OBR.player.select(extendedSelection);
+                    }
+                } else if (e.metaKey || e.ctrlKey) {
+                    currentSelection.push(props.item.id);
+                    await OBR.player.select(currentSelection);
+                } else {
+                    await OBR.player.select([props.item.id]);
+                }
             }
         }
     };

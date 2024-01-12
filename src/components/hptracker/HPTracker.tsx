@@ -227,6 +227,7 @@ const Content = () => {
                                         list={list.sort(sortItems)}
                                         selected={selectedTokens}
                                         metadata={currentSceneMetadata}
+                                        tokenLists={tokenLists}
                                     />
                                 );
                             })
@@ -236,11 +237,17 @@ const Content = () => {
                                 list={Array.from(tokens ?? []).sort(sortItems)}
                                 selected={selectedTokens}
                                 metadata={currentSceneMetadata}
+                                tokenLists={tokenLists}
                             />
                         )}
                     </DragDropContext>
                 ) : (
-                    <PlayerTokenList tokens={playerTokens} selected={selectedTokens} metadata={currentSceneMetadata!} />
+                    <PlayerTokenList
+                        tokens={playerTokens}
+                        selected={selectedTokens}
+                        metadata={currentSceneMetadata!}
+                        tokenLists={tokenLists}
+                    />
                 )}
             </div>
         )
