@@ -15,6 +15,7 @@
     - [Statblock](#statblock)
     - [Player Action Window](#player-action-window)
   + [Hp Tracker Popover](#hp-tracker-popover)
+  + [Statblock Popover](#hp-tracker-statblock-popover)
 
 # HP Tracker - Owlbear Plugin
 
