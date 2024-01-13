@@ -1,7 +1,7 @@
 {
     "name": "hp-tracker",
     "private": true,
-    "version": "1.4.6",
+    "version": "1.5.0",
     "type": "module",
     "scripts": {
         "dev": "vite --tsx",
@@ -14,11 +14,13 @@
     "prettier": "@bitperfect-software/prettier-config",
     "devDependencies": {
         "@bitperfect-software/prettier-config": "^2.0.1",
+        "@types/lodash": "^4.14.202",
         "@types/node": "^20.3.3",
         "@types/react": "^18.2.14",
         "@types/react-beautiful-dnd": "^13.1.4",
         "@types/react-dom": "^18.2.6",
         "@types/uuid": "^9.0.2",
+        "lodash": "^4.17.21",
         "openapi-typescript": "^6.6.1",
         "postcss": "^8.4.24",
         "prettier": "^2.8.8",
@@ -39,6 +41,7 @@
         "react-loader-spinner": "^5.4.5",
         "react-markdown": "^8.0.7",
         "remark-gfm": "^3.0.1",
+        "swiper": "^11.0.5",
         "uuid": "^9.0.0",
         "zustand": "^4.3.9"
     }

@@ -1,0 +1,53 @@
+@use "../utilities/breakpoint";
+
+.modal-app {
+    .close-button {
+        display: flex;
+        justify-content: center;
+        transition: all ease-in-out 0.25s;
+        cursor: pointer;
+        border: 1px solid white;
+        border-radius: 5px;
+        background-color: transparent;
+        width: 20px;
+        text-align: center;
+
+        &.close {
+            top: 4.5ch;
+        }
+
+        &:hover,
+        &focus {
+            background-color: white;
+            color: #242424;
+        }
+    }
+
+    .modal-wrapper {
+        margin: 0;
+        padding: 10px;
+        text-align: left;
+
+        @include breakpoint.laptop {
+            padding: 40px;
+        }
+
+        h1 {
+            font-size: 2rem;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 2ch;
+            right: 2ch;
+        }
+
+        img {
+            max-width: 100%;
+        }
+    }
+}

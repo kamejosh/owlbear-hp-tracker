@@ -1,5 +1,4 @@
 import { components } from "../../../ttrpgapi/schema";
-import "./pfability.scss";
 import { useState } from "react";
 import { highlightDice } from "../../../helper/diceHelper.tsx";
 

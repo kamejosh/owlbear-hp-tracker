@@ -9,6 +9,7 @@ type TokenListProps = {
     tokens: Item[];
     selected: Array<string>;
     metadata: SceneMetadata;
+    tokenLists: Map<string, Array<Item>>;
 };
 
 export const DraggableTokenList = React.memo(function DraggableTokenList(props: TokenListProps) {
@@ -47,6 +48,7 @@ export const DraggableTokenList = React.memo(function DraggableTokenList(props: 
                                             popover={false}
                                             selected={props.selected.includes(token.id)}
                                             metadata={props.metadata}
+                                            tokenLists={props.tokenLists}
                                         />
                                     </div>
                                 )}
@@ -77,6 +79,7 @@ export const PlayerTokenList = (props: TokenListProps) => {
                             popover={false}
                             selected={props.selected.includes(token.id)}
                             metadata={props.metadata}
+                            tokenLists={props.tokenLists}
                         />
                     );
                 }

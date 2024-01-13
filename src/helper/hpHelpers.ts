@@ -123,7 +123,7 @@ const handleHpOffsetUpdate = async (offset: number, hp: Item) => {
             const border = Math.floor(width / 75);
             const x = bounds.width < 0 ? bounds.position.x - width : bounds.position.x;
 
-            if (hp.name === "hp") {
+            if (hp.name === "hp" || hp.name === "temp-hp") {
                 change.position = {
                     x: x + border,
                     y: bounds.position.y + bounds.height - height + offset + border,

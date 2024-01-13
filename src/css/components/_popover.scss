@@ -1,0 +1,102 @@
+body:has(.popover-app) {
+    overflow: hidden;
+}
+
+#app {
+    .multiselection {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding-inline: 10px;
+        height: 90px;
+    }
+
+    &.popover-app {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100px;
+
+        .popover-spinner {
+            margin: auto;
+            padding: 15px;
+            width: 60px;
+            height: 100%;
+        }
+
+        .popover {
+            height: 100%;
+            overflow: hidden;
+            .player-wrapper {
+                display: grid;
+                grid-template-areas:
+                    "hp temp"
+                    "ac init"
+                    "settings settings";
+                column-gap: 1ch;
+                row-gap: 2px;
+                justify-content: space-between;
+                border-bottom: none;
+                padding: 10px 10px;
+                height: calc(100% - 20px);
+
+                .settings {
+                    grid-area: settings;
+                    justify-self: center;
+                }
+
+                .current-hp {
+                    grid-area: hp;
+                    align-items: center;
+
+                    &::before {
+                        display: block;
+                        margin: 0;
+                        min-width: 26px;
+                        content: "HP: ";
+                    }
+                }
+
+                .temp-hp {
+                    grid-area: temp;
+                    justify-self: flex-end;
+                    white-space: nowrap;
+                }
+
+                .armor-class {
+                    grid-area: ac;
+                    align-items: center;
+                    min-width: unset;
+
+                    &::before {
+                        display: block;
+                        min-width: 26px;
+                        content: "AC: ";
+                    }
+                }
+
+                .initiative-wrapper {
+                    grid-area: init;
+                    flex-direction: row-reverse;
+                    align-items: center;
+                    justify-self: flex-end;
+                    width: auto;
+
+                    &::before {
+                        display: none;
+                    }
+
+                    &::after {
+                        display: block;
+                        min-width: 26px;
+                        content: "Init: ";
+                    }
+                }
+
+                input[type="text"] {
+                    width: 28px;
+                }
+            }
+        }
+    }
+}

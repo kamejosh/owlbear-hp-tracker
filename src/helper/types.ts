@@ -29,7 +29,10 @@ export type SceneMetadata = {
     acShield?: boolean;
     ruleset?: Ruleset;
     groups?: Array<string>;
+    openGroups?: Array<string>;
     openChangeLog?: boolean;
+    initiativeDice?: number;
+    statblockPopover?: { width: number; height: number };
     playerSort: boolean;
 };
 

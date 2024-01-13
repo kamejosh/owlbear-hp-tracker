@@ -3,7 +3,6 @@ import { Help } from "./Components/Help.tsx";
 import { Changelog } from "./Components/Changelog.tsx";
 import OBR from "@owlbear-rodeo/sdk";
 import { modalId } from "../../helper/variables.ts";
-import "./modal.scss";
 import { Settings } from "./Components/Settings.tsx";
 
 export const Modal = () => {

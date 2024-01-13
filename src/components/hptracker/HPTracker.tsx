@@ -2,24 +2,17 @@ import { useEffect, useState } from "react";
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
-import {
-    changelogModal,
-    characterMetadata,
-    helpModal,
-    sceneMetadata,
-    settingsModal,
-    version,
-} from "../../helper/variables.ts";
+import { changelogModal, characterMetadata, sceneMetadata, version } from "../../helper/variables.ts";
 import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
 import { DragDropContext, DraggableLocation, DropResult } from "react-beautiful-dnd";
-import "./hp-tracker.scss";
 import { PlayerTokenList } from "./TokenList.tsx";
 import { useCharSheet } from "../../context/CharacterContext.ts";
 import { CharacterSheet } from "./charactersheet/CharacterSheet.tsx";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { DropGroup } from "./DropGroup.tsx";
-import { plausibleEvent, sortItems, sortItemsInitiative } from "../../helper/helpers.ts";
+import { sortItems, sortItemsInitiative } from "../../helper/helpers.ts";
 import { compare } from "compare-versions";
+import { Helpbuttons } from "../general/Helpbuttons/Helpbuttons.tsx";
 
 export const HPTracker = () => {
     return (
@@ -126,11 +119,41 @@ const Content = () => {
         });
     };
 
-    const reorder = (list: Item[], startIndex: number, endIndex: number) => {
+    const reorder = (
+        list: Item[],
+        startIndex: number,
+        endIndex: number,
+        dragItem: DropResult,
+        multiMove: boolean = false
+    ) => {
         const result = Array.from(list);
         result.sort(sortItems);
         const [removed] = result.splice(startIndex, 1);
-        result.splice(endIndex, 0, removed);
+        const multiRemove: Array<Item> = [removed];
+
+        if (multiMove) {
+            const alsoSelected = result.filter(
+                (item) => selectedTokens.includes(item.id) && item.id != dragItem.draggableId
+            );
+
+            let localRemove: Array<Item> = [];
+
+            alsoSelected.forEach((item) => {
+                localRemove = localRemove.concat(
+                    result.splice(
+                        result.findIndex((sourceItem) => sourceItem.id === item.id),
+                        1
+                    )
+                );
+            });
+
+            localRemove = localRemove.concat(multiRemove);
+            localRemove.forEach((item) => {
+                result.splice(endIndex, 0, item);
+            });
+        } else {
+            result.splice(endIndex, 0, removed);
+        }
         const tokens = result.filter((item) => item !== undefined);
 
         reorderMetadataIndex(tokens);
@@ -140,13 +163,39 @@ const Content = () => {
         source: Array<Item>,
         destination: Array<Item>,
         droppableSource: DraggableLocation,
-        droppableDestination: DraggableLocation
+        droppableDestination: DraggableLocation,
+        result: DropResult,
+        multiMove: boolean = false
     ) => {
         const sourceClone = Array.from(source);
         const destClone = Array.from(destination);
         const [removed] = sourceClone.splice(droppableSource.index, 1);
+        const multiRemove: Array<Item> = [removed];
 
-        destClone.splice(droppableDestination.index, 0, removed);
+        if (multiMove) {
+            const alsoSelected = source.filter(
+                (item) => selectedTokens.includes(item.id) && item.id != result.draggableId
+            );
+
+            let localRemove: Array<Item> = [];
+
+            alsoSelected.forEach((item) => {
+                localRemove = localRemove.concat(
+                    sourceClone.splice(
+                        sourceClone.findIndex((sourceItem) => sourceItem.id === item.id),
+                        1
+                    )
+                );
+            });
+
+            localRemove = localRemove.concat(multiRemove);
+
+            localRemove.forEach((item) => {
+                destClone.splice(droppableDestination.index, 0, item);
+            });
+        } else {
+            destClone.splice(droppableDestination.index, 0, removed);
+        }
 
         reorderMetadataIndex(sourceClone);
         reorderMetadataIndex(destClone, droppableDestination.droppableId);
@@ -162,7 +211,9 @@ const Content = () => {
                 tokenLists.get(result.source.droppableId) || [],
                 tokenLists.get(result.destination.droppableId) || [],
                 result.source,
-                result.destination
+                result.destination,
+                result,
+                selectedTokens.includes(result.draggableId)
             );
             return;
         }
@@ -171,7 +222,13 @@ const Content = () => {
             return;
         }
 
-        reorder(tokenLists.get(result.destination.droppableId) ?? [], result.source.index, result.destination.index);
+        reorder(
+            tokenLists.get(result.destination.droppableId) ?? [],
+            result.source.index,
+            result.destination.index,
+            result,
+            selectedTokens.includes(result.draggableId)
+        );
     };
 
     const orderByInitiative = () => {
@@ -195,38 +252,10 @@ const Content = () => {
 
     return playerContext.role ? (
         characterId ? (
-            <CharacterSheet />
+            <CharacterSheet currentSceneMetadata={currentSceneMetadata} itemId={characterId} />
         ) : (
             <div className={"hp-tracker"}>
-                <div className={"help-buttons"}>
-                    <a
-                        href={"https://www.patreon.com/TTRPGAPI"}
-                        className={"patreon-button"}
-                        target={"_blank"}
-                        onClick={() => {
-                            plausibleEvent("patreon-click");
-                        }}
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 436 476">
-                            <path
-                                data-fill="1"
-                                d="M436 143c-.084-60.778-47.57-110.591-103.285-128.565C263.528-7.884 172.279-4.649 106.214 26.424 26.142 64.089.988 146.596.051 228.883c-.77 67.653 6.004 245.841 106.83 247.11 74.917.948 86.072-95.279 120.737-141.623 24.662-32.972 56.417-42.285 95.507-51.929C390.309 265.865 436.097 213.011 436 143Z"
-                                fill={"#dddddd"}
-                            ></path>
-                        </svg>
-                    </a>
-                    {playerContext.role == "GM" ? (
-                        <button className={"settings-button"} onClick={async () => await OBR.modal.open(settingsModal)}>
-                            ⛭
-                        </button>
-                    ) : null}
-                    <button className={"change-log-button"} onClick={async () => await OBR.modal.open(changelogModal)}>
-                        i
-                    </button>
-                    <button className={"help-button"} onClick={async () => await OBR.modal.open(helpModal)}>
-                        ?
-                    </button>
-                </div>
+                <Helpbuttons currentSceneMetadata={currentSceneMetadata} />
                 <h1 className={"title"}>
                     HP Tracker<span className={"small"}>{version}</span>
                 </h1>
@@ -262,6 +291,7 @@ const Content = () => {
                                         list={list.sort(sortItems)}
                                         selected={selectedTokens}
                                         metadata={currentSceneMetadata}
+                                        tokenLists={tokenLists}
                                     />
                                 );
                             })
@@ -271,11 +301,17 @@ const Content = () => {
                                 list={Array.from(tokens ?? []).sort(sortItems)}
                                 selected={selectedTokens}
                                 metadata={currentSceneMetadata}
+                                tokenLists={tokenLists}
                             />
                         )}
                     </DragDropContext>
                 ) : (
-                    <PlayerTokenList tokens={playerTokens} selected={selectedTokens} metadata={currentSceneMetadata!} />
+                    <PlayerTokenList
+                        tokens={playerTokens}
+                        selected={selectedTokens}
+                        metadata={currentSceneMetadata!}
+                        tokenLists={tokenLists}
+                    />
                 )}
             </div>
         )

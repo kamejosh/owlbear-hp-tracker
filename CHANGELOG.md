@@ -1,3 +1,16 @@
+# 1.5.0
+
++ Add Statblock Popover
++ Add Setting to change Statblock Popover dimensions
++ Fix styling issues in Statblocks
++ Refactor styling and help buttons
++ Add auto select of current statblock
++ Fix temp hp offset bug
++ Add Group Settings that apply to all Tokens in a group
++ Make Initiative dice customizable in Settings
++ Make Initiative Bonus customizable in Statblock
++ Add Multiselect and Multidrag to Tokenlist
+
 # 1.4.6
 
 + Fix some styling issues on mobile and embedded
