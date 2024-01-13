@@ -165,7 +165,7 @@ Values can be changed in a few different ways:
 + Arrow Keys: when focus is on HP, maxHP, tempHP or AC you can increase or decrease the values by 1 by pressing up or down arrow key respectively
 + Entering a number: when focused on any field, you can delete its content and enter a new value. 
   + Note that changing the maxHP or tempHP field influences the HP field.
-+ Rolling Initiative: When clicking the Initiative Button a random number between 1 and the chosen [Initiative Dice](#global-settings) (default: 20) is rolled and the dexterity modifier (5e) or perception (pf2e) from the [Statblock](#statblock) (if selected) is added and entered as the final initiative value.
++ Rolling Initiative: When clicking the Initiative Button a random number between 1 and the chosen [Initiative Dice](#global-settings) (default: 20) is rolled and the dexterity modifier (5e) or perception (pf2e) from the [Statblock](#statblock) (if selected) is added and entered as the final initiative value. You can also change the initiative bonus to any number, once a statblock is assigned
 
 **Note: The HP value can never exceed the maxHP value ([except when maxHP is 0](#initializing-token)). It can also not be a negative number if the [Global Setting](#global-settings) for "Allow negative numbers" is not selected. All symbols except numbers will be removed to maintain a compatible value.**
 
@@ -200,17 +200,17 @@ By clicking on one of the options this statblock is selected for the Token. If t
 
 ![Statblock Selected](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/statblock_selected.png)
 
-The statblock shows all the creature information including available spells and spell detailed spell information.
+The statblock shows all the creature information including available spells and detailed spell information.
 
 #### Player Action Window
 
 ![Player Action Window](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/player_action_window.png)
 
-The Player Action Window has reduced functionality compared to the GM Action Window. Tokens that have either the HP Bar or Player Visibility enabled show up in this window. Items that are invisible (hidden) within the scene don't show up here!
+The Player Action Window has reduced functionality compared to the GM Action Window. Tokens that have either the HP Bar or Player Visibility enabled show up in this window. Tokens that are invisible (hidden) within the scene don't show up here!
 
 For tokens that have the Player Visibility set, their name change option, values, and statblock are shown. Otherwise just the dynamic-color background is there to indicate the current status of the creature.
 
-Tokens don't follow the drag and drop order in the [GM Action Window](#hp-tracker-action-window). But when activated in the [Settings](#global-settings) Tokens will be ordered by their initiative value.
+Tokens don't follow the drag and drop order in the [GM Action Window](#hp-tracker-action-window). But when activated in the [Settings](#global-settings) Tokens will be ordered by their initiative value, disregarding which group they belong to.
 
 ### HP Tracker Context Item
 

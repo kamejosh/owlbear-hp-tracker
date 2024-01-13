@@ -1,3 +1,7 @@
+body:has(.popover-app) {
+    overflow: hidden;
+}
+
 #app {
     .multiselection {
         display: flex;
@@ -11,7 +15,7 @@
         margin: 0;
         padding: 0;
         width: 100%;
-        height: 100%;
+        height: 100px;
 
         .popover-spinner {
             margin: auto;
@@ -21,23 +25,30 @@
         }
 
         .popover {
+            height: 100%;
+            overflow: hidden;
             .player-wrapper {
-                display: flex;
+                display: grid;
+                grid-template-areas:
+                    "hp temp"
+                    "ac init"
+                    "settings settings";
                 column-gap: 1ch;
                 row-gap: 2px;
-                flex-wrap: wrap;
                 justify-content: space-between;
                 border-bottom: none;
                 padding: 10px 10px;
-                height: 80px;
+                height: calc(100% - 20px);
 
                 .settings {
-                    order: 2;
+                    grid-area: settings;
+                    justify-self: center;
                 }
 
                 .current-hp {
+                    grid-area: hp;
                     align-items: center;
-                    order: 0;
+
                     &::before {
                         display: block;
                         margin: 0;
@@ -46,9 +57,15 @@
                     }
                 }
 
+                .temp-hp {
+                    grid-area: temp;
+                    justify-self: flex-end;
+                    white-space: nowrap;
+                }
+
                 .armor-class {
+                    grid-area: ac;
                     align-items: center;
-                    order: 3;
                     min-width: unset;
 
                     &::before {
@@ -59,15 +76,17 @@
                 }
 
                 .initiative-wrapper {
+                    grid-area: init;
+                    flex-direction: row-reverse;
                     align-items: center;
-                    order: 1;
+                    justify-self: flex-end;
                     width: auto;
 
-                    .toggle-button {
+                    &::before {
                         display: none;
                     }
 
-                    &::before {
+                    &::after {
                         display: block;
                         min-width: 26px;
                         content: "Init: ";
