@@ -68,6 +68,7 @@ const initScene = async () => {
             hpBarOffset: 0,
             acOffset: { x: 0, y: 0 },
             acShield: true,
+            ruleset: "e5",
             allowNegativeNumbers: false,
             id: uuidv4(),
             groups: ["Default"],
