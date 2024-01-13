@@ -239,7 +239,7 @@ export const Settings = () => {
                             <input
                                 type={"number"}
                                 defaultValue={statblockPopover.height}
-                                onChange={(e) => {
+                                onBlur={(e) => {
                                     setStatblockPopover({
                                         ...statblockPopover,
                                         height: Math.max(200, parseInt(e.target.value)),

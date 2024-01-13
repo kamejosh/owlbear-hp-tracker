@@ -1,0 +1,12 @@
+.statblock-wrapper {
+    position: relative;
+
+    .initiative-bonus {
+        display: flex;
+        gap: 1ch;
+
+        input {
+            height: 20px;
+        }
+    }
+}

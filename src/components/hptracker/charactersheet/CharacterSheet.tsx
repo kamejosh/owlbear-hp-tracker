@@ -8,7 +8,7 @@ import { SearchResult5e, SearchResultPf } from "./SearchResult.tsx";
 import { Statblock } from "./Statblock.tsx";
 import { Helpbuttons } from "../../general/Helpbuttons/Helpbuttons.tsx";
 
-export const CharacterSheet = (props: { currentSceneMetadata: SceneMetadata | null }) => {
+export const CharacterSheet = (props: { currentSceneMetadata: SceneMetadata | null; itemId: string }) => {
     const { characterId, setId } = useCharSheet();
     const playerContext = usePlayerContext();
     const [token, setToken] = useState<Item | null>(null);
@@ -110,7 +110,11 @@ export const CharacterSheet = (props: { currentSceneMetadata: SceneMetadata | nu
                         </div>
                     ) : null}
                     {data.sheet && !forceSearch ? (
-                        <Statblock slug={data.sheet} currentSceneMetadata={props.currentSceneMetadata} />
+                        <Statblock
+                            data={data}
+                            currentSceneMetadata={props.currentSceneMetadata}
+                            itemId={props.itemId}
+                        />
                     ) : search !== "" ? (
                         ruleSetMap.get(props.currentSceneMetadata?.ruleset || "e5")
                     ) : (

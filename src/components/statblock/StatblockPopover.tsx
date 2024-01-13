@@ -10,9 +10,10 @@ import { sortItems } from "../../helper/helpers.ts";
 export const StatblockPopover = () => {
     const [minimized, setMinimized] = useState<boolean>(false);
     const [tokens, setTokens] = useState<Array<Item>>([]);
+    const [sortedTokens, setSortedTokens] = useState<Array<Item>>([]);
     const [currentSceneMetadata, setCurrentSceneMetadata] = useState<SceneMetadata | null>(null);
     const [pinned, setPinned] = useState<boolean>(false);
-    const [slug, setSlug] = useState<string | null>(null);
+    const [data, setData] = useState<HpTrackerMetadata | null>(null);
     const { isReady } = SceneReadyContext();
 
     const initPopover = async () => {
@@ -56,12 +57,30 @@ export const StatblockPopover = () => {
                     const metadata = items[0].metadata;
                     if (characterMetadata in metadata) {
                         const data = metadata[characterMetadata] as HpTrackerMetadata;
-                        setSlug(data.sheet);
+                        setData(data);
                     }
                 }
             }
         });
     };
+
+    useEffect(() => {
+        let tempList: Array<Item> = [];
+
+        currentSceneMetadata?.groups?.forEach((group) => {
+            const groupItems = tokens?.filter((item) => {
+                const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
+                return (
+                    (!metadata.group && group === "Default") ||
+                    metadata.group === group ||
+                    (!currentSceneMetadata?.groups?.includes(metadata.group ?? "") && group === "Default")
+                );
+            });
+            tempList = tempList.concat(groupItems ?? []);
+        });
+
+        setSortedTokens(tempList);
+    }, [currentSceneMetadata?.groups, tokens]);
 
     useEffect(() => {
         if (isReady) {
@@ -100,10 +119,10 @@ export const StatblockPopover = () => {
                 </div>
                 <StatblockList
                     minimized={minimized}
-                    tokens={tokens}
+                    tokens={sortedTokens}
                     pinned={pinned}
                     setPinned={setPinned}
-                    slug={slug}
+                    data={data}
                     currentSceneMetadata={currentSceneMetadata}
                 />
             </div>

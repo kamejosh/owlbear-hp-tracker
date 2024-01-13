@@ -14,28 +14,38 @@ type StatblockListProps = {
     tokens: Array<Item>;
     pinned: boolean;
     setPinned: (pinned: boolean) => void;
-    slug: string | null;
+    data: HpTrackerMetadata | null;
     currentSceneMetadata: SceneMetadata | null;
 };
 export const StatblockList = (props: StatblockListProps) => {
-    const [slug, setSlug] = useState<string | null>(null);
+    const [data, setData] = useState<HpTrackerMetadata | null>(null);
+    const [id, setId] = useState<string>();
     const [swiper, setSwiper] = useState<SwiperClass>();
 
     useEffect(() => {
-        if (!props.pinned && props.slug) {
-            setSlug(props.slug);
+        if (!props.pinned && props.data) {
+            setData(props.data);
             const index = props.tokens.findIndex((item) => {
-                if (characterMetadata in item.metadata) {
+                if (characterMetadata in item.metadata && props.data) {
                     const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
-                    return metadata.sheet === props.slug;
+                    return metadata.index === props.data.index && metadata.sheet === props.data.sheet;
                 }
                 return false;
             });
             if (index >= 0 && swiper) {
+                setId(props.tokens[index].id);
                 swiper.slideTo(index, 100, false);
             }
         }
-    }, [props.slug]);
+    }, [props.data]);
+
+    const matches = (currentData: HpTrackerMetadata | null, itemData: HpTrackerMetadata) => {
+        return (
+            currentData?.index === itemData.index &&
+            currentData?.sheet === itemData.sheet &&
+            currentData?.group === itemData.group
+        );
+    };
 
     return (
         <>
@@ -50,16 +60,19 @@ export const StatblockList = (props: StatblockListProps) => {
             >
                 <SwiperSlide className={"pre"}> </SwiperSlide>
                 {props.tokens.map((token) => {
-                    const data = token.metadata[characterMetadata] as HpTrackerMetadata;
+                    const tokenData = token.metadata[characterMetadata] as HpTrackerMetadata;
                     return (
                         <SwiperSlide
-                            className={`statblock-name ${slug === data.sheet ? "active" : ""}`}
-                            onClick={() => setSlug(data.sheet)}
+                            className={`statblock-name ${matches(data, tokenData) ? "active" : ""}`}
+                            onClick={() => {
+                                setData(tokenData);
+                                setId(token.id);
+                            }}
                             key={token.id}
-                            title={data.name}
+                            title={tokenData.name}
                         >
-                            <span className={"name"}>{data.name}</span>
-                            {slug === data.sheet ? (
+                            <span className={"name"}>{tokenData.name}</span>
+                            {matches(data, tokenData) ? (
                                 <button
                                     className={`pin ${props.pinned ? "pinned" : ""}`}
                                     title={"pin statblock"}
@@ -85,7 +98,9 @@ export const StatblockList = (props: StatblockListProps) => {
             </Swiper>
             {props.minimized ? null : (
                 <div className={"statblock-sheet"}>
-                    {slug ? <Statblock slug={slug} currentSceneMetadata={props.currentSceneMetadata} /> : null}
+                    {data && id ? (
+                        <Statblock data={data} currentSceneMetadata={props.currentSceneMetadata} itemId={id} />
+                    ) : null}
                 </div>
             )}
         </>

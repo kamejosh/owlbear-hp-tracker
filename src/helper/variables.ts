@@ -27,7 +27,7 @@ export const settingsModal: Modal = {
     id: modalId,
     url: "/modal.html?content=settings",
     width: 400,
-    height: 600,
+    height: 700,
 };
 
 export const statblockPopover: Popover = {

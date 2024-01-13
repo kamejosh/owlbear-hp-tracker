@@ -2,7 +2,7 @@ import { useCharSheet } from "../../../context/CharacterContext.ts";
 import OBR from "@owlbear-rodeo/sdk";
 import { characterMetadata } from "../../../helper/variables.ts";
 import { HpTrackerMetadata, SceneMetadata } from "../../../helper/types.ts";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { PfAbility } from "./PfAbility.tsx";
 import { useE5GetStatblock } from "../../../ttrpgapi/e5/useE5Api.ts";
 import { usePfGetStatblock } from "../../../ttrpgapi/pf/usePfApi.ts";
@@ -369,14 +369,48 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
     ) : null;
 };
 
-export const Statblock = (props: { slug: string; currentSceneMetadata: SceneMetadata | null }) => {
+export const Statblock = (props: {
+    data: HpTrackerMetadata;
+    currentSceneMetadata: SceneMetadata | null;
+    itemId: string;
+}) => {
+    const [data, setData] = useState<HpTrackerMetadata>(props.data);
+
+    useEffect(() => {
+        setData(props.data);
+    }, [props.data]);
+
     return (
-        <>
+        <div className={"statblock-wrapper"}>
+            <div className={"initiative-bonus"}>
+                {"Initiative Bonus"}
+                <input
+                    type={"text"}
+                    size={1}
+                    value={data.stats.initiativeBonus}
+                    onChange={async (e) => {
+                        const factor = e.target.value.startsWith("-") ? -1 : 1;
+                        const value = Number(e.target.value.replace(/[^0-9]/g, ""));
+                        const newData: HpTrackerMetadata = {
+                            ...data,
+                            stats: { ...data.stats, initiativeBonus: factor * value },
+                        };
+
+                        setData({ ...newData });
+
+                        await OBR.scene.items.updateItems([props.itemId], (items) => {
+                            items.forEach((item) => {
+                                item.metadata[characterMetadata] = { ...newData };
+                            });
+                        });
+                    }}
+                />
+            </div>
             {props.currentSceneMetadata && props.currentSceneMetadata.ruleset === "e5" ? (
-                <E5StatBlock slug={props.slug} />
+                <E5StatBlock slug={props.data.sheet} />
             ) : (
-                <PfStatBlock slug={props.slug} />
+                <PfStatBlock slug={props.data.sheet} />
             )}
-        </>
+        </div>
     );
 };

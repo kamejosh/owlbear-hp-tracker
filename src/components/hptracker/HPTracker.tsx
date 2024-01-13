@@ -252,7 +252,7 @@ const Content = () => {
 
     return playerContext.role ? (
         characterId ? (
-            <CharacterSheet currentSceneMetadata={currentSceneMetadata} />
+            <CharacterSheet currentSceneMetadata={currentSceneMetadata} itemId={characterId} />
         ) : (
             <div className={"hp-tracker"}>
                 <Helpbuttons currentSceneMetadata={currentSceneMetadata} />
