@@ -15,6 +15,7 @@ learn-more: https://github.com/kamejosh/owlbear-hp-tracker
 # Contents
 
 - [HP Tracker - Owlbear Plugin](#hp-tracker-owlbear-plugin)
+- [Quickstart](#quickstart)
 - [How it works](#how-it-works)
   + [Adding Tokens to the HP Tracker](#adding-tokens-to-the-hp-tracker)
   + [Hp Tracker Action Window](#hp-tracker-action-window)
@@ -36,6 +37,30 @@ learn-more: https://github.com/kamejosh/owlbear-hp-tracker
 Designed around the TTRPG game mechanics of Hit Points (HP) and Armor Class (AC), this extension allows tracking and changing multiple Creatures' settings while dynamically hiding and showing this information to players.
 
 ![hp-tracker example](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/HP_Tracker.png)
+
+# Quickstart
+
+This section is intended to describe and show an example of how fast a combat sequence can be setup using HP Tracker.
+
+## Scenario
+
+Your players rest at a campsite but they fell asleep during their watch and were surprised by an Ogre and five Hobgoblins. We quickly roll initiative sort the Tokens so we know who's turn is next and start doing damage.
+The PCs start the combat with three temporary HP because of effect that was activated before they setup camp.
+
+## How
+
++ Create a new scene based on a map you have in your collection.
++ Drop all the PC Tokens you need and fill in their info.
++ Drop an Ogre and Hobgoblin Token on scene and connect them with their statblocks
++ Copy the Hobgoblin Token four times
++ Roll initiative for the whole group and sort by initiative
++ Start combat
+
+## Video Example
+
+Because the documentation currently requires gif for moving content the quality and length is limited, for better video quality consider going to the owlbear discord.
+
+![HP Tracker Quickstart](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/quickstart.gif)
 
 # How it works
 
