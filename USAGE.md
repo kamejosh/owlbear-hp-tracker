@@ -225,3 +225,18 @@ For the Players, only tokens that have Player Visibility enabled will show this 
 ![Popover Player](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/popover_player.png)
 
 ### HP Tracker statblock popover
+
+Every Token that has a statblock assigned automatically shows up in the Statblock Popover.
+
+The Popover contains two window buttons:
+
++ Minimize: Reduces the height of the popover to 100px.
++ Close: Closes the Popover
+
+The Popover displays all available statblocks indicating which statblock is currently displayed in detail.
+
+![Statblock Popover](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/statblock_popover.png)
+
+By default when selecting a Token either in the [HP Tracker Action Window](#hp-tracker-action-window) or in the Scene. The associated statblock of the selected Token is displayed. This can be prevented by "pinning" a statblocks. While pinned no automatic switching is done even when another statblock is selected. To reactivate automatic switching unselect the pin on the currently active statblock.
+
+![Statblock Demo](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/statblock_demo.gif)

@@ -23,7 +23,7 @@ export const StatblockList = (props: StatblockListProps) => {
     const [swiper, setSwiper] = useState<SwiperClass>();
 
     useEffect(() => {
-        if (!props.pinned && props.data) {
+        if (!props.pinned && props.data && props.data.sheet) {
             setData(props.data);
             const index = props.tokens.findIndex((item) => {
                 if (characterMetadata in item.metadata && props.data) {
