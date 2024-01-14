@@ -4,10 +4,11 @@
     .back-button {
         display: flex;
         position: fixed;
-        top: 30px;
-        left: 15px;
+        top: 1rem;
+        left: 1rem;
         align-items: center;
         gap: 0;
+        z-index: 200;
         cursor: pointer;
         border: 1px solid white;
         border-radius: 4px;
@@ -15,7 +16,7 @@
         font-size: 0;
 
         @include breakpoint.laptop {
-            left: 30px;
+            left: 1rem;
             gap: 5px;
             font-size: 12px;
         }
@@ -38,6 +39,10 @@
         }
     }
 
+    .help-buttons {
+        z-index: 200;
+    }
+
     .content {
         display: flex;
         flex-direction: column;
@@ -50,6 +55,11 @@
             .note {
                 font-size: 12px;
             }
+        }
+
+        .ruleset-error {
+            display: flex;
+            gap: 1ch;
         }
 
         .search-wrapper {
@@ -69,6 +79,15 @@
                 width: 20px;
                 height: 20px;
             }
+
+            .empty {
+                border-color: red;
+                background-color: rgba(255, 0, 0, 0.2);
+            }
+        }
+
+        .empty-search {
+            margin-top: 20px;
         }
 
         .search-loader {

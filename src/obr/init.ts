@@ -111,6 +111,9 @@ const initScene = async () => {
         if (sceneData.ruleset === "pf2e") {
             sceneData.ruleset = "pf";
         }
+        if (sceneData.ruleset !== "pf" && sceneData.ruleset !== "e5") {
+            sceneData.ruleset = "e5";
+        }
         if (!sceneData.acOffset) {
             sceneData.acOffset = { x: 0, y: 0 };
         }
