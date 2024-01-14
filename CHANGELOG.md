@@ -1,3 +1,7 @@
+# 1.5.1
+
++ Improve statblock search user experience
+
 # 1.5.0
 
 + Add Statblock Popover
