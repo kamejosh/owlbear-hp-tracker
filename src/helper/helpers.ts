@@ -140,24 +140,14 @@ export const attachmentFilter = (attachment: Item, attachmentType: "BAR" | "HP" 
     return false;
 };
 
-export const plausibleEvent = (event: string, props: string | undefined = undefined) => {
-    // @ts-ignore
-    window.plausible =
-        // @ts-ignore
-        window.plausible ||
-        function () {
-            // @ts-ignore
-            if (!window.plausible) window.plausible = { q: [] };
-            // @ts-ignore
-            (window.plausible.q = window.plausible.q || []).push(arguments);
-        };
-
-    // @ts-ignore
-    const plausible = window.plausible;
-
-    if (props !== undefined) {
-        plausible(event, { props: { name: props } });
-    } else {
-        plausible(event);
+export const getBgColor = (data: HpTrackerMetadata, opacity: string = "0.2") => {
+    if (data.hp === 0 && data.maxHp === 0) {
+        return "#1C1B22";
     }
+
+    const percent = data.hp / (data.stats.tempHp ? data.stats.tempHp + data.maxHp : data.maxHp);
+
+    const g = 255 * percent;
+    const r = 255 - 255 * percent;
+    return "rgb(" + r + "," + g + `,0,${opacity})`;
 };
