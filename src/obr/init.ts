@@ -280,10 +280,20 @@ const migrations = async () => {
     }
 };
 
+const debug = async () => {
+    const scene = await OBR.scene.getMetadata();
+    const player = await OBR.player.getMetadata();
+    const room = await OBR.room.getMetadata();
+
+    console.log(scene, player);
+    console.log(room);
+};
+
 const sceneReady = async () => {
     await migrations();
     await initItems();
     await initScene();
+    await debug();
 };
 
 const initTokens = async () => {
