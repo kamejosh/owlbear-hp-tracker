@@ -1,3 +1,7 @@
+# 1.5.2
+
++ Add group damage and heal function
+
 # 1.5.1
 
 + Improve statblock search user experience

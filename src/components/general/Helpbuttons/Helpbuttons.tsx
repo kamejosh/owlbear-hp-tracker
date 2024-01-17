@@ -1,4 +1,3 @@
-import { plausibleEvent } from "../../../helper/helpers.ts";
 import OBR from "@owlbear-rodeo/sdk";
 import { changelogModal, helpModal, settingsModal, statblockPopover } from "../../../helper/variables.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
@@ -13,9 +12,6 @@ export const Helpbuttons = (props: { currentSceneMetadata: SceneMetadata | null 
                 href={"https://www.patreon.com/TTRPGAPI"}
                 className={"patreon-button top-button"}
                 target={"_blank"}
-                onClick={() => {
-                    plausibleEvent("patreon-click");
-                }}
                 title={"Patreon Link"}
             >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 436 476">
