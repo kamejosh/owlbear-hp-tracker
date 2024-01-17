@@ -278,7 +278,7 @@ When multiple Tokens are selected, the names of the selected tokens is displayed
 
 This can be used to do AoE damage or healing without entering the values for each Token. This also handles tempHP, maxHP, allowed negative values and every other system in HP Tracker automatically.
 
-![Popover Multiselect](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/multiselect_demo.png)
+![Popover Multiselect](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/multiselect_demo.gif)
 
 ### HP Tracker statblock popover
 
