@@ -1,3 +1,11 @@
+# 1.5.2
+
++ Add multi-selection embedded context-menu 
+  + damage and heal function for multiple selected tokens
+  + toggle settings for multiple selected tokens
+
+![Popover Multiselect](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/multiselect_demo.gif)
+
 # 1.5.1
 
 + Improve statblock search user experience
@@ -6,7 +14,7 @@
 
 + Add Statblock Popover
 + Add Setting to change Statblock Popover dimensions
-+ Fix styling issues in Statblocks
++ Fix styling issues in Statblockss
 + Refactor styling and help buttons
 + Add auto select of current statblock
 + Fix temp hp offset bug

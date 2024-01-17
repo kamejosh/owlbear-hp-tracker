@@ -1,25 +1,34 @@
 import { ContextWrapper } from "../ContextWrapper.tsx";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Token } from "../hptracker/Token.tsx";
 import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
 import { characterMetadata, sceneMetadata } from "../../helper/variables.ts";
 import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { Loader } from "../general/Loader.tsx";
+import { updateHp } from "../../helper/hpHelpers.ts";
+import { getBgColor } from "../../helper/helpers.ts";
+import { usePlayerContext } from "../../context/PlayerContext.ts";
+import {
+    getAcOnMap,
+    getCanPlayersSee,
+    getHpBar,
+    getHpOnMap,
+    toggleAcOnMap,
+    toggleCanPlayerSee,
+    toggleHpBar,
+    toggleHpOnMap,
+} from "../../helper/multiTokenHelper.ts";
 
 export const Popover = () => {
-    const [id, setId] = useState<string | null>(null);
-    const [multiSelection, setMultiSelection] = useState<boolean>(false);
+    const [ids, setIds] = useState<Array<string>>([]);
     const { isReady } = SceneReadyContext();
 
     const initPopover = async () => {
         const selection = await OBR.player.getSelection();
-        if (selection && selection.length === 1) {
+        if (selection) {
             const items = await OBR.scene.items.getItems<Image>(selection);
-            setId(items[0].id);
-            setMultiSelection(false);
-        } else if (selection && selection.length > 1) {
-            setMultiSelection(true);
+            setIds(items.map((item) => item.id));
         }
     };
 
@@ -31,14 +40,176 @@ export const Popover = () => {
 
     return (
         <ContextWrapper>
-            {id ? (
-                <Content id={id} />
-            ) : multiSelection ? (
-                <span className={"multiselection"}>Context menu only available when one Token is selected</span>
+            {ids.length === 1 ? (
+                <Content id={ids[0]} />
+            ) : ids.length > 1 ? (
+                <MultiContent ids={ids} />
             ) : (
                 <Loader className={"popover-spinner"} />
             )}
         </ContextWrapper>
+    );
+};
+
+const MultiContent = ({ ids }: { ids: Array<string> }) => {
+    const [items, setItems] = useState<Array<Item>>([]);
+    const [currentSceneMetadata, setCurrentSceneMetadata] = useState<SceneMetadata | null>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const { isReady } = SceneReadyContext();
+    const playerContext = usePlayerContext();
+
+    const initPopover = async () => {
+        setItems(await OBR.scene.items.getItems(ids));
+        const metadata = await OBR.scene.getMetadata();
+        const data = metadata[sceneMetadata] as SceneMetadata;
+        if (data) {
+            setCurrentSceneMetadata(data);
+        }
+    };
+
+    const changeHP = async (value: number) => {
+        await OBR.scene.items.updateItems(items, (uItems) => {
+            uItems.forEach((item) => {
+                if (characterMetadata in item.metadata) {
+                    const itemData = item.metadata[characterMetadata] as HpTrackerMetadata;
+                    const newHp = itemData.hp + value;
+                    if (newHp < itemData.hp && itemData.stats.tempHp && itemData.stats.tempHp > 0) {
+                        itemData.stats.tempHp = Math.max(itemData.stats.tempHp - (itemData.hp - newHp), 0);
+                    }
+                    itemData.hp = Math.min(
+                        currentSceneMetadata?.allowNegativeNumbers ? newHp : Math.max(newHp, 0),
+                        itemData.maxHp + (itemData.stats.tempHp || 0)
+                    );
+                    const uItem = items.find((i) => i.id === item.id);
+                    if (uItem && characterMetadata in uItem.metadata) {
+                        const uItemData = uItem.metadata[characterMetadata] as HpTrackerMetadata;
+                        updateHp(uItem, {
+                            ...uItemData,
+                            hp: itemData.hp,
+                            stats: { ...uItemData.stats, tempHp: itemData.stats.tempHp },
+                        });
+                    }
+                    item.metadata[characterMetadata] = { ...itemData };
+                }
+            });
+        });
+    };
+
+    useEffect(() => {
+        OBR.scene.items.onChange(async (cItems) => {
+            const filteredItems = cItems.filter((item) => ids.includes(item.id));
+            let localItems = Array.from(items);
+
+            if (filteredItems.length > 0) {
+                filteredItems.forEach((item) => {
+                    const index = localItems.findIndex((lItem) => lItem.id === item.id);
+                    if (index >= 0) {
+                        localItems.splice(index, 1, item);
+                    } else {
+                        localItems.push(item);
+                    }
+                });
+            }
+            setItems(localItems);
+        });
+
+        OBR.scene.onMetadataChange((sceneData) => {
+            const metadata = sceneData[sceneMetadata] as SceneMetadata;
+            if (metadata) {
+                setCurrentSceneMetadata(metadata);
+            }
+        });
+    }, []);
+
+    useEffect(() => {
+        if (isReady) {
+            initPopover();
+        }
+    }, [isReady]);
+
+    return (
+        <div className={"popover multi-selection"}>
+            <ul className={"token-names"}>
+                {items?.map((item, index) => {
+                    if (characterMetadata in item.metadata) {
+                        const d = item.metadata[characterMetadata] as HpTrackerMetadata;
+                        return (
+                            <li
+                                className={"token-entry"}
+                                key={index}
+                                style={{
+                                    background: `linear-gradient(to right, ${getBgColor(
+                                        d,
+                                        "0.4"
+                                    )}, #1C1B22 90%, #1C1B22 )`,
+                                }}
+                            >
+                                {d.name}
+                            </li>
+                        );
+                    }
+                })}
+            </ul>
+            <div className={"changes"}>
+                <div className={"hp"}>
+                    <input className={"input"} ref={inputRef} type={"number"} defaultValue={0} />
+                    <button
+                        className={"heal"}
+                        title={"heal"}
+                        onClick={() => {
+                            if (inputRef.current) {
+                                changeHP(parseInt(inputRef.current.value));
+                            }
+                        }}
+                    >
+                        Heal
+                    </button>
+                    <button
+                        className={"damage"}
+                        title={"damage"}
+                        onClick={() => {
+                            if (inputRef.current) {
+                                changeHP(parseInt(inputRef.current.value) * -1);
+                            }
+                        }}
+                    >
+                        Damage
+                    </button>
+                </div>
+                {playerContext.role === "GM" ? (
+                    <div className={"settings"}>
+                        <button
+                            title={"Toggle HP Bar visibility for GM and Players"}
+                            className={`toggle-button hp ${getHpBar(items) ? "on" : "off"}`}
+                            onClick={() => {
+                                toggleHpBar(items);
+                            }}
+                        />
+                        <button
+                            title={"Toggle HP displayed on Map"}
+                            className={`toggle-button map ${getHpOnMap(items) ? "on" : "off"}`}
+                            onClick={() => {
+                                toggleHpOnMap(items);
+                            }}
+                        />
+                        <button
+                            title={"Toggle AC displayed on Map"}
+                            className={`toggle-button ac ${getAcOnMap(items) ? "on" : "off"}`}
+                            onClick={async () => {
+                                toggleAcOnMap(items);
+                            }}
+                        />
+                        <button
+                            title={"Toggle HP/AC visibility for players"}
+                            className={`toggle-button players ${getCanPlayersSee(items) ? "on" : "off"}`}
+                            onClick={() => {
+                                toggleCanPlayerSee(items);
+                            }}
+                        />{" "}
+                    </div>
+                ) : null}
+            </div>
+        </div>
     );
 };
 

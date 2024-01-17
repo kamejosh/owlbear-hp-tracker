@@ -15,7 +15,9 @@
       * [Initializing Token](#initializing-token)
     - [Statblock](#statblock)
     - [Player Action Window](#player-action-window)
-  + [Hp Tracker Popover](#hp-tracker-popover)
+  + [Hp Tracker Context Menu](#hp-tracker-context-menu)
+    - [Single Selection](#single-selection)
+    - [Multi Selection](#multi-selection)
   + [Statblock Popover](#hp-tracker-statblock-popover)
 
 # HP Tracker - Owlbear Plugin
@@ -238,9 +240,13 @@ For tokens that have the Player Visibility set, their name change option, values
 
 Tokens don't follow the drag and drop order in the [GM Action Window](#hp-tracker-action-window). But when activated in the [Settings](#global-settings) Tokens will be ordered by their initiative value, disregarding which group they belong to.
 
-### HP Tracker Context Item
+### HP Tracker Context Menu
 
-The HP Tracker Context Item is a simplified version of the Action Window [Token](#token)
+The HP Tracker Context Menu comes in two versions depending on how many tokens are selected.
+
+#### Single Selection
+
+The HP Tracker Context Menu is a simplified version of the Action Window [Token](#token)
 
 For the GM all options except name and statblock are available:
 
@@ -249,6 +255,16 @@ For the GM all options except name and statblock are available:
 For the Players, only tokens that have Player Visibility enabled will show this popover, but the Toggle buttons are not available.
 
 ![Popover Player](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/popover_player.png)
+
+#### Multi Selection
+
+When multiple Tokens are selected, the names of the selected tokens is displayed as well as their general state (background color). And Options to either heal or damage all of them at once. For GMs there is also the options to change the visibility settings for all Tokens at once.
+
+![Popover Multiselect](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/popover_multi_select.png)
+
+This can be used to do AoE damage or healing without entering the values for each Token. This also handles tempHP, maxHP, allowed negative values and every other system in HP Tracker automatically.
+
+![Popover Multiselect](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/multiselect_demo.gif)
 
 ### HP Tracker statblock popover
 

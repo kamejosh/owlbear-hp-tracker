@@ -7,7 +7,7 @@ import { characterMetadata, sceneMetadata } from "../../helper/variables.ts";
 import { useCharSheet } from "../../context/CharacterContext.ts";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { updateHp } from "../../helper/hpHelpers.ts";
-import { evalString } from "../../helper/helpers.ts";
+import { evalString, getBgColor } from "../../helper/helpers.ts";
 import { updateAc } from "../../helper/acHelper.ts";
 import _ from "lodash";
 
@@ -24,7 +24,7 @@ export const Token = (props: TokenProps) => {
     const playerContext = usePlayerContext();
     const [data, setData] = useState<HpTrackerMetadata>(props.data);
     const [editName, setEditName] = useState<boolean>(false);
-    const [allowNegativNumbers, setAllowNegativeNumbers] = useState<boolean | undefined>(undefined);
+    const [allowNegativeNumbers, setAllowNegativeNumbers] = useState<boolean | undefined>(undefined);
     const { isReady } = SceneReadyContext();
     const { setId } = useCharSheet();
     const hpRef = useRef<HTMLInputElement>(null);
@@ -64,7 +64,7 @@ export const Token = (props: TokenProps) => {
 
     useEffect(() => {
         // could be undefined so we check for boolean
-        if (allowNegativNumbers === false) {
+        if (allowNegativeNumbers === false) {
             if (data.hp < 0) {
                 changeHp(0);
             }
@@ -72,7 +72,7 @@ export const Token = (props: TokenProps) => {
                 changeArmorClass(0);
             }
         }
-    }, [allowNegativNumbers]);
+    }, [allowNegativeNumbers]);
 
     const changeHp = (newHp: number) => {
         const newData = { ...data };
@@ -82,7 +82,7 @@ export const Token = (props: TokenProps) => {
                 tempHpRef.current.value = newData.stats.tempHp.toString();
             }
         }
-        newData.hp = allowNegativNumbers ? newHp : Math.max(newHp, 0);
+        newData.hp = allowNegativeNumbers ? newHp : Math.max(newHp, 0);
         updateHp(props.item, newData);
         setData(newData);
         handleValueChange(newData);
@@ -110,7 +110,7 @@ export const Token = (props: TokenProps) => {
     };
 
     const changeArmorClass = (newAc: number) => {
-        if (!allowNegativNumbers) {
+        if (!allowNegativeNumbers) {
             newAc = Math.max(newAc, 0);
         }
         const newData = { ...data, armorClass: newAc };
@@ -247,22 +247,10 @@ export const Token = (props: TokenProps) => {
         );
     };
 
-    const getBgColor = () => {
-        if (props.data.hp === 0 && props.data.maxHp === 0) {
-            return "#1C1B22";
-        }
-
-        const percent = props.data.hp / (data.stats.tempHp ? data.stats.tempHp + data.maxHp : data.maxHp);
-
-        const g = 255 * percent;
-        const r = 255 - 255 * percent;
-        return "rgb(" + r + "," + g + ",0,0.2)";
-    };
-
     const getNewHpValue = (input: string) => {
         let value: number;
         let factor = 1;
-        if (allowNegativNumbers) {
+        if (allowNegativeNumbers) {
             factor = input.startsWith("-") ? -1 : 1;
         }
         if (input.indexOf("+") > 0 || input.indexOf("-") > 0) {
@@ -284,7 +272,7 @@ export const Token = (props: TokenProps) => {
             }
             return null;
         }
-        return allowNegativNumbers ? hp : Math.max(hp, 0);
+        return allowNegativeNumbers ? hp : Math.max(hp, 0);
     };
 
     return display() ? (
@@ -292,7 +280,7 @@ export const Token = (props: TokenProps) => {
             className={`player-wrapper ${playerContext.role === "PLAYER" ? "player" : ""} ${
                 props.selected ? "selected" : ""
             }`}
-            style={{ background: `linear-gradient(to right, ${getBgColor()}, #1C1B22 50%, #1C1B22 )` }}
+            style={{ background: `linear-gradient(to right, ${getBgColor(data)}, #1C1B22 50%, #1C1B22 )` }}
         >
             {props.popover ? null : (
                 <div className={"player-name"}>
@@ -463,7 +451,7 @@ export const Token = (props: TokenProps) => {
                     value={data.armorClass}
                     onChange={(e) => {
                         let factor = 1;
-                        if (allowNegativNumbers) {
+                        if (allowNegativeNumbers) {
                             factor = e.target.value.startsWith("-") ? -1 : 1;
                         }
                         const value = Number(e.target.value.replace(/[^0-9]/g, ""));
@@ -518,7 +506,7 @@ export const Token = (props: TokenProps) => {
     ) : props.data.hpBar && props.item.visible ? (
         <div
             className={"player-wrapper player"}
-            style={{ background: `linear-gradient(to right, ${getBgColor()}, #242424 50%, #242424 )` }}
+            style={{ background: `linear-gradient(to right, ${getBgColor(data)}, #242424 50%, #242424 )` }}
         >
             <div className={"player-name"}>
                 <div
