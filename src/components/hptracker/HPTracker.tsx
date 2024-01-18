@@ -13,19 +13,19 @@ import { DropGroup } from "./DropGroup.tsx";
 import { sortItems, sortItemsInitiative } from "../../helper/helpers.ts";
 import { compare } from "compare-versions";
 import { Helpbuttons } from "../general/Helpbuttons/Helpbuttons.tsx";
-import { useDiceContext } from "../../context/DDDiceContext.tsx";
+import { DiceTray } from "../general/DiceTray.tsx";
 
 export const HPTracker = () => {
     return (
         <ContextWrapper>
             <Content />
+            <DiceTray />
         </ContextWrapper>
     );
 };
 
 const Content = () => {
     const playerContext = usePlayerContext();
-    const diceContext = useDiceContext();
     const [tokens, setTokens] = useState<Item[] | undefined>(undefined);
     const [playerTokens, setPlayerTokens] = useState<Array<Item>>([]);
     const [selectedTokens, setSelectedTokens] = useState<Array<string>>([]);
@@ -315,13 +315,6 @@ const Content = () => {
                         tokenLists={tokenLists}
                     />
                 )}
-                <button
-                    onClick={() => {
-                        diceContext.dice?.roll([{ type: "d20", theme: "dddice-standard" }]);
-                    }}
-                >
-                    roll
-                </button>
             </div>
         )
     ) : (
