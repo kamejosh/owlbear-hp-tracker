@@ -19,7 +19,7 @@ export const HPTracker = () => {
     return (
         <ContextWrapper>
             <Content />
-            <DiceTray />
+            <DiceTray classes={"hp-tracker-dice-tray"} />
         </ContextWrapper>
     );
 };

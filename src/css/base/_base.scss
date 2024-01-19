@@ -28,6 +28,7 @@ body {
 }
 
 #app {
+    position: relative;
     padding: 1rem;
     width: calc(100% - 2rem);
     max-width: 1280px;

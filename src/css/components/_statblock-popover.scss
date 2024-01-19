@@ -11,6 +11,7 @@ body:has(.statblock-app) {
             position: fixed;
             top: 0;
             left: 0;
+            z-index: 1000;
             background-color: var(--bg-color);
             width: 100%;
             height: calc(30px + 1rem);

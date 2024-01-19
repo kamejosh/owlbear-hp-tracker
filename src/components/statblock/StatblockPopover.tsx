@@ -6,6 +6,7 @@ import { ContextWrapper } from "../ContextWrapper.tsx";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
 import { sortItems } from "../../helper/helpers.ts";
+import { DiceTray } from "../general/DiceTray.tsx";
 
 export const StatblockPopover = () => {
     const [minimized, setMinimized] = useState<boolean>(false);
@@ -126,6 +127,7 @@ export const StatblockPopover = () => {
                     currentSceneMetadata={currentSceneMetadata}
                 />
             </div>
+            <DiceTray classes={"statblock-dice-tray"} />
         </ContextWrapper>
     );
 };

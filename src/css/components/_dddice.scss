@@ -1,8 +1,12 @@
 #DiceCanvas {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
-    z-index: -1;
-    width: 100svw;
-    height: 100svh;
+    width: 90svw;
+    height: 90svh;
+    pointer-events: none;
+
+    &.statblock-dice-tray {
+        top: calc(30px + 1rem);
+    }
 }
