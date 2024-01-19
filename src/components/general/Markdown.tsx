@@ -12,9 +12,19 @@ export const Markdown = ({ text }: { text: string }) => {
                 h3: ({ node, ...props }) => <h3 id={generateSlug(props.children[0] as string)} {...props}></h3>,
                 h4: ({ node, ...props }) => <h4 id={generateSlug(props.children[0] as string)} {...props}></h4>,
                 h5: ({ node, ...props }) => <h5 id={generateSlug(props.children[0] as string)} {...props}></h5>,
+                a: ({ node, ...props }) => {
+                    if (props.href?.startsWith("#")) {
+                        return <a href={props.href}>{props.children[0]}</a>;
+                    } else {
+                        return (
+                            <a href={props.href} target={"_blank"}>
+                                {props.children[0]}
+                            </a>
+                        );
+                    }
+                },
             }}
             children={text}
-            linkTarget={"_blank"}
         />
     );
 };
