@@ -19,7 +19,10 @@ export type HpTrackerMetadata = {
     group?: string;
 };
 
-export type SceneMetadata = {
+/**
+ * @deprecated The type is only used for migrations and should no longer be used in production code
+ */
+export type SceneMetadata_Deprecated = {
     version: string;
     id: string;
     allowNegativeNumbers?: boolean;
@@ -34,6 +37,25 @@ export type SceneMetadata = {
     initiativeDice?: number;
     statblockPopover?: { width: number; height: number };
     playerSort: boolean;
+};
+
+export type SceneMetadata = {
+    version?: string;
+    id?: string;
+    ruleset?: Ruleset;
+    groups?: Array<string>;
+    openGroups?: Array<string>;
+};
+
+export type RoomMetadata = {
+    allowNegativeNumbers?: boolean;
+    hpBarSegments?: number;
+    hpBarOffset?: number;
+    acOffset?: { x: number; y: number };
+    acShield?: boolean;
+    playerSort?: boolean;
+    statblockPopover?: { width: number; height: number };
+    initiativeDice?: number;
 };
 
 export type AttachmentMetadata = {

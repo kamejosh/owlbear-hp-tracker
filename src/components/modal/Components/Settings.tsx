@@ -1,78 +1,25 @@
-import { useLocalStorage } from "../../../helper/hooks.ts";
-import { ID, modalId, sceneMetadata } from "../../../helper/variables.ts";
-import { Ruleset, SceneMetadata } from "../../../helper/types.ts";
-import { SceneReadyContext } from "../../../context/SceneReadyContext.ts";
-import { useEffect, useState } from "react";
-import OBR, { Metadata } from "@owlbear-rodeo/sdk";
+import { modalId } from "../../../helper/variables.ts";
+import OBR from "@owlbear-rodeo/sdk";
 import { updateHpOffset } from "../../../helper/hpHelpers.ts";
 import { Groups } from "./Groups.tsx";
 import { Switch } from "../../general/Switch/Switch.tsx";
 import { dndSvg, pfSvg } from "./SwitchBackground.ts";
 import { updateAcOffset } from "../../../helper/acHelper.ts";
+import { useMetadataContext } from "../../../context/MetadataContext.ts";
+import { updateRoomMetadata, updateSceneMetadata } from "../../../helper/helpers.ts";
 
 export const Settings = () => {
-    const [offset, setOffset] = useLocalStorage<number>(`${ID}.offset`, 0);
-    const [acOffset, setAcOffset] = useLocalStorage<{ x: number; y: number }>(`${ID}.acOffset`, { x: 0, y: 0 });
-    // const [acShield, setAcShield] = useLocalStorage<boolean>(`${ID}.acShield`, true);
-    const [segments, setSegments] = useLocalStorage<number>(`${ID}.hpSegments`, 0);
-    const [allowNegativNumbers, setAllowNegativeNumbers] = useLocalStorage<boolean>(
-        `${ID}.allowNegativeNumbers`,
-        false
-    );
-    const [ruleset, setStateRuleset] = useLocalStorage<Ruleset>(`${ID}.ruleset`, "e5");
-    const [initiativeDice, setInitiativeDice] = useLocalStorage<number>(`${ID}.initiativeDice`, 20);
-    const [statblockPopover, setStatblockPopover] = useLocalStorage<{ width: number; height: number }>(
-        `${ID}.statblockPopover`,
-        { width: 500, height: 600 }
-    );
-    const [playerSort, setPlayerSort] = useLocalStorage<boolean>(`${ID}.playerSort`, false);
-    const { isReady } = SceneReadyContext();
-    const [sceneId, setSceneId] = useState<string | null>(null);
-
-    useEffect(() => {
-        const setSceneMetadata = async () => {
-            const metadata: Metadata = await OBR.scene.getMetadata();
-            // We use version and id from the saved metadata, no need to refresh this
-            const hpTrackerSceneMetadata = metadata[sceneMetadata] as SceneMetadata;
-            hpTrackerSceneMetadata.hpBarOffset = offset;
-            hpTrackerSceneMetadata.acOffset = acOffset;
-            // hpTrackerSceneMetadata.acShield = acShield;
-            hpTrackerSceneMetadata.hpBarSegments = segments;
-            hpTrackerSceneMetadata.allowNegativeNumbers = allowNegativNumbers;
-            hpTrackerSceneMetadata.ruleset = ruleset;
-            hpTrackerSceneMetadata.initiativeDice = initiativeDice;
-            hpTrackerSceneMetadata.statblockPopover = statblockPopover;
-            hpTrackerSceneMetadata.playerSort = playerSort;
-            const ownMetadata: Metadata = {};
-            ownMetadata[sceneMetadata] = hpTrackerSceneMetadata;
-
-            await OBR.scene.setMetadata(ownMetadata);
-        };
-        if (isReady) {
-            setSceneMetadata();
-        }
-    }, [offset, segments, allowNegativNumbers, ruleset, acOffset, statblockPopover, playerSort, initiativeDice]);
+    const { scene, room } = useMetadataContext();
 
     const handleOffsetChange = (value: number) => {
         updateHpOffset(value);
-        setOffset(value);
+        updateRoomMetadata(room, { hpBarOffset: value });
     };
 
     const handleAcOffsetChange = (x: number, y: number) => {
         updateAcOffset({ x: x, y: y });
-        setAcOffset({ x: x, y: y });
+        updateRoomMetadata(room, { acOffset: { x: x, y: y } });
     };
-
-    const initSettings = async () => {
-        const sceneData = await OBR.scene.getMetadata();
-        setSceneId((sceneData[sceneMetadata] as SceneMetadata).id);
-    };
-
-    useEffect(() => {
-        if (isReady) {
-            initSettings();
-        }
-    }, [isReady]);
 
     return (
         <>
@@ -88,12 +35,12 @@ export const Settings = () => {
                             labels={{ left: "DnD", right: "PF" }}
                             onChange={(checked) => {
                                 if (checked) {
-                                    setStateRuleset("pf");
+                                    updateSceneMetadata(scene, { ruleset: "pf" });
                                 } else {
-                                    setStateRuleset("e5");
+                                    updateSceneMetadata(scene, { ruleset: "e5" });
                                 }
                             }}
-                            checked={ruleset === "pf"}
+                            checked={!!scene && scene.ruleset === "pf"}
                             backgroundImages={{ left: dndSvg, right: pfSvg }}
                         />
                     </div>
@@ -102,16 +49,16 @@ export const Settings = () => {
                         <input
                             type={"text"}
                             size={2}
-                            value={segments}
+                            value={room?.hpBarSegments || 0}
                             onChange={(e) => {
                                 const nValue = Number(e.target.value.replace(/[^0-9]/g, ""));
-                                setSegments(nValue);
+                                updateRoomMetadata(room, { hpBarSegments: nValue });
                             }}
                             onKeyDown={(e) => {
                                 if (e.key === "ArrowUp") {
-                                    setSegments(segments + 1);
+                                    updateRoomMetadata(room, { hpBarSegments: (room?.hpBarSegments || 0) + 1 });
                                 } else if (e.key === "ArrowDown") {
-                                    setSegments(segments - 1);
+                                    updateRoomMetadata(room, { hpBarSegments: (room?.hpBarSegments || 0) + -1 });
                                 }
                             }}
                         />
@@ -121,7 +68,7 @@ export const Settings = () => {
                         <input
                             type={"text"}
                             size={2}
-                            value={offset}
+                            value={room?.hpBarOffset || 0}
                             onChange={(e) => {
                                 const factor = e.target.value.startsWith("-") ? -1 : 1;
                                 const nValue = Number(e.target.value.replace(/[^0-9]/g, ""));
@@ -129,9 +76,9 @@ export const Settings = () => {
                             }}
                             onKeyDown={(e) => {
                                 if (e.key === "ArrowUp") {
-                                    handleOffsetChange(offset + 1);
+                                    handleOffsetChange((room?.hpBarOffset || 0) + 1);
                                 } else if (e.key === "ArrowDown") {
-                                    handleOffsetChange(offset - 1);
+                                    handleOffsetChange((room?.hpBarOffset || 0) - 1);
                                 }
                             }}
                         />
@@ -143,22 +90,22 @@ export const Settings = () => {
                             <input
                                 type={"text"}
                                 size={2}
-                                value={acOffset.x}
+                                value={room?.acOffset?.x || 0}
                                 onChange={(e) => {
                                     const factor = e.target.value.startsWith("-") ? -1 : 1;
                                     const nValue = Number(e.target.value.replace(/[^0-9]/g, ""));
-                                    handleAcOffsetChange(nValue * factor, acOffset.y);
+                                    handleAcOffsetChange(nValue * factor, room?.acOffset?.y || 0);
                                 }}
                             />
                             Y{" "}
                             <input
                                 type={"text"}
                                 size={2}
-                                value={acOffset.y}
+                                value={room?.acOffset?.y || 0}
                                 onChange={(e) => {
                                     const factor = e.target.value.startsWith("-") ? -1 : 1;
                                     const nValue = Number(e.target.value.replace(/[^0-9]/g, ""));
-                                    handleAcOffsetChange(acOffset.x, nValue * factor);
+                                    handleAcOffsetChange(room?.acOffset?.x || 0, nValue * factor);
                                 }}
                             />
                         </div>
@@ -167,9 +114,9 @@ export const Settings = () => {
                         Allow negative HP/AC:
                         <input
                             type={"checkbox"}
-                            checked={allowNegativNumbers}
+                            checked={room?.allowNegativeNumbers || false}
                             onChange={() => {
-                                setAllowNegativeNumbers(!allowNegativNumbers);
+                                updateRoomMetadata(room, { allowNegativeNumbers: !room?.allowNegativeNumbers });
                             }}
                         />
                     </div>
@@ -177,9 +124,9 @@ export const Settings = () => {
                         Sort Tokens in Player View:
                         <input
                             type={"checkbox"}
-                            checked={playerSort}
+                            checked={room?.playerSort || false}
                             onChange={() => {
-                                setPlayerSort(!playerSort);
+                                updateRoomMetadata(room, { playerSort: !room?.playerSort });
                             }}
                         />
                     </div>
@@ -188,9 +135,9 @@ export const Settings = () => {
                         <input
                             type={"number"}
                             size={1}
-                            value={initiativeDice}
+                            value={room?.initiativeDice || 20}
                             onChange={(e) => {
-                                setInitiativeDice(parseInt(e.target.value));
+                                updateRoomMetadata(room, { initiativeDice: parseInt(e.target.value) });
                             }}
                         />
                     </div>
@@ -201,19 +148,24 @@ export const Settings = () => {
                             width{" "}
                             <input
                                 type={"number"}
-                                defaultValue={statblockPopover.width}
+                                defaultValue={room?.statblockPopover?.width || 500}
                                 onBlur={(e) => {
-                                    setStatblockPopover({
-                                        ...statblockPopover,
-                                        width: Math.max(parseInt(e.target.value), 200),
+                                    updateRoomMetadata(room, {
+                                        statblockPopover: {
+                                            height: room?.statblockPopover?.height || 600,
+                                            width: Math.max(parseInt(e.currentTarget.value), 200),
+                                        },
                                     });
+
                                     e.currentTarget.value = Math.max(200, parseInt(e.currentTarget.value)).toString();
                                 }}
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter") {
-                                        setStatblockPopover({
-                                            ...statblockPopover,
-                                            width: Math.max(parseInt(e.currentTarget.value), 200),
+                                        updateRoomMetadata(room, {
+                                            statblockPopover: {
+                                                height: room?.statblockPopover?.height || 600,
+                                                width: Math.max(parseInt(e.currentTarget.value), 200),
+                                            },
                                         });
                                         e.currentTarget.value = Math.max(
                                             200,
@@ -227,19 +179,23 @@ export const Settings = () => {
                             height{" "}
                             <input
                                 type={"number"}
-                                defaultValue={statblockPopover.height}
+                                defaultValue={room?.statblockPopover?.height || 600}
                                 onBlur={(e) => {
-                                    setStatblockPopover({
-                                        ...statblockPopover,
-                                        height: Math.max(200, parseInt(e.target.value)),
+                                    updateRoomMetadata(room, {
+                                        statblockPopover: {
+                                            width: room?.statblockPopover?.width || 500,
+                                            height: Math.max(parseInt(e.currentTarget.value), 200),
+                                        },
                                     });
                                     e.currentTarget.value = Math.max(200, parseInt(e.target.value)).toString();
                                 }}
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter") {
-                                        setStatblockPopover({
-                                            ...statblockPopover,
-                                            height: Math.max(parseInt(e.currentTarget.value)),
+                                        updateRoomMetadata(room, {
+                                            statblockPopover: {
+                                                width: room?.statblockPopover?.width || 500,
+                                                height: Math.max(parseInt(e.currentTarget.value), 200),
+                                            },
                                         });
                                         e.currentTarget.value = Math.max(
                                             200,
@@ -250,7 +206,7 @@ export const Settings = () => {
                             />
                         </label>
                     </div>
-                    {sceneId ? <Groups sceneId={sceneId} /> : null}
+                    <Groups />
                 </>
             </div>
         </>

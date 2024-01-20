@@ -1,12 +1,13 @@
 import { ReactElement, useEffect, useRef, useState } from "react";
 import { useCharSheet } from "../../../context/CharacterContext.ts";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
-import { characterMetadata, settingsModal } from "../../../helper/variables.ts";
-import { HpTrackerMetadata, Ruleset, SceneMetadata } from "../../../helper/types.ts";
+import { itemMetadataKey, settingsModal } from "../../../helper/variables.ts";
+import { HpTrackerMetadata, Ruleset } from "../../../helper/types.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { SearchResult5e, SearchResultPf } from "./SearchResult.tsx";
 import { Statblock } from "./Statblock.tsx";
 import { Helpbuttons } from "../../general/Helpbuttons/Helpbuttons.tsx";
+import { useMetadataContext } from "../../../context/MetadataContext.ts";
 
 type SearchWrapperProps = {
     data: HpTrackerMetadata;
@@ -19,7 +20,6 @@ type StatblockWrapperProps = {
     data: HpTrackerMetadata;
     forceSearch: boolean;
     search: string;
-    currentSceneMetadata: SceneMetadata | null;
     itemId: string;
     setEmpty: (empty: boolean) => void;
 };
@@ -77,6 +77,7 @@ const SearchWrapper = (props: SearchWrapperProps) => {
 };
 
 const StatblockWrapper = (props: StatblockWrapperProps) => {
+    const { scene } = useMetadataContext();
     const ruleSetMap = new Map<Ruleset, ReactElement>([
         ["pf", <SearchResultPf search={props.search} setEmpty={props.setEmpty} />],
         ["e5", <SearchResult5e search={props.search} setEmpty={props.setEmpty} />],
@@ -85,9 +86,9 @@ const StatblockWrapper = (props: StatblockWrapperProps) => {
     return (
         <>
             {props.data.sheet && !props.forceSearch ? (
-                <Statblock data={props.data} currentSceneMetadata={props.currentSceneMetadata} itemId={props.itemId} />
+                <Statblock data={props.data} itemId={props.itemId} />
             ) : props.search !== "" ? (
-                ruleSetMap.get(props.currentSceneMetadata?.ruleset || "e5")
+                ruleSetMap.get(scene?.ruleset || "e5")
             ) : (
                 <></>
             )}
@@ -95,8 +96,9 @@ const StatblockWrapper = (props: StatblockWrapperProps) => {
     );
 };
 
-export const CharacterSheet = (props: { currentSceneMetadata: SceneMetadata | null; itemId: string }) => {
+export const CharacterSheet = (props: { itemId: string }) => {
     const { characterId, setId } = useCharSheet();
+    const { scene } = useMetadataContext();
     const [token, setToken] = useState<Item | null>(null);
     const [data, setData] = useState<HpTrackerMetadata | null>(null);
     const [search, setSearch] = useState<string>("");
@@ -106,8 +108,8 @@ export const CharacterSheet = (props: { currentSceneMetadata: SceneMetadata | nu
     const initData = (items: Item[]) => {
         if (items.length > 0) {
             const item = items[0];
-            if (characterMetadata in item.metadata) {
-                const d = item.metadata[characterMetadata] as HpTrackerMetadata;
+            if (itemMetadataKey in item.metadata) {
+                const d = item.metadata[itemMetadataKey] as HpTrackerMetadata;
                 setData(d);
                 if (!d.sheet) {
                     setSearch(getSearchString(d.name));
@@ -137,7 +139,7 @@ export const CharacterSheet = (props: { currentSceneMetadata: SceneMetadata | nu
     }, []);
 
     useEffect(() => {
-        if (data?.sheet && data?.ruleset === props.currentSceneMetadata?.ruleset) {
+        if (data?.sheet && data?.ruleset === scene?.ruleset) {
             setForceSearch(false);
         } else {
             setForceSearch(true);
@@ -149,13 +151,13 @@ export const CharacterSheet = (props: { currentSceneMetadata: SceneMetadata | nu
             <button className={"back-button"} onClick={() => setId(null)}>
                 Back
             </button>
-            <Helpbuttons currentSceneMetadata={props.currentSceneMetadata} />
+            <Helpbuttons />
             {token && data ? (
                 <div className={"content"}>
                     <h2>
-                        {data.name} <span className={"note"}>(using {props.currentSceneMetadata?.ruleset} Filter)</span>
+                        {data.name} <span className={"note"}>(using {scene?.ruleset} Filter)</span>
                     </h2>
-                    {props.currentSceneMetadata?.ruleset === "e5" || props.currentSceneMetadata?.ruleset === "pf" ? (
+                    {scene?.ruleset === "e5" || scene?.ruleset === "pf" ? (
                         <>
                             <SearchWrapper
                                 data={data}
@@ -167,7 +169,6 @@ export const CharacterSheet = (props: { currentSceneMetadata: SceneMetadata | nu
                                 data={data}
                                 search={search}
                                 forceSearch={forceSearch}
-                                currentSceneMetadata={props.currentSceneMetadata}
                                 itemId={props.itemId}
                                 setEmpty={setEmptySearch}
                             />

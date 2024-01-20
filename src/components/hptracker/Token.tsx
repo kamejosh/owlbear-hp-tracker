@@ -1,22 +1,20 @@
-import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
-
+import { HpTrackerMetadata } from "../../helper/types.ts";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import { useEffect, useRef, useState } from "react";
-import OBR, { Item, Metadata } from "@owlbear-rodeo/sdk";
-import { characterMetadata, sceneMetadata } from "../../helper/variables.ts";
+import OBR, { Item } from "@owlbear-rodeo/sdk";
+import { itemMetadataKey } from "../../helper/variables.ts";
 import { useCharSheet } from "../../context/CharacterContext.ts";
-import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { updateHp } from "../../helper/hpHelpers.ts";
 import { evalString, getBgColor } from "../../helper/helpers.ts";
 import { updateAc } from "../../helper/acHelper.ts";
 import _ from "lodash";
+import { useMetadataContext } from "../../context/MetadataContext.ts";
 
 type TokenProps = {
     item: Item;
     data: HpTrackerMetadata;
     popover: boolean;
     selected: boolean;
-    metadata: SceneMetadata;
     tokenLists?: Map<string, Array<Item>>;
 };
 
@@ -24,19 +22,11 @@ export const Token = (props: TokenProps) => {
     const playerContext = usePlayerContext();
     const [data, setData] = useState<HpTrackerMetadata>(props.data);
     const [editName, setEditName] = useState<boolean>(false);
-    const [allowNegativeNumbers, setAllowNegativeNumbers] = useState<boolean | undefined>(undefined);
-    const { isReady } = SceneReadyContext();
+    const { room } = useMetadataContext();
     const { setId } = useCharSheet();
     const hpRef = useRef<HTMLInputElement>(null);
     const maxHpRef = useRef<HTMLInputElement>(null);
     const tempHpRef = useRef<HTMLInputElement>(null);
-
-    const handleMetadata = (metadata: Metadata) => {
-        if (metadata && sceneMetadata in metadata) {
-            const sceneData = metadata[sceneMetadata] as SceneMetadata;
-            setAllowNegativeNumbers(sceneData.allowNegativeNumbers ?? false);
-        }
-    };
 
     useEffect(() => {
         setData(props.data);
@@ -49,22 +39,8 @@ export const Token = (props: TokenProps) => {
     }, [props.data.hp]);
 
     useEffect(() => {
-        const initMetadataValues = async () => {
-            const metadata = (await OBR.scene.getMetadata()) as Metadata;
-            handleMetadata(metadata);
-        };
-        if (isReady) {
-            initMetadataValues();
-        }
-    }, [isReady]);
-
-    useEffect(() => {
-        handleMetadata(props.metadata);
-    }, [props.metadata]);
-
-    useEffect(() => {
         // could be undefined so we check for boolean
-        if (allowNegativeNumbers === false) {
+        if (room && room.allowNegativeNumbers === false) {
             if (data.hp < 0) {
                 changeHp(0);
             }
@@ -72,7 +48,7 @@ export const Token = (props: TokenProps) => {
                 changeArmorClass(0);
             }
         }
-    }, [allowNegativeNumbers]);
+    }, [room?.allowNegativeNumbers]);
 
     const changeHp = (newHp: number) => {
         const newData = { ...data };
@@ -82,7 +58,7 @@ export const Token = (props: TokenProps) => {
                 tempHpRef.current.value = newData.stats.tempHp.toString();
             }
         }
-        newData.hp = allowNegativeNumbers ? newHp : Math.max(newHp, 0);
+        newData.hp = room?.allowNegativeNumbers ? newHp : Math.max(newHp, 0);
         updateHp(props.item, newData);
         setData(newData);
         handleValueChange(newData);
@@ -110,7 +86,7 @@ export const Token = (props: TokenProps) => {
     };
 
     const changeArmorClass = (newAc: number) => {
-        if (!allowNegativeNumbers) {
+        if (!room?.allowNegativeNumbers) {
             newAc = Math.max(newAc, 0);
         }
         const newData = { ...data, armorClass: newAc };
@@ -146,7 +122,7 @@ export const Token = (props: TokenProps) => {
         OBR.scene.items.updateItems([props.item], (items) => {
             items.forEach((item) => {
                 // just assigning currentData did not trigger onChange event. Spreading helps
-                item.metadata[characterMetadata] = { ...newData };
+                item.metadata[itemMetadataKey] = { ...newData };
             });
         });
     };
@@ -161,8 +137,8 @@ export const Token = (props: TokenProps) => {
                 const selectedGroupItems = groupItems.filter((item) => currentSelection.includes(item.id));
 
                 const sortedByDistance = selectedGroupItems.sort((a, b) => {
-                    const aData = a.metadata[characterMetadata] as HpTrackerMetadata;
-                    const bData = b.metadata[characterMetadata] as HpTrackerMetadata;
+                    const aData = a.metadata[itemMetadataKey] as HpTrackerMetadata;
+                    const bData = b.metadata[itemMetadataKey] as HpTrackerMetadata;
                     const aDelta = Math.abs(index - aData.index!);
                     const bDelta = Math.abs(index - bData.index!);
                     if (aDelta < bDelta) {
@@ -176,7 +152,7 @@ export const Token = (props: TokenProps) => {
 
                 if (sortedByDistance.length > 0) {
                     const closestDistance = sortedByDistance[0];
-                    const cdData = closestDistance.metadata[characterMetadata] as HpTrackerMetadata;
+                    const cdData = closestDistance.metadata[itemMetadataKey] as HpTrackerMetadata;
 
                     let indices: Array<number> = [];
                     if (cdData.index! < index) {
@@ -185,7 +161,7 @@ export const Token = (props: TokenProps) => {
                         indices = _.range(index, cdData.index);
                     }
                     const toSelect = groupItems.map((item) => {
-                        const itemData = item.metadata[characterMetadata] as HpTrackerMetadata;
+                        const itemData = item.metadata[itemMetadataKey] as HpTrackerMetadata;
                         if (itemData.index) {
                             if (indices.includes(itemData.index)) {
                                 return item.id;
@@ -250,7 +226,7 @@ export const Token = (props: TokenProps) => {
     const getNewHpValue = (input: string) => {
         let value: number;
         let factor = 1;
-        if (allowNegativeNumbers) {
+        if (room?.allowNegativeNumbers) {
             factor = input.startsWith("-") ? -1 : 1;
         }
         if (input.indexOf("+") > 0 || input.indexOf("-") > 0) {
@@ -272,7 +248,7 @@ export const Token = (props: TokenProps) => {
             }
             return null;
         }
-        return allowNegativeNumbers ? hp : Math.max(hp, 0);
+        return room?.allowNegativeNumbers ? hp : Math.max(hp, 0);
     };
 
     return display() ? (
@@ -451,7 +427,7 @@ export const Token = (props: TokenProps) => {
                     value={data.armorClass}
                     onChange={(e) => {
                         let factor = 1;
-                        if (allowNegativeNumbers) {
+                        if (room?.allowNegativeNumbers) {
                             factor = e.target.value.startsWith("-") ? -1 : 1;
                         }
                         const value = Number(e.target.value.replace(/[^0-9]/g, ""));
@@ -484,9 +460,7 @@ export const Token = (props: TokenProps) => {
                     className={`toggle-button initiative-button`}
                     onClick={() => {
                         const value =
-                            Math.floor(Math.random() * (props.metadata.initiativeDice ?? 20)) +
-                            1 +
-                            data.stats.initiativeBonus;
+                            Math.floor(Math.random() * (room?.initiativeDice ?? 20)) + 1 + data.stats.initiativeBonus;
                         const newData = { ...data, initiative: value };
                         setData(newData);
                         handleValueChange(newData);

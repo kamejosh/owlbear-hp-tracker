@@ -8,7 +8,7 @@ import {
     getImageBounds,
     getYOffset,
 } from "./helpers.ts";
-import { characterMetadata, infoMetadata } from "./variables.ts";
+import { itemMetadataKey, infoMetadataKey } from "./variables.ts";
 
 export const createBar = async (percentage: number, tempHpPercentage: number, token: Image) => {
     const bounds = await getImageBounds(token);
@@ -70,9 +70,9 @@ export const createBar = async (percentage: number, tempHpPercentage: number, to
         .visible(token.visible)
         .build();
 
-    backgroundShape.metadata[infoMetadata] = { isHpText: true, attachmentType: "BAR" };
-    hpShape.metadata[infoMetadata] = { isHpText: true, attachmentType: "BAR" };
-    tempHp.metadata[infoMetadata] = { isHpText: true, attachmentType: "BAR" };
+    backgroundShape.metadata[infoMetadataKey] = { isHpText: true, attachmentType: "BAR" };
+    hpShape.metadata[infoMetadataKey] = { isHpText: true, attachmentType: "BAR" };
+    tempHp.metadata[infoMetadataKey] = { isHpText: true, attachmentType: "BAR" };
     return [backgroundShape, hpShape, tempHp];
 };
 
@@ -105,7 +105,7 @@ const createText = async (text: string, token: Image) => {
         .name("hp-text")
         .build();
 
-    textItem.metadata[infoMetadata] = { isHpText: true, attachmentType: "HP" };
+    textItem.metadata[infoMetadataKey] = { isHpText: true, attachmentType: "HP" };
     return textItem;
 };
 
@@ -148,14 +148,14 @@ export const updateHpOffset = async (offset: number) => {
     const hpBars = await OBR.scene.items.getItems(
         (item) =>
             item.type === "SHAPE" &&
-            infoMetadata in item.metadata &&
-            (item.metadata[infoMetadata] as AttachmentMetadata).attachmentType === "BAR"
+            infoMetadataKey in item.metadata &&
+            (item.metadata[infoMetadataKey] as AttachmentMetadata).attachmentType === "BAR"
     );
     const hpTexts = await OBR.scene.items.getItems(
         (item) =>
             item.type === "TEXT" &&
-            infoMetadata in item.metadata &&
-            (item.metadata[infoMetadata] as AttachmentMetadata).attachmentType === "HP"
+            infoMetadataKey in item.metadata &&
+            (item.metadata[infoMetadataKey] as AttachmentMetadata).attachmentType === "HP"
     );
     const barChanges = new Map<string, BarItemChanges>();
     const textChanges = new Map<string, TextItemChanges>();
@@ -319,7 +319,7 @@ const handleBarAttachment = async (
     const width = Math.abs(bounds.width);
     const border = Math.floor(width / 75);
 
-    if (attachment.name === "hp" && infoMetadata in attachment.metadata) {
+    if (attachment.name === "hp" && infoMetadataKey in attachment.metadata) {
         const change = changeMap.get(attachment.id) ?? {};
         const { hpPercentage } = await calculatePercentage(data);
         if (hpPercentage === 0) {
@@ -331,7 +331,7 @@ const handleBarAttachment = async (
         if (shape.width != change.width || shape.style.fillColor != change.color) {
             return change;
         }
-    } else if (attachment.name === "temp-hp" && infoMetadata in attachment.metadata) {
+    } else if (attachment.name === "temp-hp" && infoMetadataKey in attachment.metadata) {
         const change = changeMap.get(attachment.id) ?? {};
         const { tempHpPercentage } = await calculatePercentage(data);
         if (tempHpPercentage === 0) {
@@ -343,7 +343,7 @@ const handleBarAttachment = async (
         if (shape.width != change.width || shape.style.fillColor != change.color) {
             return change;
         }
-    } else if (infoMetadata in attachment.metadata) {
+    } else if (infoMetadataKey in attachment.metadata) {
         const change = changeMap.get(attachment.id) ?? {};
         if (shape.width != width) {
             change.width = width;
@@ -357,7 +357,7 @@ export const updateTextVisibility = async (tokens: Array<Item>) => {
     const textChanges = new Map<string, TextItemChanges>();
     for (const token of tokens) {
         const textAttachments = (await getAttachedItems(token.id, ["TEXT"])).filter((a) => attachmentFilter(a, "HP"));
-        const data = token.metadata[characterMetadata] as HpTrackerMetadata;
+        const data = token.metadata[itemMetadataKey] as HpTrackerMetadata;
 
         textAttachments.forEach((text) => {
             const change = textChanges.get(text.id) ?? {};

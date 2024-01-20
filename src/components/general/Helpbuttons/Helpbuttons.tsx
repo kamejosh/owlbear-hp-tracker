@@ -1,9 +1,10 @@
 import OBR from "@owlbear-rodeo/sdk";
 import { changelogModal, helpModal, settingsModal, statblockPopover } from "../../../helper/variables.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
-import { SceneMetadata } from "../../../helper/types.ts";
+import { useMetadataContext } from "../../../context/MetadataContext.ts";
 
-export const Helpbuttons = (props: { currentSceneMetadata: SceneMetadata | null }) => {
+export const Helpbuttons = () => {
+    const { room } = useMetadataContext();
     const playerContext = usePlayerContext();
 
     return (
@@ -31,8 +32,8 @@ export const Helpbuttons = (props: { currentSceneMetadata: SceneMetadata | null 
                             const height = await OBR.viewport.getHeight();
                             await OBR.popover.open({
                                 ...statblockPopover,
-                                width: Math.min(props.currentSceneMetadata?.statblockPopover?.width || 500, width),
-                                height: Math.min(props.currentSceneMetadata?.statblockPopover?.height || 600, height),
+                                width: Math.min(room?.statblockPopover?.width || 500, width),
+                                height: Math.min(room?.statblockPopover?.height || 600, height),
                                 anchorPosition: { top: 55, left: width - 70 },
                             });
                         }}

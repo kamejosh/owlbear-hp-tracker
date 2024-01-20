@@ -1,7 +1,7 @@
 import { useCharSheet } from "../../../context/CharacterContext.ts";
 import OBR from "@owlbear-rodeo/sdk";
-import { characterMetadata } from "../../../helper/variables.ts";
-import { HpTrackerMetadata, SceneMetadata } from "../../../helper/types.ts";
+import { itemMetadataKey } from "../../../helper/variables.ts";
+import { HpTrackerMetadata } from "../../../helper/types.ts";
 import { useEffect, useState } from "react";
 import { PfAbility } from "./PfAbility.tsx";
 import { useE5GetStatblock } from "../../../ttrpgapi/e5/useE5Api.ts";
@@ -9,6 +9,7 @@ import { usePfGetStatblock } from "../../../ttrpgapi/pf/usePfApi.ts";
 import { E5Ability } from "./E5Ability.tsx";
 import { E5Spells } from "./E5Spells.tsx";
 import { PfSpells } from "./PfSpells.tsx";
+import { useMetadataContext } from "../../../context/MetadataContext.ts";
 
 const E5StatBlock = ({ slug }: { slug: string }) => {
     const statblockQuery = useE5GetStatblock(slug);
@@ -21,9 +22,9 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
         if (characterId) {
             OBR.scene.items.updateItems([characterId], (items) => {
                 items.forEach((item) => {
-                    const data = item.metadata[characterMetadata] as HpTrackerMetadata;
+                    const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
                     if (data.hp === 0 && data.maxHp === 0 && data.armorClass === 0) {
-                        item.metadata[characterMetadata] = {
+                        item.metadata[itemMetadataKey] = {
                             ...data,
                             maxHp: maxHp,
                             armorClass: ac,
@@ -212,9 +213,9 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
         if (characterId) {
             OBR.scene.items.updateItems([characterId], (items) => {
                 items.forEach((item) => {
-                    const data = item.metadata[characterMetadata] as HpTrackerMetadata;
+                    const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
                     if (data.hp === 0 && data.maxHp === 0 && data.armorClass === 0) {
-                        item.metadata[characterMetadata] = {
+                        item.metadata[itemMetadataKey] = {
                             ...data,
                             maxHp: maxHp,
                             armorClass: ac,
@@ -369,11 +370,8 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
     ) : null;
 };
 
-export const Statblock = (props: {
-    data: HpTrackerMetadata;
-    currentSceneMetadata: SceneMetadata | null;
-    itemId: string;
-}) => {
+export const Statblock = (props: { data: HpTrackerMetadata; itemId: string }) => {
+    const { scene } = useMetadataContext();
     const [data, setData] = useState<HpTrackerMetadata>(props.data);
 
     useEffect(() => {
@@ -400,13 +398,13 @@ export const Statblock = (props: {
 
                         await OBR.scene.items.updateItems([props.itemId], (items) => {
                             items.forEach((item) => {
-                                item.metadata[characterMetadata] = { ...newData };
+                                item.metadata[itemMetadataKey] = { ...newData };
                             });
                         });
                     }}
                 />
             </div>
-            {props.currentSceneMetadata && props.currentSceneMetadata.ruleset === "e5" ? (
+            {scene && scene.ruleset === "e5" ? (
                 <E5StatBlock slug={props.data.sheet} />
             ) : (
                 <PfStatBlock slug={props.data.sheet} />

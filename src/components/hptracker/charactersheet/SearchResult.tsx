@@ -1,6 +1,6 @@
 import { useCharSheet } from "../../../context/CharacterContext.ts";
 import OBR from "@owlbear-rodeo/sdk";
-import { characterMetadata } from "../../../helper/variables.ts";
+import { itemMetadataKey } from "../../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../../helper/types.ts";
 import { Loader } from "../../general/Loader.tsx";
 import { E5Statblock, useE5SearchStatblock } from "../../../ttrpgapi/e5/useE5Api.ts";
@@ -18,8 +18,8 @@ export const SearchResult5e = (props: SearchResultProps) => {
         if (characterId) {
             OBR.scene.items.updateItems([characterId], (items) => {
                 items.forEach((item) => {
-                    const data = item.metadata[characterMetadata] as HpTrackerMetadata;
-                    item.metadata[characterMetadata] = {
+                    const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+                    item.metadata[itemMetadataKey] = {
                         ...data,
                         sheet: slug,
                         ruleset: "e5",
@@ -77,8 +77,8 @@ export const SearchResultPf = (props: SearchResultProps) => {
         if (characterId) {
             OBR.scene.items.updateItems([characterId], (items) => {
                 items.forEach((item) => {
-                    const data = item.metadata[characterMetadata] as HpTrackerMetadata;
-                    item.metadata[characterMetadata] = {
+                    const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+                    item.metadata[itemMetadataKey] = {
                         ...data,
                         sheet: slug,
                         ruleset: "pf",

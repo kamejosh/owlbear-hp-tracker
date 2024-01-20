@@ -5,8 +5,8 @@ import "swiper/css";
 import "swiper/css/free-mode";
 import { Item } from "@owlbear-rodeo/sdk";
 import { useEffect, useState } from "react";
-import { characterMetadata } from "../../helper/variables.ts";
-import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
+import { itemMetadataKey } from "../../helper/variables.ts";
+import { HpTrackerMetadata } from "../../helper/types.ts";
 import SwiperClass from "swiper/types/swiper-class";
 
 type StatblockListProps = {
@@ -15,7 +15,6 @@ type StatblockListProps = {
     pinned: boolean;
     setPinned: (pinned: boolean) => void;
     data: HpTrackerMetadata | null;
-    currentSceneMetadata: SceneMetadata | null;
 };
 export const StatblockList = (props: StatblockListProps) => {
     const [data, setData] = useState<HpTrackerMetadata | null>(null);
@@ -26,8 +25,8 @@ export const StatblockList = (props: StatblockListProps) => {
         if (!props.pinned && props.data && props.data.sheet) {
             setData(props.data);
             const index = props.tokens.findIndex((item) => {
-                if (characterMetadata in item.metadata && props.data) {
-                    const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
+                if (itemMetadataKey in item.metadata && props.data) {
+                    const metadata = item.metadata[itemMetadataKey] as HpTrackerMetadata;
                     return metadata.index === props.data.index && metadata.sheet === props.data.sheet;
                 }
                 return false;
@@ -60,7 +59,7 @@ export const StatblockList = (props: StatblockListProps) => {
             >
                 <SwiperSlide className={"pre"}> </SwiperSlide>
                 {props.tokens.map((token) => {
-                    const tokenData = token.metadata[characterMetadata] as HpTrackerMetadata;
+                    const tokenData = token.metadata[itemMetadataKey] as HpTrackerMetadata;
                     return (
                         <SwiperSlide
                             className={`statblock-name ${matches(data, tokenData) ? "active" : ""}`}
@@ -97,11 +96,7 @@ export const StatblockList = (props: StatblockListProps) => {
                 <SwiperSlide className={"post"}> </SwiperSlide>
             </Swiper>
             {props.minimized ? null : (
-                <div className={"statblock-sheet"}>
-                    {data && id ? (
-                        <Statblock data={data} currentSceneMetadata={props.currentSceneMetadata} itemId={id} />
-                    ) : null}
-                </div>
+                <div className={"statblock-sheet"}>{data && id ? <Statblock data={data} itemId={id} /> : null}</div>
             )}
         </>
     );

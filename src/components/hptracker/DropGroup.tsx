@@ -2,7 +2,7 @@ import { Droppable } from "react-beautiful-dnd";
 import { DraggableTokenList } from "./TokenList.tsx";
 import OBR, { Item, Metadata } from "@owlbear-rodeo/sdk";
 import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
-import { characterMetadata, sceneMetadata } from "../../helper/variables.ts";
+import { itemMetadataKey, metadataKey } from "../../helper/variables.ts";
 import {
     getAcOnMap,
     getCanPlayersSee,
@@ -13,26 +13,28 @@ import {
     toggleHpBar,
     toggleHpOnMap,
 } from "../../helper/multiTokenHelper.ts";
+import { useMetadataContext } from "../../context/MetadataContext.ts";
 
 type DropGroupProps = {
     title: string;
     list: Array<Item>;
     selected: Array<string>;
-    metadata: SceneMetadata;
     tokenLists: Map<string, Array<Item>>;
 };
 
 export const DropGroup = (props: DropGroupProps) => {
+    const { room, scene } = useMetadataContext();
+
     const setOpenGroupSetting = async (name: string) => {
         const metadata: Metadata = await OBR.scene.getMetadata();
-        const hpTrackerSceneMetadata = metadata[sceneMetadata] as SceneMetadata;
+        const hpTrackerSceneMetadata = metadata[metadataKey] as SceneMetadata;
         if (hpTrackerSceneMetadata.openGroups && hpTrackerSceneMetadata.openGroups.indexOf(name) >= 0) {
             hpTrackerSceneMetadata.openGroups.splice(hpTrackerSceneMetadata.openGroups.indexOf(name), 1);
         } else {
             hpTrackerSceneMetadata.openGroups?.push(name);
         }
         const ownMetadata: Metadata = {};
-        ownMetadata[sceneMetadata] = hpTrackerSceneMetadata;
+        ownMetadata[metadataKey] = hpTrackerSceneMetadata;
         await OBR.scene.setMetadata(ownMetadata);
     };
 
@@ -40,10 +42,10 @@ export const DropGroup = (props: DropGroupProps) => {
         await OBR.scene.items.updateItems(props.list, (items) => {
             items.forEach((item) => {
                 const value =
-                    Math.floor(Math.random() * (props.metadata.initiativeDice ?? 20)) +
+                    Math.floor(Math.random() * (room?.initiativeDice ?? 20)) +
                     1 +
-                    (item.metadata[characterMetadata] as HpTrackerMetadata).stats.initiativeBonus;
-                (item.metadata[characterMetadata] as HpTrackerMetadata).initiative = value;
+                    (item.metadata[itemMetadataKey] as HpTrackerMetadata).stats.initiativeBonus;
+                (item.metadata[itemMetadataKey] as HpTrackerMetadata).initiative = value;
             });
         });
     };
@@ -51,7 +53,7 @@ export const DropGroup = (props: DropGroupProps) => {
     return (
         <div
             className={`group-wrapper ${
-                props.metadata.openGroups && props.metadata.openGroups?.indexOf(props.title) >= 0 ? "" : "hidden"
+                scene?.openGroups && scene?.openGroups?.indexOf(props.title) >= 0 ? "" : "hidden"
             }`}
         >
             <div className={"group-title"}>
@@ -110,7 +112,6 @@ export const DropGroup = (props: DropGroupProps) => {
                                 <DraggableTokenList
                                     tokens={props.list}
                                     selected={props.selected}
-                                    metadata={props.metadata}
                                     tokenLists={props.tokenLists}
                                 />
                                 {provided.placeholder}

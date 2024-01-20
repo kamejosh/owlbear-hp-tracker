@@ -2,9 +2,9 @@ import { Modal } from "@owlbear-rodeo/sdk/lib/types/Modal";
 import { Popover } from "@owlbear-rodeo/sdk";
 
 export const ID = "com.bitperfect-software.hp-tracker";
-export const sceneMetadata = `${ID}/metadata`;
-export const characterMetadata = `${ID}/data`;
-export const infoMetadata = `${ID}/text`;
+export const metadataKey = `${ID}/metadata`;
+export const itemMetadataKey = `${ID}/data`;
+export const infoMetadataKey = `${ID}/text`;
 
 export const modalId = `${ID}/modal`;
 export const statblockPopoverId = `${ID}/statblock-popover`;
