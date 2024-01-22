@@ -42,12 +42,12 @@ export type SceneMetadata_Deprecated = {
 export type SceneMetadata = {
     version?: string;
     id?: string;
-    ruleset?: Ruleset;
     groups?: Array<string>;
     openGroups?: Array<string>;
 };
 
 export type RoomMetadata = {
+    ruleset?: Ruleset;
     allowNegativeNumbers?: boolean;
     hpBarSegments?: number;
     hpBarOffset?: number;
@@ -56,6 +56,7 @@ export type RoomMetadata = {
     playerSort?: boolean;
     statblockPopover?: { width: number; height: number };
     initiativeDice?: number;
+    ignoreUpdateNotification?: boolean;
 };
 
 export type AttachmentMetadata = {

@@ -371,7 +371,7 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
 };
 
 export const Statblock = (props: { data: HpTrackerMetadata; itemId: string }) => {
-    const { scene } = useMetadataContext();
+    const { room } = useMetadataContext();
     const [data, setData] = useState<HpTrackerMetadata>(props.data);
 
     useEffect(() => {
@@ -404,7 +404,7 @@ export const Statblock = (props: { data: HpTrackerMetadata; itemId: string }) =>
                     }}
                 />
             </div>
-            {scene && scene.ruleset === "e5" ? (
+            {room && room.ruleset === "e5" ? (
                 <E5StatBlock slug={props.data.sheet} />
             ) : (
                 <PfStatBlock slug={props.data.sheet} />

@@ -6,10 +6,10 @@ import { Switch } from "../../general/Switch/Switch.tsx";
 import { dndSvg, pfSvg } from "./SwitchBackground.ts";
 import { updateAcOffset } from "../../../helper/acHelper.ts";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
-import { updateRoomMetadata, updateSceneMetadata } from "../../../helper/helpers.ts";
+import { updateRoomMetadata } from "../../../helper/helpers.ts";
 
 export const Settings = () => {
-    const { scene, room } = useMetadataContext();
+    const { room } = useMetadataContext();
 
     const handleOffsetChange = (value: number) => {
         updateHpOffset(value);
@@ -27,20 +27,24 @@ export const Settings = () => {
                 X
             </button>
             <div className={"global-setting"}>
-                <h3>Global Settings</h3>
+                <h2>Settings</h2>
                 <>
+                    <div className={"settings-context"}>
+                        <h3>Room Settings</h3>
+                        <span className={"small"}>(Shared across all scenes in opened in the current Room)</span>
+                    </div>
                     <div className={"ruleset setting"}>
                         Statblock Game Rules:{" "}
                         <Switch
                             labels={{ left: "DnD", right: "PF" }}
                             onChange={(checked) => {
                                 if (checked) {
-                                    updateSceneMetadata(scene, { ruleset: "pf" });
+                                    updateRoomMetadata(room, { ruleset: "pf" });
                                 } else {
-                                    updateSceneMetadata(scene, { ruleset: "e5" });
+                                    updateRoomMetadata(room, { ruleset: "e5" });
                                 }
                             }}
-                            checked={!!scene && scene.ruleset === "pf"}
+                            checked={!!room && room.ruleset === "pf"}
                             backgroundImages={{ left: dndSvg, right: pfSvg }}
                         />
                     </div>
@@ -205,6 +209,20 @@ export const Settings = () => {
                                 }}
                             />
                         </label>
+                    </div>
+                    <div className={"update-notification setting"}>
+                        Don't show Changelog on updates:
+                        <input
+                            type={"checkbox"}
+                            checked={room?.ignoreUpdateNotification || false}
+                            onChange={() => {
+                                updateRoomMetadata(room, { ignoreUpdateNotification: !room?.ignoreUpdateNotification });
+                            }}
+                        />
+                    </div>
+                    <div className={"settings-context"}>
+                        <h3>Scene Settings</h3>
+                        <span className={"small"}>(Settings only affect the current Scene)</span>
                     </div>
                     <Groups />
                 </>

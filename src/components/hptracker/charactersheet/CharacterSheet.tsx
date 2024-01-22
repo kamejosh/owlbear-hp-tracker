@@ -77,7 +77,7 @@ const SearchWrapper = (props: SearchWrapperProps) => {
 };
 
 const StatblockWrapper = (props: StatblockWrapperProps) => {
-    const { scene } = useMetadataContext();
+    const { room } = useMetadataContext();
     const ruleSetMap = new Map<Ruleset, ReactElement>([
         ["pf", <SearchResultPf search={props.search} setEmpty={props.setEmpty} />],
         ["e5", <SearchResult5e search={props.search} setEmpty={props.setEmpty} />],
@@ -88,7 +88,7 @@ const StatblockWrapper = (props: StatblockWrapperProps) => {
             {props.data.sheet && !props.forceSearch ? (
                 <Statblock data={props.data} itemId={props.itemId} />
             ) : props.search !== "" ? (
-                ruleSetMap.get(scene?.ruleset || "e5")
+                ruleSetMap.get(room?.ruleset || "e5")
             ) : (
                 <></>
             )}
@@ -98,7 +98,7 @@ const StatblockWrapper = (props: StatblockWrapperProps) => {
 
 export const CharacterSheet = (props: { itemId: string }) => {
     const { characterId, setId } = useCharSheet();
-    const { scene } = useMetadataContext();
+    const { room } = useMetadataContext();
     const [token, setToken] = useState<Item | null>(null);
     const [data, setData] = useState<HpTrackerMetadata | null>(null);
     const [search, setSearch] = useState<string>("");
@@ -139,7 +139,7 @@ export const CharacterSheet = (props: { itemId: string }) => {
     }, []);
 
     useEffect(() => {
-        if (data?.sheet && data?.ruleset === scene?.ruleset) {
+        if (data?.sheet && data?.ruleset === room?.ruleset) {
             setForceSearch(false);
         } else {
             setForceSearch(true);
@@ -155,9 +155,9 @@ export const CharacterSheet = (props: { itemId: string }) => {
             {token && data ? (
                 <div className={"content"}>
                     <h2>
-                        {data.name} <span className={"note"}>(using {scene?.ruleset} Filter)</span>
+                        {data.name} <span className={"note"}>(using {room?.ruleset} Filter)</span>
                     </h2>
-                    {scene?.ruleset === "e5" || scene?.ruleset === "pf" ? (
+                    {room?.ruleset === "e5" || room?.ruleset === "pf" ? (
                         <>
                             <SearchWrapper
                                 data={data}

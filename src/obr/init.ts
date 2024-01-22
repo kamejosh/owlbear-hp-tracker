@@ -78,8 +78,15 @@ const initRoom = async () => {
             playerSort: false,
             statblockPopover: { width: 500, height: 600 },
             initiativeDice: 20,
+            ruleset: "e5",
+            ignoreUpdateNotification: false,
         };
         ownMetadata[metadataKey] = roomData;
+    } else {
+        const roomData = metadata[metadataKey] as RoomMetadata;
+        if (roomData.ruleset !== "pf" && roomData.ruleset !== "e5") {
+            roomData.ruleset = "e5";
+        }
     }
     await OBR.room.setMetadata(ownMetadata);
 };
@@ -91,7 +98,6 @@ const initScene = async () => {
         const sceneData: SceneMetadata = {
             version: version,
             id: uuidv4(),
-            ruleset: "e5",
             groups: ["Default"],
             openGroups: ["Default"],
         };
@@ -104,27 +110,13 @@ const initScene = async () => {
         if (!sceneData.id) {
             sceneData.id = uuidv4();
         }
-        if (typeof sceneData.groups === "string") {
-            // @ts-ignore there might be some legacy issue where groups is still a string
-            sceneData.groups = sceneData.groups.split(" ");
-        }
         if (!sceneData.groups || sceneData.groups.length === 0) {
             sceneData.groups = ["Default"];
         }
         if (sceneData.openGroups === undefined) {
             sceneData.openGroups = ["Default"];
         }
-        // @ts-ignore some beta version started with using 5e
-        if (sceneData.ruleset === "5e") {
-            sceneData.ruleset = "e5";
-        }
-        // @ts-ignore some beta version started with using pf2e
-        if (sceneData.ruleset === "pf2e") {
-            sceneData.ruleset = "pf";
-        }
-        if (sceneData.ruleset !== "pf" && sceneData.ruleset !== "e5") {
-            sceneData.ruleset = "e5";
-        }
+
         ownMetadata[metadataKey] = sceneData;
     }
     await OBR.scene.setMetadata(ownMetadata);

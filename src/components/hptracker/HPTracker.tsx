@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
-import { changelogModal, itemMetadataKey, metadataKey, version } from "../../helper/variables.ts";
-import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
+import { changelogModal, itemMetadataKey, version } from "../../helper/variables.ts";
+import { HpTrackerMetadata } from "../../helper/types.ts";
 import { DragDropContext, DraggableLocation, DropResult } from "react-beautiful-dnd";
 import { PlayerTokenList } from "./TokenList.tsx";
 import { useCharSheet } from "../../context/CharacterContext.ts";
@@ -43,16 +43,21 @@ const Content = () => {
         );
         setTokens(initialItems);
 
-        //TODO rework this
-        const sceneData = await OBR.scene.getMetadata();
-        const metadata = sceneData[metadataKey] as SceneMetadata;
-        if (metadata?.version && compare(metadata.version, version, "<")) {
+        if (
+            playerContext.role === "GM" &&
+            !room?.ignoreUpdateNotification &&
+            scene?.version &&
+            compare(scene.version, version, "<")
+        ) {
             await OBR.modal.open({
                 ...changelogModal,
                 fullScreen: false,
+                url: `${changelogModal.url}&update=true`,
                 height: 600,
                 width: 600,
             });
+        } else if (playerContext.role === "GM" && scene?.version && compare(scene.version, version, "<")) {
+            await OBR.notification.show(`HP Tracker has been updated to version ${version}`, "SUCCESS");
         }
     };
 

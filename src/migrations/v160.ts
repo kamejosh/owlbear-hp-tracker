@@ -21,12 +21,12 @@ export const migrateTo160 = async () => {
             playerSort: hpSceneData.playerSort,
             statblockPopover: hpSceneData.statblockPopover,
             initiativeDice: hpSceneData.initiativeDice,
+            ruleset: hpSceneData.ruleset,
         };
 
         ownSceneMetadata[metadataKey] = {
             version: hpSceneData.version,
             id: hpSceneData.id,
-            ruleset: hpSceneData.ruleset,
             groups: hpSceneData.groups,
             openGroups: hpSceneData.openGroups,
         };
