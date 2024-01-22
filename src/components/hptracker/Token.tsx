@@ -49,6 +49,12 @@ export const Token = (props: TokenProps) => {
     }, [props.data.hp]);
 
     useEffect(() => {
+        if (maxHpRef && maxHpRef.current) {
+            maxHpRef.current.value = props.data.maxHp.toString();
+        }
+    }, [props.data.maxHp]);
+
+    useEffect(() => {
         const initMetadataValues = async () => {
             const metadata = (await OBR.scene.getMetadata()) as Metadata;
             handleMetadata(metadata);
