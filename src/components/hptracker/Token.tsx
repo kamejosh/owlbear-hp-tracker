@@ -39,6 +39,12 @@ export const Token = (props: TokenProps) => {
     }, [props.data.hp]);
 
     useEffect(() => {
+        if (maxHpRef && maxHpRef.current) {
+            maxHpRef.current.value = props.data.maxHp.toString();
+        }
+    }, [props.data.maxHp]);
+
+    useEffect(() => {
         // could be undefined so we check for boolean
         if (room && room.allowNegativeNumbers === false) {
             if (data.hp < 0) {
