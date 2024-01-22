@@ -1,3 +1,8 @@
+# 1.6.0
+
++ Refactor Settings and split them into Room and Scene Settings
++ Update Changelog -> Changelog can now be hidden by default so it won't be displayed on updates any longer (you might miss new features)
+
 # 1.5.2
 
 + Add multi-selection embedded context-menu 

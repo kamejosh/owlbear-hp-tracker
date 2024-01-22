@@ -25,6 +25,22 @@ button {
         background-size: 80%;
         background-repeat: no-repeat;
     }
+
+    .change-log-button {
+        @keyframes changeColor {
+            from {
+                background-color: #242424;
+                color: white;
+            }
+            to {
+                background-color: white;
+                color: #242424;
+            }
+        }
+        &.ignored {
+            animation: changeColor 1s ease-in-out 0s 30 alternate;
+        }
+    }
 }
 
 .top-button {

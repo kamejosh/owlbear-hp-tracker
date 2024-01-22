@@ -31,6 +31,7 @@ const Content = () => {
     const [playerTokens, setPlayerTokens] = useState<Array<Item>>([]);
     const [selectedTokens, setSelectedTokens] = useState<Array<string>>([]);
     const [tokenLists, setTokenLists] = useState<Map<string, Array<Item>>>(new Map());
+    const [ignoredChanges, setIgnoredChanges] = useState<boolean>(false);
     const { scene, room } = useMetadataContext();
     const { isReady } = SceneReadyContext();
     const { characterId } = useCharSheet();
@@ -57,6 +58,7 @@ const Content = () => {
                 width: 600,
             });
         } else if (playerContext.role === "GM" && scene?.version && compare(scene.version, version, "<")) {
+            setIgnoredChanges(true);
             await OBR.notification.show(`HP Tracker has been updated to version ${version}`, "SUCCESS");
         }
     };
@@ -258,7 +260,7 @@ const Content = () => {
             <CharacterSheet itemId={characterId} />
         ) : (
             <div className={"hp-tracker"}>
-                <Helpbuttons />
+                <Helpbuttons ignoredChanges={ignoredChanges} setIgnoredChange={setIgnoredChanges} />
                 <h1 className={"title"}>
                     HP Tracker<span className={"small"}>{version}</span>
                 </h1>

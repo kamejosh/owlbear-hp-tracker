@@ -3,7 +3,12 @@ import { changelogModal, helpModal, settingsModal, statblockPopover } from "../.
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 
-export const Helpbuttons = () => {
+type HelpButtonsProps = {
+    ignoredChanges?: boolean;
+    setIgnoredChange?: (ignoredChanges: boolean) => void;
+};
+
+export const Helpbuttons = (props: HelpButtonsProps) => {
     const { room } = useMetadataContext();
     const playerContext = usePlayerContext();
 
@@ -49,8 +54,13 @@ export const Helpbuttons = () => {
                 </>
             ) : null}
             <button
-                className={"change-log-button top-button"}
-                onClick={async () => await OBR.modal.open(changelogModal)}
+                className={`change-log-button top-button ${props.ignoredChanges ? "ignored" : ""}`}
+                onClick={async () => {
+                    if (props.setIgnoredChange !== undefined && props.ignoredChanges !== undefined) {
+                        props.setIgnoredChange(!props.ignoredChanges);
+                    }
+                    await OBR.modal.open(changelogModal);
+                }}
                 title={"Changelog"}
             >
                 i

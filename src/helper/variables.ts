@@ -9,7 +9,7 @@ export const infoMetadataKey = `${ID}/text`;
 export const modalId = `${ID}/modal`;
 export const statblockPopoverId = `${ID}/statblock-popover`;
 
-export const version = "1.6.0";
+export const version = "1.6.1";
 
 export const changelogModal: Modal = {
     id: modalId,
