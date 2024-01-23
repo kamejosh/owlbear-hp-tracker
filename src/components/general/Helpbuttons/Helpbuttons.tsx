@@ -46,7 +46,15 @@ export const Helpbuttons = (props: HelpButtonsProps) => {
                     ></button>
                     <button
                         className={"settings-button top-button"}
-                        onClick={async () => await OBR.modal.open(settingsModal)}
+                        onClick={async () => {
+                            const width = await OBR.viewport.getWidth();
+                            const height = await OBR.viewport.getHeight();
+                            await OBR.modal.open({
+                                ...settingsModal,
+                                width: Math.min(500, width * 0.9),
+                                height: Math.min(800, height * 0.9),
+                            });
+                        }}
                         title={"Settings"}
                     >
                         ⛭
@@ -59,7 +67,13 @@ export const Helpbuttons = (props: HelpButtonsProps) => {
                     if (props.setIgnoredChange !== undefined && props.ignoredChanges !== undefined) {
                         props.setIgnoredChange(!props.ignoredChanges);
                     }
-                    await OBR.modal.open(changelogModal);
+                    const width = await OBR.viewport.getWidth();
+                    const height = await OBR.viewport.getHeight();
+                    await OBR.modal.open({
+                        ...changelogModal,
+                        width: Math.min(600, width * 0.9),
+                        height: Math.min(800, height * 0.9),
+                    });
                 }}
                 title={"Changelog"}
             >
@@ -67,7 +81,15 @@ export const Helpbuttons = (props: HelpButtonsProps) => {
             </button>
             <button
                 className={"help-button top-button"}
-                onClick={async () => await OBR.modal.open(helpModal)}
+                onClick={async () => {
+                    const width = await OBR.viewport.getWidth();
+                    const height = await OBR.viewport.getHeight();
+                    await OBR.modal.open({
+                        ...helpModal,
+                        width: Math.min(700, width * 0.9),
+                        height: Math.min(800, height * 0.9),
+                    });
+                }}
                 title={"Help"}
             >
                 ?

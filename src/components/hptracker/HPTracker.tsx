@@ -50,12 +50,12 @@ const Content = () => {
             scene?.version &&
             compare(scene.version, version, "<")
         ) {
+            const width = await OBR.viewport.getWidth();
             await OBR.modal.open({
                 ...changelogModal,
                 fullScreen: false,
-                url: `${changelogModal.url}&update=true`,
                 height: 600,
-                width: 600,
+                width: Math.min(width * 0.9, 600),
             });
         } else if (playerContext.role === "GM" && scene?.version && compare(scene.version, version, "<")) {
             setIgnoredChanges(true);
