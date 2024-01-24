@@ -35,7 +35,11 @@ const Spell = (props: { spell: Spell }) => {
                         <h4 className={"spell-name"}>{spell.name}</h4>
                         <span className={"spell-level"}>({getSpellLevel()})</span>
                     </div>
-                    {damage ? <span className={"spell-damage"}>Damage: {DiceButtonWrapper(damage)}</span> : null}
+                    {damage ? (
+                        <span className={"spell-damage"}>
+                            Damage: {DiceButtonWrapper(damage, `${spell.name} Damage`)}
+                        </span>
+                    ) : null}
                     <div className={"spell-components"}>
                         {spell.verbal ? "V" : null}
                         {spell.somatic ? "S" : null}
@@ -89,11 +93,11 @@ const Spell = (props: { spell: Spell }) => {
                         </span>
                     </div>
                     <div className={"spell-description"}>
-                        <b>Description</b>: {DiceButtonWrapper(spell.desc)}
+                        <b>Description</b>: {DiceButtonWrapper(spell.desc, `${spell.name}`)}
                     </div>
                     {!!spell.higher_level ? (
                         <div className={"spell-higher-level"}>
-                            <b>Higher Levels</b>: {DiceButtonWrapper(spell.higher_level)}
+                            <b>Higher Levels</b>: {DiceButtonWrapper(spell.higher_level, `${spell.name} higher level`)}
                         </div>
                     ) : null}
                 </div>

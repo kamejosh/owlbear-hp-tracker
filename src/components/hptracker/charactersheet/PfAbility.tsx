@@ -56,7 +56,7 @@ export const PfAbility = ({ ability }: { ability: Action | Reaction | SpecialAbi
                     <b className={"ability-name"}>{ability.name}</b> {actionTypeConvert(ability)}
                     {Object.keys(ability).includes("description") && (ability as Action).description !== "" ? (
                         <div className={`ability-description ${isAction(ability) ? "action" : "ability"}`}>
-                            {DiceButtonWrapper((ability as Action).description!)}
+                            {DiceButtonWrapper((ability as Action).description!, ability.name)}
                         </div>
                     ) : null}
                 </div>
@@ -71,7 +71,7 @@ export const PfAbility = ({ ability }: { ability: Action | Reaction | SpecialAbi
                         if (value !== null && value !== "" && !["name", "type", "description", "value"].includes(key)) {
                             return (
                                 <li key={index}>
-                                    <b>{key}</b>: {DiceButtonWrapper(value)}
+                                    <b>{key}</b>: {DiceButtonWrapper(value, `${ability.name} ${key}`)}
                                 </li>
                             );
                         }

@@ -25,7 +25,11 @@ const Spell = (props: { spell: PfSpellOut }) => {
                     <div className={"spell-header"}>
                         <h4 className={"spell-name"}>{spell?.name}</h4>
                     </div>
-                    {damage ? <span className={"spell-damage"}>Damage: {DiceButtonWrapper(damage)}</span> : null}
+                    {damage ? (
+                        <span className={"spell-damage"}>
+                            Damage: {DiceButtonWrapper(damage, `${spell?.name} Damage`)}
+                        </span>
+                    ) : null}
                     {spell?.cast ? (
                         <div className={"spell-components"}>
                             {spell.cast.verbal ? "V" : null}
@@ -106,13 +110,14 @@ const Spell = (props: { spell: PfSpellOut }) => {
                         ) : null}
                     </div>
                     <div className={"spell-description"}>
-                        <b>Description</b>: {DiceButtonWrapper(spell?.description?.text || "")}
+                        <b>Description</b>: {DiceButtonWrapper(spell?.description?.text || "", `${spell?.name}`)}
                         {spell?.description?.details && spell.description.details.length > 0 ? (
                             <ul>
                                 {spell?.description.details.map((details, index) => {
                                     return (
                                         <li key={index}>
-                                            <b>{details.title}</b>: {DiceButtonWrapper(details.text)}
+                                            <b>{details.title}</b>:{" "}
+                                            {DiceButtonWrapper(details.text, `${spell.name} ${details.title}`)}
                                         </li>
                                     );
                                 })}
@@ -126,9 +131,11 @@ const Spell = (props: { spell: PfSpellOut }) => {
                                 {spell.heightened.map((heightened, index) => {
                                     return (
                                         <div key={index}>
-                                            <div className={"modifier"}>{DiceButtonWrapper(heightened.modifier)}</div>
+                                            <div className={"modifier"}>
+                                                {DiceButtonWrapper(heightened.modifier, `${spell.name} heightened`)}
+                                            </div>
                                             <div className={"description"}>
-                                                {DiceButtonWrapper(heightened.description)}
+                                                {DiceButtonWrapper(heightened.description, `${spell.name} heightened`)}
                                             </div>
                                         </div>
                                     );
@@ -204,11 +211,17 @@ const PfSpellCategory = (props: { spellCategory: PfSpellCategory }) => {
                     <h3 className={"spell-category-name"}>{props.spellCategory.name}</h3>
                     <span className={"spell-category-info"}>
                         {props.spellCategory.dc ? (
-                            <span className={"text-roll"}>DC: {DiceButtonWrapper("+" + props.spellCategory.dc)}</span>
+                            <span className={"text-roll"}>
+                                DC: {DiceButtonWrapper("+" + props.spellCategory.dc, `${props.spellCategory.name} DC`)}
+                            </span>
                         ) : null}{" "}
                         {props.spellCategory.attack ? (
                             <span className={"text-roll"}>
-                                Attack: {DiceButtonWrapper("+" + props.spellCategory.attack)}
+                                Attack:{" "}
+                                {DiceButtonWrapper(
+                                    "+" + props.spellCategory.attack,
+                                    `${props.spellCategory.name} Attack`
+                                )}
                             </span>
                         ) : null}
                     </span>

@@ -60,7 +60,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                 </span>
                 <span className={"hp"}>
                     <b>Hit Points</b> {statblock.hp.value}{" "}
-                    {statblock.hp.hit_dice ? DiceButtonWrapper(statblock.hp.hit_dice) : null}
+                    {statblock.hp.hit_dice ? DiceButtonWrapper(statblock.hp.hit_dice, "hit dice") : null}
                 </span>
                 <span className={"speed"}>
                     <b>Speed</b>{" "}
@@ -85,7 +85,8 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                                 {DiceButtonWrapper(
                                     Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
                                         Math.floor((value - 10) / 2)
-                                    )
+                                    ),
+                                    `${stat} Check`
                                 )}
                             </div>
                         </div>
@@ -101,7 +102,8 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                                 if (value) {
                                     return (
                                         <span className={"saving-throw"}>
-                                            {key.substring(0, 3)}: {DiceButtonWrapper("+" + value)}
+                                            {key.substring(0, 3)}:{" "}
+                                            {DiceButtonWrapper("+" + value, `${key} saving-throw`)}
                                         </span>
                                     );
                                 }
@@ -129,7 +131,8 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                                     <li className={"skill"} key={index}>
                                         <b>{key}</b>:{" "}
                                         {DiceButtonWrapper(
-                                            Intl.NumberFormat("en-US", { signDisplay: "always" }).format(value)
+                                            Intl.NumberFormat("en-US", { signDisplay: "always" }).format(value),
+                                            `${key} check`
                                         )}
                                     </li>
                                 );
@@ -275,7 +278,7 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                     <b>Speed</b> {statblock.speed}
                 </span>
                 <span className={"perception"}>
-                    <b>Perception</b> {DiceButtonWrapper(statblock.perception!)}
+                    <b>Perception</b> {DiceButtonWrapper(statblock.perception!, "perception Check")}
                 </span>
             </div>
             <div className={"stats"}>
@@ -284,7 +287,10 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                         <div className={"stat"} key={stat}>
                             <div className={"stat-name"}>{stat.substring(0, 3)}</div>
                             <div className={"stat-value"}>
-                                {DiceButtonWrapper(Intl.NumberFormat("en-US", { signDisplay: "always" }).format(value))}
+                                {DiceButtonWrapper(
+                                    Intl.NumberFormat("en-US", { signDisplay: "always" }).format(value),
+                                    `${stat} Check`
+                                )}
                             </div>
                         </div>
                     );
@@ -299,7 +305,8 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                                 if (value) {
                                     return (
                                         <li key={index}>
-                                            <span className={"name"}>{key}</span> {DiceButtonWrapper("+" + value)}
+                                            <span className={"name"}>{key}</span>{" "}
+                                            {DiceButtonWrapper("+" + value, `${key} saving-throw`)}
                                         </li>
                                     );
                                 }
@@ -316,7 +323,9 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                             return (
                                 <div className={"skill"} key={skill.name}>
                                     <div className={"skill-name"}>{skill.name}</div>
-                                    <div className={"skill-value"}>{DiceButtonWrapper(skill.value)}</div>
+                                    <div className={"skill-value"}>
+                                        {DiceButtonWrapper(skill.value, `${skill.name} Check`)}
+                                    </div>
                                 </div>
                             );
                         })}

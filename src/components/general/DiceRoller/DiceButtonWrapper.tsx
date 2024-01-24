@@ -5,6 +5,7 @@ import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 
 type DiceButtonProps = {
     dice: string;
+    context: string;
 };
 export const DiceButton = (props: DiceButtonProps) => {
     const { roller } = useDiceRoller();
@@ -54,7 +55,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                 const button = e.currentTarget;
                 button.classList.add("rolling");
                 const roll = await roller.roll(diceToRoll(), {
-                    label: `${playerContext.name} rolls`,
+                    label: `${playerContext.name} - ${props.context}`,
                 });
                 button.classList.remove("rolling");
                 console.log(roll.data);
@@ -66,7 +67,7 @@ export const DiceButton = (props: DiceButtonProps) => {
     );
 };
 
-export const DiceButtonWrapper = (text: string) => {
+export const DiceButtonWrapper = (text: string, context: string) => {
     const regex = /((\d+?d\d+)( ?[\+\-] ?\d+)?)|([\+\-]\d+)|(DC ?\d+)/gi;
     const dice = text.match(regex);
     dice?.forEach((die) => {
@@ -79,7 +80,7 @@ export const DiceButtonWrapper = (text: string) => {
             {parts.map((part, index) => {
                 let diceField = null;
                 if (dice && dice.length >= index && dice[index]) {
-                    diceField = <DiceButton dice={dice[index]} />;
+                    diceField = <DiceButton dice={dice[index]} context={context} />;
                 }
                 return (
                     <span key={index}>
