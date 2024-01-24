@@ -1,13 +1,17 @@
 import { useEffect, useRef } from "react";
-import { useDiceRoller } from "../../context/DDDiceContext.tsx";
-import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
-import { DDDICE_API_KEY } from "../../config.ts";
+import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
+import { SceneReadyContext } from "../../../context/SceneReadyContext.ts";
+import { DDDICE_API_KEY } from "../../../config.ts";
 import { IRoom } from "dddice-js";
+import { useMetadataContext } from "../../../context/MetadataContext.ts";
+import { updateRoomMetadata } from "../../../helper/helpers.ts";
+import { DiceRoom } from "./DiceRoom.tsx";
 
 export const DiceTray = ({ classes }: { classes: string }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const { roller } = useDiceRoller();
     const { isReady } = SceneReadyContext();
+    const { room } = useMetadataContext();
 
     useEffect(() => {
         const initDice = async () => {
@@ -25,9 +29,16 @@ export const DiceTray = ({ classes }: { classes: string }) => {
                     userId = roomMetadata[`com.dddice/${playerId}`] as string;
                 }
                 */
+                let diceRoom: IRoom | undefined = undefined;
+                let roomSlug: string | undefined = undefined;
 
-                const room: IRoom | undefined = (await roller.api?.room.create())?.data;
-                const roomSlug = room?.slug;
+                if (room?.diceRoom === undefined) {
+                    diceRoom = (await roller.api?.room.create())?.data;
+                    roomSlug = diceRoom?.slug;
+                    updateRoomMetadata(room, { diceRoom: roomSlug });
+                } else {
+                    roomSlug = room.diceRoom;
+                }
                 roller.start();
                 if (roomSlug) {
                     roller.connect(roomSlug);
@@ -44,5 +55,10 @@ export const DiceTray = ({ classes }: { classes: string }) => {
         }
     }, [isReady, canvasRef]);
 
-    return <canvas ref={canvasRef} id={"DiceCanvas"} className={classes}></canvas>;
+    return (
+        <>
+            <canvas ref={canvasRef} id={"DiceCanvas"} className={classes}></canvas>
+            <DiceRoom className={classes} />
+        </>
+    );
 };

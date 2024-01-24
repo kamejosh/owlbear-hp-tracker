@@ -13,7 +13,7 @@ import { DropGroup } from "./DropGroup.tsx";
 import { sortItems, sortItemsInitiative } from "../../helper/helpers.ts";
 import { compare } from "compare-versions";
 import { Helpbuttons } from "../general/Helpbuttons/Helpbuttons.tsx";
-import { DiceTray } from "../general/DiceTray.tsx";
+import { DiceTray } from "../general/DiceRoller/DiceTray.tsx";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
 
 export const HPTracker = () => {
@@ -282,7 +282,7 @@ const Content = () => {
                             </button>
                         ) : null}
                     </span>
-                    <span className={"character-sheet"}>INFO</span>
+                    <span className={"statblock-heading"}>INFO</span>
                 </div>
                 {playerContext.role === "GM" ? (
                     <DragDropContext onDragEnd={onDragEnd}>

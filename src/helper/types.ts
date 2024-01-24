@@ -57,6 +57,7 @@ export type RoomMetadata = {
     statblockPopover?: { width: number; height: number };
     initiativeDice?: number;
     ignoreUpdateNotification?: boolean;
+    diceRoom?: string;
 };
 
 export type AttachmentMetadata = {

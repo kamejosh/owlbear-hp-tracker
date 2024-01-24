@@ -118,3 +118,9 @@ body:has(.statblock-app) {
         }
     }
 }
+
+.statblock-dice-tray {
+    .dice-tray-content {
+        max-height: 80vh;
+    }
+}

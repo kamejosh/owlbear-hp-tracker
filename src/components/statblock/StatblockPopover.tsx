@@ -6,7 +6,7 @@ import { ContextWrapper } from "../ContextWrapper.tsx";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { HpTrackerMetadata } from "../../helper/types.ts";
 import { sortItems } from "../../helper/helpers.ts";
-import { DiceTray } from "../general/DiceTray.tsx";
+import { DiceTray } from "../general/DiceRoller/DiceTray.tsx";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
 
 export const StatblockPopover = () => {

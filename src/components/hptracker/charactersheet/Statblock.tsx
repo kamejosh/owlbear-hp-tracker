@@ -10,6 +10,7 @@ import { E5Ability } from "./E5Ability.tsx";
 import { E5Spells } from "./E5Spells.tsx";
 import { PfSpells } from "./PfSpells.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
+import { DiceButtonWrapper } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
 
 const E5StatBlock = ({ slug }: { slug: string }) => {
     const statblockQuery = useE5GetStatblock(slug);
@@ -58,7 +59,8 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                     {!!statblock.armor_class.special ? `(${statblock.armor_class.special})` : null}
                 </span>
                 <span className={"hp"}>
-                    <b>Hit Points</b> {statblock.hp.value} {statblock.hp.hit_dice ? `(${statblock.hp.hit_dice})` : null}
+                    <b>Hit Points</b> {statblock.hp.value}{" "}
+                    {statblock.hp.hit_dice ? DiceButtonWrapper(statblock.hp.hit_dice) : null}
                 </span>
                 <span className={"speed"}>
                     <b>Speed</b>{" "}
@@ -79,11 +81,12 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                         <div className={"stat"} key={stat}>
                             <div className={"stat-name"}>{stat.substring(0, 3)}</div>
                             <div className={"stat-value"}>
-                                {value} (
-                                {Intl.NumberFormat("en-US", { signDisplay: "exceptZero" }).format(
-                                    Math.floor((value - 10) / 2)
+                                {value}
+                                {DiceButtonWrapper(
+                                    Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
+                                        Math.floor((value - 10) / 2)
+                                    )
                                 )}
-                                )
                             </div>
                         </div>
                     );
@@ -91,16 +94,19 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
             </div>
             <div className={"tidbits"}>
                 {Object.entries(statblock.saving_throws).filter((st) => !!st[1]).length > 0 ? (
-                    <div className={"tidbit"}>
+                    <div className={"tidbit saving-throws"}>
                         <b>Saving Throws</b>{" "}
                         {Object.entries(statblock.saving_throws)
                             .map(([key, value]) => {
                                 if (value) {
-                                    return `${key.substring(0, 3)} +${value}`;
+                                    return (
+                                        <span className={"saving-throw"}>
+                                            {key.substring(0, 3)}: {DiceButtonWrapper("+" + value)}
+                                        </span>
+                                    );
                                 }
                             })
-                            .filter((v) => !!v)
-                            .join(", ")}
+                            .filter((v) => !!v)}
                     </div>
                 ) : null}
                 <div className={"tidbit"}>
@@ -120,9 +126,11 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                         {Object.entries(statblock.skills).map(([key, value], index) => {
                             if (value) {
                                 return (
-                                    <li key={index}>
+                                    <li className={"skill"} key={index}>
                                         <b>{key}</b>:{" "}
-                                        {Intl.NumberFormat("en-US", { signDisplay: "exceptZero" }).format(value)}
+                                        {DiceButtonWrapper(
+                                            Intl.NumberFormat("en-US", { signDisplay: "always" }).format(value)
+                                        )}
                                     </li>
                                 );
                             }
@@ -267,7 +275,7 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                     <b>Speed</b> {statblock.speed}
                 </span>
                 <span className={"perception"}>
-                    <b>Perception</b> {statblock.perception}
+                    <b>Perception</b> {DiceButtonWrapper(statblock.perception!)}
                 </span>
             </div>
             <div className={"stats"}>
@@ -276,8 +284,7 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                         <div className={"stat"} key={stat}>
                             <div className={"stat-name"}>{stat.substring(0, 3)}</div>
                             <div className={"stat-value"}>
-                                {value * 2 + 10} (
-                                {Intl.NumberFormat("en-US", { signDisplay: "exceptZero" }).format(value)})
+                                {DiceButtonWrapper(Intl.NumberFormat("en-US", { signDisplay: "always" }).format(value))}
                             </div>
                         </div>
                     );
@@ -292,7 +299,7 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                                 if (value) {
                                     return (
                                         <li key={index}>
-                                            <span className={"name"}>{key}</span> +{value}
+                                            <span className={"name"}>{key}</span> {DiceButtonWrapper("+" + value)}
                                         </li>
                                     );
                                 }
@@ -309,7 +316,7 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                             return (
                                 <div className={"skill"} key={skill.name}>
                                     <div className={"skill-name"}>{skill.name}</div>
-                                    <div className={"skill-value"}>{skill.value}</div>
+                                    <div className={"skill-value"}>{DiceButtonWrapper(skill.value)}</div>
                                 </div>
                             );
                         })}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { highlightDice } from "../../../helper/diceHelper.tsx";
+import { DiceButtonWrapper } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { getDamage } from "../../../helper/helpers.ts";
 import { PfSpell, usePfGetSpell } from "../../../ttrpgapi/pf/usePfApi.ts";
 import { components } from "../../../ttrpgapi/schema";
@@ -25,7 +25,7 @@ const Spell = (props: { spell: PfSpellOut }) => {
                     <div className={"spell-header"}>
                         <h4 className={"spell-name"}>{spell?.name}</h4>
                     </div>
-                    {damage ? <span className={"spell-damage"}>Damage: {damage}</span> : null}
+                    {damage ? <span className={"spell-damage"}>Damage: {DiceButtonWrapper(damage)}</span> : null}
                     {spell?.cast ? (
                         <div className={"spell-components"}>
                             {spell.cast.verbal ? "V" : null}
@@ -106,13 +106,13 @@ const Spell = (props: { spell: PfSpellOut }) => {
                         ) : null}
                     </div>
                     <div className={"spell-description"}>
-                        <b>Description</b>: {highlightDice(spell?.description?.text || "")}
+                        <b>Description</b>: {DiceButtonWrapper(spell?.description?.text || "")}
                         {spell?.description?.details && spell.description.details.length > 0 ? (
                             <ul>
                                 {spell?.description.details.map((details, index) => {
                                     return (
                                         <li key={index}>
-                                            <b>{details.title}</b>: {details.text}
+                                            <b>{details.title}</b>: {DiceButtonWrapper(details.text)}
                                         </li>
                                     );
                                 })}
@@ -126,8 +126,10 @@ const Spell = (props: { spell: PfSpellOut }) => {
                                 {spell.heightened.map((heightened, index) => {
                                     return (
                                         <div key={index}>
-                                            <div className={"modifier"}>{heightened.modifier}</div>
-                                            <div className={"description"}>{highlightDice(heightened.description)}</div>
+                                            <div className={"modifier"}>{DiceButtonWrapper(heightened.modifier)}</div>
+                                            <div className={"description"}>
+                                                {DiceButtonWrapper(heightened.description)}
+                                            </div>
                                         </div>
                                     );
                                 })}
@@ -201,8 +203,14 @@ const PfSpellCategory = (props: { spellCategory: PfSpellCategory }) => {
                 <div className={"spell-category-header"}>
                     <h3 className={"spell-category-name"}>{props.spellCategory.name}</h3>
                     <span className={"spell-category-info"}>
-                        {props.spellCategory.dc ? `DC: ${props.spellCategory.dc}` : null}{" "}
-                        {props.spellCategory.attack ? `Attack: ${props.spellCategory.attack}` : null}
+                        {props.spellCategory.dc ? (
+                            <span className={"text-roll"}>DC: {DiceButtonWrapper("+" + props.spellCategory.dc)}</span>
+                        ) : null}{" "}
+                        {props.spellCategory.attack ? (
+                            <span className={"text-roll"}>
+                                Attack: {DiceButtonWrapper("+" + props.spellCategory.attack)}
+                            </span>
+                        ) : null}
                     </span>
                 </div>
                 <button className={`expand ${open ? "open" : null}`} onClick={() => setOpen(!open)}></button>

@@ -10,3 +10,106 @@
         top: calc(30px + 1rem);
     }
 }
+
+.dice-room {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    width: 100svw;
+    overflow: hidden;
+
+    .open-dice-tray {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        translate: 0 1px;
+        z-index: 2000;
+        transition: all 0.25s ease-in-out;
+        box-shadow: 0 -5px 25px #1c1b22;
+        border-bottom: 1px solid #1c1b22;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+        width: 40px;
+        height: 40px;
+
+        .dice-svg {
+            width: 30px;
+        }
+
+        &:hover,
+        &:focus {
+            background-color: white;
+            height: 45px;
+
+            .dice-svg {
+                fill: black;
+            }
+        }
+    }
+
+    &.open {
+        max-height: calc(100vh - 5rem);
+
+        &.statblock-dice-tray {
+            max-height: calc(100vh - (70px + 1rem));
+        }
+
+        .dice-tray-wrapper {
+            grid-template-rows: 1fr;
+            border-top: 1px solid white;
+        }
+    }
+
+    .dice-tray-wrapper {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: all 0.25s ease-in-out;
+        border-top: 1px solid #1c1b22;
+        width: 100%;
+        overflow: hidden;
+
+        .dice-tray {
+            min-height: 0;
+
+            .dice-tray-content {
+                background-color: #1c1b22;
+                padding: 10px 20px;
+                max-height: 100%;
+
+                .room-link {
+                    display: flex;
+                    align-items: center;
+                    gap: 1ch;
+
+                    .copy-link {
+                        display: flex;
+                        transition: all 0.25s ease-in-out;
+                        padding: 3px;
+                        width: 20px;
+
+                        &:hover,
+                        &:focus {
+                            background-color: white;
+
+                            .copy-icon {
+                                fill: #1c1b22;
+                            }
+                        }
+
+                        .copy-icon {
+                            fill: white;
+                            transition: all 0.25s ease-in-out;
+                            object-fit: cover;
+                            object-position: center;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
