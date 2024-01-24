@@ -101,7 +101,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                             .map(([key, value]) => {
                                 if (value) {
                                     return (
-                                        <span className={"saving-throw"}>
+                                        <span className={"saving-throw"} key={key}>
                                             {key.substring(0, 3)}:{" "}
                                             {DiceButtonWrapper("+" + value, `${key} saving-throw`)}
                                         </span>

@@ -2,12 +2,14 @@ import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { IDiceRoll } from "dddice-js";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { DiceSvg } from "../../svgs/DiceSvg.tsx";
+import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 
 type DiceButtonProps = {
     dice: string;
     context: string;
 };
 export const DiceButton = (props: DiceButtonProps) => {
+    const { addRoll } = useRollLogContext();
     const { roller } = useDiceRoller();
     const playerContext = usePlayerContext();
 
@@ -43,7 +45,7 @@ export const DiceButton = (props: DiceButtonProps) => {
             diceToRoll.push({ type: "d20", theme: "silvie-lr1gjqod" });
             diceToRoll.push({ type: "mod", theme: "silvie-lr1gjqod", value: parseInt(props.dice) });
         } else {
-            console.log(props.dice);
+            console.warn("found dice string that could not be parsed", props.dice);
         }
         return diceToRoll;
     };
@@ -58,7 +60,18 @@ export const DiceButton = (props: DiceButtonProps) => {
                     label: `${playerContext.name} - ${props.context}`,
                 });
                 button.classList.remove("rolling");
-                console.log(roll.data);
+                if (roll && roll.data) {
+                    const data = roll.data;
+                    addRoll({
+                        uuid: data.uuid,
+                        created_at: data.created_at,
+                        equation: data.equation,
+                        label: data.label,
+                        total_value: data.total_value,
+                        username: data.user.username,
+                        values: data.values,
+                    });
+                }
             }}
         >
             <DiceSvg />
