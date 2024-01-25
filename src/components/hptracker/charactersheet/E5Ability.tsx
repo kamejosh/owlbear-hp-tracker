@@ -1,5 +1,5 @@
 import { components } from "../../../ttrpgapi/schema";
-import { DiceButtonWrapper } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { DiceButton, DiceButtonWrapper } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
 
 type Ability = components["schemas"]["Action-Output"];
 
@@ -13,12 +13,22 @@ export const E5Ability = (props: { ability: Ability }) => {
             <span className={"ability-extra-info"}>
                 {ability.damage_dice ? (
                     <span>
-                        <i>Damage</i>: {DiceButtonWrapper(ability.damage_dice, `${ability.name} Damage`)}
+                        <i>Damage</i>:{" "}
+                        <DiceButton
+                            dice={ability.damage_dice}
+                            text={ability.damage_dice}
+                            context={`${ability.name}: Damage`}
+                        />
                     </span>
                 ) : null}
                 {ability.attack_bonus ? (
                     <span>
-                        <i>Attack bonus</i>: {DiceButtonWrapper(`+${ability.attack_bonus}`, `${ability.name} Attack`)}
+                        <i>Attack bonus</i>:
+                        <DiceButton
+                            dice={`+${ability.attack_bonus}`}
+                            text={`+${ability.attack_bonus}`}
+                            context={`${ability.name}: To Hit`}
+                        />
                     </span>
                 ) : null}
             </span>

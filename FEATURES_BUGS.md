@@ -18,4 +18,5 @@
 
 ## Development Ideas
 
-+ Make Changelog Setting to only show notification: https://discord.com/channels/795808973743194152/1136777520868507728/1197801201778044998
++ DC rolls not working
++ make text input for custom rolls

@@ -1,7 +1,9 @@
 import OBR, { Image, Item, Metadata } from "@owlbear-rodeo/sdk";
-import { itemMetadataKey, infoMetadataKey, metadataKey } from "./variables.ts";
+import { infoMetadataKey, itemMetadataKey, metadataKey } from "./variables.ts";
 import { AttachmentMetadata, HpTrackerMetadata, RoomMetadata, SceneMetadata } from "./types.ts";
 import { isObject } from "lodash";
+import { IRoll, IRoomParticipant } from "dddice-js";
+import { RollLogEntryType } from "../context/RollLogContext.tsx";
 
 export const getYOffset = async (height: number) => {
     const metadata = (await OBR.room.getMetadata()) as Metadata;
@@ -188,4 +190,34 @@ export const updateRoomMetadata = async (room: RoomMetadata | null, data: Partia
     ownMetadata[metadataKey] = { ...room, ...data };
 
     await OBR.room.setMetadata({ ...ownMetadata });
+};
+
+export const dddiceRollToRollLog = async (
+    roll: IRoll,
+    participants?: Array<IRoomParticipant>
+): Promise<RollLogEntryType> => {
+    let username = roll.user.username;
+
+    if (roll.user.name === "Guest User") {
+        username = roll.user.name;
+        if (roll.external_id?.startsWith("dndbCharacterId")) {
+            const index = participants?.findIndex((participant) => {
+                return participant.user.uuid === roll.user.uuid;
+            });
+
+            if (participants && index && index >= 0) {
+                username = participants[index].username;
+            }
+        }
+    }
+
+    return {
+        uuid: roll.uuid,
+        created_at: roll.created_at,
+        equation: roll.equation,
+        label: roll.label,
+        total_value: roll.total_value,
+        username: username,
+        values: roll.values,
+    };
 };

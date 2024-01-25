@@ -2,14 +2,18 @@ import { useEffect, useRef } from "react";
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { SceneReadyContext } from "../../../context/SceneReadyContext.ts";
 import { DDDICE_API_KEY } from "../../../config.ts";
-import { IRoom } from "dddice-js";
+import { IRoom, ThreeDDiceRollEvent } from "dddice-js";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
-import { updateRoomMetadata } from "../../../helper/helpers.ts";
+import { dddiceRollToRollLog, updateRoomMetadata } from "../../../helper/helpers.ts";
 import { DiceRoom } from "./DiceRoom.tsx";
+import { useRollLogContext } from "../../../context/RollLogContext.tsx";
+import { usePlayerContext } from "../../../context/PlayerContext.ts";
 
 export const DiceTray = ({ classes }: { classes: string }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const { roller } = useDiceRoller();
+    const playerContext = usePlayerContext();
+    const { addRoll } = useRollLogContext();
     const { isReady } = SceneReadyContext();
     const { room } = useMetadataContext();
 
@@ -46,6 +50,19 @@ export const DiceTray = ({ classes }: { classes: string }) => {
                     if (theme) {
                         roller.loadTheme(theme.data);
                     }
+                    roller.on(ThreeDDiceRollEvent.RollStarted, async (e) => {
+                        if (e.label) {
+                            try {
+                                const rollLabel = JSON.parse(e.label);
+                                if ("user" in rollLabel && rollLabel.user !== playerContext.name) {
+                                    addRoll(await dddiceRollToRollLog(e));
+                                }
+                            } catch {
+                                const room = (await roller.api?.room.get(roomSlug!))?.data;
+                                addRoll(await dddiceRollToRollLog(e, room?.participants));
+                            }
+                        }
+                    });
                 }
             }
         };

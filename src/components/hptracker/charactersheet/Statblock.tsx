@@ -10,7 +10,7 @@ import { E5Ability } from "./E5Ability.tsx";
 import { E5Spells } from "./E5Spells.tsx";
 import { PfSpells } from "./PfSpells.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
-import { DiceButtonWrapper } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { DiceButton, DiceButtonWrapper } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
 
 const E5StatBlock = ({ slug }: { slug: string }) => {
     const statblockQuery = useE5GetStatblock(slug);
@@ -60,7 +60,13 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                 </span>
                 <span className={"hp"}>
                     <b>Hit Points</b> {statblock.hp.value}{" "}
-                    {statblock.hp.hit_dice ? DiceButtonWrapper(statblock.hp.hit_dice, "hit dice") : null}
+                    {statblock.hp.hit_dice ? (
+                        <DiceButton
+                            dice={statblock.hp.hit_dice}
+                            text={statblock.hp.hit_dice}
+                            context={slug + ": Hit Dice"}
+                        />
+                    ) : null}
                 </span>
                 <span className={"speed"}>
                     <b>Speed</b>{" "}

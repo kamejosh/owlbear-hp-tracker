@@ -58,6 +58,7 @@ export type RoomMetadata = {
     initiativeDice?: number;
     ignoreUpdateNotification?: boolean;
     diceRoom?: string;
+    diceTheme?: string;
 };
 
 export type AttachmentMetadata = {

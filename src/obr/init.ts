@@ -80,6 +80,7 @@ const initRoom = async () => {
             initiativeDice: 20,
             ruleset: "e5",
             ignoreUpdateNotification: false,
+            diceTheme: "silvie-lr1gjqod",
         };
         ownMetadata[metadataKey] = roomData;
     } else {

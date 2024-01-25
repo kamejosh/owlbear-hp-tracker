@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 import { ID } from "../helper/variables.ts";
 import { IRollValue, IRollValueImage } from "dddice-js";
 
-export type RollLogEntry = {
+export type RollLogEntryType = {
     uuid: string;
     created_at: string;
     equation: string;
@@ -14,8 +14,8 @@ export type RollLogEntry = {
 };
 
 export type RollLogContextType = {
-    log: Array<RollLogEntry>;
-    addRoll: (roll: RollLogEntry) => void;
+    log: Array<RollLogEntryType>;
+    addRoll: (roll: RollLogEntryType) => void;
     clear: () => void;
 };
 

@@ -1,6 +1,6 @@
 import { components } from "../../../ttrpgapi/schema";
 import { useState } from "react";
-import { DiceButtonWrapper } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { DiceButton, DiceButtonWrapper } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { getDamage } from "../../../helper/helpers.ts";
 import { SpellFilter } from "./SpellFilter.tsx";
 
@@ -37,7 +37,7 @@ const Spell = (props: { spell: Spell }) => {
                     </div>
                     {damage ? (
                         <span className={"spell-damage"}>
-                            Damage: {DiceButtonWrapper(damage, `${spell.name} Damage`)}
+                            Damage: <DiceButton dice={damage} text={damage} context={`${spell.name}: Damage`} />
                         </span>
                     ) : null}
                     <div className={"spell-components"}>

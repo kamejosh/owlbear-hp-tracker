@@ -210,11 +210,7 @@ const PfSpellCategory = (props: { spellCategory: PfSpellCategory }) => {
                 <div className={"spell-category-header"}>
                     <h3 className={"spell-category-name"}>{props.spellCategory.name}</h3>
                     <span className={"spell-category-info"}>
-                        {props.spellCategory.dc ? (
-                            <span className={"text-roll"}>
-                                DC: {DiceButtonWrapper("+" + props.spellCategory.dc, `${props.spellCategory.name} DC`)}
-                            </span>
-                        ) : null}{" "}
+                        {props.spellCategory.dc ? `DC: ${props.spellCategory.dc}` : null}{" "}
                         {props.spellCategory.attack ? (
                             <span className={"text-roll"}>
                                 Attack:{" "}
