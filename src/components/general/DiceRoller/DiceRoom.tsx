@@ -1,11 +1,11 @@
-import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { useState } from "react";
 import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { RollLog } from "./RollLog.tsx";
+import { useMetadataContext } from "../../../context/MetadataContext.ts";
 
 export const DiceRoom = ({ className }: { className?: string }) => {
-    const { roller } = useDiceRoller();
+    const { room } = useMetadataContext();
     const { clear } = useRollLogContext();
     const [open, setOpen] = useState<boolean>(false);
 
@@ -27,14 +27,14 @@ export const DiceRoom = ({ className }: { className?: string }) => {
                     <div className={"dice-tray-content"}>
                         <div className={"top"}>
                             <div className={"room-link"}>
-                                <a href={`https://dddice.com/room/${roller.api?.roomSlug}`} target={"_blank"}>
+                                <a href={`https://dddice.com/room/${room?.diceRoom?.slug}`} target={"_blank"}>
                                     Room Link
                                 </a>
                                 <button
                                     className={"copy-link"}
                                     onClick={(e) => {
                                         navigator.clipboard.writeText(
-                                            `https://dddice.com/room/${roller.api?.roomSlug}`
+                                            `https://dddice.com/room/${room?.diceRoom?.slug}`
                                         );
                                         e.currentTarget.blur();
                                     }}
