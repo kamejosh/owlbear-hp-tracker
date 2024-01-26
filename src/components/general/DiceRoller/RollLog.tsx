@@ -18,7 +18,6 @@ export const RollLog = () => {
 export const RollLogEntry = ({ entry }: { entry: RollLogEntryType }) => {
     const rollTime = new Date(entry.created_at);
     const now = new Date();
-    let jsonLabel: { user: string; context: string; operator: string } | null = null;
 
     const deltaTime = now.getTime() - rollTime.getTime();
 
@@ -45,12 +44,6 @@ export const RollLogEntry = ({ entry }: { entry: RollLogEntryType }) => {
 
     const [rollTimeText, setRollTimeText] = useState<string>(getRollTimeText(deltaTime));
 
-    try {
-        if (entry.label) {
-            jsonLabel = JSON.parse(entry.label);
-        }
-    } catch {}
-
     useInterval(() => {
         const nowTime = new Date();
         setRollTimeText(getRollTimeText(nowTime.getTime() - rollTime.getTime()));
@@ -59,19 +52,13 @@ export const RollLogEntry = ({ entry }: { entry: RollLogEntryType }) => {
     return (
         <li className={"roll-log-entry"}>
             <span className={"roll-time"}>{rollTimeText}</span>
-            <span className={"username"}>
-                {entry.username} {jsonLabel ? `(${jsonLabel.user})` : null}
-            </span>
+            <span className={"username"}>{entry.username}</span>
             <ul className={"dice"}>
                 {entry.values.map((die, index) => {
                     return (
                         <li key={index} className={"die"}>
                             {die.type !== "mod" ? (
-                                <DiceButton
-                                    dice={"1" + die.type}
-                                    text={"1" + die.type}
-                                    context={jsonLabel ? jsonLabel.context : entry.label || ""}
-                                />
+                                <DiceButton dice={"1" + die.type} text={"1" + die.type} context={entry.label || ""} />
                             ) : (
                                 "+ "
                             )}

@@ -57,8 +57,8 @@ export type RoomMetadata = {
     statblockPopover?: { width: number; height: number };
     initiativeDice?: number;
     ignoreUpdateNotification?: boolean;
-    diceRoom?: { slug: string };
-    diceUser?: Array<{ playerId: string; apiKey: string; lastUse: number }>;
+    diceRoom?: { slug: string | undefined };
+    diceUser?: Array<{ playerId: string; apiKey: string | undefined; lastUse: number }>;
     diceTheme?: string;
 };
 

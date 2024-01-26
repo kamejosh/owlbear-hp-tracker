@@ -3,56 +3,15 @@ import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { SceneReadyContext } from "../../../context/SceneReadyContext.ts";
 import { IRoom, ThreeDDiceAPI, ThreeDDiceRollEvent } from "dddice-js";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
-import { dddiceRollToRollLog, updateRoomMetadata } from "../../../helper/helpers.ts";
+import { dddiceRollToRollLog } from "../../../helper/helpers.ts";
 import { DiceRoom } from "./DiceRoom.tsx";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
-import OBR, { Metadata } from "@owlbear-rodeo/sdk";
-import { RoomMetadata } from "../../../helper/types.ts";
-
-const updateRoomMetadataApiKey = async (room: RoomMetadata, apiKey: string, playerId: string) => {
-    const diceUser: Array<{ playerId: string; apiKey: string; lastUse: number }> =
-        room.diceUser === undefined ? [] : room.diceUser;
-
-    // This first removes the current entry for the user if it finds it and replaces it with updated apiKey and lastUser timestamp
-    diceUser.splice(
-        diceUser.findIndex((user) => user.playerId === playerId),
-        1,
-        { playerId: playerId, apiKey: apiKey, lastUse: new Date().getTime() }
-    );
-
-    // to not pollute the room metadata we remove all users that haven't logged in in the last month
-    const filteredUser = diceUser.filter((user) => {
-        return user.lastUse > new Date().getTime() - 1000 * 60 * 60 * 24 * 30;
-    });
-
-    await updateRoomMetadata(room, { diceUser: filteredUser });
-
-    // to keep in sync with dddice I save the dddice metadata as well (Approved by CelesteBloodreign)
-    const dddiceMetadata: Metadata = {};
-    dddiceMetadata[`com.dddice/${playerId}`] = apiKey;
-    await OBR.room.setMetadata({ ...dddiceMetadata });
-};
-
-const updateRoomMetadataDiceRoom = async (room: RoomMetadata, diceRoom: IRoom) => {
-    const tempRoom: { slug: string } = {
-        slug: diceRoom?.slug || "",
-    };
-    await updateRoomMetadata(room, {
-        diceRoom: {
-            ...tempRoom,
-        },
-    });
-
-    // to keep in sync with dddice I save the dddice metadata as well (Approved by CelesteBloodreign)
-    const dddiceMetadata: Metadata = {};
-    dddiceMetadata["com.dddice/roomSlug"] = tempRoom.slug;
-    await OBR.room.setMetadata({ ...dddiceMetadata });
-};
+import OBR from "@owlbear-rodeo/sdk";
+import { updateRoomMetadataApiKey, updateRoomMetadataDiceRoom } from "../../../helper/diceHelper.ts";
 
 export const DiceTray = ({ classes }: { classes: string }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const api = useRef<ThreeDDiceAPI>(new ThreeDDiceAPI());
     const { roller } = useDiceRoller();
     const playerContext = usePlayerContext();
     const { addRoll } = useRollLogContext();
@@ -79,7 +38,6 @@ export const DiceTray = ({ classes }: { classes: string }) => {
                 await updateRoomMetadataApiKey(room, apiKey, playerId);
             }
 
-            console.log("api-key", apiKey);
             return apiKey;
         };
 
@@ -97,7 +55,7 @@ export const DiceTray = ({ classes }: { classes: string }) => {
                 const diceRoom = (await roller.api?.room.create())?.data;
 
                 if (room && diceRoom) {
-                    await updateRoomMetadataDiceRoom(room, diceRoom);
+                    await updateRoomMetadataDiceRoom(room, diceRoom.slug);
                 }
 
                 return diceRoom;
@@ -105,7 +63,7 @@ export const DiceTray = ({ classes }: { classes: string }) => {
                 const diceRoom = (await roller?.api?.room.get(slug))?.data;
 
                 if (room && diceRoom) {
-                    await updateRoomMetadataDiceRoom(room, diceRoom);
+                    await updateRoomMetadataDiceRoom(room, diceRoom.slug);
                 }
 
                 return diceRoom;
@@ -114,15 +72,14 @@ export const DiceTray = ({ classes }: { classes: string }) => {
 
         const prepareRoomUser = async (diceRoom: IRoom) => {
             const user = (await roller.api?.user.get())?.data;
-            console.log("api-user", user);
             if (user) {
                 const participant = diceRoom.participants.find((p) => p.user.uuid === user.uuid);
 
-                console.log("room-participant", participant);
+                const name = await OBR.player.getName();
 
-                if (participant && playerContext.name && participant.username !== playerContext.name) {
+                if (participant && participant.username !== name) {
                     await roller.api?.room.updateParticipant(diceRoom.slug, participant.id, {
-                        username: playerContext.name,
+                        username: name,
                     });
                 }
             }
@@ -130,38 +87,32 @@ export const DiceTray = ({ classes }: { classes: string }) => {
 
         const addRollerCallbacks = async () => {
             roller.on(ThreeDDiceRollEvent.RollStarted, async (e) => {
-                if (e.label) {
-                    try {
-                        const rollLabel = JSON.parse(e.label);
-                        if ("user" in rollLabel && rollLabel.user !== playerContext.name) {
-                            addRoll(await dddiceRollToRollLog(e));
-                        }
-                    } catch {
-                        let dddiceRoom: IRoom | undefined = undefined;
-                        if (room && room.diceRoom && room.diceRoom.slug) {
-                            dddiceRoom = (await roller.api?.room.get(room?.diceRoom?.slug))?.data;
-                        }
-                        addRoll(await dddiceRollToRollLog(e, dddiceRoom?.participants || []));
-                    }
+                const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
+
+                if (participant && participant.username !== playerContext.name) {
+                    addRoll(await dddiceRollToRollLog(e, participant));
                 }
             });
         };
 
         const initDice = async () => {
             if (!roller.canvas && canvasRef.current) {
-                console.log("hp-tracker-room-metadata", room);
-
                 roller.initialize(canvasRef.current, await getApiKey(), {}, "HP Tracker");
 
                 const diceRoom = await getDiceRoom();
-                console.log("dddice-room", diceRoom);
-
                 if (diceRoom) {
-                    roller.connect(diceRoom.slug, diceRoom.passcode);
-                    api.current?.room.join(diceRoom.slug, diceRoom.passcode);
-                    roller.start();
+                    try {
+                        const userDiceRoom = (await roller?.api?.room.join(diceRoom.slug, diceRoom.passcode))?.data;
+                        if (userDiceRoom) {
+                            await prepareRoomUser(userDiceRoom);
+                        }
+                    } catch {
+                        // if we already joined it fails and we can take the default room
+                        await prepareRoomUser(diceRoom);
+                    }
 
-                    await prepareRoomUser(diceRoom);
+                    roller.connect(diceRoom.slug, diceRoom.passcode);
+                    roller.start();
                     const theme = await roller.api?.theme.get("silvie-lr1gjqod");
                     if (theme) {
                         roller.loadTheme(theme.data);

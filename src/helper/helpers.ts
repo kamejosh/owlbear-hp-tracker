@@ -192,21 +192,16 @@ export const updateRoomMetadata = async (room: RoomMetadata | null, data: Partia
     await OBR.room.setMetadata({ ...ownMetadata });
 };
 
-export const dddiceRollToRollLog = async (
-    roll: IRoll,
-    participants?: Array<IRoomParticipant>
-): Promise<RollLogEntryType> => {
+export const dddiceRollToRollLog = async (roll: IRoll, participant?: IRoomParticipant): Promise<RollLogEntryType> => {
     let username = roll.user.username;
 
     if (roll.user.name === "Guest User") {
-        username = roll.user.name;
-        if (roll.external_id?.startsWith("dndbCharacterId")) {
-            const index = participants?.findIndex((participant) => {
-                return participant.user.uuid === roll.user.uuid;
-            });
-
-            if (participants && index && index >= 0) {
-                username = participants[index].username;
+        if (participant && participant.username) {
+            username = participant?.username;
+        } else {
+            const particip = roll.room.participants.find((p) => p.user.uuid === roll.user.uuid);
+            if (particip && particip.username) {
+                username = particip.username;
             }
         }
     }

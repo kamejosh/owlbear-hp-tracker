@@ -3,9 +3,14 @@ import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { RollLog } from "./RollLog.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
+import { updateRoomMetadataApiKey, updateRoomMetadataDiceRoom } from "../../../helper/diceHelper.ts";
+import { usePlayerContext } from "../../../context/PlayerContext.ts";
+import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 
 export const DiceRoom = ({ className }: { className?: string }) => {
     const { room } = useMetadataContext();
+    const { roller } = useDiceRoller();
+    const playerContext = usePlayerContext();
     const { clear } = useRollLogContext();
     const [open, setOpen] = useState<boolean>(false);
 
@@ -57,6 +62,29 @@ export const DiceRoom = ({ className }: { className?: string }) => {
                                 }}
                             >
                                 clear
+                            </button>
+                            <button
+                                className={"dddice-disconnect"}
+                                onClick={async () => {
+                                    if (room && playerContext.id) {
+                                        const user = (await roller.api?.user.get())?.data;
+                                        if (user && room?.diceRoom?.slug) {
+                                            const diceRoom = (await roller.api?.room.get(room?.diceRoom?.slug))?.data;
+                                            const participant = diceRoom?.participants.find(
+                                                (p) => p.user.uuid === user.uuid
+                                            );
+                                            if (participant) {
+                                                roller.api?.room.leave(room.diceRoom.slug, participant.id.toString());
+                                            }
+                                        }
+                                        await updateRoomMetadataApiKey(room, undefined, playerContext.id);
+                                        if (playerContext.role === "GM") {
+                                            await updateRoomMetadataDiceRoom(room, undefined);
+                                        }
+                                    }
+                                }}
+                            >
+                                Logout
                             </button>
                         </div>
                         <RollLog />

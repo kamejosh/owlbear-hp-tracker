@@ -1,9 +1,9 @@
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { IDiceRoll, Operator, parseRollEquation } from "dddice-js";
-import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
+import { dddiceRollToRollLog } from "../../../helper/helpers.ts";
 
 type DiceButtonProps = {
     dice: string;
@@ -14,12 +14,10 @@ export const DiceButton = (props: DiceButtonProps) => {
     const { addRoll } = useRollLogContext();
     const { room } = useMetadataContext();
     const { roller } = useDiceRoller();
-    const playerContext = usePlayerContext();
 
     const diceToRoll = () => {
         let dice: Array<IDiceRoll> = [];
         let operator: Operator | undefined = undefined;
-        let context: string | null = null;
         if (props.dice.includes("d")) {
             try {
                 const parsed = parseRollEquation(props.dice, room?.diceTheme || "dddice-standard");
@@ -55,22 +53,6 @@ export const DiceButton = (props: DiceButtonProps) => {
                         }
                     }
 
-                    if (die.includes(">")) {
-                        const parts = die.split(">");
-                        if (parts.length === 2) {
-                            die = parts[0];
-                            context = `>${parts[1]}`;
-                        }
-                    }
-
-                    if (die.includes("<")) {
-                        const parts = die.split("<");
-                        if (parts.length === 2) {
-                            die = parts[0];
-                            context = `<${parts[1]}`;
-                        }
-                    }
-
                     for (let i = 0; i < amount; i++) {
                         dice.splice(0, 0, { type: `d${parseInt(die)}`, theme: room?.diceTheme || "dddice-standard" });
                     }
@@ -82,7 +64,7 @@ export const DiceButton = (props: DiceButtonProps) => {
         } else {
             console.warn("found dice string that could not be parsed", props.dice);
         }
-        return { dice, operator, context };
+        return { dice, operator };
     };
 
     return (
@@ -93,21 +75,14 @@ export const DiceButton = (props: DiceButtonProps) => {
                 button.classList.add("rolling");
                 const parsed = diceToRoll();
                 const roll = await roller.roll(parsed.dice, {
-                    label: `{"user": "${playerContext.name}", "context": "${props.context}", "operator": "${parsed.context}"}`,
+                    label: props.context,
                     operator: parsed.operator,
                 });
                 button.classList.remove("rolling");
                 if (roll && roll.data) {
                     const data = roll.data;
-                    addRoll({
-                        uuid: data.uuid,
-                        created_at: data.created_at,
-                        equation: data.equation,
-                        label: data.label,
-                        total_value: data.total_value,
-                        username: data.user.username,
-                        values: data.values,
-                    });
+
+                    addRoll(await dddiceRollToRollLog(data));
                 }
             }}
         >
