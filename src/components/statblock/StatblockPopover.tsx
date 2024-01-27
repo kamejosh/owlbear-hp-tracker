@@ -83,7 +83,7 @@ export const StatblockPopover = () => {
     }, [isReady]);
 
     return (
-        <ContextWrapper>
+        <ContextWrapper component={"statblock_popover"}>
             <div className={"statblock-popover"}>
                 <div className={"help-buttons"}>
                     <button

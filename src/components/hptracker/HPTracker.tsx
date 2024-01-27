@@ -18,7 +18,7 @@ import { useMetadataContext } from "../../context/MetadataContext.ts";
 
 export const HPTracker = () => {
     return (
-        <ContextWrapper>
+        <ContextWrapper component={"action_window"}>
             <Content />
             <DiceTray classes={"hp-tracker-dice-tray"} />
         </ContextWrapper>

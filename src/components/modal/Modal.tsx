@@ -7,7 +7,7 @@ import { Settings } from "./Components/Settings.tsx";
 
 export const Modal = () => {
     return (
-        <ContextWrapper>
+        <ContextWrapper component={"modal"}>
             <Content />
         </ContextWrapper>
     );

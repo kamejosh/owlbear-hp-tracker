@@ -9,17 +9,24 @@ import { RoomMetadata, SceneMetadata } from "../helper/types.ts";
 import { Loader } from "./general/Loader.tsx";
 import { objectsEqual } from "../helper/helpers.ts";
 import { SceneReadyContext } from "../context/SceneReadyContext.ts";
+import { useComponentContext } from "../context/ComponentContext.tsx";
 
-export const ContextWrapper = (props: PropsWithChildren) => {
+type ContextWrapperProps = PropsWithChildren & {
+    component: string;
+};
+
+export const ContextWrapper = (props: ContextWrapperProps) => {
     const [role, setRole] = useState<string | null>(null);
     const [playerId, setPlayerId] = useState<string | null>(null);
     const [playerName, setPlayerName] = useState<string | null>(null);
     const [ready, setReady] = useState<boolean>(false);
     const { scene, room, setSceneMetadata, setRoomMetadata } = useMetadataContext();
+    const { component, setComponent } = useComponentContext();
     const queryClient = new QueryClient();
     const { isReady } = SceneReadyContext();
 
     useEffect(() => {
+        setComponent(props.component);
         if (OBR.isAvailable) {
             OBR.onReady(async () => {
                 setReady(true);
@@ -74,7 +81,7 @@ export const ContextWrapper = (props: PropsWithChildren) => {
             <PluginGate>
                 <QueryClientProvider client={queryClient}>
                     <PlayerContext.Provider value={playerContext}>
-                        {scene && room ? props.children : <Loader className={"initialization-loader"} />}
+                        {component && scene && room ? props.children : <Loader className={"initialization-loader"} />}
                     </PlayerContext.Provider>
                 </QueryClientProvider>
             </PluginGate>

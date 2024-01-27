@@ -88,12 +88,13 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                             <div className={"stat-name"}>{stat.substring(0, 3)}</div>
                             <div className={"stat-value"}>
                                 {value}
-                                {DiceButtonWrapper(
-                                    Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
+                                <DiceButton
+                                    dice={"d20"}
+                                    text={Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
                                         Math.floor((value - 10) / 2)
-                                    ),
-                                    `${stat} Check`
-                                )}
+                                    )}
+                                    context={`${stat} Check`}
+                                />
                             </div>
                         </div>
                     );

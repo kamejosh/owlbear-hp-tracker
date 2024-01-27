@@ -81,6 +81,7 @@ const initRoom = async () => {
             ruleset: "e5",
             ignoreUpdateNotification: false,
             diceTheme: "silvie-lr1gjqod",
+            diceRendering: true,
         };
         ownMetadata[metadataKey] = roomData;
     } else {

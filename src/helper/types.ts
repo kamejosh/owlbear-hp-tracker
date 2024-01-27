@@ -58,6 +58,7 @@ export type RoomMetadata = {
     initiativeDice?: number;
     ignoreUpdateNotification?: boolean;
     diceRoom?: { slug: string | undefined };
+    diceRendering?: boolean;
     diceUser?: Array<{ playerId: string; apiKey: string | undefined; lastUse: number }>;
     diceTheme?: string;
 };

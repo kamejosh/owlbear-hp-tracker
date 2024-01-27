@@ -4,6 +4,8 @@ import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { dddiceRollToRollLog } from "../../../helper/helpers.ts";
+import { useComponentContext } from "../../../context/ComponentContext.tsx";
+import { useRef, useState } from "react";
 
 type DiceButtonProps = {
     dice: string;
@@ -14,13 +16,16 @@ export const DiceButton = (props: DiceButtonProps) => {
     const { addRoll } = useRollLogContext();
     const { room } = useMetadataContext();
     const { roller } = useDiceRoller();
+    const { component } = useComponentContext();
+    const [context, setContext] = useState<boolean>(false);
+    const rollButton = useRef<HTMLButtonElement>(null);
 
-    const diceToRoll = () => {
+    const diceToRoll = (diceString: string) => {
         let dice: Array<IDiceRoll> = [];
         let operator: Operator | undefined = undefined;
         if (props.dice.includes("d")) {
             try {
-                const parsed = parseRollEquation(props.dice, room?.diceTheme || "dddice-standard");
+                const parsed = parseRollEquation(diceString, room?.diceTheme || "dddice-standard");
                 dice = parsed.dice;
                 operator = parsed.operator;
             } catch {
@@ -67,27 +72,109 @@ export const DiceButton = (props: DiceButtonProps) => {
         return { dice, operator };
     };
 
-    return (
-        <div
-            className={"dice-button button"}
-            onClick={async (e) => {
-                const button = e.currentTarget;
-                button.classList.add("rolling");
-                const parsed = diceToRoll();
+    const getUserUuid = async () => {
+        if (room?.diceRoom?.slug) {
+            const diceRoom = (await roller.api?.room.get(room?.diceRoom.slug))?.data;
+            const user = (await roller.api?.user.get())?.data;
+            if (user && diceRoom) {
+                const participant = diceRoom.participants.find((p) => p.user.uuid === user.uuid);
+                if (participant) {
+                    return [participant.id];
+                }
+            }
+        }
+        return undefined;
+    };
+
+    const roll = async (modifier?: "ADV" | "DIS" | "SELF") => {
+        const button = rollButton.current;
+        if (button) {
+            button.classList.add("rolling");
+            let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined;
+            if (modifier && modifier === "ADV") {
+                parsed = diceToRoll("2d20kh1");
+            } else if (modifier && modifier === "DIS") {
+                parsed = diceToRoll("2d20dh1");
+            } else {
+                parsed = diceToRoll(props.dice);
+            }
+            if (parsed) {
                 const roll = await roller.roll(parsed.dice, {
                     label: props.context,
                     operator: parsed.operator,
+                    external_id: component,
+                    whisper: modifier === "SELF" ? await getUserUuid() : undefined,
                 });
-                button.classList.remove("rolling");
                 if (roll && roll.data) {
                     const data = roll.data;
 
                     addRoll(await dddiceRollToRollLog(data));
                 }
+            }
+            button.classList.remove("rolling");
+        }
+    };
+
+    return (
+        <div
+            className={`button-wrapper ${roller.api ? "enabled" : "disabled"}`}
+            onMouseEnter={() => {
+                setContext(true);
             }}
+            onMouseLeave={() => setContext(false)}
         >
-            <DiceSvg />
-            {props.text}
+            <button
+                ref={rollButton}
+                className={"dice-button button"}
+                onClick={async () => {
+                    await roll();
+                }}
+            >
+                <DiceSvg />
+                {props.text.replace(/\s/g, "")}
+            </button>
+            <div
+                className={`dice-context-button ${context ? "visible" : ""} ${
+                    props.dice.startsWith("1d20") ||
+                    props.dice.startsWith("d20") ||
+                    props.dice.startsWith("+") ||
+                    props.dice.startsWith("-")
+                        ? "full"
+                        : "reduced"
+                }`}
+            >
+                {props.dice.startsWith("1d20") ||
+                props.dice.startsWith("d20") ||
+                props.dice.startsWith("+") ||
+                props.dice.startsWith("-") ? (
+                    <>
+                        <button
+                            className={"advantage"}
+                            onClick={async () => {
+                                await roll("ADV");
+                            }}
+                        >
+                            ADV
+                        </button>
+                        <button
+                            className={"disadvantage"}
+                            onClick={async () => {
+                                await roll("DIS");
+                            }}
+                        >
+                            DIS
+                        </button>
+                    </>
+                ) : null}
+                <button
+                    className={"self"}
+                    onClick={async () => {
+                        await roll("SELF");
+                    }}
+                >
+                    HIDE
+                </button>
+            </div>
         </div>
     );
 };

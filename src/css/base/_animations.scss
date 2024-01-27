@@ -1,0 +1,28 @@
+@keyframes rotating {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes shaking {
+    from {
+        transform: rotate(-30deg);
+    }
+    to {
+        transform: rotate(30deg);
+    }
+}
+
+@keyframes changeColor {
+    from {
+        background-color: #242424;
+        color: white;
+    }
+    to {
+        background-color: white;
+        color: #242424;
+    }
+}

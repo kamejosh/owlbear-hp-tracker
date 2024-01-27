@@ -7,7 +7,11 @@
     pointer-events: none;
 
     &.statblock-dice-tray {
-        top: calc(30px + 1rem);
+        top: calc(60px + 1rem);
+    }
+
+    &.hide {
+        display: none;
     }
 }
 
@@ -75,11 +79,11 @@
 
         .dice-tray {
             min-height: 0;
+            overflow-y: auto;
 
             .dice-tray-content {
                 background-color: #1c1b22;
                 padding: 10px 20px;
-                max-height: 100%;
 
                 .top {
                     display: flex;
@@ -142,6 +146,42 @@
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+.dice-settings {
+    border: 1px solid lightgrey;
+    padding: 2px;
+    text-align: left;
+
+    .setting {
+        display: flex;
+        align-items: center;
+        gap: 1ch;
+
+        &.dice-theme {
+            &.invalid {
+                .theme-input {
+                    border-color: red;
+                    background-color: rgba(255, 0, 0, 0.2);
+                }
+            }
+
+            &.searching {
+                .theme-preview {
+                    animation: rotating 0.3s linear infinite;
+                }
+            }
+
+            .theme-input {
+                width: 100px;
+            }
+
+            .theme-preview {
+                width: auto;
+                height: 2em;
             }
         }
     }

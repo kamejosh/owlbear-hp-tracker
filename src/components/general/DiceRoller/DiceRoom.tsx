@@ -6,6 +6,7 @@ import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { updateRoomMetadataApiKey, updateRoomMetadataDiceRoom } from "../../../helper/diceHelper.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
+import { DiceSettings } from "./DiceSettings.tsx";
 
 export const DiceRoom = ({ className }: { className?: string }) => {
     const { room } = useMetadataContext();
@@ -87,6 +88,7 @@ export const DiceRoom = ({ className }: { className?: string }) => {
                                 Logout
                             </button>
                         </div>
+                        <DiceSettings />
                         <RollLog />
                     </div>
                 </div>

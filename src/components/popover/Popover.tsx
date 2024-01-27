@@ -40,7 +40,7 @@ export const Popover = () => {
     }, [isReady]);
 
     return (
-        <ContextWrapper>
+        <ContextWrapper component={"popover"}>
             {ids.length === 1 ? (
                 <Content id={ids[0]} />
             ) : ids.length > 1 ? (
