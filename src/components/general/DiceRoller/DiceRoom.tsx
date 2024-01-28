@@ -70,7 +70,7 @@ export const DiceRoom = ({ className }: { className?: string }) => {
                             >
                                 clear
                             </button>
-                            <button
+                            {/*                            <button
                                 className={"dddice-disconnect"}
                                 onClick={async () => {
                                     if (room && playerContext.id) {
@@ -88,7 +88,7 @@ export const DiceRoom = ({ className }: { className?: string }) => {
                                 }}
                             >
                                 Logout
-                            </button>
+                            </button>*/}
                             <button
                                 className={"dddice-login"}
                                 onClick={async () => {
