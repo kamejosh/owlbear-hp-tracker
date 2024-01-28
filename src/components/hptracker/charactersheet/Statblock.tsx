@@ -96,7 +96,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                                     text={Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
                                         Math.floor((value - 10) / 2)
                                     )}
-                                    context={`${capitalize(stat)} Check`}
+                                    context={`${capitalize(stat)}: Check`}
                                 />
                             </div>
                         </div>
@@ -116,7 +116,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                                             <DiceButton
                                                 dice={`d20+${value}`}
                                                 text={`+${value}`}
-                                                context={`${capitalize(key)} Save`}
+                                                context={`${capitalize(key)}: Save`}
                                             />
                                         </span>
                                     );
@@ -151,7 +151,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                                             text={Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
                                                 Math.floor(value)
                                             )}
-                                            context={`${capitalize(key)} Check`}
+                                            context={`${capitalize(key)}: Check`}
                                         />
                                     </li>
                                 );
@@ -302,7 +302,7 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                         <DiceButton
                             dice={`d20${statblock.perception}`}
                             text={statblock.perception}
-                            context={`Perception Check`}
+                            context={`Perception: Check`}
                         />
                     </span>
                 ) : null}
@@ -320,7 +320,7 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                                     text={Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
                                         Math.floor(value)
                                     )}
-                                    context={`${capitalize(stat)} Check`}
+                                    context={`${capitalize(stat)}: Check`}
                                 />
                             </div>
                         </div>
@@ -334,16 +334,20 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                         <ul className={"saving-throw-list"}>
                             {Object.entries(statblock.saving_throws).map(([key, value], index) => {
                                 if (value) {
-                                    return (
-                                        <li key={index}>
-                                            <span className={"name"}>{key}</span>{" "}
-                                            <DiceButton
-                                                dice={`d20+${value}`}
-                                                text={`+${value}`}
-                                                context={`${capitalize(key)} Save`}
-                                            />
-                                        </li>
-                                    );
+                                    if (typeof value === "number") {
+                                        return (
+                                            <li key={index}>
+                                                <span className={"name"}>{key}</span>{" "}
+                                                <DiceButton
+                                                    dice={`d20+${value}`}
+                                                    text={`+${value}`}
+                                                    context={`${capitalize(key)}: Save`}
+                                                />
+                                            </li>
+                                        );
+                                    } else {
+                                        return <li key={index}>{value}</li>;
+                                    }
                                 }
                             })}
                         </ul>
@@ -366,7 +370,7 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                                         <DiceButton
                                             dice={`d20+${value}`}
                                             text={value}
-                                            context={`${capitalize(skill.name)} Check`}
+                                            context={`${capitalize(skill.name)}: Check`}
                                         />
                                     </div>
                                 </div>
