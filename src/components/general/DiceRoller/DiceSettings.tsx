@@ -18,6 +18,7 @@ export const DiceSettings = () => {
             if (newTheme && newTheme.id !== theme?.id) {
                 await updateRoomMetadata(room, { diceTheme: newTheme.id });
                 setValidTheme(true);
+                roller.loadTheme(newTheme);
                 setTheme(newTheme);
             }
         } catch {

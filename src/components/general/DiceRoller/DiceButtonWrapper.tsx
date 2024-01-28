@@ -86,15 +86,25 @@ export const DiceButton = (props: DiceButtonProps) => {
         return undefined;
     };
 
+    const addModifier = (originalDie: string, baseDie: string) => {
+        if (originalDie.includes("+")) {
+            baseDie += `+${props.dice.split("+").pop()}`;
+        }
+        if (originalDie.includes("-")) {
+            baseDie += `+${props.dice.split("-").pop()}`;
+        }
+        return baseDie;
+    };
+
     const roll = async (modifier?: "ADV" | "DIS" | "SELF") => {
         const button = rollButton.current;
         if (button) {
             button.classList.add("rolling");
             let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined;
             if (modifier && modifier === "ADV") {
-                parsed = diceToRoll("2d20kh1");
+                parsed = diceToRoll(addModifier(props.dice, "2d20kh1"));
             } else if (modifier && modifier === "DIS") {
-                parsed = diceToRoll("2d20dh1");
+                parsed = diceToRoll(addModifier(props.dice, "2d20dh1"));
             } else {
                 parsed = diceToRoll(props.dice);
             }
@@ -112,6 +122,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                 }
             }
             button.classList.remove("rolling");
+            button.blur();
         }
     };
 

@@ -89,7 +89,9 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                             <div className={"stat-value"}>
                                 {value}
                                 <DiceButton
-                                    dice={"d20"}
+                                    dice={`d20${Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
+                                        Math.floor((value - 10) / 2)
+                                    )}`}
                                     text={Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
                                         Math.floor((value - 10) / 2)
                                     )}

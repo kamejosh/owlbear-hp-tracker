@@ -57,9 +57,7 @@ export const DiceTray = ({ classes }: { classes: string }) => {
                         roller.connect(diceRoom.slug, diceRoom.passcode, user.uuid);
                     }
 
-                    if (room?.diceRendering) {
-                        roller.start();
-                    }
+                    roller.start();
                     await addRollerCallbacks(roller, playerContext.name, addRoll, component);
                 }
             }
