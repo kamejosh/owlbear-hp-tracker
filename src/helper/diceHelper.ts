@@ -1,7 +1,7 @@
 import { RoomMetadata } from "./types.ts";
 import { dddiceRollToRollLog, updateRoomMetadata } from "./helpers.ts";
 import OBR, { Metadata } from "@owlbear-rodeo/sdk";
-import { IRoom, ThreeDDice, ThreeDDiceAPI, ThreeDDiceRollEvent } from "dddice-js";
+import { IRoom, IUser, ThreeDDice, ThreeDDiceAPI, ThreeDDiceRollEvent } from "dddice-js";
 import { RollLogEntryType } from "../context/RollLogContext.tsx";
 
 export const updateRoomMetadataApiKey = async (room: RoomMetadata, apiKey: string | undefined, playerId: string) => {
@@ -15,7 +15,7 @@ export const updateRoomMetadataApiKey = async (room: RoomMetadata, apiKey: strin
         { playerId: playerId, apiKey: apiKey, lastUse: new Date().getTime() }
     );
 
-    // to not pollute the room metadata we remove all users that haven't logged in in the last month
+    // to not pollute the room metadata we remove all users that haven't logged-in in the last month
     const filteredUser = diceUser.filter((user) => {
         return user.lastUse > new Date().getTime() - 1000 * 60 * 60 * 24 * 30;
     });
@@ -39,6 +39,23 @@ export const updateRoomMetadataDiceRoom = async (room: RoomMetadata, slug: strin
     const dddiceMetadata: Metadata = {};
     dddiceMetadata["com.dddice/roomSlug"] = slug;
     await OBR.room.setMetadata({ ...dddiceMetadata });
+};
+
+export const getDiceUser = async (roller: ThreeDDice) => {
+    return (await roller.api?.user.get())?.data;
+};
+
+export const getDiceParticipant = async (roller: ThreeDDice, roomSlug: string | undefined, user?: IUser) => {
+    let diceUser: IUser | undefined = user;
+    if (diceUser === undefined) {
+        diceUser = await getDiceUser(roller);
+    }
+    if (diceUser && roomSlug) {
+        const diceRoom = (await roller.api?.room.get(roomSlug))?.data;
+        // @ts-ignore we test diceUser in the if above it will not be undefined
+        return diceRoom?.participants.find((p) => p.user.uuid === diceUser.uuid);
+    }
+    return undefined;
 };
 
 export const getApiKey = async (room: RoomMetadata | null) => {
@@ -93,17 +110,13 @@ export const getDiceRoom = async (roller: ThreeDDice, room: RoomMetadata | null)
 };
 
 export const prepareRoomUser = async (diceRoom: IRoom, roller: ThreeDDice) => {
-    const user = (await roller.api?.user.get())?.data;
-    if (user) {
-        const participant = diceRoom.participants.find((p) => p.user.uuid === user.uuid);
+    const participant = await getDiceParticipant(roller, diceRoom.slug);
+    const name = await OBR.player.getName();
 
-        const name = await OBR.player.getName();
-
-        if (participant && participant.username !== name) {
-            await roller.api?.room.updateParticipant(diceRoom.slug, participant.id, {
-                username: name,
-            });
-        }
+    if (participant && participant.username !== name) {
+        await roller.api?.room.updateParticipant(diceRoom.slug, participant.id, {
+            username: name,
+        });
     }
 };
 
@@ -132,4 +145,59 @@ export const addRollerCallbacks = async (
             });*/
         }
     });
+};
+
+export const removeRollerCallbacks = (roller: ThreeDDice) => {
+    roller.off(ThreeDDiceRollEvent.RollStarted);
+    roller.off(ThreeDDiceRollEvent.RollCreated);
+};
+
+export const dddiceLogin = async (
+    room: RoomMetadata | null,
+    roller: ThreeDDice,
+    canvas: HTMLCanvasElement | undefined
+) => {
+    const diceUser = await getDiceUser(roller);
+    const participant = await getDiceParticipant(roller, room?.diceRoom?.slug, diceUser);
+
+    if (diceUser && participant && room?.diceRoom?.slug) {
+        roller.api?.room.leave(room.diceRoom.slug, participant.id.toString());
+        removeRollerCallbacks(roller);
+    }
+
+    try {
+        if (canvas) {
+            roller.initialize(canvas, await getApiKey(room), {}, `HP Tracker - ${OBR.room.id}`);
+            const diceRoom = await getDiceRoom(roller, room);
+            if (diceRoom) {
+                const user = (await roller.api?.user.get())?.data;
+                if (user) {
+                    const participant = diceRoom.participants.find((p) => p.user.uuid === user.uuid);
+                    if (participant) {
+                        await prepareRoomUser(diceRoom, roller);
+                    } else {
+                        try {
+                            const userDiceRoom = (await roller?.api?.room.join(diceRoom.slug, diceRoom.passcode))?.data;
+                            if (userDiceRoom) {
+                                await prepareRoomUser(userDiceRoom, roller);
+                            }
+                        } catch {
+                            /**
+                             * if we already joined. We already check that when
+                             * looking if the user is a participant in the room,
+                             * but better be safe than sorry
+                             */
+                        }
+                    }
+                    roller.connect(diceRoom.slug, diceRoom.passcode, user.uuid);
+                }
+
+                roller.start();
+            }
+            return true;
+        }
+    } catch (e) {
+        return false;
+    }
+    return false;
 };

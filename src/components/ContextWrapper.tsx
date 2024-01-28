@@ -60,8 +60,6 @@ export const ContextWrapper = (props: ContextWrapperProps) => {
             OBR.room.onMetadataChange((metadata) => {
                 if (metadataKey in metadata) {
                     const newRoomMetadata = metadata[metadataKey] as RoomMetadata;
-                    if (room) {
-                    }
                     if (!room || !objectsEqual(newRoomMetadata, room)) {
                         setRoomMetadata(newRoomMetadata);
                     }

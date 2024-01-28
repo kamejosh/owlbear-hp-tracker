@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 // See https://usehooks.com/useLocalStorage
 export const useLocalStorage = <T>(key: string, initialValue: T) => {
@@ -46,6 +46,7 @@ export const useLocalStorage = <T>(key: string, initialValue: T) => {
 
 export const useInterval = (callback: Function, delay: number) => {
     const savedCallback = useRef<Function>();
+    const intervalIdRef = useRef<number>();
 
     // Remember the latest callback.
     useEffect(() => {
@@ -60,8 +61,25 @@ export const useInterval = (callback: Function, delay: number) => {
             }
         }
         if (delay !== null) {
-            let id = setInterval(tick, delay);
-            return () => clearInterval(id);
+            intervalIdRef.current = setInterval(tick, delay);
+            const id = intervalIdRef.current;
+            return () => {
+                clearInterval(id);
+            };
+        }
+    }, [delay]);
+
+    useEffect(() => {
+        const id = intervalIdRef.current;
+        return () => {
+            clearInterval(id);
+        };
+    }, []);
+
+    return useCallback(() => {
+        clearInterval(intervalIdRef.current);
+        if (savedCallback.current) {
+            intervalIdRef.current = setInterval(savedCallback.current, delay);
         }
     }, [delay]);
 };

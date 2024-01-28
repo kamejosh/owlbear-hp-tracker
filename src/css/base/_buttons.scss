@@ -96,6 +96,19 @@ button,
     display: inline-block;
     position: relative;
 
+    &.disabled {
+        .dice-button {
+            background-color: darkgrey;
+
+            &:hover,
+            &:focus {
+                svg {
+                    animation: none;
+                }
+            }
+        }
+    }
+
     .dice-button {
         display: inline-flex;
         align-items: center;

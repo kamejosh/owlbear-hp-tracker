@@ -3,10 +3,16 @@ import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { RollLog } from "./RollLog.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
-import { updateRoomMetadataApiKey, updateRoomMetadataDiceRoom } from "../../../helper/diceHelper.ts";
+import {
+    getDiceParticipant,
+    updateRoomMetadataApiKey,
+    updateRoomMetadataDiceRoom,
+} from "../../../helper/diceHelper.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { DiceSettings } from "./DiceSettings.tsx";
+import OBR from "@owlbear-rodeo/sdk";
+import { diceModal } from "../../../helper/variables.ts";
 
 export const DiceRoom = ({ className }: { className?: string }) => {
     const { room } = useMetadataContext();
@@ -68,16 +74,12 @@ export const DiceRoom = ({ className }: { className?: string }) => {
                                 className={"dddice-disconnect"}
                                 onClick={async () => {
                                     if (room && playerContext.id) {
-                                        const user = (await roller.api?.user.get())?.data;
-                                        if (user && room?.diceRoom?.slug) {
-                                            const diceRoom = (await roller.api?.room.get(room?.diceRoom?.slug))?.data;
-                                            const participant = diceRoom?.participants.find(
-                                                (p) => p.user.uuid === user.uuid
-                                            );
-                                            if (participant) {
-                                                roller.api?.room.leave(room.diceRoom.slug, participant.id.toString());
-                                            }
+                                        const participant = await getDiceParticipant(roller, room.diceRoom?.slug);
+
+                                        if (participant && room.diceRoom?.slug) {
+                                            roller.api?.room.leave(room.diceRoom.slug, participant.id.toString());
                                         }
+
                                         await updateRoomMetadataApiKey(room, undefined, playerContext.id);
                                         if (playerContext.role === "GM") {
                                             await updateRoomMetadataDiceRoom(room, undefined);
@@ -86,6 +88,20 @@ export const DiceRoom = ({ className }: { className?: string }) => {
                                 }}
                             >
                                 Logout
+                            </button>
+                            <button
+                                className={"dddice-login"}
+                                onClick={async () => {
+                                    const width = await OBR.viewport.getWidth();
+                                    const height = await OBR.viewport.getHeight();
+                                    await OBR.modal.open({
+                                        ...diceModal,
+                                        width: Math.min(400, width * 0.9),
+                                        height: Math.min(400, height * 0.9),
+                                    });
+                                }}
+                            >
+                                Login
                             </button>
                         </div>
                         <DiceSettings />

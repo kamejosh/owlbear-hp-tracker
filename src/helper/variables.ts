@@ -26,6 +26,11 @@ export const settingsModal: Modal = {
     url: "/modal.html?content=settings",
 };
 
+export const diceModal: Modal = {
+    id: modalId,
+    url: "/modal.html?content=dddice",
+};
+
 export const statblockPopover: Popover = {
     id: statblockPopoverId,
     url: "/statblock.html",
