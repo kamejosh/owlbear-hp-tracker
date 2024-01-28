@@ -3,6 +3,7 @@ import { useState } from "react";
 import { DiceButton, DiceButtonWrapper } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { getDamage } from "../../../helper/helpers.ts";
 import { SpellFilter } from "./SpellFilter.tsx";
+import { capitalize } from "lodash";
 
 type Spell = components["schemas"]["src__types__e5__Spell"];
 
@@ -37,7 +38,8 @@ const Spell = (props: { spell: Spell }) => {
                     </div>
                     {damage ? (
                         <span className={"spell-damage"}>
-                            Damage: <DiceButton dice={damage} text={damage} context={`${spell.name}: Damage`} />
+                            Damage:{" "}
+                            <DiceButton dice={damage} text={damage} context={`${capitalize(spell.name)}: Damage`} />
                         </span>
                     ) : null}
                     <div className={"spell-components"}>
@@ -93,11 +95,12 @@ const Spell = (props: { spell: Spell }) => {
                         </span>
                     </div>
                     <div className={"spell-description"}>
-                        <b>Description</b>: {DiceButtonWrapper(spell.desc, `${spell.name}`)}
+                        <b>Description</b>: {DiceButtonWrapper(spell.desc, `${capitalize(spell.name)}`)}
                     </div>
                     {!!spell.higher_level ? (
                         <div className={"spell-higher-level"}>
-                            <b>Higher Levels</b>: {DiceButtonWrapper(spell.higher_level, `${spell.name} higher level`)}
+                            <b>Higher Levels</b>:{" "}
+                            {DiceButtonWrapper(spell.higher_level, `${capitalize(spell.name)}: Higher Level`)}
                         </div>
                     ) : null}
                 </div>

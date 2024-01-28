@@ -10,7 +10,8 @@ import { E5Ability } from "./E5Ability.tsx";
 import { E5Spells } from "./E5Spells.tsx";
 import { PfSpells } from "./PfSpells.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
-import { DiceButton, DiceButtonWrapper } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { DiceButton } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { capitalize } from "lodash";
 
 const E5StatBlock = ({ slug }: { slug: string }) => {
     const statblockQuery = useE5GetStatblock(slug);
@@ -95,7 +96,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                                     text={Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
                                         Math.floor((value - 10) / 2)
                                     )}
-                                    context={`${stat} Check`}
+                                    context={`${capitalize(stat)} Check`}
                                 />
                             </div>
                         </div>
@@ -112,7 +113,11 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                                     return (
                                         <span className={"saving-throw"} key={key}>
                                             {key.substring(0, 3)}:{" "}
-                                            {DiceButtonWrapper("+" + value, `${key} saving-throw`)}
+                                            <DiceButton
+                                                dice={`d20+${value}`}
+                                                text={`+${value}`}
+                                                context={`${capitalize(key)} Save`}
+                                            />
                                         </span>
                                     );
                                 }
@@ -139,10 +144,15 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                                 return (
                                     <li className={"skill"} key={index}>
                                         <b>{key}</b>:{" "}
-                                        {DiceButtonWrapper(
-                                            Intl.NumberFormat("en-US", { signDisplay: "always" }).format(value),
-                                            `${key} check`
-                                        )}
+                                        <DiceButton
+                                            dice={`d20${Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
+                                                Math.floor(value)
+                                            )}`}
+                                            text={Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
+                                                Math.floor(value)
+                                            )}
+                                            context={`${capitalize(key)} Check`}
+                                        />
                                     </li>
                                 );
                             }
@@ -286,9 +296,16 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                 <span className={"speed"}>
                     <b>Speed</b> {statblock.speed}
                 </span>
-                <span className={"perception"}>
-                    <b>Perception</b> {DiceButtonWrapper(statblock.perception!, "perception Check")}
-                </span>
+                {statblock.perception ? (
+                    <span className={"perception"}>
+                        <b>Perception</b>{" "}
+                        <DiceButton
+                            dice={`d20${statblock.perception}`}
+                            text={statblock.perception}
+                            context={`Perception Check`}
+                        />
+                    </span>
+                ) : null}
             </div>
             <div className={"stats"}>
                 {Object.entries(statblock.stats).map(([stat, value]) => {
@@ -296,10 +313,15 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                         <div className={"stat"} key={stat}>
                             <div className={"stat-name"}>{stat.substring(0, 3)}</div>
                             <div className={"stat-value"}>
-                                {DiceButtonWrapper(
-                                    Intl.NumberFormat("en-US", { signDisplay: "always" }).format(value),
-                                    `${stat} Check`
-                                )}
+                                <DiceButton
+                                    dice={`d20${Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
+                                        Math.floor(value)
+                                    )}`}
+                                    text={Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
+                                        Math.floor(value)
+                                    )}
+                                    context={`${capitalize(stat)} Check`}
+                                />
                             </div>
                         </div>
                     );
@@ -315,7 +337,11 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                                     return (
                                         <li key={index}>
                                             <span className={"name"}>{key}</span>{" "}
-                                            {DiceButtonWrapper("+" + value, `${key} saving-throw`)}
+                                            <DiceButton
+                                                dice={`d20+${value}`}
+                                                text={`+${value}`}
+                                                context={`${capitalize(key)} Save`}
+                                            />
                                         </li>
                                     );
                                 }
@@ -329,11 +355,19 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                     <h3>Skills</h3>
                     <div className={"skill-list"}>
                         {statblock.skills?.map((skill) => {
+                            let value = skill.value;
+                            if (skill.value.includes(",")) {
+                                value = skill.value.split(",")[0];
+                            }
                             return (
                                 <div className={"skill"} key={skill.name}>
                                     <div className={"skill-name"}>{skill.name}</div>
                                     <div className={"skill-value"}>
-                                        {DiceButtonWrapper(skill.value, `${skill.name} Check`)}
+                                        <DiceButton
+                                            dice={`d20+${value}`}
+                                            text={value}
+                                            context={`${capitalize(skill.name)} Check`}
+                                        />
                                     </div>
                                 </div>
                             );

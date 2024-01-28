@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { DiceButtonWrapper } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { DiceButton, DiceButtonWrapper } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { getDamage } from "../../../helper/helpers.ts";
 import { PfSpell, usePfGetSpell } from "../../../ttrpgapi/pf/usePfApi.ts";
 import { components } from "../../../ttrpgapi/schema";
 import { SpellFilter } from "./SpellFilter.tsx";
+import { capitalize } from "lodash";
 
 export type PfSpellCategory = components["schemas"]["SpellCategoryOut"];
 export type PfSpellList = components["schemas"]["SpelllistOut"];
@@ -27,7 +28,7 @@ const Spell = (props: { spell: PfSpellOut }) => {
                     </div>
                     {damage ? (
                         <span className={"spell-damage"}>
-                            Damage: {DiceButtonWrapper(damage, `${spell?.name} Damage`)}
+                            Damage: {DiceButtonWrapper(damage, `${capitalize(spell?.name)} Damage`)}
                         </span>
                     ) : null}
                     {spell?.cast ? (
@@ -110,14 +111,18 @@ const Spell = (props: { spell: PfSpellOut }) => {
                         ) : null}
                     </div>
                     <div className={"spell-description"}>
-                        <b>Description</b>: {DiceButtonWrapper(spell?.description?.text || "", `${spell?.name}`)}
+                        <b>Description</b>:{" "}
+                        {DiceButtonWrapper(spell?.description?.text || "", `${capitalize(spell?.name)}`)}
                         {spell?.description?.details && spell.description.details.length > 0 ? (
                             <ul>
                                 {spell?.description.details.map((details, index) => {
                                     return (
                                         <li key={index}>
                                             <b>{details.title}</b>:{" "}
-                                            {DiceButtonWrapper(details.text, `${spell.name} ${details.title}`)}
+                                            {DiceButtonWrapper(
+                                                details.text,
+                                                `${capitalize(spell.name)} ${details.title}`
+                                            )}
                                         </li>
                                     );
                                 })}
@@ -132,10 +137,16 @@ const Spell = (props: { spell: PfSpellOut }) => {
                                     return (
                                         <div key={index}>
                                             <div className={"modifier"}>
-                                                {DiceButtonWrapper(heightened.modifier, `${spell.name} heightened`)}
+                                                {DiceButtonWrapper(
+                                                    heightened.modifier,
+                                                    `${capitalize(spell.name)}: Heightened`
+                                                )}
                                             </div>
                                             <div className={"description"}>
-                                                {DiceButtonWrapper(heightened.description, `${spell.name} heightened`)}
+                                                {DiceButtonWrapper(
+                                                    heightened.description,
+                                                    `${capitalize(spell.name)}: Heightened`
+                                                )}
                                             </div>
                                         </div>
                                     );
@@ -214,10 +225,11 @@ const PfSpellCategory = (props: { spellCategory: PfSpellCategory }) => {
                         {props.spellCategory.attack ? (
                             <span className={"text-roll"}>
                                 Attack:{" "}
-                                {DiceButtonWrapper(
-                                    "+" + props.spellCategory.attack,
-                                    `${props.spellCategory.name} Attack`
-                                )}
+                                <DiceButton
+                                    dice={`d20+${props.spellCategory.attack}`}
+                                    text={`+${props.spellCategory.attack}`}
+                                    context={`${capitalize(props.spellCategory.name)}: Attack`}
+                                />
                             </span>
                         ) : null}
                     </span>
