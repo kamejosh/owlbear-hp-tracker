@@ -3,21 +3,12 @@ import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { RollLog } from "./RollLog.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
-import {
-    getDiceParticipant,
-    updateRoomMetadataApiKey,
-    updateRoomMetadataDiceRoom,
-} from "../../../helper/diceHelper.ts";
-import { usePlayerContext } from "../../../context/PlayerContext.ts";
-import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { DiceSettings } from "./DiceSettings.tsx";
 import OBR from "@owlbear-rodeo/sdk";
 import { diceModal } from "../../../helper/variables.ts";
 
 export const DiceRoom = ({ className }: { className?: string }) => {
     const { room } = useMetadataContext();
-    const { roller } = useDiceRoller();
-    const playerContext = usePlayerContext();
     const { clear } = useRollLogContext();
     const [open, setOpen] = useState<boolean>(false);
 
