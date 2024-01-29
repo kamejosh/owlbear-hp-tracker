@@ -2,6 +2,7 @@
 
 + Refactor Settings and split them into Room and Scene Settings
 + Update Changelog -> Changelog can now be hidden by default so it won't be displayed on updates any longer (you might miss new features)
++ Add dice roller using dddice
 
 # 1.5.2
 

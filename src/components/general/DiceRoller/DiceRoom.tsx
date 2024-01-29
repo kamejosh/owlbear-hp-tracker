@@ -6,7 +6,6 @@ import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { DiceSettings } from "./DiceSettings.tsx";
 import OBR from "@owlbear-rodeo/sdk";
 import { diceModal } from "../../../helper/variables.ts";
-import { Logout } from "./Logout.tsx";
 
 export const DiceRoom = ({ className }: { className?: string }) => {
     const { room } = useMetadataContext();
@@ -62,7 +61,6 @@ export const DiceRoom = ({ className }: { className?: string }) => {
                             >
                                 clear
                             </button>
-                            <Logout />
                             <button
                                 className={"dddice-login"}
                                 onClick={async () => {
