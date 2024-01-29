@@ -1,5 +1,5 @@
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
-import { IDiceRoll, Operator, parseRollEquation } from "dddice-js";
+import { IDiceRoll, Operator } from "dddice-js";
 import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
@@ -7,6 +7,7 @@ import { dddiceRollToRollLog } from "../../../helper/helpers.ts";
 import { useComponentContext } from "../../../context/ComponentContext.tsx";
 import { useRef, useState } from "react";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
+import { diceToRoll } from "../../../helper/diceHelper.ts";
 
 type DiceButtonProps = {
     dice: string;
@@ -19,64 +20,8 @@ export const DiceButton = (props: DiceButtonProps) => {
     const { roller, initialized } = useDiceRoller();
     const { component } = useComponentContext();
     const [context, setContext] = useState<boolean>(false);
-    const playerContext = usePlayerContext();
     const rollButton = useRef<HTMLButtonElement>(null);
-
-    const diceToRoll = (diceString: string) => {
-        let dice: Array<IDiceRoll> = [];
-        let operator: Operator | undefined = undefined;
-        const theme = room?.diceUser?.find((user) => user.playerId === playerContext.id)?.diceTheme;
-
-        console.log(room?.diceUser);
-        console.log(theme);
-        if (props.dice.includes("d")) {
-            try {
-                const parsed = parseRollEquation(diceString, theme || "dddice-standard");
-                dice = parsed.dice;
-                operator = parsed.operator;
-            } catch {
-                const split = props.dice.split("d");
-                if (split.length === 2) {
-                    const amount = parseInt(split[0]);
-                    let die = split[1];
-
-                    if (die.includes("+")) {
-                        const parts = die.split("+");
-                        if (parts.length === 2) {
-                            die = parts[0];
-                            dice.push({
-                                type: "mod",
-                                theme: theme || "dddice-standard",
-                                value: parseInt(parts[1]),
-                            });
-                        }
-                    }
-
-                    if (die.includes("-")) {
-                        const parts = die.split("-");
-                        if (parts.length === 2) {
-                            die = parts[0];
-                            dice.push({
-                                type: "mod",
-                                theme: theme || "dddice-standard",
-                                value: parseInt(parts[1]) * -1,
-                            });
-                        }
-                    }
-
-                    for (let i = 0; i < amount; i++) {
-                        dice.splice(0, 0, { type: `d${parseInt(die)}`, theme: theme || "dddice-standard" });
-                    }
-                }
-            }
-        } else if (props.dice.startsWith("+") || props.dice.startsWith("-")) {
-            dice.push({ type: "d20", theme: theme || "dddice-standard" });
-            dice.push({ type: "mod", theme: theme || "dddice-standard", value: parseInt(props.dice) });
-        } else {
-            console.warn("found dice string that could not be parsed", props.dice);
-        }
-        return { dice, operator };
-    };
+    const playerContext = usePlayerContext();
 
     const getUserUuid = async () => {
         if (room?.diceRoom?.slug) {
@@ -104,15 +49,16 @@ export const DiceButton = (props: DiceButtonProps) => {
 
     const roll = async (modifier?: "ADV" | "DIS" | "SELF") => {
         const button = rollButton.current;
-        if (button) {
+        const theme = room?.diceUser?.find((user) => user.playerId === playerContext.id)?.diceTheme;
+        if (button && theme) {
             button.classList.add("rolling");
             let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined;
             if (modifier && modifier === "ADV") {
-                parsed = diceToRoll(addModifier(props.dice, "2d20kh1"));
+                parsed = diceToRoll(addModifier(props.dice, "2d20kh1"), theme);
             } else if (modifier && modifier === "DIS") {
-                parsed = diceToRoll(addModifier(props.dice, "2d20dh1"));
+                parsed = diceToRoll(addModifier(props.dice, "2d20dh1"), theme);
             } else {
-                parsed = diceToRoll(props.dice);
+                parsed = diceToRoll(props.dice, theme);
             }
             if (parsed) {
                 const roll = await roller.roll(parsed.dice, {

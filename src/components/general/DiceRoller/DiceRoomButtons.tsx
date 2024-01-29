@@ -2,11 +2,14 @@ import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useDiceButtonsContext } from "../../../context/DiceButtonContext.tsx";
 import { useEffect, useState } from "react";
-import { ITheme, parseRollEquation } from "dddice-js";
+import { IDiceRoll, ITheme, Operator, parseRollEquation } from "dddice-js";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { AddSvg } from "../../svgs/AddSvg.tsx";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
+import { diceToRoll } from "../../../helper/diceHelper.ts";
+import { dddiceRollToRollLog } from "../../../helper/helpers.ts";
+import { useComponentContext } from "../../../context/ComponentContext.tsx";
 
 type DiceRoomButtonsProps = {
     open: boolean;
@@ -21,9 +24,12 @@ type CustomDiceButtonProps = {
 const CustomDiceButton = (props: CustomDiceButtonProps) => {
     const { roller, initialized } = useDiceRoller();
     const { room } = useMetadataContext();
+    const { addRoll } = useRollLogContext();
     const { buttons, setButtons } = useDiceButtonsContext();
     const [theme, setTheme] = useState<ITheme | null>(null);
+    const { component } = useComponentContext();
     const playerContext = usePlayerContext();
+    const [hover, setHover] = useState<boolean>(false);
 
     useEffect(() => {
         const loadTheme = async () => {
@@ -38,9 +44,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
         if (initialized) {
             loadTheme();
         }
-    }, [initialized]);
-
-    console.log(props.dice);
+    }, [initialized, room]);
 
     const getDicePreview = () => {
         if (props.dice && theme) {
@@ -77,20 +81,61 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
         return <DiceSvg />;
     };
 
-    return (
-        <button
-            className={`button custom-dice dice-${props.button}`}
-            onClick={() => {
-                if (!props.dice && buttons.hasOwnProperty(props.button.toString())) {
-                    const newButton = {
-                        [props.button]: "1d4 2d6",
-                    };
-                    setButtons(newButton);
+    const roll = async (button: HTMLButtonElement) => {
+        button.classList.add("rolling");
+        if (theme && props.dice) {
+            let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined = diceToRoll(
+                props.dice,
+                theme.id
+            );
+            if (parsed) {
+                const roll = await roller.roll(parsed.dice, {
+                    operator: parsed.operator,
+                    external_id: component,
+                });
+                if (roll && roll.data) {
+                    const data = roll.data;
+                    addRoll(await dddiceRollToRollLog(data));
                 }
-            }}
-        >
-            {props.dice ? getDicePreview() : <AddSvg />}
-        </button>
+            }
+        }
+        button.classList.remove("rolling");
+        button.blur();
+    };
+
+    return (
+        <div className={"custom-dice-wrapper"} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
+            <button
+                className={`button custom-dice dice-${props.button}`}
+                onClick={async (e) => {
+                    if (!props.dice && buttons.hasOwnProperty(props.button.toString())) {
+                        const newButton = {
+                            [props.button]: "1d4 2d6",
+                        };
+                        setButtons(newButton);
+                    } else if (props.dice) {
+                        await roll(e.currentTarget);
+                    }
+                }}
+            >
+                {props.dice ? getDicePreview() : <AddSvg />}
+            </button>
+            {props.dice ? (
+                <button
+                    className={`remove-dice ${hover ? "hover" : ""}`}
+                    onClick={() => {
+                        if (props.dice && buttons.hasOwnProperty(props.button.toString())) {
+                            const newButton = {
+                                [props.button]: null,
+                            };
+                            setButtons(newButton);
+                        }
+                    }}
+                >
+                    x
+                </button>
+            ) : null}
+        </div>
     );
 };
 

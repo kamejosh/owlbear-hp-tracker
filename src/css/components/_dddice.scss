@@ -33,15 +33,10 @@
     .dice-room-buttons {
         display: flex;
 
-        .custom-dice {
+        .custom-dice-wrapper {
+            position: relative;
             align-self: flex-end;
             order: 3;
-            translate: 0 1px;
-            transition: all 0.25s ease;
-            border-bottom: none;
-            border-bottom-right-radius: 0;
-            border-bottom-left-radius: 0;
-            height: 40px;
 
             &:nth-child(-n + 4) {
                 order: 1;
@@ -49,21 +44,56 @@
 
             &:hover,
             &:focus-visible {
-                height: 45px;
+                .custom-dice {
+                    height: 45px;
+                }
             }
 
-            .add-svg {
-                fill: white;
+            .custom-dice {
+                translate: 0 1px;
+                transition: all 0.25s ease;
+                border-bottom: none;
+                border-bottom-right-radius: 0;
+                border-bottom-left-radius: 0;
+                padding-inline: 0;
+                height: 40px;
+
+                .add-svg {
+                    fill: white;
+                }
+
+                .custom-dice-preview-wrapper {
+                    display: flex;
+                    flex-wrap: wrap;
+                    justify-content: space-around;
+                    max-width: 45px;
+
+                    .preview-image {
+                        height: 20px;
+                        object-fit: contain;
+                    }
+                }
             }
 
-            .custom-dice-preview-wrapper {
-                display: flex;
-                flex-wrap: wrap;
-                max-width: 45px;
+            .remove-dice {
+                position: absolute;
+                top: 0;
+                right: 0;
+                translate: -50% 0;
+                visibility: hidden;
+                opacity: 0;
+                z-index: 100;
+                transition: all 0.25s ease;
 
-                .preview-image {
-                    height: 20px;
-                    object-fit: contain;
+                &.hover {
+                    translate: 25% 0;
+                    visibility: visible;
+                    opacity: 1;
+                }
+
+                &:hover {
+                    border-color: red;
+                    background-color: rgb(79, 33, 36);
                 }
             }
         }

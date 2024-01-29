@@ -1,7 +1,16 @@
 import { RoomMetadata } from "./types.ts";
 import { dddiceRollToRollLog, updateRoomMetadata } from "./helpers.ts";
 import OBR, { Metadata } from "@owlbear-rodeo/sdk";
-import { IRoom, IUser, ThreeDDice, ThreeDDiceAPI, ThreeDDiceRollEvent } from "dddice-js";
+import {
+    IDiceRoll,
+    IRoom,
+    IUser,
+    Operator,
+    parseRollEquation,
+    ThreeDDice,
+    ThreeDDiceAPI,
+    ThreeDDiceRollEvent,
+} from "dddice-js";
 import { RollLogEntryType } from "../context/RollLogContext.tsx";
 
 export const updateRoomMetadataDiceUser = async (
@@ -226,4 +235,57 @@ export const dddiceLogin = async (
         return false;
     }
     return false;
+};
+
+export const diceToRoll = (diceString: string, theme: string) => {
+    let dice: Array<IDiceRoll> = [];
+    let operator: Operator | undefined = undefined;
+
+    if (diceString.includes("d")) {
+        try {
+            const parsed = parseRollEquation(diceString, theme || "dddice-standard");
+            dice = parsed.dice;
+            operator = parsed.operator;
+        } catch {
+            const split = diceString.split("d");
+            if (split.length === 2) {
+                const amount = parseInt(split[0]);
+                let die = split[1];
+
+                if (die.includes("+")) {
+                    const parts = die.split("+");
+                    if (parts.length === 2) {
+                        die = parts[0];
+                        dice.push({
+                            type: "mod",
+                            theme: theme || "dddice-standard",
+                            value: parseInt(parts[1]),
+                        });
+                    }
+                }
+
+                if (die.includes("-")) {
+                    const parts = die.split("-");
+                    if (parts.length === 2) {
+                        die = parts[0];
+                        dice.push({
+                            type: "mod",
+                            theme: theme || "dddice-standard",
+                            value: parseInt(parts[1]) * -1,
+                        });
+                    }
+                }
+
+                for (let i = 0; i < amount; i++) {
+                    dice.splice(0, 0, { type: `d${parseInt(die)}`, theme: theme || "dddice-standard" });
+                }
+            }
+        }
+    } else if (diceString.startsWith("+") || diceString.startsWith("-")) {
+        dice.push({ type: "d20", theme: theme || "dddice-standard" });
+        dice.push({ type: "mod", theme: theme || "dddice-standard", value: parseInt(diceString) });
+    } else {
+        console.warn("found dice string that could not be parsed", diceString);
+    }
+    return { dice, operator };
 };
