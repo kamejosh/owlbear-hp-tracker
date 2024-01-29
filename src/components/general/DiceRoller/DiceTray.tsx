@@ -54,8 +54,8 @@ export const DiceTray = ({ classes }: { classes: string }) => {
 
     return (
         <>
-            <canvas ref={canvasRef} id={"DiceCanvas"} className={classes}></canvas>
             <DiceRoom className={classes} />
+            <canvas ref={canvasRef} id={"DiceCanvas"} className={classes}></canvas>
         </>
     );
 };

@@ -40,13 +40,13 @@ export const DiceSettings = () => {
                         roller.loadTheme(newTheme);
                         setValidTheme(true);
                         setTheme(newTheme);
+                    } else {
+                        if (input) {
+                            input.value = theme?.id || "";
+                        }
+                        setError("error updating theme");
+                        setValidTheme(false);
                     }
-                } else {
-                    if (input) {
-                        input.value = theme?.id || "";
-                    }
-                    setError("error updating theme");
-                    setValidTheme(false);
                 }
             }
         } catch {

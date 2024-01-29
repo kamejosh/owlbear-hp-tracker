@@ -23,35 +23,76 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
     width: 100svw;
     overflow: hidden;
 
-    .open-dice-tray {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        translate: 0 1px;
-        z-index: 2000;
-        transition: all 0.25s ease-in-out;
-        box-shadow: 0 -5px 25px #1c1b22;
-        border-bottom: 1px solid #1c1b22;
-        border-bottom-right-radius: 0;
-        border-bottom-left-radius: 0;
-        width: 40px;
-        height: 40px;
+    button:not(.dice-button) {
+        background-color: #211f28;
+    }
 
-        .dice-svg {
-            width: 30px;
+    .dice-room-buttons {
+        display: flex;
+
+        .custom-dice {
+            align-self: flex-end;
+            order: 3;
+            translate: 0 1px;
+            transition: all 0.25s ease;
+            border-bottom: none;
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 0;
+            height: 40px;
+
+            &:nth-child(-n + 4) {
+                order: 1;
+            }
+
+            &:hover,
+            &:focus-visible {
+                height: 45px;
+            }
+
+            .add-svg {
+                fill: white;
+            }
+
+            .custom-dice-preview-wrapper {
+                display: flex;
+                flex-wrap: wrap;
+                max-width: 45px;
+
+                .preview-image {
+                    height: 20px;
+                    object-fit: contain;
+                }
+            }
         }
 
-        &:hover,
-        &:focus {
-            background-color: white;
+        .open-dice-tray {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            order: 2;
+            translate: 0 1px;
+            transition: all 0.25s ease-in-out;
+            border-bottom: 1px solid #211f28;
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 0;
+            width: 45px;
             height: 45px;
 
             .dice-svg {
-                fill: black;
+                width: 30px;
+            }
+
+            &:hover,
+            &:focus {
+                background-color: white;
+                height: 50px;
+
+                .dice-svg {
+                    fill: black;
+                }
             }
         }
     }
@@ -73,7 +114,8 @@
         display: grid;
         grid-template-rows: 0fr;
         transition: all 0.25s ease-in-out;
-        border-top: 1px solid #1c1b22;
+        box-shadow: 0 -15px 25px #211f28;
+        border-top: 1px solid #211f28;
         width: 100%;
         overflow: hidden;
 
@@ -82,7 +124,7 @@
             overflow-y: auto;
 
             .dice-tray-content {
-                background-color: #1c1b22;
+                background-color: #211f28;
                 padding: 10px 20px;
 
                 .top {

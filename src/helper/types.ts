@@ -64,7 +64,6 @@ export type RoomMetadata = {
         apiKey: string | undefined;
         lastUse: number;
         diceTheme: string;
-        diceButtons: Array<string>;
     }>;
 };
 

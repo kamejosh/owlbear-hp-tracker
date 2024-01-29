@@ -10,7 +10,6 @@ export const updateRoomMetadataDiceUser = async (
     options?: {
         apiKey?: string;
         diceTheme?: string;
-        diceButtons?: Array<string>;
     }
 ) => {
     const diceUser: Array<{
@@ -18,7 +17,6 @@ export const updateRoomMetadataDiceUser = async (
         apiKey: string | undefined;
         lastUse: number;
         diceTheme: string;
-        diceButtons: Array<string>;
     }> = room.diceUser === undefined ? [] : room.diceUser;
 
     let apiKey = options?.apiKey;
@@ -33,7 +31,6 @@ export const updateRoomMetadataDiceUser = async (
             apiKey: options?.apiKey ?? user.apiKey,
             lastUse: new Date().getTime(),
             diceTheme: options?.diceTheme ?? user.diceTheme ?? "silvie-lr1gjqod",
-            diceButtons: options?.diceButtons ?? user.diceButtons ?? [],
         });
     } else {
         diceUser.push({
@@ -41,7 +38,6 @@ export const updateRoomMetadataDiceUser = async (
             apiKey: options?.apiKey,
             lastUse: new Date().getTime(),
             diceTheme: options?.diceTheme ?? "silvie-lr1gjqod",
-            diceButtons: options?.diceButtons ?? [],
         });
     }
 

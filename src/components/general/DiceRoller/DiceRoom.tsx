@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { RollLog } from "./RollLog.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { DiceSettings } from "./DiceSettings.tsx";
 import OBR from "@owlbear-rodeo/sdk";
 import { diceModal } from "../../../helper/variables.ts";
+import { DiceRoomButtons } from "./DiceRoomButtons.tsx";
 
 export const DiceRoom = ({ className }: { className?: string }) => {
     const { room } = useMetadataContext();
@@ -14,17 +14,7 @@ export const DiceRoom = ({ className }: { className?: string }) => {
 
     return (
         <div className={`dice-room ${className} ${open ? "open" : "closed"}`}>
-            <button
-                className={`open-dice-tray button icon ${open ? "open" : "closed"}`}
-                onClick={(e) => {
-                    setOpen(!open);
-                    useRollLogContext.persist.rehydrate();
-                    e.currentTarget.blur();
-                }}
-            >
-                <DiceSvg />
-            </button>
-
+            <DiceRoomButtons open={open} setOpen={setOpen} />
             <div className={"dice-tray-wrapper"}>
                 <div className={`dice-tray ${open ? "open" : "closed"}`}>
                     <div className={"dice-tray-content"}>
