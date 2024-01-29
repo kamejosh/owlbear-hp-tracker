@@ -32,7 +32,7 @@ export const updateRoomMetadataDiceUser = async (
             playerId: playerId,
             apiKey: options?.apiKey ?? user.apiKey,
             lastUse: new Date().getTime(),
-            diceTheme: options?.diceTheme ?? user.diceTheme ?? "silvie-lr1gjgod",
+            diceTheme: options?.diceTheme ?? user.diceTheme ?? "silvie-lr1gjqod",
             diceButtons: options?.diceButtons ?? user.diceButtons ?? [],
         });
     } else {
@@ -50,25 +50,25 @@ export const updateRoomMetadataDiceUser = async (
         return user.lastUse > new Date().getTime() - 1000 * 60 * 60 * 24 * 30;
     });
 
-    await updateRoomMetadata(room, { diceUser: filteredUser });
-
     // to keep in sync with dddice I save the dddice metadata as well (Approved by CelesteBloodreign)
     const dddiceMetadata: Metadata = {};
     dddiceMetadata[`com.dddice/${playerId}`] = apiKey;
-    await OBR.room.setMetadata({ ...dddiceMetadata });
+    await updateRoomMetadata(room, { diceUser: filteredUser }, dddiceMetadata);
 };
 
 export const updateRoomMetadataDiceRoom = async (room: RoomMetadata, slug: string | undefined) => {
-    await updateRoomMetadata(room, {
-        diceRoom: {
-            slug: slug,
-        },
-    });
-
     // to keep in sync with dddice I save the dddice metadata as well (Approved by CelesteBloodreign)
     const dddiceMetadata: Metadata = {};
     dddiceMetadata["com.dddice/roomSlug"] = slug;
-    await OBR.room.setMetadata({ ...dddiceMetadata });
+    await updateRoomMetadata(
+        room,
+        {
+            diceRoom: {
+                slug: slug,
+            },
+        },
+        dddiceMetadata
+    );
 };
 
 export const getDiceUser = async (roller: ThreeDDice) => {

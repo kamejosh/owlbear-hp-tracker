@@ -188,12 +188,15 @@ export const updateSceneMetadata = async (scene: SceneMetadata | null, data: Par
     }
 };
 
-export const updateRoomMetadata = async (room: RoomMetadata | null, data: Partial<RoomMetadata>) => {
-    const ownMetadata: Metadata = {};
+export const updateRoomMetadata = async (
+    room: RoomMetadata | null,
+    data: Partial<RoomMetadata>,
+    additionalData?: Metadata
+) => {
+    const ownMetadata: Metadata = additionalData ?? {};
     ownMetadata[metadataKey] = { ...room, ...data };
 
     if (!room || !objectsEqual(ownMetadata, room)) {
-        console.log("set metadata");
         await OBR.room.setMetadata({ ...ownMetadata });
     }
 };

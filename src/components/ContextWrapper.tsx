@@ -45,13 +45,11 @@ export const ContextWrapper = (props: ContextWrapperProps) => {
             }
             const roomMetadata = await OBR.room.getMetadata();
             if (metadataKey in roomMetadata) {
-                console.log(roomMetadata[metadataKey]);
                 setRoomMetadata(roomMetadata[metadataKey] as RoomMetadata);
             }
         };
 
         if (isReady) {
-            console.log("isReady");
             setMetadata();
             const unsubSceneMetadataChange = OBR.scene.onMetadataChange((metadata) => {
                 if (metadataKey in metadata) {
@@ -67,17 +65,12 @@ export const ContextWrapper = (props: ContextWrapperProps) => {
                 if (metadataKey in metadata) {
                     const newRoomMetadata = metadata[metadataKey] as RoomMetadata;
                     const roomState = useMetadataContext.getState().room;
-                    if (roomState) {
-                        console.log(newRoomMetadata, roomState, objectsEqual(newRoomMetadata, roomState));
-                    }
                     if (!roomState || !objectsEqual(newRoomMetadata, roomState)) {
-                        console.log("update room metadata");
                         setRoomMetadata(newRoomMetadata);
                     }
                 }
             });
             return () => {
-                console.log("unsubscribe");
                 unsubRoomMetadataChange();
                 unsubSceneMetadataChange();
             };
