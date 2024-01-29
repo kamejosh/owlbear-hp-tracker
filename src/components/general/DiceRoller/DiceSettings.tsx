@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { updateRoomMetadataDiceUser } from "../../../helper/diceHelper.ts";
-import { has } from "lodash";
 
 export const DiceSettings = () => {
     const { room } = useMetadataContext();
@@ -74,6 +73,14 @@ export const DiceSettings = () => {
         }
     }, [initialized]);
 
+    useEffect(() => {
+        if (error) {
+            setTimeout(() => {
+                setError(null);
+            }, 5000);
+        }
+    }, [error]);
+
     const getThemePreview = () => {
         if (theme?.preview) {
             if (Object.keys(theme.preview).includes("d20")) {
@@ -116,6 +123,7 @@ export const DiceSettings = () => {
                 />
                 {theme ? getThemePreview() : null}
             </div>
+            {error ? <span>{error}</span> : null}
         </div>
     );
 };
