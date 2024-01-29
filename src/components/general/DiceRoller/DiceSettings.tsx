@@ -3,23 +3,31 @@ import { updateRoomMetadata } from "../../../helper/helpers.ts";
 import { ITheme } from "dddice-js";
 import { useEffect, useState } from "react";
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
+import { usePlayerContext } from "../../../context/PlayerContext.ts";
+import { updateRoomMetadataDiceUser } from "../../../helper/diceHelper.ts";
 
 export const DiceSettings = () => {
     const { room } = useMetadataContext();
-    const { roller } = useDiceRoller();
+    const { roller, initialized } = useDiceRoller();
+    const playerContext = usePlayerContext();
     const [validTheme, setValidTheme] = useState<boolean>(true);
     const [theme, setTheme] = useState<ITheme>();
     const [searching, setSearching] = useState<boolean>(false);
 
     const findAndSetTheme = async (searchTheme: string, input?: HTMLInputElement) => {
+        console.log(searchTheme);
         try {
             setSearching(true);
             const newTheme = (await roller.api?.theme.get(searchTheme))?.data;
             if (newTheme && newTheme.id !== theme?.id) {
-                await updateRoomMetadata(room, { diceTheme: newTheme.id });
-                setValidTheme(true);
+                console.log(room, playerContext.id);
+                if (room && playerContext.id) {
+                    await updateRoomMetadataDiceUser(room, playerContext.id, { diceTheme: newTheme.id });
+                }
                 roller.loadTheme(newTheme);
+                setValidTheme(true);
                 setTheme(newTheme);
+                console.log("setTheme done");
             }
         } catch {
             if (input) {
@@ -33,15 +41,16 @@ export const DiceSettings = () => {
 
     useEffect(() => {
         const initTheme = async () => {
-            if (room?.diceTheme) {
-                await findAndSetTheme(room.diceTheme);
+            const themeId = room?.diceUser?.find((user) => user.playerId === playerContext.id)?.diceTheme;
+            if (themeId) {
+                await findAndSetTheme(themeId);
             }
         };
 
-        if (roller.api) {
+        if (initialized) {
             initTheme();
         }
-    }, [roller.api, room?.diceTheme]);
+    }, [initialized]);
 
     const getThemePreview = () => {
         if (theme?.preview) {
@@ -73,7 +82,7 @@ export const DiceSettings = () => {
                 <input
                     className={"theme-input"}
                     type={"text"}
-                    defaultValue={room?.diceTheme}
+                    defaultValue={room?.diceUser?.find((user) => user.playerId === playerContext.id)?.diceTheme}
                     onKeyDown={async (e) => {
                         if (e.key === "Enter") {
                             await findAndSetTheme(e.currentTarget.value, e.currentTarget);

@@ -4,16 +4,46 @@ import OBR, { Metadata } from "@owlbear-rodeo/sdk";
 import { IRoom, IUser, ThreeDDice, ThreeDDiceAPI, ThreeDDiceRollEvent } from "dddice-js";
 import { RollLogEntryType } from "../context/RollLogContext.tsx";
 
-export const updateRoomMetadataApiKey = async (room: RoomMetadata, apiKey: string | undefined, playerId: string) => {
-    const diceUser: Array<{ playerId: string; apiKey: string | undefined; lastUse: number }> =
-        room.diceUser === undefined ? [] : room.diceUser;
+export const updateRoomMetadataDiceUser = async (
+    room: RoomMetadata,
+    playerId: string,
+    options?: {
+        apiKey?: string;
+        diceTheme?: string;
+        diceButtons?: Array<string>;
+    }
+) => {
+    const diceUser: Array<{
+        playerId: string;
+        apiKey: string | undefined;
+        lastUse: number;
+        diceTheme: string;
+        diceButtons: Array<string>;
+    }> = room.diceUser === undefined ? [] : room.diceUser;
 
-    // This first removes the current entry for the user if it finds it and replaces it with updated apiKey and lastUser timestamp
-    diceUser.splice(
-        diceUser.findIndex((user) => user.playerId === playerId),
-        1,
-        { playerId: playerId, apiKey: apiKey, lastUse: new Date().getTime() }
-    );
+    let apiKey = options?.apiKey;
+
+    // This first removes the current entry for the user if it finds it
+    const index = diceUser.findIndex((user) => user.playerId === playerId);
+    if (index >= 0) {
+        const user = diceUser[index];
+        apiKey = options?.apiKey ?? user.apiKey;
+        diceUser.splice(index, 1, {
+            playerId: playerId,
+            apiKey: options?.apiKey ?? user.apiKey,
+            lastUse: new Date().getTime(),
+            diceTheme: options?.diceTheme ?? user.diceTheme ?? "silvie-lr1gjgod",
+            diceButtons: options?.diceButtons ?? user.diceButtons ?? [],
+        });
+    } else {
+        diceUser.push({
+            playerId: playerId,
+            apiKey: options?.apiKey,
+            lastUse: new Date().getTime(),
+            diceTheme: options?.diceTheme ?? "silvie-lr1gjqod",
+            diceButtons: options?.diceButtons ?? [],
+        });
+    }
 
     // to not pollute the room metadata we remove all users that haven't logged-in in the last month
     const filteredUser = diceUser.filter((user) => {
@@ -74,7 +104,7 @@ export const getApiKey = async (room: RoomMetadata | null) => {
     }
 
     if (room) {
-        await updateRoomMetadataApiKey(room, apiKey, playerId);
+        await updateRoomMetadataDiceUser(room, playerId, { apiKey: apiKey });
     }
 
     return apiKey;
@@ -122,12 +152,12 @@ export const prepareRoomUser = async (diceRoom: IRoom, roller: ThreeDDice) => {
 
 export const addRollerCallbacks = async (
     roller: ThreeDDice,
-    name: string | null,
     addRoll: (entry: RollLogEntryType) => void,
     component: string | undefined
 ) => {
     roller.on(ThreeDDiceRollEvent.RollStarted, async (e) => {
         const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
+        const name = await OBR.player.getName();
 
         if (participant && participant.username !== name) {
             addRoll(await dddiceRollToRollLog(e, participant));

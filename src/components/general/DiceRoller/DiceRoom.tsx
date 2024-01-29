@@ -6,6 +6,7 @@ import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { DiceSettings } from "./DiceSettings.tsx";
 import OBR from "@owlbear-rodeo/sdk";
 import { diceModal } from "../../../helper/variables.ts";
+import { Logout } from "./Logout.tsx";
 
 export const DiceRoom = ({ className }: { className?: string }) => {
     const { room } = useMetadataContext();
@@ -61,25 +62,7 @@ export const DiceRoom = ({ className }: { className?: string }) => {
                             >
                                 clear
                             </button>
-                            {/*                            <button
-                                className={"dddice-disconnect"}
-                                onClick={async () => {
-                                    if (room && playerContext.id) {
-                                        const participant = await getDiceParticipant(roller, room.diceRoom?.slug);
-
-                                        if (participant && room.diceRoom?.slug) {
-                                            roller.api?.room.leave(room.diceRoom.slug, participant.id.toString());
-                                        }
-
-                                        await updateRoomMetadataApiKey(room, undefined, playerContext.id);
-                                        if (playerContext.role === "GM") {
-                                            await updateRoomMetadataDiceRoom(room, undefined);
-                                        }
-                                    }
-                                }}
-                            >
-                                Logout
-                            </button>*/}
+                            <Logout />
                             <button
                                 className={"dddice-login"}
                                 onClick={async () => {

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import OBR from "@owlbear-rodeo/sdk";
 import { modalId } from "../../../helper/variables.ts";
 import { useInterval } from "../../../helper/hooks.ts";
-import { updateRoomMetadataApiKey } from "../../../helper/diceHelper.ts";
+import { updateRoomMetadataDiceUser } from "../../../helper/diceHelper.ts";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 
@@ -50,7 +50,7 @@ export const DiceLogin = () => {
                 if (response.status === 200) {
                     const data = (await response.json()).data;
                     if (data.token && room && playerContext.id) {
-                        await updateRoomMetadataApiKey(room, data.token, playerContext.id);
+                        await updateRoomMetadataDiceUser(room, playerContext.id, { apiKey: data.token });
                         OBR.modal.close(modalId);
                     }
                 }

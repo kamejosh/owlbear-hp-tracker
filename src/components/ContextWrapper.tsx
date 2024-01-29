@@ -45,30 +45,42 @@ export const ContextWrapper = (props: ContextWrapperProps) => {
             }
             const roomMetadata = await OBR.room.getMetadata();
             if (metadataKey in roomMetadata) {
+                console.log(roomMetadata[metadataKey]);
                 setRoomMetadata(roomMetadata[metadataKey] as RoomMetadata);
             }
+        };
 
-            OBR.scene.onMetadataChange((metadata) => {
+        if (isReady) {
+            console.log("isReady");
+            setMetadata();
+            const unsubSceneMetadataChange = OBR.scene.onMetadataChange((metadata) => {
                 if (metadataKey in metadata) {
                     const newSceneMetadata = metadata[metadataKey] as SceneMetadata;
-                    if (!scene || !objectsEqual(newSceneMetadata, scene)) {
+                    const sceneState = useMetadataContext.getState().scene;
+                    if (!sceneState || !objectsEqual(newSceneMetadata, sceneState)) {
                         setSceneMetadata(newSceneMetadata);
                     }
                 }
             });
 
-            OBR.room.onMetadataChange((metadata) => {
+            const unsubRoomMetadataChange = OBR.room.onMetadataChange((metadata) => {
                 if (metadataKey in metadata) {
                     const newRoomMetadata = metadata[metadataKey] as RoomMetadata;
-                    if (!room || !objectsEqual(newRoomMetadata, room)) {
+                    const roomState = useMetadataContext.getState().room;
+                    if (roomState) {
+                        console.log(newRoomMetadata, roomState, objectsEqual(newRoomMetadata, roomState));
+                    }
+                    if (!roomState || !objectsEqual(newRoomMetadata, roomState)) {
+                        console.log("update room metadata");
                         setRoomMetadata(newRoomMetadata);
                     }
                 }
             });
-        };
-
-        if (isReady) {
-            setMetadata();
+            return () => {
+                console.log("unsubscribe");
+                unsubRoomMetadataChange();
+                unsubSceneMetadataChange();
+            };
         }
     }, [isReady]);
 

@@ -42,7 +42,7 @@ export const DiceTray = ({ classes }: { classes: string }) => {
             if (canvasRef.current) {
                 setInitialized(false);
                 await dddiceLogin(room, roller, canvasRef.current);
-                await addRollerCallbacks(roller, playerContext.name, addRoll, component);
+                await addRollerCallbacks(roller, addRoll, component);
                 setInitialized(true);
             }
         };

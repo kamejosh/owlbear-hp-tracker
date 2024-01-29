@@ -59,8 +59,13 @@ export type RoomMetadata = {
     ignoreUpdateNotification?: boolean;
     diceRoom?: { slug: string | undefined };
     diceRendering?: boolean;
-    diceUser?: Array<{ playerId: string; apiKey: string | undefined; lastUse: number }>;
-    diceTheme?: string;
+    diceUser?: Array<{
+        playerId: string;
+        apiKey: string | undefined;
+        lastUse: number;
+        diceTheme: string;
+        diceButtons: Array<string>;
+    }>;
 };
 
 export type AttachmentMetadata = {

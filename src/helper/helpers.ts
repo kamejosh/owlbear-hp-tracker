@@ -163,7 +163,8 @@ export const objectsEqual = (obj1: Object, obj2: Object) => {
         return false;
     }
 
-    keys1.forEach((key) => {
+    // a forEach loop is not disrupted by a return
+    for (const key of keys1) {
         // @ts-ignore obj1 has key
         const val1 = obj1[key];
         // @ts-ignore obj1 has key
@@ -173,7 +174,7 @@ export const objectsEqual = (obj1: Object, obj2: Object) => {
         if ((areObjects && !objectsEqual(val1, val2)) || (!areObjects && val1 !== val2)) {
             return false;
         }
-    });
+    }
 
     return true;
 };
@@ -182,14 +183,19 @@ export const updateSceneMetadata = async (scene: SceneMetadata | null, data: Par
     const ownMetadata: Metadata = {};
     ownMetadata[metadataKey] = { ...scene, ...data };
 
-    await OBR.scene.setMetadata({ ...ownMetadata });
+    if (!scene || !objectsEqual(ownMetadata, scene)) {
+        await OBR.scene.setMetadata({ ...ownMetadata });
+    }
 };
 
 export const updateRoomMetadata = async (room: RoomMetadata | null, data: Partial<RoomMetadata>) => {
     const ownMetadata: Metadata = {};
     ownMetadata[metadataKey] = { ...room, ...data };
 
-    await OBR.room.setMetadata({ ...ownMetadata });
+    if (!room || !objectsEqual(ownMetadata, room)) {
+        console.log("set metadata");
+        await OBR.room.setMetadata({ ...ownMetadata });
+    }
 };
 
 export const dddiceRollToRollLog = async (roll: IRoll, participant?: IRoomParticipant): Promise<RollLogEntryType> => {
