@@ -1,6 +1,6 @@
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { updateRoomMetadata } from "../../../helper/helpers.ts";
-import { IAvailableDie, ITheme } from "dddice-js";
+import { IAvailableDie } from "dddice-js";
 import { useEffect, useState } from "react";
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
@@ -8,10 +8,9 @@ import { updateRoomMetadataDiceUser } from "../../../helper/diceHelper.ts";
 
 export const DiceSettings = () => {
     const { room } = useMetadataContext();
-    const { roller, initialized } = useDiceRoller();
+    const { roller, initialized, theme, setTheme } = useDiceRoller();
     const playerContext = usePlayerContext();
     const [validTheme, setValidTheme] = useState<boolean>(true);
-    const [theme, setTheme] = useState<ITheme>();
     const [searching, setSearching] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 

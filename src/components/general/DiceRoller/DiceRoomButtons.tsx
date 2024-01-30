@@ -1,15 +1,14 @@
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
-import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useDiceButtonsContext } from "../../../context/DiceButtonContext.tsx";
-import { useEffect, useState } from "react";
-import { IDiceRoll, ITheme, Operator, parseRollEquation } from "dddice-js";
-import { usePlayerContext } from "../../../context/PlayerContext.ts";
+import { useEffect, useRef, useState } from "react";
+import { IDiceRoll, Operator, parseRollEquation } from "dddice-js";
 import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { AddSvg } from "../../svgs/AddSvg.tsx";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { diceToRoll } from "../../../helper/diceHelper.ts";
 import { dddiceRollToRollLog } from "../../../helper/helpers.ts";
 import { useComponentContext } from "../../../context/ComponentContext.tsx";
+import tippy from "tippy.js";
 
 type DiceRoomButtonsProps = {
     open: boolean;
@@ -22,29 +21,20 @@ type CustomDiceButtonProps = {
 };
 
 const CustomDiceButton = (props: CustomDiceButtonProps) => {
-    const { roller, initialized } = useDiceRoller();
-    const { room } = useMetadataContext();
+    const { roller, theme } = useDiceRoller();
     const { addRoll } = useRollLogContext();
     const { buttons, setButtons } = useDiceButtonsContext();
-    const [theme, setTheme] = useState<ITheme | null>(null);
     const { component } = useComponentContext();
-    const playerContext = usePlayerContext();
     const [hover, setHover] = useState<boolean>(false);
+    const buttonRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
-        const loadTheme = async () => {
-            const themeId = room?.diceUser?.find((user) => user.playerId === playerContext.id)?.diceTheme;
-            if (themeId) {
-                const newTheme = (await roller.api?.theme.get(themeId))?.data;
-                if (newTheme && newTheme.id !== theme?.id) {
-                    setTheme(newTheme);
-                }
-            }
-        };
-        if (initialized) {
-            loadTheme();
+        if (buttonRef.current) {
+            tippy(buttonRef.current, {
+                content: props.dice || "Add new custom dice roll",
+            });
         }
-    }, [initialized, room]);
+    }, [buttonRef.current]);
 
     const getDicePreview = () => {
         if (props.dice && theme) {
@@ -106,6 +96,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
     return (
         <div className={"custom-dice-wrapper"} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
             <button
+                ref={buttonRef}
                 className={`button custom-dice dice-${props.button}`}
                 onClick={async (e) => {
                     if (!props.dice && buttons.hasOwnProperty(props.button.toString())) {

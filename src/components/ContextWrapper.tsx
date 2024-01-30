@@ -10,6 +10,7 @@ import { Loader } from "./general/Loader.tsx";
 import { objectsEqual } from "../helper/helpers.ts";
 import { SceneReadyContext } from "../context/SceneReadyContext.ts";
 import { useComponentContext } from "../context/ComponentContext.tsx";
+import "tippy.js/dist/tippy.css";
 
 type ContextWrapperProps = PropsWithChildren & {
     component: string;

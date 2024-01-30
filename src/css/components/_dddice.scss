@@ -56,6 +56,7 @@
                 border-bottom-right-radius: 0;
                 border-bottom-left-radius: 0;
                 padding-inline: 0;
+                min-width: 30px;
                 height: 40px;
 
                 .add-svg {
@@ -77,7 +78,7 @@
 
             .remove-dice {
                 position: absolute;
-                top: 0;
+                top: 1px;
                 right: 0;
                 translate: -50% 0;
                 visibility: hidden;
@@ -86,7 +87,7 @@
                 transition: all 0.25s ease;
 
                 &.hover {
-                    translate: 25% 0;
+                    translate: 75% 0;
                     visibility: visible;
                     opacity: 1;
                 }

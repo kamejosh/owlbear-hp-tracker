@@ -10,7 +10,7 @@ import { useComponentContext } from "../../../context/ComponentContext.tsx";
 
 export const DiceTray = ({ classes }: { classes: string }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const { roller, setInitialized } = useDiceRoller();
+    const { roller, setInitialized, theme, setTheme } = useDiceRoller();
     const playerContext = usePlayerContext();
     const { addRoll } = useRollLogContext();
     const { isReady } = SceneReadyContext();
@@ -44,6 +44,15 @@ export const DiceTray = ({ classes }: { classes: string }) => {
                 await dddiceLogin(room, roller, canvasRef.current);
                 await addRollerCallbacks(roller, addRoll, component);
                 setInitialized(true);
+                if (!theme) {
+                    const themeId = room?.diceUser?.find((user) => user.playerId === playerContext.id)?.diceTheme;
+                    if (themeId) {
+                        const newTheme = (await roller.api?.theme.get(themeId))?.data;
+                        if (newTheme) {
+                            setTheme(newTheme);
+                        }
+                    }
+                }
             }
         };
 
