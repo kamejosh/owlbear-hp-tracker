@@ -29,7 +29,6 @@ export const Logout = () => {
                             apiKey: undefined,
                             lastUse: new Date().getTime(),
                             diceTheme: "silvie-lr1gjgod",
-                            diceButtons: [],
                         });
 
                         await updateRoomMetadata(room, { diceUser: diceUser });
