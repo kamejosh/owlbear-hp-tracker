@@ -119,7 +119,9 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                     if (!props.dice && buttons.hasOwnProperty(props.button.toString())) {
                         setAddCustom(true);
                     } else if (props.dice) {
+                        e.currentTarget.classList.add("rolling");
                         await roll(e.currentTarget);
+                        e.currentTarget.classList.remove("rolling");
                     }
                 }}
             >

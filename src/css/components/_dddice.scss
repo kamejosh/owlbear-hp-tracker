@@ -82,6 +82,12 @@
                     }
                 }
 
+                &.rolling {
+                    .preview-image {
+                        animation: rotating 1s linear infinite;
+                    }
+                }
+
                 &:hover {
                     background: linear-gradient(to bottom, #454545 80%, #282828);
                 }
