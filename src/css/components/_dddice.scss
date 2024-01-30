@@ -36,6 +36,8 @@
             position: relative;
             align-self: flex-end;
             order: 3;
+            transition: all 0.25s ease;
+            height: 40px;
 
             &:nth-child(-n + 4) {
                 order: 1;
@@ -43,9 +45,12 @@
 
             &:hover,
             &:focus-visible {
-                .custom-dice {
-                    height: 45px;
-                }
+                height: 45px;
+            }
+
+            &.has-dice {
+                align-self: flex-start;
+                height: 50px;
             }
 
             .custom-dice {
@@ -54,9 +59,14 @@
                 border-bottom: none;
                 border-bottom-right-radius: 0;
                 border-bottom-left-radius: 0;
+                background: linear-gradient(to bottom, #282828, #282828);
                 padding-inline: 0;
                 min-width: 30px;
-                height: 40px;
+                height: 100%;
+
+                &:hover {
+                    background: linear-gradient(to bottom, #454545 80%, #282828);
+                }
 
                 .add-svg {
                     fill: white;
@@ -65,12 +75,56 @@
                 .custom-dice-preview-wrapper {
                     display: flex;
                     flex-wrap: wrap;
+                    align-content: space-around;
                     justify-content: space-around;
+                    align-items: center;
                     max-width: 45px;
+                    max-height: 40px;
+                    overflow: hidden;
+
+                    * {
+                        flex: 1;
+                        width: 100%;
+                        min-width: 20px;
+                        height: 100%;
+                    }
 
                     .preview-image {
-                        height: 20px;
+                        max-width: 20px;
+                        overflow: hidden;
                         object-fit: contain;
+
+                        &:only-child {
+                            max-width: 40px;
+                        }
+                    }
+
+                    .modifier {
+                        text-align: center;
+                    }
+                }
+            }
+
+            .add-custom-dice {
+                display: flex;
+                position: absolute;
+                top: 0;
+                left: 50%;
+                translate: -50% -100%;
+
+                .success {
+                    border-color: green;
+                    background-color: rgb(33, 79, 36);
+                }
+
+                .error {
+                    border-color: red;
+                    background-color: rgb(79, 33, 36);
+                }
+
+                .save-custom-dice {
+                    &:disabled {
+                        cursor: default;
                     }
                 }
             }
@@ -102,6 +156,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            align-self: flex-end;
             order: 2;
             translate: 0 1px;
             transition: all 0.25s ease-in-out;
@@ -111,16 +166,18 @@
             width: 45px;
             height: 45px;
 
-            .dice-svg {
+            .roll-log-svg {
+                fill: white;
                 width: 30px;
             }
 
             &:hover,
             &:focus {
+                border-bottom-color: white;
                 background-color: white;
                 height: 50px;
 
-                .dice-svg {
+                .roll-log-svg {
                     fill: black;
                 }
             }
