@@ -61,16 +61,20 @@ export const DiceButton = (props: DiceButtonProps) => {
                 parsed = diceToRoll(props.dice, theme);
             }
             if (parsed) {
-                const roll = await roller.roll(parsed.dice, {
-                    label: props.context,
-                    operator: parsed.operator,
-                    external_id: component,
-                    whisper: modifier === "SELF" ? await getUserUuid() : undefined,
-                });
-                if (roll && roll.data) {
-                    const data = roll.data;
+                try {
+                    const roll = await roller.roll(parsed.dice, {
+                        label: props.context,
+                        operator: parsed.operator,
+                        external_id: component,
+                        whisper: modifier === "SELF" ? await getUserUuid() : undefined,
+                    });
+                    if (roll && roll.data) {
+                        const data = roll.data;
 
-                    addRoll(await dddiceRollToRollLog(data));
+                        addRoll(await dddiceRollToRollLog(data));
+                    }
+                } catch {
+                    console.warn("error in dice roll", parsed.dice, parsed.operator, component);
                 }
             }
             button.classList.remove("rolling");

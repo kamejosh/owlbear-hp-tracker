@@ -24,10 +24,9 @@
     justify-content: center;
     align-items: center;
     width: 100svw;
-    overflow: hidden;
 
     button:not(.dice-button) {
-        background-color: #211f28;
+        background-color: #282828;
     }
 
     .dice-room-buttons {
@@ -106,7 +105,7 @@
             order: 2;
             translate: 0 1px;
             transition: all 0.25s ease-in-out;
-            border-bottom: 1px solid #211f28;
+            border-bottom: 1px solid #282828;
             border-bottom-right-radius: 0;
             border-bottom-left-radius: 0;
             width: 45px;
@@ -145,8 +144,8 @@
         display: grid;
         grid-template-rows: 0fr;
         transition: all 0.25s ease-in-out;
-        box-shadow: 0 -15px 25px #211f28;
-        border-top: 1px solid #211f28;
+        box-shadow: 0 -15px 25px #1b1b1b;
+        border-top: 1px solid #282828;
         width: 100%;
         overflow: hidden;
 
@@ -155,7 +154,7 @@
             overflow-y: auto;
 
             .dice-tray-content {
-                background-color: #211f28;
+                background-color: #282828;
                 padding: 10px 20px;
 
                 .top {

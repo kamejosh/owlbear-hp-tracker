@@ -58,7 +58,11 @@ export const RollLogEntry = ({ entry }: { entry: RollLogEntryType }) => {
                     return (
                         <li key={index} className={"die"}>
                             {die.type !== "mod" ? (
-                                <DiceButton dice={"1" + die.type} text={"1" + die.type} context={entry.label || ""} />
+                                <DiceButton
+                                    dice={"1" + die.type}
+                                    text={"1" + die.type}
+                                    context={entry.label || "custom roll"}
+                                />
                             ) : (
                                 "+ "
                             )}
