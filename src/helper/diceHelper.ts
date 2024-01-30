@@ -12,6 +12,9 @@ import {
     ThreeDDiceRollEvent,
 } from "dddice-js";
 import { RollLogEntryType } from "../context/RollLogContext.tsx";
+import { rollLogPopover, rollLogPopoverId } from "./variables.ts";
+
+let rollLogTimeOut: number;
 
 export const updateRoomMetadataDiceUser = async (
     room: RoomMetadata,
@@ -158,14 +161,38 @@ export const prepareRoomUser = async (diceRoom: IRoom, roller: ThreeDDice) => {
 export const addRollerCallbacks = async (
     roller: ThreeDDice,
     addRoll: (entry: RollLogEntryType) => void,
-    component: string | undefined
+    component: string | undefined,
+    showPopover: boolean = true
 ) => {
     roller.on(ThreeDDiceRollEvent.RollStarted, async (e) => {
         const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
         const name = await OBR.player.getName();
+        const rollLogEntry = await dddiceRollToRollLog(e, { participant: participant });
 
         if (participant && participant.username !== name) {
-            addRoll(await dddiceRollToRollLog(e, { participant: participant }));
+            addRoll(rollLogEntry);
+        }
+
+        if (showPopover) {
+            const width = await OBR.viewport.getWidth();
+            const height = await OBR.viewport.getHeight();
+            await OBR.popover.open({
+                ...rollLogPopover,
+                anchorPosition: { top: Math.max(height - 55, 0), left: width - 70 },
+            });
+
+            if (rollLogTimeOut) {
+                clearTimeout(rollLogTimeOut);
+            }
+
+            rollLogTimeOut = setTimeout(async () => {
+                await OBR.popover.close(rollLogPopoverId);
+            }, 5000);
+        } else {
+            await OBR.notification.show(
+                `${rollLogEntry.username} rolled ${rollLogEntry.equation} = ${rollLogEntry.total_value}`,
+                "INFO"
+            );
         }
     });
 

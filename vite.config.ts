@@ -15,6 +15,7 @@ export default defineConfig({
                 background: resolve(__dirname, "background.html"),
                 modal: resolve(__dirname, "modal.html"),
                 statblock: resolve(__dirname, "statblock.html"),
+                rolllog: resolve(__dirname, "rolllog.html"),
             },
             /**
              * Ignore "use client" waning since we are not using SSR

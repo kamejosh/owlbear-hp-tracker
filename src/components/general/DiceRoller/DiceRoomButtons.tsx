@@ -23,7 +23,7 @@ type CustomDiceButtonProps = {
 };
 
 const CustomDiceButton = (props: CustomDiceButtonProps) => {
-    const { roller, theme } = useDiceRoller();
+    const { roller, theme, initialized } = useDiceRoller();
     const { addRoll } = useRollLogContext();
     const { buttons, setButtons } = useDiceButtonsContext();
     const { component } = useComponentContext();
@@ -114,7 +114,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
         >
             <button
                 ref={buttonRef}
-                className={`button custom-dice dice-${props.button}`}
+                className={`button custom-dice dice-${props.button} ${initialized ? "enabled" : "disabled"} `}
                 onClick={async (e) => {
                     if (!props.dice && buttons.hasOwnProperty(props.button.toString())) {
                         setAddCustom(true);

@@ -14,9 +14,13 @@ export const RollLog = () => {
 
     return (
         <ul className={"roll-log"}>
-            {log.reverse().map((entry, index) => {
-                return <RollLogEntry entry={entry} key={entry.uuid} classes={index > 4 ? "old-roll" : ""} />;
-            })}
+            {log
+                .sort((a, b) => {
+                    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+                })
+                .map((entry, index) => {
+                    return <RollLogEntry entry={entry} key={entry.uuid} classes={index > 4 ? "old-roll" : ""} />;
+                })}
         </ul>
     );
 };
@@ -101,6 +105,7 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
                 text={props.entry.equation}
                 context={props.entry.label || "re-roll"}
             />
+            <div className={"roll-equation"}>{props.entry.equation}</div>
             <div className={"detailed-result"}>{getDetailedResult()}</div>
             <div className={"divider"}>=</div>
             <div className={"total"}>{props.entry.total_value.toString()}</div>

@@ -9,7 +9,7 @@ export const infoMetadataKey = `${ID}/text`;
 export const modalId = `${ID}/modal`;
 export const statblockPopoverId = `${ID}/statblock-popover`;
 
-export const diceLogModalId = `${ID}/dice-log`;
+export const rollLogPopoverId = `${ID}/dice-log`;
 
 export const version = "1.6.0";
 
@@ -31,6 +31,18 @@ export const settingsModal: Modal = {
 export const diceModal: Modal = {
     id: modalId,
     url: "/modal.html?content=dddice",
+};
+
+export const rollLogPopover: Popover = {
+    id: rollLogPopoverId,
+    url: "/rolllog.html",
+    width: 350,
+    height: 200,
+    transformOrigin: { vertical: "BOTTOM", horizontal: "RIGHT" },
+    marginThreshold: 10,
+    anchorReference: "POSITION",
+    disableClickAway: false,
+    hidePaper: true,
 };
 
 export const statblockPopover: Popover = {

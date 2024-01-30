@@ -73,6 +73,15 @@
                 min-width: 30px;
                 height: 100%;
 
+                &.disabled {
+                    filter: grayscale(1);
+                    cursor: default;
+
+                    &:hover {
+                        background: linear-gradient(to bottom, #282828, #282828);
+                    }
+                }
+
                 &:hover {
                     background: linear-gradient(to bottom, #454545 80%, #282828);
                 }
@@ -301,6 +310,21 @@
     padding: 0;
     list-style: none;
 
+    &.popover {
+        .roll-log-entry {
+            border: none;
+            background-color: #1c1b22dd;
+
+            .button-wrapper {
+                display: none;
+            }
+
+            .roll-equation {
+                display: flex;
+            }
+        }
+    }
+
     .roll-log-entry {
         display: grid;
         grid-template-columns: 70px auto auto 80px;
@@ -309,6 +333,7 @@
             "user user divider total"
             "detail detail divider total"
             "reroll reroll divider total";
+        column-gap: 1ch;
         align-content: flex-start;
         border: 1px solid dimgrey;
         border-radius: 5%;
@@ -392,6 +417,12 @@
         }
 
         .button-wrapper {
+            grid-area: reroll;
+            justify-self: flex-start;
+        }
+
+        .roll-equation {
+            display: none;
             grid-area: reroll;
         }
 
