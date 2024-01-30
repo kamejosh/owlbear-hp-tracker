@@ -10,6 +10,7 @@ export type RollLogEntryType = {
     label?: string;
     total_value: string | Array<string | IRollValueImage>;
     username: string;
+    owlbear_user_id?: string;
     values: Array<IRollValue>;
 };
 

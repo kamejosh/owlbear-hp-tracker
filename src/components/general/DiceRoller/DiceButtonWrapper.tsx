@@ -70,8 +70,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                     });
                     if (roll && roll.data) {
                         const data = roll.data;
-
-                        addRoll(await dddiceRollToRollLog(data));
+                        addRoll(await dddiceRollToRollLog(data, { owlbear_user_id: playerContext.id || undefined }));
                     }
                 } catch {
                     console.warn("error in dice roll", parsed.dice, parsed.operator, component);

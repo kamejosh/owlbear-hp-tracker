@@ -201,12 +201,15 @@ export const updateRoomMetadata = async (
     }
 };
 
-export const dddiceRollToRollLog = async (roll: IRoll, participant?: IRoomParticipant): Promise<RollLogEntryType> => {
+export const dddiceRollToRollLog = async (
+    roll: IRoll,
+    options?: { participant?: IRoomParticipant; owlbear_user_id?: string }
+): Promise<RollLogEntryType> => {
     let username = roll.user.username;
 
     if (roll.user.name === "Guest User") {
-        if (participant && participant.username) {
-            username = participant?.username;
+        if (options && options.participant && options.participant.username) {
+            username = options.participant.username;
         } else {
             const particip = roll.room.participants.find((p) => p.user.uuid === roll.user.uuid);
             if (particip && particip.username) {
@@ -223,5 +226,6 @@ export const dddiceRollToRollLog = async (roll: IRoll, participant?: IRoomPartic
         total_value: roll.total_value,
         username: username,
         values: roll.values,
+        owlbear_user_id: options?.owlbear_user_id,
     };
 };

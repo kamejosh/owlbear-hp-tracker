@@ -209,6 +209,16 @@
         .dice-tray {
             min-height: 0;
             overflow-y: auto;
+            &::-webkit-scrollbar {
+                background-color: rgba(55, 55, 55, 0.1);
+                width: 10px;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+                border-radius: 10px;
+                background-color: rgba(255, 255, 255, 0.5);
+            }
 
             .dice-tray-content {
                 background-color: #282828;
@@ -242,35 +252,6 @@
                                 transition: all 0.25s ease-in-out;
                                 object-fit: cover;
                                 object-position: center;
-                            }
-                        }
-                    }
-                }
-
-                .roll-log {
-                    display: flex;
-                    flex-direction: column;
-                    padding: 0;
-                    list-style: none;
-
-                    .roll-log-entry {
-                        display: flex;
-                        align-items: flex-start;
-                        gap: 1ch;
-                        white-space: nowrap;
-
-                        .dice {
-                            display: flex;
-                            column-gap: 1ch;
-                            flex-wrap: wrap;
-                            align-items: center;
-                            padding: 0;
-                            list-style: none;
-
-                            .die {
-                                display: flex;
-                                align-items: center;
-                                gap: 2px;
                             }
                         }
                     }
@@ -311,6 +292,120 @@
             .theme-preview {
                 width: auto;
                 height: 2em;
+            }
+        }
+    }
+}
+
+.roll-log {
+    display: flex;
+    flex-direction: column;
+    gap: 1ch;
+    padding: 0;
+    list-style: none;
+
+    .roll-log-entry {
+        display: grid;
+        grid-template-columns: repeat(2, 70px) auto 80px;
+        grid-template-areas:
+            "context context divider total"
+            "user user divider total"
+            "detail detail divider total"
+            "reroll reroll divider total";
+        align-items: flex-start;
+        border: 1px solid dimgrey;
+        border-radius: 5%;
+        background-color: #1c1b22;
+        padding: 10px;
+        width: 250px;
+        text-align: left;
+        white-space: nowrap;
+
+        &.self {
+            align-self: flex-end;
+        }
+
+        .roll-time {
+            grid-row: 1;
+            grid-column: 4/5;
+            justify-self: flex-end;
+            padding: 1px;
+            font-size: 0.8rem;
+        }
+
+        .roll-context {
+            grid-area: context;
+            font-weight: bolder;
+
+            .label-detail {
+                text-transform: capitalize;
+
+                &.to-hit,
+                &.attack {
+                    color: #1b9af0;
+                }
+
+                &.damage {
+                    color: #df7b7b;
+                }
+
+                &.check {
+                    color: #b55dff;
+                }
+
+                &.save {
+                    color: #6cbf5b;
+                }
+                &.custom {
+                    color: #f5a623;
+                }
+            }
+        }
+
+        .username {
+            grid-area: user;
+            color: dimgrey;
+            font-weight: bolder;
+            font-size: 0.9rem;
+        }
+
+        .button-wrapper {
+            grid-area: reroll;
+        }
+
+        .detailed-result {
+            grid-area: detail;
+            font-weight: bolder;
+            font-size: 1.2rem;
+        }
+
+        .divider {
+            grid-area: divider;
+            align-self: center;
+            color: dimgrey;
+            font-size: 3rem;
+        }
+
+        .total {
+            grid-area: total;
+            align-self: center;
+            justify-self: center;
+            font-weight: bold;
+            font-size: 3rem;
+        }
+
+        .dice {
+            display: flex;
+            column-gap: 1ch;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 0;
+            list-style: none;
+
+            .die {
+                display: flex;
+                align-items: center;
+                gap: 2px;
             }
         }
     }

@@ -165,7 +165,7 @@ export const addRollerCallbacks = async (
         const name = await OBR.player.getName();
 
         if (participant && participant.username !== name) {
-            addRoll(await dddiceRollToRollLog(e, participant));
+            addRoll(await dddiceRollToRollLog(e, { participant: participant }));
         }
     });
 

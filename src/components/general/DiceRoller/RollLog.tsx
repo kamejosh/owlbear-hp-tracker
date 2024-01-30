@@ -1,22 +1,29 @@
 import { DiceButton } from "./DiceButtonWrapper.tsx";
 import { RollLogEntryType, useRollLogContext } from "../../../context/RollLogContext.tsx";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useInterval } from "../../../helper/hooks.ts";
+import { usePlayerContext } from "../../../context/PlayerContext.ts";
+
+type RollLogEntryProps = {
+    entry: RollLogEntryType;
+    classes?: string;
+};
 
 export const RollLog = () => {
     const { log } = useRollLogContext();
 
     return (
         <ul className={"roll-log"}>
-            {log.map((entry) => {
-                return <RollLogEntry entry={entry} key={entry.uuid} />;
+            {log.reverse().map((entry, index) => {
+                return <RollLogEntry entry={entry} key={entry.uuid} classes={index === 0 ? "last-roll" : ""} />;
             })}
         </ul>
     );
 };
 
-export const RollLogEntry = ({ entry }: { entry: RollLogEntryType }) => {
-    const rollTime = new Date(entry.created_at);
+export const RollLogEntry = (props: RollLogEntryProps) => {
+    const playerContext = usePlayerContext();
+    const rollTime = new Date(props.entry.created_at);
     const now = new Date();
 
     const deltaTime = now.getTime() - rollTime.getTime();
@@ -49,29 +56,54 @@ export const RollLogEntry = ({ entry }: { entry: RollLogEntryType }) => {
         setRollTimeText(getRollTimeText(nowTime.getTime() - rollTime.getTime()));
     }, 10000);
 
+    const getDetailedResult = useCallback(() => {
+        let result = "";
+        props.entry.values.forEach((value) => {
+            result += Intl.NumberFormat("en-US", { signDisplay: "always" }).format(Math.floor(value.value));
+        });
+        if (result.length > 0) {
+            result = result.substring(1, result.length);
+        }
+        return result;
+    }, [props.entry.values]);
+
+    const formatLabel = useCallback(() => {
+        if (props.entry.label) {
+            const parts = props.entry.label.split(":");
+            if (parts.length === 2) {
+                return (
+                    <>
+                        <span className={"label-name"}>{parts[0]}:</span>
+                        <span className={`label-detail ${parts[1].trim().toLowerCase().replace(" ", "-")}`}>
+                            {parts[1]}
+                        </span>
+                    </>
+                );
+            } else {
+                return <span className={"label-name"}>{props.entry.label}</span>;
+            }
+        } else {
+            return undefined;
+        }
+    }, [props.entry.label]);
+
     return (
-        <li className={"roll-log-entry"}>
-            <span className={"roll-time"}>{rollTimeText}</span>
-            <span className={"username"}>{entry.username}</span>
-            <ul className={"dice"}>
-                {entry.values.map((die, index) => {
-                    return (
-                        <li key={index} className={"die"}>
-                            {die.type !== "mod" ? (
-                                <DiceButton
-                                    dice={"1" + die.type}
-                                    text={"1" + die.type}
-                                    context={entry.label || "custom roll"}
-                                />
-                            ) : (
-                                "+ "
-                            )}
-                            {die.type !== "mod" ? `(${die.value})` : die.value}
-                        </li>
-                    );
-                })}
-            </ul>
-            <span className={"total"}>= {entry.total_value.toString()}</span>
+        <li
+            className={`roll-log-entry ${props.classes} ${
+                props.entry.owlbear_user_id === playerContext.id ? "self" : ""
+            }`}
+        >
+            <div className={"roll-time"}>{rollTimeText}</div>
+            <div className={"roll-context"}>{formatLabel()}</div>
+            <div className={"username"}>{props.entry.username}</div>
+            <DiceButton
+                dice={props.entry.equation}
+                text={props.entry.equation}
+                context={props.entry.label || "re-roll"}
+            />
+            <div className={"detailed-result"}>{getDetailedResult()}</div>
+            <div className={"divider"}>=</div>
+            <div className={"total"}>{props.entry.total_value.toString()}</div>
         </li>
     );
 };

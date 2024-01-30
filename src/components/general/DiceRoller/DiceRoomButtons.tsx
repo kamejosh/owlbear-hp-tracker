@@ -10,6 +10,7 @@ import { dddiceRollToRollLog } from "../../../helper/helpers.ts";
 import { useComponentContext } from "../../../context/ComponentContext.tsx";
 import tippy from "tippy.js";
 import { RollLogSvg } from "../../svgs/RollLogSvg.tsx";
+import { usePlayerContext } from "../../../context/PlayerContext.ts";
 
 type DiceRoomButtonsProps = {
     open: boolean;
@@ -26,6 +27,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
     const { addRoll } = useRollLogContext();
     const { buttons, setButtons } = useDiceButtonsContext();
     const { component } = useComponentContext();
+    const playerContext = usePlayerContext();
     const [hover, setHover] = useState<boolean>(false);
     const [addCustom, setAddCustom] = useState<boolean>(false);
     const [validCustom, setValidCustom] = useState<boolean>(false);
@@ -89,7 +91,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                 });
                 if (roll && roll.data) {
                     const data = roll.data;
-                    addRoll(await dddiceRollToRollLog(data));
+                    addRoll(await dddiceRollToRollLog(data, { owlbear_user_id: playerContext.id || undefined }));
                 }
             }
         }
