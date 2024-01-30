@@ -15,7 +15,7 @@ export const RollLog = () => {
     return (
         <ul className={"roll-log"}>
             {log.reverse().map((entry, index) => {
-                return <RollLogEntry entry={entry} key={entry.uuid} classes={index === 0 ? "last-roll" : ""} />;
+                return <RollLogEntry entry={entry} key={entry.uuid} classes={index > 4 ? "old-roll" : ""} />;
             })}
         </ul>
     );

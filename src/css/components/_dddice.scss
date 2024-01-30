@@ -8,6 +8,7 @@
 
     &.statblock-dice-tray {
         top: calc(60px + 1rem);
+        max-height: calc(100vh - (70px + 1rem));
     }
 
     &.hide {
@@ -24,6 +25,14 @@
     justify-content: center;
     align-items: center;
     width: 100svw;
+    max-height: calc(100vh - 5rem);
+
+    &.open {
+        .dice-tray-wrapper {
+            grid-template-rows: 1fr;
+            border-top: 1px solid white;
+        }
+    }
 
     button:not(.dice-button) {
         background-color: #282828;
@@ -37,7 +46,7 @@
             align-self: flex-end;
             order: 3;
             transition: all 0.25s ease;
-            height: 40px;
+            height: 30px;
 
             &:nth-child(-n + 4) {
                 order: 1;
@@ -45,7 +54,7 @@
 
             &:hover,
             &:focus-visible {
-                height: 45px;
+                height: 35px;
             }
 
             &.has-dice {
@@ -184,19 +193,6 @@
         }
     }
 
-    &.open {
-        max-height: calc(100vh - 5rem);
-
-        &.statblock-dice-tray {
-            max-height: calc(100vh - (70px + 1rem));
-        }
-
-        .dice-tray-wrapper {
-            grid-template-rows: 1fr;
-            border-top: 1px solid white;
-        }
-    }
-
     .dice-tray-wrapper {
         display: grid;
         grid-template-rows: 0fr;
@@ -300,29 +296,55 @@
 .roll-log {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     gap: 1ch;
     padding: 0;
     list-style: none;
 
     .roll-log-entry {
         display: grid;
-        grid-template-columns: repeat(2, 70px) auto 80px;
+        grid-template-columns: 70px auto auto 80px;
         grid-template-areas:
             "context context divider total"
             "user user divider total"
             "detail detail divider total"
             "reroll reroll divider total";
-        align-items: flex-start;
+        align-content: flex-start;
         border: 1px solid dimgrey;
         border-radius: 5%;
         background-color: #1c1b22;
         padding: 10px;
-        width: 250px;
+        min-width: 250px;
         text-align: left;
         white-space: nowrap;
 
         &.self {
             align-self: flex-end;
+        }
+
+        &.old-roll {
+            grid-template-columns: 70px auto auto 50px;
+            grid-template-areas:
+                "context context divider total"
+                "user user divider total";
+            padding-block: 2px;
+            min-width: 200px;
+
+            .detailed-result {
+                display: none;
+            }
+
+            .button-wrapper {
+                display: none;
+            }
+
+            .total {
+                font-size: 1.5rem;
+            }
+
+            .roll-context {
+                align-self: flex-end;
+            }
         }
 
         .roll-time {

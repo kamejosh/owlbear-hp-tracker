@@ -8,7 +8,7 @@ import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { diceToRoll } from "../../../helper/diceHelper.ts";
 import { dddiceRollToRollLog } from "../../../helper/helpers.ts";
 import { useComponentContext } from "../../../context/ComponentContext.tsx";
-import tippy from "tippy.js";
+import tippy, { Instance } from "tippy.js";
 import { RollLogSvg } from "../../svgs/RollLogSvg.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 
@@ -31,16 +31,23 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
     const [hover, setHover] = useState<boolean>(false);
     const [addCustom, setAddCustom] = useState<boolean>(false);
     const [validCustom, setValidCustom] = useState<boolean>(false);
+    const [tippyInstance, setTippyInstance] = useState<Instance>();
     const buttonRef = useRef<HTMLButtonElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (buttonRef.current) {
-            tippy(buttonRef.current, {
-                content: props.dice || "Add new custom dice roll",
-            });
+            if (!tippyInstance) {
+                setTippyInstance(
+                    tippy(buttonRef.current, {
+                        content: props.dice || "Add new custom dice roll",
+                    })
+                );
+            } else {
+                tippyInstance.setContent(props.dice || "Add new custom dice roll");
+            }
         }
-    }, [buttonRef.current]);
+    }, [props.dice]);
 
     const getDicePreview = () => {
         if (props.dice && theme) {
