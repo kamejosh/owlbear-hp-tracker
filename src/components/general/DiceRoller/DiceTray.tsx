@@ -18,12 +18,6 @@ export const DiceTray = ({ classes }: { classes: string }) => {
     const { component } = useComponentContext();
     const [apiKey, setApiKey] = useState<string | undefined>();
 
-    useEffect(() => {
-        if (roller) {
-            initDice(!!room?.diceRendering);
-        }
-    }, [room?.diceRendering]);
-
     useEffect(() => {}, [room?.diceUser]);
 
     useEffect(() => {
@@ -34,10 +28,10 @@ export const DiceTray = ({ classes }: { classes: string }) => {
     }, [room]);
 
     useEffect(() => {
-        if (isReady && canvasRef.current) {
+        if (isReady && canvasRef.current && apiKey) {
             initDice(!!room?.diceRendering);
         }
-    }, [isReady, canvasRef, apiKey]);
+    }, [apiKey]);
 
     const initDice = async (diceRendering: boolean = true) => {
         if (canvasRef.current || !diceRendering) {

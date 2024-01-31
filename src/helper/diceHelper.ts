@@ -252,13 +252,15 @@ export const dddiceLogin = async (room: RoomMetadata | null, roller: ThreeDDice,
                 roller.connect(diceRoom.slug, diceRoom.passcode, user.uuid);
             }
 
-            roller.start();
+            if (canvas) {
+                roller.start();
+            }
         }
         return true;
     } catch (e) {
+        console.warn(e);
         return false;
     }
-    return false;
 };
 
 export const diceToRoll = (diceString: string, theme: string) => {

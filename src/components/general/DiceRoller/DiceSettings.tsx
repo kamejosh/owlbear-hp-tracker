@@ -16,8 +16,10 @@ export const DiceSettings = () => {
 
     const findAndSetTheme = async (searchTheme: string, input?: HTMLInputElement) => {
         try {
+            console.log(searchTheme);
             setSearching(true);
             const newTheme = (await roller.api?.theme.get(searchTheme))?.data;
+            console.log(newTheme?.available_dice);
             const hasD20 = !!newTheme?.available_dice.find((die) => {
                 try {
                     const d = die as IAvailableDie;
@@ -96,7 +98,7 @@ export const DiceSettings = () => {
     return (
         <div className={"dice-settings"}>
             <div className={"setting dice-rendering"}>
-                Render 3D Dice:
+                Render 3D Dice (requires restart):
                 <input
                     type={"checkbox"}
                     checked={room?.diceRendering}
