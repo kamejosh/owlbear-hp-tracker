@@ -116,6 +116,10 @@
                         height: 100%;
                     }
 
+                    :nth-child(n + 5) {
+                        display: none;
+                    }
+
                     .preview-image {
                         max-width: 20px;
                         overflow: hidden;
