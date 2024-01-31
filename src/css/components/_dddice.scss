@@ -47,7 +47,7 @@
         .custom-dice-wrapper {
             position: relative;
             align-self: flex-end;
-            order: 3;
+            order: 4;
             transition: all 0.25s ease;
             height: 30px;
 
@@ -142,6 +142,7 @@
                 top: 0;
                 left: 50%;
                 translate: -50% -100%;
+                z-index: 100;
 
                 .success {
                     border-color: green;
@@ -183,7 +184,8 @@
             }
         }
 
-        .open-dice-tray {
+        .open-dice-tray,
+        .quick-roll-button {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -208,9 +210,18 @@
                 background-color: white;
                 height: 50px;
 
-                .roll-log-svg {
+                .roll-log-svg,
+                .dice-svg {
                     fill: black;
                 }
+            }
+        }
+
+        .quick-roll-button {
+            order: 2;
+
+            .dice-svg {
+                width: 30px;
             }
         }
     }
@@ -223,6 +234,10 @@
         border-top: 1px solid #282828;
         width: 100%;
         overflow: hidden;
+
+        &:has(.dice-settings) {
+            min-height: 200px;
+        }
 
         .dice-tray {
             background-color: #282828;
@@ -244,6 +259,11 @@
                 .top {
                     display: flex;
                     justify-content: space-between;
+
+                    .side-buttons {
+                        display: flex;
+                        gap: 1ch;
+                    }
 
                     .room-link {
                         display: flex;
@@ -279,37 +299,71 @@
     }
 }
 
-.dice-settings {
-    border: 1px solid lightgrey;
-    padding: 2px;
-    text-align: left;
+.dice-settings-wrapper {
+    position: relative;
+    height: 100%;
 
-    .setting {
+    .dice-settings-button {
+        height: 100%;
+    }
+
+    .dice-settings {
         display: flex;
-        align-items: center;
-        gap: 1ch;
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        flex-direction: column;
+        gap: 0.5ch;
+        translate: 0 100%;
+        z-index: 200;
+        box-shadow: -5px 5px 5px #111, 5px 5px 5px #111;
+        border: 1px solid lightgrey;
+        border-radius: 5px;
+        background-color: #2b2a33;
+        padding: 10px;
+        text-align: left;
 
-        &.dice-theme {
-            &.invalid {
+        .close-button {
+            align-self: flex-end;
+        }
+
+        .setting {
+            display: flex;
+            align-items: center;
+            gap: 1ch;
+            white-space: nowrap;
+
+            &.dice-rendering {
+                gap: 0;
+                .text {
+                    .small {
+                        font-size: 0.7rem;
+                    }
+                }
+            }
+
+            &.dice-theme {
+                &.invalid {
+                    .theme-input {
+                        border-color: red;
+                        background-color: rgba(255, 0, 0, 0.2);
+                    }
+                }
+
+                &.searching {
+                    .theme-preview {
+                        animation: rotating 0.3s linear infinite;
+                    }
+                }
+
                 .theme-input {
-                    border-color: red;
-                    background-color: rgba(255, 0, 0, 0.2);
+                    width: 100px;
                 }
-            }
 
-            &.searching {
                 .theme-preview {
-                    animation: rotating 0.3s linear infinite;
+                    width: auto;
+                    height: 2em;
                 }
-            }
-
-            .theme-input {
-                width: 100px;
-            }
-
-            .theme-preview {
-                width: auto;
-                height: 2em;
             }
         }
     }

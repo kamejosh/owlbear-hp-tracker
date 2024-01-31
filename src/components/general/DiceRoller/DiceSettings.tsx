@@ -6,7 +6,7 @@ import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { updateRoomMetadataDiceUser } from "../../../helper/diceHelper.ts";
 
-export const DiceSettings = () => {
+export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean) => void }) => {
     const { room } = useMetadataContext();
     const { roller, initialized, theme, setTheme } = useDiceRoller();
     const playerContext = usePlayerContext();
@@ -95,16 +95,14 @@ export const DiceSettings = () => {
 
     return (
         <div className={"dice-settings"}>
-            <div className={"setting dice-rendering"}>
-                Render 3D Dice (requires restart):
-                <input
-                    type={"checkbox"}
-                    checked={room?.diceRendering}
-                    onChange={async () => {
-                        await updateRoomMetadata(room, { diceRendering: !room?.diceRendering });
-                    }}
-                />
-            </div>
+            <button
+                className={"close-button"}
+                onClick={() => {
+                    setSettings(false);
+                }}
+            >
+                X
+            </button>
             <div className={`setting dice-theme ${validTheme ? "valid" : "invalid"} ${searching ? "searching" : ""}`}>
                 dice theme:
                 <input
@@ -123,6 +121,19 @@ export const DiceSettings = () => {
                 {theme ? getThemePreview() : null}
             </div>
             {error ? <span>{error}</span> : null}
+            <div className={"setting dice-rendering"}>
+                <span className={"text"}>
+                    {"Render 3D Dice "}
+                    <span className={"small"}>(requires restart)</span>:
+                </span>
+                <input
+                    type={"checkbox"}
+                    checked={room?.diceRendering}
+                    onChange={async () => {
+                        await updateRoomMetadata(room, { diceRendering: !room?.diceRendering });
+                    }}
+                />
+            </div>
         </div>
     );
 };

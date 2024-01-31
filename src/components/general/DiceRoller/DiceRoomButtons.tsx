@@ -223,6 +223,9 @@ export const DiceRoomButtons = (props: DiceRoomButtonsProps) => {
             >
                 <RollLogSvg />
             </button>
+            <button className={"quick-roll-button button icon"}>
+                <DiceSvg />
+            </button>
         </div>
     );
 };
