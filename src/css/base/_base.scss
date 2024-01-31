@@ -40,6 +40,10 @@ body {
     &:has(.roll-log-popover) {
         background-color: transparent;
     }
+
+    :has(.dddice-login-modal) {
+        background-color: black;
+    }
 }
 
 #app {

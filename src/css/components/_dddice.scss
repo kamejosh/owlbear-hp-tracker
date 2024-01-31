@@ -482,3 +482,83 @@
         }
     }
 }
+
+.dddice-login-modal {
+    justify-content: space-around;
+    background-color: black;
+    height: calc(100svh - 52px);
+    overflow: hidden;
+    text-align: center;
+
+    .content {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        gap: 0.5ch;
+        height: 100%;
+
+        .activate {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5ch;
+
+            a {
+                margin-bottom: 1ch;
+                font-weight: bolder;
+                font-size: 1.5rem;
+            }
+
+            .code {
+                display: flex;
+                align-self: center;
+                gap: 0.5ch;
+                font-size: 2rem;
+
+                .letter {
+                    background-color: #1b1b25;
+                    padding-inline: 0.7ch;
+                    line-height: 1.4;
+                }
+            }
+        }
+
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 1ch;
+            padding-block: 1ch;
+            color: #99a;
+        }
+
+        .or {
+            display: flex;
+            align-items: center;
+            gap: 1ch;
+            padding-bottom: 1ch;
+            color: #99a;
+
+            &::before,
+            &::after {
+                border-top: 1px solid #99a;
+                width: 100%;
+                height: 1px;
+                content: "";
+            }
+        }
+
+        .guest-button {
+            align-self: center;
+            transition: all 0.25s ease;
+            background-color: white;
+            padding-inline: 2ch;
+            height: 3rem;
+            color: black;
+            font-weight: bolder;
+            font-size: 1rem;
+
+            &:hover {
+                box-shadow: 0 0 15px white;
+            }
+        }
+    }
+}

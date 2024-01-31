@@ -64,31 +64,48 @@ export const DiceLogin = () => {
             <button className={"close-button"} onClick={async () => await OBR.modal.close(modalId)}>
                 X
             </button>
-            <h1>dddice Login</h1>
-            {activate ? (
-                <div className={"activate"}>
-                    Go to
-                    <a href={`https://dddice.com/activate?code=${activate.code}`} target={"_blank"}>
-                        dddice.com/activate
-                    </a>
-                    Then enter this code
-                    <div className={"code"}>{activate.code}</div>
-                </div>
-            ) : null}
-            {timeLeft ? (
-                <span>
-                    This code expires in
-                    {new Date(timeLeft).getMinutes()}:{new Date(timeLeft).getSeconds()}
-                </span>
-            ) : null}
-            <button
-                className={"button guest-button"}
-                onClick={() => {
-                    OBR.modal.close(modalId);
-                }}
-            >
-                Continue as guest
-            </button>
+            <div className={"content"}>
+                <h1>dddice Login</h1>
+                {activate ? (
+                    <div className={"activate"}>
+                        <span>Go to</span>
+                        <a href={`https://dddice.com/activate?code=${activate.code}`} target={"_blank"}>
+                            dddice.com/activate
+                        </a>
+                        <span>Then enter this code</span>
+                        <div className={"code"}>
+                            {Array.from(activate.code).map((l, index) => (
+                                <span key={index} className={"letter"}>
+                                    {l}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                ) : null}
+                {timeLeft ? (
+                    <div className={"countdown"}>
+                        <span>This code expires in</span>
+                        {new Date(timeLeft).getMinutes().toLocaleString("en-US", {
+                            minimumIntegerDigits: 2,
+                            useGrouping: false,
+                        })}
+                        :
+                        {new Date(timeLeft).getSeconds().toLocaleString("en-US", {
+                            minimumIntegerDigits: 2,
+                            useGrouping: false,
+                        })}
+                    </div>
+                ) : null}
+                <div className={"or"}>or</div>
+                <button
+                    className={"button guest-button"}
+                    onClick={() => {
+                        OBR.modal.close(modalId);
+                    }}
+                >
+                    Continue as guest
+                </button>
+            </div>
         </div>
     );
 };

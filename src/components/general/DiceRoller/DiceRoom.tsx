@@ -59,7 +59,7 @@ export const DiceRoom = ({ className }: { className?: string }) => {
                                     await OBR.modal.open({
                                         ...diceModal,
                                         width: Math.min(400, width * 0.9),
-                                        height: Math.min(400, height * 0.9),
+                                        height: Math.min(500, height * 0.9),
                                     });
                                 }}
                             >
