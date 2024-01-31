@@ -14,6 +14,12 @@ import {
     toggleHpOnMap,
 } from "../../helper/multiTokenHelper.ts";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
+import { useDiceRoller } from "../../context/DDDiceContext.tsx";
+import { IDiceRoll, IRoll, Operator } from "dddice-js";
+import { diceToRoll } from "../../helper/diceHelper.ts";
+import { dddiceRollToRollLog } from "../../helper/helpers.ts";
+import { useComponentContext } from "../../context/ComponentContext.tsx";
+import { useRollLogContext } from "../../context/RollLogContext.tsx";
 
 type DropGroupProps = {
     title: string;
@@ -24,6 +30,9 @@ type DropGroupProps = {
 
 export const DropGroup = (props: DropGroupProps) => {
     const { room, scene } = useMetadataContext();
+    const { component } = useComponentContext();
+    const { addRoll } = useRollLogContext();
+    const { roller, initialized, theme } = useDiceRoller();
 
     const setOpenGroupSetting = async (name: string) => {
         const metadata: Metadata = await OBR.scene.getMetadata();
@@ -38,13 +47,42 @@ export const DropGroup = (props: DropGroupProps) => {
         await OBR.scene.setMetadata(ownMetadata);
     };
 
-    const setInitiative = async () => {
+    const roll = async (button: HTMLButtonElement, dice: string) => {
+        button.classList.add("rolling");
+        if (theme) {
+            let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined = diceToRoll(dice, theme.id);
+            if (parsed) {
+                const roll = await roller.roll(parsed.dice, {
+                    operator: parsed.operator,
+                    external_id: component,
+                    label: "Initiative: Roll",
+                });
+                if (roll && roll.data) {
+                    const data = roll.data;
+                    addRoll(await dddiceRollToRollLog(data, { owlbear_user_id: OBR.player.id || undefined }));
+                    button.classList.remove("rolling");
+                    return data;
+                }
+            }
+        }
+        button.classList.remove("rolling");
+        button.blur();
+    };
+
+    const setInitiative = async (button: HTMLButtonElement) => {
+        let rollData: IRoll | undefined;
+        if (room?.diceRendering) {
+            rollData = await roll(button, `${props.list.length}d${room?.initiativeDice ?? 20}`);
+        }
         await OBR.scene.items.updateItems(props.list, (items) => {
-            items.forEach((item) => {
-                const value =
-                    Math.floor(Math.random() * (room?.initiativeDice ?? 20)) +
-                    1 +
-                    (item.metadata[itemMetadataKey] as HpTrackerMetadata).stats.initiativeBonus;
+            items.forEach((item, index) => {
+                let value = 0;
+                let bonus = (item.metadata[itemMetadataKey] as HpTrackerMetadata).stats.initiativeBonus;
+                if (rollData && rollData.values.length >= items.length) {
+                    value = rollData.values[index].value + bonus;
+                } else {
+                    value = Math.floor(Math.random() * (room?.initiativeDice ?? 20)) + 1 + bonus;
+                }
                 (item.metadata[itemMetadataKey] as HpTrackerMetadata).initiative = value;
             });
         });
@@ -93,8 +131,9 @@ export const DropGroup = (props: DropGroupProps) => {
                 <button
                     title={"Roll Initiative (including initiative modifier from statblock)"}
                     className={`toggle-button initiative-button`}
-                    onClick={() => {
-                        setInitiative();
+                    disabled={room?.diceRendering && !initialized}
+                    onClick={async (e) => {
+                        await setInitiative(e.currentTarget);
                     }}
                 />
                 <button

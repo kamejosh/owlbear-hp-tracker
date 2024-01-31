@@ -417,7 +417,8 @@
                 &.save {
                     color: #6cbf5b;
                 }
-                &.custom {
+                &.custom,
+                &.roll {
                     color: #f5a623;
                 }
             }
@@ -442,6 +443,7 @@
 
         .detailed-result {
             grid-area: detail;
+            justify-self: flex-start;
             max-width: 250px;
             overflow: hidden;
             font-weight: bolder;

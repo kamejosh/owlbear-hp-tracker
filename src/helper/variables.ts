@@ -41,7 +41,7 @@ export const rollLogPopover: Popover = {
     transformOrigin: { vertical: "BOTTOM", horizontal: "RIGHT" },
     marginThreshold: 10,
     anchorReference: "POSITION",
-    disableClickAway: false,
+    disableClickAway: true,
     hidePaper: true,
 };
 

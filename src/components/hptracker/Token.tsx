@@ -5,10 +5,15 @@ import OBR, { Item } from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "../../helper/variables.ts";
 import { useCharSheet } from "../../context/CharacterContext.ts";
 import { updateHp } from "../../helper/hpHelpers.ts";
-import { evalString, getBgColor } from "../../helper/helpers.ts";
+import { dddiceRollToRollLog, evalString, getBgColor } from "../../helper/helpers.ts";
 import { updateAc } from "../../helper/acHelper.ts";
 import _ from "lodash";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
+import { useComponentContext } from "../../context/ComponentContext.tsx";
+import { useRollLogContext } from "../../context/RollLogContext.tsx";
+import { useDiceRoller } from "../../context/DDDiceContext.tsx";
+import { IDiceRoll, IRoll, Operator } from "dddice-js";
+import { diceToRoll } from "../../helper/diceHelper.ts";
 
 type TokenProps = {
     item: Item;
@@ -24,6 +29,9 @@ export const Token = (props: TokenProps) => {
     const [editName, setEditName] = useState<boolean>(false);
     const { room } = useMetadataContext();
     const { setId } = useCharSheet();
+    const { component } = useComponentContext();
+    const { addRoll } = useRollLogContext();
+    const { roller, initialized, theme } = useDiceRoller();
     const hpRef = useRef<HTMLInputElement>(null);
     const maxHpRef = useRef<HTMLInputElement>(null);
     const tempHpRef = useRef<HTMLInputElement>(null);
@@ -257,6 +265,28 @@ export const Token = (props: TokenProps) => {
         return room?.allowNegativeNumbers ? hp : Math.max(hp, 0);
     };
 
+    const roll = async (button: HTMLButtonElement, dice: string) => {
+        button.classList.add("rolling");
+        if (theme) {
+            let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined = diceToRoll(dice, theme.id);
+            if (parsed) {
+                const roll = await roller.roll(parsed.dice, {
+                    operator: parsed.operator,
+                    external_id: component,
+                    label: "Initiative: Roll",
+                });
+                if (roll && roll.data) {
+                    const data = roll.data;
+                    addRoll(await dddiceRollToRollLog(data, { owlbear_user_id: OBR.player.id || undefined }));
+                    button.classList.remove("rolling");
+                    return data;
+                }
+            }
+        }
+        button.classList.remove("rolling");
+        button.blur();
+    };
+
     return display() ? (
         <div
             className={`player-wrapper ${playerContext.role === "PLAYER" ? "player" : ""} ${
@@ -464,9 +494,19 @@ export const Token = (props: TokenProps) => {
                 <button
                     title={"Roll Initiative (including initiative modifier from statblock)"}
                     className={`toggle-button initiative-button`}
-                    onClick={() => {
-                        const value =
-                            Math.floor(Math.random() * (room?.initiativeDice ?? 20)) + 1 + data.stats.initiativeBonus;
+                    disabled={room?.diceRendering && !initialized}
+                    onClick={async (e) => {
+                        let rollData: IRoll | undefined;
+                        if (room?.diceRendering) {
+                            rollData = await roll(e.currentTarget, `1d${room?.initiativeDice ?? 20}`);
+                        }
+                        let value = 0;
+                        let bonus = data.stats.initiativeBonus;
+                        if (rollData && rollData.values.length >= 1) {
+                            value = rollData.values[0].value + bonus;
+                        } else {
+                            value = Math.floor(Math.random() * (room?.initiativeDice ?? 20)) + 1 + bonus;
+                        }
                         const newData = { ...data, initiative: value };
                         setData(newData);
                         handleValueChange(newData);

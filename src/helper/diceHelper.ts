@@ -217,11 +217,7 @@ export const removeRollerCallbacks = (roller: ThreeDDice) => {
     roller.off(ThreeDDiceRollEvent.RollCreated);
 };
 
-export const dddiceLogin = async (
-    room: RoomMetadata | null,
-    roller: ThreeDDice,
-    canvas: HTMLCanvasElement | undefined
-) => {
+export const dddiceLogin = async (room: RoomMetadata | null, roller: ThreeDDice, canvas?: HTMLCanvasElement) => {
     const diceUser = await getDiceUser(roller);
     const participant = await getDiceParticipant(roller, room?.diceRoom?.slug, diceUser);
 
@@ -231,36 +227,34 @@ export const dddiceLogin = async (
     }
 
     try {
-        if (canvas) {
-            roller.initialize(canvas, await getApiKey(room), {}, `HP Tracker - ${OBR.room.id}`);
-            const diceRoom = await getDiceRoom(roller, room);
-            if (diceRoom) {
-                const user = (await roller.api?.user.get())?.data;
-                if (user) {
-                    const participant = diceRoom.participants.find((p) => p.user.uuid === user.uuid);
-                    if (participant) {
-                        await prepareRoomUser(diceRoom, roller);
-                    } else {
-                        try {
-                            const userDiceRoom = (await roller?.api?.room.join(diceRoom.slug, diceRoom.passcode))?.data;
-                            if (userDiceRoom) {
-                                await prepareRoomUser(userDiceRoom, roller);
-                            }
-                        } catch {
-                            /**
-                             * if we already joined. We already check that when
-                             * looking if the user is a participant in the room,
-                             * but better be safe than sorry
-                             */
+        roller.initialize(canvas, await getApiKey(room), {}, `HP Tracker - ${OBR.room.id}`);
+        const diceRoom = await getDiceRoom(roller, room);
+        if (diceRoom) {
+            const user = (await roller.api?.user.get())?.data;
+            if (user) {
+                const participant = diceRoom.participants.find((p) => p.user.uuid === user.uuid);
+                if (participant) {
+                    await prepareRoomUser(diceRoom, roller);
+                } else {
+                    try {
+                        const userDiceRoom = (await roller?.api?.room.join(diceRoom.slug, diceRoom.passcode))?.data;
+                        if (userDiceRoom) {
+                            await prepareRoomUser(userDiceRoom, roller);
                         }
+                    } catch {
+                        /**
+                         * if we already joined. We already check that when
+                         * looking if the user is a participant in the room,
+                         * but better be safe than sorry
+                         */
                     }
-                    roller.connect(diceRoom.slug, diceRoom.passcode, user.uuid);
                 }
-
-                roller.start();
+                roller.connect(diceRoom.slug, diceRoom.passcode, user.uuid);
             }
-            return true;
+
+            roller.start();
         }
+        return true;
     } catch (e) {
         return false;
     }

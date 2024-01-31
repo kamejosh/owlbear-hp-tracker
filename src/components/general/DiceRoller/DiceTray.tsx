@@ -20,11 +20,7 @@ export const DiceTray = ({ classes }: { classes: string }) => {
 
     useEffect(() => {
         if (roller) {
-            if (!room?.diceRendering) {
-                canvasRef.current?.classList.add("hide");
-            } else {
-                canvasRef.current?.classList.remove("hide");
-            }
+            initDice(!!room?.diceRendering);
         }
     }, [room?.diceRendering]);
 
@@ -38,28 +34,32 @@ export const DiceTray = ({ classes }: { classes: string }) => {
     }, [room]);
 
     useEffect(() => {
-        const initDice = async () => {
-            if (canvasRef.current) {
-                setInitialized(false);
+        if (isReady && canvasRef.current) {
+            initDice(!!room?.diceRendering);
+        }
+    }, [isReady, canvasRef, apiKey]);
+
+    const initDice = async (diceRendering: boolean = true) => {
+        if (canvasRef.current || !diceRendering) {
+            setInitialized(false);
+            if (diceRendering && canvasRef.current) {
                 await dddiceLogin(room, roller, canvasRef.current);
-                await addRollerCallbacks(roller, addRoll, component, room?.diceRendering);
-                setInitialized(true);
-                if (!theme) {
-                    const themeId = room?.diceUser?.find((user) => user.playerId === playerContext.id)?.diceTheme;
-                    if (themeId) {
-                        const newTheme = (await roller.api?.theme.get(themeId))?.data;
-                        if (newTheme) {
-                            setTheme(newTheme);
-                        }
+            } else {
+                await dddiceLogin(room, roller);
+            }
+            await addRollerCallbacks(roller, addRoll, component, room?.diceRendering);
+            setInitialized(true);
+            if (!theme) {
+                const themeId = room?.diceUser?.find((user) => user.playerId === playerContext.id)?.diceTheme;
+                if (themeId) {
+                    const newTheme = (await roller.api?.theme.get(themeId))?.data;
+                    if (newTheme) {
+                        setTheme(newTheme);
                     }
                 }
             }
-        };
-
-        if (isReady && canvasRef.current) {
-            initDice();
         }
-    }, [isReady, canvasRef, apiKey]);
+    };
 
     return (
         <>
