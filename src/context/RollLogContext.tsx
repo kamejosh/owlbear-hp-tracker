@@ -2,6 +2,7 @@ import { create, StateCreator } from "zustand";
 import { persist } from "zustand/middleware";
 import { ID } from "../helper/variables.ts";
 import { IRollValue, IRollValueImage } from "dddice-js";
+import { withStorageDOMEvents } from "../helper/hooks.ts";
 
 export type RollLogEntryType = {
     uuid: string;
@@ -38,3 +39,5 @@ export const useRollLogContext = create<RollLogContextType>()(
         name: `${ID}.roll-log`,
     })
 );
+
+withStorageDOMEvents(useRollLogContext);

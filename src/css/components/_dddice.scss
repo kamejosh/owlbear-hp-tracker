@@ -8,7 +8,6 @@
 
     &.statblock-dice-tray {
         top: calc(60px + 1rem);
-        max-height: calc(100vh - (70px + 1rem));
     }
 
     &.hide {
@@ -26,6 +25,10 @@
     align-items: center;
     width: 100svw;
     max-height: calc(100vh - 5rem);
+
+    &.statblock-dice-tray {
+        max-height: calc(100vh - (70px + 1rem));
+    }
 
     &.open {
         .dice-tray-wrapper {
@@ -218,6 +221,7 @@
         overflow: hidden;
 
         .dice-tray {
+            background-color: #282828;
             min-height: 0;
             overflow-y: auto;
             &::-webkit-scrollbar {
@@ -230,14 +234,13 @@
                 border-radius: 10px;
                 background-color: rgba(255, 255, 255, 0.5);
             }
-
             .dice-tray-content {
-                background-color: #282828;
                 padding: 10px 20px;
 
                 .top {
                     display: flex;
                     justify-content: space-between;
+
                     .room-link {
                         display: flex;
                         align-items: center;

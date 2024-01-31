@@ -24,8 +24,8 @@ const Content = () => {
                 .sort((a, b) => {
                     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
                 })
-                .map((entry) => {
-                    return <RollLogEntry entry={entry} />;
+                .map((entry, index) => {
+                    return <RollLogEntry key={index} entry={entry} />;
                 })}
         </div>
     );

@@ -173,26 +173,29 @@ export const addRollerCallbacks = async (
             addRoll(rollLogEntry);
         }
 
-        if (showPopover) {
-            const width = await OBR.viewport.getWidth();
-            const height = await OBR.viewport.getHeight();
-            await OBR.popover.open({
-                ...rollLogPopover,
-                anchorPosition: { top: Math.max(height - 55, 0), left: width - 70 },
-            });
+        // only the action window triggers the popover or notification because it always exists
+        if (component === "action_window") {
+            if (showPopover) {
+                const width = await OBR.viewport.getWidth();
+                const height = await OBR.viewport.getHeight();
+                await OBR.popover.open({
+                    ...rollLogPopover,
+                    anchorPosition: { top: Math.max(height - 55, 0), left: width - 70 },
+                });
 
-            if (rollLogTimeOut) {
-                clearTimeout(rollLogTimeOut);
+                if (rollLogTimeOut) {
+                    clearTimeout(rollLogTimeOut);
+                }
+
+                rollLogTimeOut = setTimeout(async () => {
+                    await OBR.popover.close(rollLogPopoverId);
+                }, 5000);
+            } else {
+                await OBR.notification.show(
+                    `${rollLogEntry.username} rolled ${rollLogEntry.equation} = ${rollLogEntry.total_value}`,
+                    "INFO"
+                );
             }
-
-            rollLogTimeOut = setTimeout(async () => {
-                await OBR.popover.close(rollLogPopoverId);
-            }, 5000);
-        } else {
-            await OBR.notification.show(
-                `${rollLogEntry.username} rolled ${rollLogEntry.equation} = ${rollLogEntry.total_value}`,
-                "INFO"
-            );
         }
     });
 

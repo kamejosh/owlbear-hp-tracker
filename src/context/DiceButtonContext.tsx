@@ -1,6 +1,7 @@
 import { create, StateCreator } from "zustand";
 import { persist } from "zustand/middleware";
 import { ID } from "../helper/variables.ts";
+import { withStorageDOMEvents } from "../helper/hooks.ts";
 
 export type DiceButtonsType = {
     1: string | null;
@@ -30,3 +31,5 @@ export const useDiceButtonsContext = create<DiceButtonsContextType>()(
         name: `${ID}.dice-buttons`,
     })
 );
+
+withStorageDOMEvents(useDiceButtonsContext);
