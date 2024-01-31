@@ -345,10 +345,11 @@
         column-gap: 1ch;
         align-content: flex-start;
         border: 1px solid dimgrey;
-        border-radius: 5%;
+        border-radius: 5px;
         background-color: #1c1b22;
         padding: 10px;
         min-width: 250px;
+        max-width: 500px;
         text-align: left;
         white-space: nowrap;
 
@@ -437,8 +438,11 @@
 
         .detailed-result {
             grid-area: detail;
+            max-width: 250px;
+            overflow: hidden;
             font-weight: bolder;
             font-size: 1.2rem;
+            text-overflow: ellipsis;
         }
 
         .divider {

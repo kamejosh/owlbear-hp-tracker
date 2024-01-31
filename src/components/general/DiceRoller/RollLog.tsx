@@ -1,8 +1,9 @@
 import { DiceButton } from "./DiceButtonWrapper.tsx";
 import { RollLogEntryType, useRollLogContext } from "../../../context/RollLogContext.tsx";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useInterval } from "../../../helper/hooks.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
+import tippy from "tippy.js";
 
 type RollLogEntryProps = {
     entry: RollLogEntryType;
@@ -29,6 +30,7 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
     const playerContext = usePlayerContext();
     const rollTime = new Date(props.entry.created_at);
     const now = new Date();
+    const detailsRef = useRef<HTMLDivElement>(null);
 
     const deltaTime = now.getTime() - rollTime.getTime();
 
@@ -59,6 +61,12 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
         const nowTime = new Date();
         setRollTimeText(getRollTimeText(nowTime.getTime() - rollTime.getTime()));
     }, 10000);
+
+    useEffect(() => {
+        if (detailsRef.current) {
+            tippy(detailsRef.current, { content: getDetailedResult(), maxWidth: "100vw" });
+        }
+    }, [detailsRef]);
 
     const getDetailedResult = useCallback(() => {
         let result = "";
@@ -106,7 +114,9 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
                 context={props.entry.label || "re-roll"}
             />
             <div className={"roll-equation"}>{props.entry.equation}</div>
-            <div className={"detailed-result"}>{getDetailedResult()}</div>
+            <div ref={detailsRef} className={"detailed-result"}>
+                {getDetailedResult()}
+            </div>
             <div className={"divider"}>=</div>
             <div className={"total"}>{props.entry.total_value.toString()}</div>
         </li>

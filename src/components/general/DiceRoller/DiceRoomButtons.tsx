@@ -220,7 +220,6 @@ export const DiceRoomButtons = (props: DiceRoomButtonsProps) => {
                 className={`open-dice-tray button icon ${props.open ? "open" : "closed"}`}
                 onClick={(e) => {
                     props.setOpen(!props.open);
-                    useRollLogContext.persist.rehydrate();
                     e.currentTarget.blur();
                 }}
             >

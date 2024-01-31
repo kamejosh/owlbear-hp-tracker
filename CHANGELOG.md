@@ -3,6 +3,10 @@
 + Refactor Settings and split them into Room and Scene Settings
 + Update Changelog -> Changelog can now be hidden by default so it won't be displayed on updates any longer (you might miss new features)
 + Add dice roller using dddice
++ Bugfixes:
+  + Fix error where copied items or new tokens were not properly order for drag and drop
+  + Improved base HP Tracker performance
+  + Improve modal styling to not completly cover screen
 
 # 1.5.2
 

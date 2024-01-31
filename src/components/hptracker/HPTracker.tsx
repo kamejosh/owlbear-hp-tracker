@@ -15,6 +15,7 @@ import { compare } from "compare-versions";
 import { Helpbuttons } from "../general/Helpbuttons/Helpbuttons.tsx";
 import { DiceTray } from "../general/DiceRoller/DiceTray.tsx";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
+import { uniq } from "lodash";
 
 export const HPTracker = () => {
     return (
@@ -96,7 +97,13 @@ const Content = () => {
                     (!scene?.groups?.includes(metadata.group ?? "") && group === "Default")
                 );
             });
-            tokenMap.set(group, groupItems ?? []);
+            const indices = groupItems?.map((gi) => (gi.metadata[itemMetadataKey] as HpTrackerMetadata).index);
+
+            if (groupItems && indices && (indices.includes(undefined) || uniq(indices).length !== indices.length)) {
+                reorderMetadataIndex(groupItems, group);
+            } else {
+                tokenMap.set(group, groupItems ?? []);
+            }
         });
 
         setTokenLists(tokenMap);
@@ -110,6 +117,27 @@ const Content = () => {
             setPlayerTokens(tokens ?? []);
         }
     }, [room?.playerSort, tokens]);
+
+    const reorderMetadataIndexMulti = (destList: Array<Item>, group: string, sourceList: Array<Item>) => {
+        const combinedList = destList.concat(sourceList);
+        const destinationIds = destList.map((d) => d.id);
+        OBR.scene.items.updateItems(combinedList, (items) => {
+            let destIndex = 0;
+            let sourceIndex = 0;
+            items.forEach((item) => {
+                const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+                if (destinationIds.includes(item.id)) {
+                    data.index = destIndex;
+                    destIndex += 1;
+                    data.group = group;
+                } else {
+                    data.index = sourceIndex;
+                    sourceIndex += 1;
+                }
+                item.metadata[itemMetadataKey] = { ...data };
+            });
+        });
+    };
 
     const reorderMetadataIndex = (list: Array<Item>, group?: string) => {
         OBR.scene.items.updateItems(list, (items) => {
@@ -202,8 +230,7 @@ const Content = () => {
             destClone.splice(droppableDestination.index, 0, removed);
         }
 
-        reorderMetadataIndex(sourceClone);
-        reorderMetadataIndex(destClone, droppableDestination.droppableId);
+        reorderMetadataIndexMulti(destClone, droppableDestination.droppableId, sourceClone);
     };
 
     const onDragEnd = (result: DropResult) => {
