@@ -33,16 +33,22 @@
     &.open {
         .dice-tray-wrapper {
             grid-template-rows: 1fr;
-            border-top: 1px solid white;
         }
     }
 
-    button:not(.dice-button) {
-        background-color: #282828;
+    button:not(.dice-button),
+    .button {
+        background: linear-gradient(-45deg, var(--bg1), var(--bg2), var(--bg3), var(--bg4));
     }
 
     .dice-room-buttons {
         display: flex;
+        gap: 1px;
+
+        button {
+            box-shadow: 0 -2px 2px var(--button-shadow);
+            border: none;
+        }
 
         .custom-dice-wrapper {
             position: relative;
@@ -67,11 +73,11 @@
 
             .custom-dice {
                 translate: 0 1px;
-                transition: all 0.25s ease;
+                animation: gradient 15s ease infinite;
+                transition: all 0.25s ease, --bg3 0.25s ease, --bg4 0.25s ease;
                 border-bottom: none;
                 border-bottom-right-radius: 0;
                 border-bottom-left-radius: 0;
-                background: linear-gradient(to bottom, #282828, #282828);
                 padding-inline: 0;
                 min-width: 30px;
                 height: 100%;
@@ -81,18 +87,20 @@
                     cursor: default;
 
                     &:hover {
-                        background: linear-gradient(to bottom, #282828, #282828);
+                        background: linear-gradient(-45deg, var(--bg1), var(--bg2), var(--bg3), var(--bg4));
                     }
                 }
 
                 &.rolling {
                     .preview-image {
-                        animation: rotating 1s linear infinite;
+                        animation: rotating 0.5s linear infinite;
                     }
                 }
 
                 &:hover {
-                    background: linear-gradient(to bottom, #454545 80%, #282828);
+                    --bg3: #556;
+                    --bg4: #778;
+                    background: linear-gradient(-45deg, var(--bg1), var(--bg2), var(--bg3), var(--bg4));
                 }
 
                 .add-svg {
@@ -145,13 +153,13 @@
                 z-index: 100;
 
                 .success {
-                    border-color: green;
-                    background-color: rgb(33, 79, 36);
+                    border-color: var(--success-border);
+                    background-color: rgb(var(--success-bg));
                 }
 
                 .error {
-                    border-color: red;
-                    background-color: rgb(79, 33, 36);
+                    border-color: var(--error-border);
+                    background-color: rgb(var(--error-bg));
                 }
 
                 .save-custom-dice {
@@ -178,8 +186,8 @@
                 }
 
                 &:hover {
-                    border-color: red;
-                    background-color: rgb(79, 33, 36);
+                    border-color: var(--error-border);
+                    background-color: rgb(var(--error-bg));
                 }
             }
         }
@@ -192,8 +200,7 @@
             align-self: flex-end;
             order: 2;
             translate: 0 1px;
-            transition: all 0.25s ease-in-out;
-            border-bottom: 1px solid #282828;
+            transition: all 0.25s ease, --bg3 0.25s ease, --bg4 0.25s ease;
             border-bottom-right-radius: 0;
             border-bottom-left-radius: 0;
             width: 45px;
@@ -205,23 +212,94 @@
             }
 
             &:hover,
-            &:focus {
-                border-bottom-color: white;
-                background-color: white;
+            &:focus-visible {
+                --bg3: #556;
+                --bg4: #778;
+                background: linear-gradient(-45deg, var(--bg1), var(--bg2), var(--bg3), var(--bg4));
                 height: 50px;
-
-                .roll-log-svg,
-                .dice-svg {
-                    fill: black;
-                }
             }
         }
 
-        .quick-roll-button {
+        .quick-button-wrapper {
+            position: relative;
+            align-self: flex-end;
             order: 2;
 
-            .dice-svg {
-                width: 30px;
+            &:has(.rolling) {
+                .dice-svg {
+                    animation: rotating 0.5s linear infinite;
+                }
+            }
+
+            .quick-roll-button {
+                .dice-svg {
+                    width: 30px;
+                }
+            }
+
+            .quick-button-list {
+                display: flex;
+                position: absolute;
+                top: 0;
+                left: 50%;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                translate: -50% 100%;
+                visibility: collapse;
+                transition: all 0.25s ease;
+                margin: 0;
+                padding: 0 0 1ch 0;
+                list-style: none;
+
+                &.open {
+                    display: flex;
+                    flex-direction: column;
+                    translate: -50% -100%;
+                    visibility: visible;
+                }
+
+                .quick-custom-roll {
+                    display: flex;
+                    gap: 1ch;
+
+                    &:has(.rolling) {
+                        .dice-svg {
+                            animation: rotating 0.25s linear infinite;
+                        }
+                    }
+
+                    .quick-custom-input {
+                        width: 40px;
+                        text-align: center;
+
+                        &.invalid {
+                            border-color: var(--error-border);
+                            background-color: rgb(var(--error-bg));
+                        }
+                    }
+                }
+
+                .quick-roll {
+                    cursor: pointer;
+                    max-width: 40px;
+
+                    &:hover {
+                        img {
+                            animation: shaking 0.1s alternate linear infinite;
+                        }
+                    }
+
+                    &.rolling {
+                        img {
+                            animation: rotating 0.5s linear infinite;
+                        }
+                    }
+
+                    img {
+                        max-width: 40px;
+                    }
+                }
             }
         }
     }
@@ -231,7 +309,7 @@
         grid-template-rows: 0fr;
         transition: all 0.25s ease-in-out;
         box-shadow: 0 -15px 25px #1b1b1b;
-        border-top: 1px solid #282828;
+        background: linear-gradient(-45deg, var(--bg1), var(--bg2), var(--bg3), var(--bg4));
         width: 100%;
         overflow: hidden;
 
@@ -240,9 +318,9 @@
         }
 
         .dice-tray {
-            background-color: #282828;
             min-height: 0;
             overflow-y: auto;
+
             &::-webkit-scrollbar {
                 background-color: rgba(55, 55, 55, 0.1);
                 width: 10px;
@@ -253,6 +331,7 @@
                 border-radius: 10px;
                 background-color: rgba(255, 255, 255, 0.5);
             }
+
             .dice-tray-content {
                 padding: 10px 20px;
 
@@ -278,10 +357,10 @@
 
                             &:hover,
                             &:focus {
-                                background-color: white;
+                                background: white;
 
                                 .copy-icon {
-                                    fill: #1c1b22;
+                                    fill: var(--bg-color);
                                 }
                             }
 
@@ -380,7 +459,7 @@
     &.popover {
         .roll-log-entry {
             border: none;
-            background-color: #1c1b22dd;
+            background-color: var(--bg-color) dd;
 
             .button-wrapper {
                 display: none;
@@ -404,7 +483,7 @@
         align-content: flex-start;
         border: 1px solid dimgrey;
         border-radius: 5px;
-        background-color: #1c1b22;
+        background-color: var(--bg-color);
         padding: 10px;
         min-width: 250px;
         max-width: 500px;

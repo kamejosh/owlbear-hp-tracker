@@ -1,7 +1,7 @@
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { useDiceButtonsContext } from "../../../context/DiceButtonContext.tsx";
 import { useEffect, useRef, useState } from "react";
-import { IDiceRoll, Operator, parseRollEquation } from "dddice-js";
+import { IAvailableDie, IDiceRoll, IDieType, Operator, parseRollEquation } from "dddice-js";
 import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { AddSvg } from "../../svgs/AddSvg.tsx";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
@@ -11,6 +11,7 @@ import { useComponentContext } from "../../../context/ComponentContext.tsx";
 import tippy, { Instance } from "tippy.js";
 import { RollLogSvg } from "../../svgs/RollLogSvg.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
+import OBR from "@owlbear-rodeo/sdk";
 
 type DiceRoomButtonsProps = {
     open: boolean;
@@ -95,6 +96,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                 const roll = await roller.roll(parsed.dice, {
                     operator: parsed.operator,
                     external_id: component,
+                    label: "Roll: Custom",
                 });
                 if (roll && roll.data) {
                     const data = roll.data;
@@ -196,17 +198,107 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
     );
 };
 
+const QuickButtons = ({ open }: { open: boolean }) => {
+    const { theme, roller } = useDiceRoller();
+    const { addRoll } = useRollLogContext();
+    const { component } = useComponentContext();
+    const [validCustom, setValidCustom] = useState<boolean>();
+
+    const roll = async (element: HTMLElement, dice: string) => {
+        element.classList.add("rolling");
+        if (theme && dice) {
+            let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined = diceToRoll(dice, theme.id);
+            if (parsed) {
+                const roll = await roller.roll(parsed.dice, {
+                    operator: parsed.operator,
+                    external_id: component,
+                    label: "Roll: Custom",
+                });
+                if (roll && roll.data) {
+                    const data = roll.data;
+                    addRoll(await dddiceRollToRollLog(data, { owlbear_user_id: OBR.player.id || undefined }));
+                }
+            }
+        }
+        element.classList.remove("rolling");
+        element.blur();
+    };
+
+    return (
+        <>
+            {theme ? (
+                <ul className={`quick-button-list ${open ? "open" : ""}`}>
+                    {theme.available_dice.map((die, index) => {
+                        let preview = "";
+                        let name = "";
+                        try {
+                            if (die.hasOwnProperty("type")) {
+                                const notation = (die as IAvailableDie).notation;
+                                if (notation && theme.preview.hasOwnProperty(notation)) {
+                                    preview = theme.preview[notation];
+                                } else {
+                                    preview = theme.preview[(die as IAvailableDie).type];
+                                }
+                                name = (die as IAvailableDie).notation ?? (die as IAvailableDie).id;
+                            } else {
+                                preview = theme.preview[die as IDieType];
+                                name = die.toString();
+                            }
+                            if (preview && name) {
+                                name = name === "d10x" ? "d100" : name;
+                                return (
+                                    <li
+                                        key={index}
+                                        className={"quick-roll"}
+                                        onClick={async (e) => {
+                                            await roll(e.currentTarget, name);
+                                        }}
+                                        onLoad={(e) => {
+                                            tippy(e.currentTarget, { content: name });
+                                        }}
+                                    >
+                                        <img src={preview} alt={name} />
+                                    </li>
+                                );
+                            }
+                        } catch {
+                            return null;
+                        }
+                    })}
+                    <li className={"quick-custom-roll"}>
+                        <DiceSvg />
+                        <input
+                            className={`quick-custom-input ${validCustom ? "valid" : "invalid"}`}
+                            type={"text"}
+                            size={2}
+                            onChange={(e) => {
+                                try {
+                                    const parsed = parseRollEquation(e.currentTarget.value, theme.id);
+                                    if (parsed) {
+                                        setValidCustom(true);
+                                    } else {
+                                        setValidCustom(false);
+                                    }
+                                } catch {
+                                    setValidCustom(false);
+                                }
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" && validCustom) {
+                                    roll(e.currentTarget, e.currentTarget.value);
+                                }
+                            }}
+                        />
+                    </li>
+                </ul>
+            ) : null}
+        </>
+    );
+};
+
 export const DiceRoomButtons = (props: DiceRoomButtonsProps) => {
     const { buttons } = useDiceButtonsContext();
-    const logButtonRef = useRef<HTMLButtonElement>(null);
-
-    useEffect(() => {
-        if (logButtonRef.current) {
-            tippy(logButtonRef.current, {
-                content: "open roll log",
-            });
-        }
-    }, [logButtonRef]);
+    const [quick, setQuick] = useState<boolean>(false);
 
     return (
         <div className={"dice-room-buttons"}>
@@ -214,8 +306,12 @@ export const DiceRoomButtons = (props: DiceRoomButtonsProps) => {
                 return <CustomDiceButton key={index} button={index + 1} dice={value} />;
             })}
             <button
-                ref={logButtonRef}
                 className={`open-dice-tray button icon ${props.open ? "open" : "closed"}`}
+                ref={(e) => {
+                    if (e) {
+                        tippy(e, { content: "Log & Settings" });
+                    }
+                }}
                 onClick={(e) => {
                     props.setOpen(!props.open);
                     e.currentTarget.blur();
@@ -223,9 +319,20 @@ export const DiceRoomButtons = (props: DiceRoomButtonsProps) => {
             >
                 <RollLogSvg />
             </button>
-            <button className={"quick-roll-button button icon"}>
-                <DiceSvg />
-            </button>
+            <div className={"quick-button-wrapper"}>
+                <QuickButtons open={quick} />
+                <button
+                    onClick={() => setQuick(!quick)}
+                    className={"quick-roll-button button icon"}
+                    ref={(e) => {
+                        if (e) {
+                            tippy(e, { content: "Quick roll" });
+                        }
+                    }}
+                >
+                    <DiceSvg />
+                </button>
+            </div>
         </div>
     );
 };

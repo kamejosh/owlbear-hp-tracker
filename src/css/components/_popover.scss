@@ -30,7 +30,7 @@ body:has(.popover-app) {
             }
 
             &::-webkit-scrollbar {
-                background-color: #1c1b22;
+                background-color: var(--bg-color);
                 width: 12px;
             }
 

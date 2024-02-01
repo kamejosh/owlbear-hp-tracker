@@ -14,7 +14,7 @@
         cursor: pointer;
         border: 1px solid white;
         border-radius: 4px;
-        background-color: #1c1b22;
+        background-color: var(--bg-color);
         font-size: 0;
 
         @include breakpoint.laptop {

@@ -164,7 +164,7 @@ export const addRollerCallbacks = async (
     component: string | undefined,
     showPopover: boolean = true
 ) => {
-    roller.on(ThreeDDiceRollEvent.RollStarted, async (e) => {
+    roller.on(ThreeDDiceRollEvent.RollFinished, async (e) => {
         const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
         const name = await OBR.player.getName();
         const rollLogEntry = await dddiceRollToRollLog(e, { participant: participant });
@@ -213,6 +213,7 @@ export const addRollerCallbacks = async (
 };
 
 export const removeRollerCallbacks = (roller: ThreeDDice) => {
+    console.log("remove");
     roller.off(ThreeDDiceRollEvent.RollStarted);
     roller.off(ThreeDDiceRollEvent.RollCreated);
 };

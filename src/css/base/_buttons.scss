@@ -3,7 +3,7 @@ button,
     cursor: pointer;
     border: 1px solid lightgrey;
     border-radius: 4px;
-    background-color: #1c1b22;
+    background-color: var(--bg-color);
     color: var(--text-color);
 }
 
@@ -41,7 +41,7 @@ button,
     cursor: pointer;
     border: 1px solid white;
     border-radius: 5px;
-    background-color: #1c1b22;
+    background-color: var(--bg-color);
     padding-top: 2px;
     padding-inline: 0;
     width: 20px;
@@ -149,7 +149,7 @@ button,
         z-index: 10;
         border: 1px solid lightgrey;
         border-radius: 4px;
-        background-color: #1c1b22;
+        background-color: var(--bg-color);
         padding: 1px;
 
         &.full {
@@ -181,7 +181,7 @@ button,
             &:hover,
             &:focus {
                 background-color: var(--hover-color);
-                color: #1c1b22;
+                color: var(--bg-color);
             }
         }
     }
