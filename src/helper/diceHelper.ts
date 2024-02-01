@@ -233,7 +233,7 @@ export const dddiceLogin = async (room: RoomMetadata | null, roller: ThreeDDice,
     }
 
     try {
-        roller.initialize(canvas, await getApiKey(room), {}, `HP Tracker - ${OBR.room.id}`);
+        roller.initialize(canvas, await getApiKey(room), { autoClear: 3 }, `HP Tracker - ${OBR.room.id}`);
         const diceRoom = await getDiceRoom(roller, room);
         if (diceRoom) {
             const user = (await roller.api?.user.get())?.data;
