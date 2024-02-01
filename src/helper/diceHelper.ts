@@ -164,6 +164,17 @@ export const addRollerCallbacks = async (
     component: string | undefined,
     showPopover: boolean = true
 ) => {
+    roller.on(ThreeDDiceRollEvent.RollStarted, async (e) => {
+        if (!showPopover) {
+            const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
+            const rollLogEntry = await dddiceRollToRollLog(e, { participant: participant });
+            await OBR.notification.show(
+                `${rollLogEntry.username} rolled ${rollLogEntry.equation} = ${rollLogEntry.total_value}`,
+                "INFO"
+            );
+        }
+    });
+
     roller.on(ThreeDDiceRollEvent.RollFinished, async (e) => {
         const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
         const name = await OBR.player.getName();
@@ -190,11 +201,6 @@ export const addRollerCallbacks = async (
                 rollLogTimeOut = setTimeout(async () => {
                     await OBR.popover.close(rollLogPopoverId);
                 }, 5000);
-            } else {
-                await OBR.notification.show(
-                    `${rollLogEntry.username} rolled ${rollLogEntry.equation} = ${rollLogEntry.total_value}`,
-                    "INFO"
-                );
             }
         }
     });
@@ -213,7 +219,6 @@ export const addRollerCallbacks = async (
 };
 
 export const removeRollerCallbacks = (roller: ThreeDDice) => {
-    console.log("remove");
     roller.off(ThreeDDiceRollEvent.RollStarted);
     roller.off(ThreeDDiceRollEvent.RollCreated);
 };

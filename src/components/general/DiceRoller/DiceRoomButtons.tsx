@@ -202,7 +202,7 @@ const QuickButtons = ({ open }: { open: boolean }) => {
     const { theme, roller } = useDiceRoller();
     const { addRoll } = useRollLogContext();
     const { component } = useComponentContext();
-    const [validCustom, setValidCustom] = useState<boolean>();
+    const [validCustom, setValidCustom] = useState<boolean>(true);
 
     const roll = async (element: HTMLElement, dice: string) => {
         element.classList.add("rolling");
@@ -272,6 +272,10 @@ const QuickButtons = ({ open }: { open: boolean }) => {
                             type={"text"}
                             size={2}
                             onChange={(e) => {
+                                if (e.currentTarget.value === "") {
+                                    setValidCustom(true);
+                                    return;
+                                }
                                 try {
                                     const parsed = parseRollEquation(e.currentTarget.value, theme.id);
                                     if (parsed) {
@@ -283,9 +287,9 @@ const QuickButtons = ({ open }: { open: boolean }) => {
                                     setValidCustom(false);
                                 }
                             }}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter" && validCustom) {
-                                    roll(e.currentTarget, e.currentTarget.value);
+                            onKeyDown={async (e) => {
+                                if (e.key === "Enter" && validCustom && e.currentTarget.value) {
+                                    await roll(e.currentTarget, e.currentTarget.value);
                                 }
                             }}
                         />

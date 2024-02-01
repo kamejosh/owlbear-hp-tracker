@@ -49,6 +49,7 @@ export const DiceLogin = () => {
 
                 if (response.status === 200) {
                     const data = (await response.json()).data;
+                    console.log(data.token, room, playerContext.id);
                     if (data.token && room && playerContext.id) {
                         await updateRoomMetadataDiceUser(room, playerContext.id, { apiKey: data.token });
                         OBR.modal.close(modalId);

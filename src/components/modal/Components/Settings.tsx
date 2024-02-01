@@ -88,7 +88,6 @@ export const Settings = () => {
                         />
                     </div>
                     <div className={"ac setting"}>
-                        <h4>Armorclass</h4>
                         <div className={"ac-position"}>
                             AC Offset: X{" "}
                             <input

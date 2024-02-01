@@ -1,6 +1,6 @@
 ---
 title: HP Tracker
-description: An extension to keep track of all creature stats and abilities while showing players only what they need to know. 
+description: All-In-One Hitpoint and Initiative Tracking with 5e and PF2e Statblocks included, player visibility settings, 3D dice-rolling and more.
 author: Joshua Hercher
 image: https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/HP_Tracker.png
 icon: https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/public/icon.svg
@@ -8,6 +8,7 @@ tags:
   - combat
   - tool
   - automation
+  - dice
 manifest: https://hp-tracker.bitperfect-software.com/manifest.json
 learn-more: https://github.com/kamejosh/owlbear-hp-tracker
 ---
@@ -36,7 +37,9 @@ learn-more: https://github.com/kamejosh/owlbear-hp-tracker
 
 # HP Tracker - Owlbear Plugin
 
-Designed around the TTRPG game mechanics of Hit Points (HP) and Armor Class (AC), this extension allows tracking and changing multiple Creatures' settings while dynamically hiding and showing this information to players.
+Designed around the TTRPG game mechanics of Hit Points (HP) and Armor Class (AC), this extension allows tracking and changing multiple Creatures' settings while dynamically hiding and showing this information to players. 
+
+It also comes with initiative tracking, auto-sorting, drag and drop, 3D dice-rolling and much more. 
 
 ![hp-tracker example](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/HP_Tracker.png)
 
@@ -108,13 +111,13 @@ The Action Window can be opened by clicking the HP Tracker Action Icon in the Ow
 At the top of the action window the current version of the extension is displayed as well as three system buttons, the statblock popover button and a link to the HP Tracker Patreon page.
 
 The system buttons open a new modal (changelog and help are opened in fullscreen mode):
-+ The [⛭] buttons opens the [global settings](#global-settings).
-+ The [i] button opens the changelog so you can see recent changes
++ The [⛭] button opens the [global settings](#global-settings).
++ The [i] button opens the changelog, so you can see recent changes
 + The [?] button opens the help menu which displays the same help information you are currently reading
 
 The statblock popover button opens a popover, for more information see [here](#hp-tracker-statblock-popover).
 
-The Patreon Link opens in a new window.
+The Patreon Link opens my patreon page in a new window.
 
 #### Global Settings
 

@@ -24,11 +24,13 @@ export const DiceTray = ({ classes }: { classes: string }) => {
         const newApiKey = room?.diceUser?.find((user) => user.playerId === playerContext.id)?.apiKey;
         if (newApiKey && newApiKey !== apiKey) {
             setApiKey(newApiKey);
+        } else if (newApiKey === undefined && apiKey === undefined) {
+            setApiKey("");
         }
     }, [room]);
 
     useEffect(() => {
-        if (isReady && canvasRef.current && apiKey) {
+        if (isReady && canvasRef.current && apiKey !== undefined) {
             initDice(!!room?.diceRendering);
         }
     }, [apiKey]);

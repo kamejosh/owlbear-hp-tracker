@@ -187,7 +187,7 @@
 
                 &:hover {
                     border-color: var(--error-border);
-                    background-color: rgb(var(--error-bg));
+                    background: rgb(var(--error-bg));
                 }
             }
         }
@@ -205,6 +205,12 @@
             border-bottom-left-radius: 0;
             width: 45px;
             height: 45px;
+
+            &.open {
+                --bg1: #556;
+                --bg2: #778;
+                background: linear-gradient(-30deg, var(--bg4), var(--bg3), var(--bg2), var(--bg1));
+            }
 
             .roll-log-svg {
                 fill: white;
@@ -459,7 +465,7 @@
     &.popover {
         .roll-log-entry {
             border: none;
-            background-color: var(--bg-color) dd;
+            background-color: var(--bg-color);
 
             .button-wrapper {
                 display: none;
