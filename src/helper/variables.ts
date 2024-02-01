@@ -8,7 +8,6 @@ export const infoMetadataKey = `${ID}/text`;
 
 export const modalId = `${ID}/modal`;
 export const statblockPopoverId = `${ID}/statblock-popover`;
-
 export const rollLogPopoverId = `${ID}/dice-log`;
 
 export const version = "1.6.0";

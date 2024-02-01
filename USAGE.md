@@ -19,6 +19,18 @@
     - [Single Selection](#single-selection)
     - [Multi Selection](#multi-selection)
   + [Statblock Popover](#hp-tracker-statblock-popover)
+- [Dice Roller](#dice-roller)
+  + [Disclaimer](#disclaimer)
+  + [Getting Started](#getting-started)
+  + [Login into dddice](#login-into-dddice)
+  + [Dice Settings](#dice-settings)
+    - [Dice Theme](#dice-theme)
+    - [3D Rendering](#3d-rendering)
+  + [Using The Dice Roller](#using-the-dice-roller)
+    - [Dice Buttons in Statblocks](#dice-buttons-in-statblocks)
+    - [Initiative Buttons](#initiative-buttons)
+    - [Custom Roll Buttons](#custom-roll-buttons)
+    - [Quick Roll Buttons](#quick-roll-buttons)
 
 # HP Tracker - Owlbear Plugin
 
