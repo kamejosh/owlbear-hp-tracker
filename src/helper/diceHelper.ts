@@ -10,7 +10,6 @@ import {
     ThreeDDice,
     ThreeDDiceAPI,
     ThreeDDiceRollEvent,
-    ThreeDDiceRoomEvent,
 } from "dddice-js";
 import { RollLogEntryType } from "../context/RollLogContext.tsx";
 import { rollLogPopover, rollLogPopoverId } from "./variables.ts";
