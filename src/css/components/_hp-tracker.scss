@@ -13,18 +13,30 @@
     }
 
     .group-wrapper {
-        .drop-list-wrapper {
+        .draggable-token-list-wrapper {
             display: grid;
             grid-template-rows: 1fr;
             transition: all 0.25s ease-in-out;
             overflow: hidden;
 
-            .drop-list {
+            .draggable-token-list-wrapper {
                 min-height: 0;
             }
         }
+
+        .empty-group {
+            opacity: 0.5;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.5);
+            height: 40px;
+
+            &:not(:only-child) {
+                display: none;
+            }
+        }
+
         &.hidden {
-            .drop-list-wrapper {
+            .draggable-token-list-wrapper {
                 grid-template-rows: 0fr;
             }
 
@@ -34,6 +46,12 @@
                         rotate: 0deg;
                     }
                 }
+            }
+
+            .empty-group {
+                display: block;
+                background-color: transparent;
+                height: 2px;
             }
         }
 
@@ -118,13 +136,6 @@
                     content: "";
                 }
             }
-        }
-
-        .empty-group {
-            opacity: 0.5;
-            border-radius: 5px;
-            background-color: rgba(255, 255, 255, 0.5);
-            height: 40px;
         }
     }
 }

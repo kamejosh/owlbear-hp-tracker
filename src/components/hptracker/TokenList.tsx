@@ -27,35 +27,42 @@ export const DraggableTokenList = React.memo(function DraggableTokenList(props: 
     return (
         <>
             {props.tokens.length > 0 ? (
-                props.tokens?.map((token, index) => {
-                    const data = token.metadata[itemMetadataKey] as HpTrackerMetadata;
-                    if (data) {
-                        if (data.index === undefined) {
-                            updateTokenIndex(token.id, index);
-                        }
-                        return (
-                            <Draggable key={token.id} draggableId={token.id} index={index}>
-                                {(provided) => (
-                                    <div
-                                        ref={provided.innerRef}
-                                        {...provided.draggableProps}
-                                        {...provided.dragHandleProps}
-                                    >
-                                        <Token
-                                            item={token}
-                                            data={data}
-                                            popover={false}
-                                            selected={props.selected.includes(token.id)}
-                                            tokenLists={props.tokenLists}
-                                        />
-                                    </div>
-                                )}
-                            </Draggable>
-                        );
-                    }
+                <>
+                    <div className={"draggable-token-list-wrapper"}>
+                        <div className={"draggable-token-list-wrapper"}>
+                            {props.tokens?.map((token, index) => {
+                                const data = token.metadata[itemMetadataKey] as HpTrackerMetadata;
+                                if (data) {
+                                    if (data.index === undefined) {
+                                        updateTokenIndex(token.id, index);
+                                    }
+                                    return (
+                                        <Draggable key={token.id} draggableId={token.id} index={index}>
+                                            {(provided) => (
+                                                <div
+                                                    ref={provided.innerRef}
+                                                    {...provided.draggableProps}
+                                                    {...provided.dragHandleProps}
+                                                >
+                                                    <Token
+                                                        item={token}
+                                                        data={data}
+                                                        popover={false}
+                                                        selected={props.selected.includes(token.id)}
+                                                        tokenLists={props.tokenLists}
+                                                    />
+                                                </div>
+                                            )}
+                                        </Draggable>
+                                    );
+                                }
 
-                    return null;
-                })
+                                return null;
+                            })}
+                        </div>
+                    </div>
+                    <div className={"empty-group"}></div>
+                </>
             ) : (
                 <div className={"empty-group"}></div>
             )}
