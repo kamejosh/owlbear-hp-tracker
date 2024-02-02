@@ -318,34 +318,43 @@ const handleBarAttachment = async (
     const bounds = await getImageBounds(character);
     const width = Math.abs(bounds.width);
     const border = Math.floor(width / 75);
+    const color = shape.style.fillColor;
 
     if (attachment.name === "hp" && infoMetadataKey in attachment.metadata) {
         const change = changeMap.get(attachment.id) ?? {};
         const { hpPercentage } = await calculatePercentage(data);
         if (hpPercentage === 0) {
-            change.color = "black";
+            if (color !== "black") {
+                change.color = "black";
+            }
         } else {
-            change.color = "red";
+            if (color !== "red") {
+                change.color = "red";
+            }
         }
         change.width = hpPercentage === 0 ? 0 : (width - border * 2) * hpPercentage;
-        if (shape.width != change.width || shape.style.fillColor != change.color) {
+        if (shape.width !== change.width || (change.color && color !== change.color)) {
             return change;
         }
     } else if (attachment.name === "temp-hp" && infoMetadataKey in attachment.metadata) {
         const change = changeMap.get(attachment.id) ?? {};
         const { tempHpPercentage } = await calculatePercentage(data);
         if (tempHpPercentage === 0) {
-            change.color = "black";
+            if (color !== "black") {
+                change.color = "black";
+            }
         } else {
-            change.color = "blue";
+            if (color !== "red") {
+                change.color = "blue";
+            }
         }
         change.width = tempHpPercentage === 0 ? 0 : (width - border * 2) * tempHpPercentage;
-        if (shape.width != change.width || shape.style.fillColor != change.color) {
+        if (shape.width !== change.width || (change.color && color !== change.color)) {
             return change;
         }
     } else if (infoMetadataKey in attachment.metadata) {
         const change = changeMap.get(attachment.id) ?? {};
-        if (shape.width != width) {
+        if (shape.width !== width) {
             change.width = width;
             return change;
         }

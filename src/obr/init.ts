@@ -296,18 +296,21 @@ const initTokens = async () => {
 };
 
 OBR.onReady(async () => {
-    console.log(`HP Tracker version ${version} initializing`);
-    await setupContextMenu();
-    OBR.scene.onReadyChange(async (isReady) => {
+    console.info(`HP Tracker version ${version} initializing`);
+    if ((await OBR.player.getRole()) === "GM") {
+        await setupContextMenu();
+        OBR.scene.onReadyChange(async (isReady) => {
+            if (isReady) {
+                await sceneReady();
+            }
+        });
+
+        const isReady = await OBR.scene.isReady();
         if (isReady) {
             await sceneReady();
         }
-    });
 
-    const isReady = await OBR.scene.isReady();
-    if (isReady) {
-        await sceneReady();
+        await initTokens();
     }
-
-    await initTokens();
+    console.info(`HP Tracker initialization done`);
 });
