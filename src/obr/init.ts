@@ -62,7 +62,7 @@ const initItems = async () => {
     await updateAcChanges(acChanges);
     await updateBarChanges(barChanges);
     await updateTextChanges(textChanges);
-    console.log("HP Tracker - Token initialization done");
+    console.info("HP Tracker - Token initialization done");
 };
 
 const initRoom = async () => {
@@ -312,7 +312,7 @@ const initTokens = async () => {
 };
 
 OBR.onReady(async () => {
-    console.info(`HP Tracker version ${version} initializing`);
+    console.info(`HP Tracker - version ${version} initializing`);
     if ((await OBR.player.getRole()) === "GM") {
         try {
             await setupContextMenu();
@@ -336,5 +336,5 @@ OBR.onReady(async () => {
             console.warn("HP Tracker - error while initializing Token event handler", e);
         }
     }
-    console.info(`HP Tracker initialization done`);
+    console.info(`HP Tracker - initialization done`);
 });

@@ -48,7 +48,7 @@ body {
         background-color: rgba(255, 255, 255, 0.5);
     }
 
-    &:has(.roll-log-popover) {
+    &:has(.roll-log-popover, .modal-wrapper) {
         &::after {
             background: transparent;
         }

@@ -10,6 +10,7 @@ import {
     ThreeDDice,
     ThreeDDiceAPI,
     ThreeDDiceRollEvent,
+    ThreeDDiceRoomEvent,
 } from "dddice-js";
 import { RollLogEntryType } from "../context/RollLogContext.tsx";
 import { rollLogPopover, rollLogPopoverId } from "./variables.ts";
@@ -165,17 +166,6 @@ export const addRollerCallbacks = async (
     showPopover: boolean = true
 ) => {
     roller.on(ThreeDDiceRollEvent.RollStarted, async (e) => {
-        if (!showPopover) {
-            const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
-            const rollLogEntry = await dddiceRollToRollLog(e, { participant: participant });
-            await OBR.notification.show(
-                `${rollLogEntry.username} rolled ${rollLogEntry.equation} = ${rollLogEntry.total_value}`,
-                "INFO"
-            );
-        }
-    });
-
-    roller.on(ThreeDDiceRollEvent.RollFinished, async (e) => {
         const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
         const name = await OBR.player.getName();
         const rollLogEntry = await dddiceRollToRollLog(e, { participant: participant });
@@ -184,23 +174,32 @@ export const addRollerCallbacks = async (
             addRoll(rollLogEntry);
         }
 
-        // only the action window triggers the popover or notification because it always exists
-        if (component === "action_window") {
-            if (showPopover) {
-                const width = await OBR.viewport.getWidth();
-                const height = await OBR.viewport.getHeight();
-                await OBR.popover.open({
-                    ...rollLogPopover,
-                    anchorPosition: { top: Math.max(height - 55, 0), left: width - 70 },
-                });
+        if (!showPopover) {
+            const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
+            const rollLogEntry = await dddiceRollToRollLog(e, { participant: participant });
+            await OBR.notification.show(
+                `${rollLogEntry.username} rolled ${rollLogEntry.equation} = ${rollLogEntry.total_value}`,
+                "INFO"
+            );
+        } else {
+            // only the action window triggers the popover or notification because it always exists
+            if (component === "action_window") {
+                if (showPopover) {
+                    const width = await OBR.viewport.getWidth();
+                    const height = await OBR.viewport.getHeight();
+                    await OBR.popover.open({
+                        ...rollLogPopover,
+                        anchorPosition: { top: Math.max(height - 55, 0), left: width - 70 },
+                    });
 
-                if (rollLogTimeOut) {
-                    clearTimeout(rollLogTimeOut);
+                    if (rollLogTimeOut) {
+                        clearTimeout(rollLogTimeOut);
+                    }
+
+                    rollLogTimeOut = setTimeout(async () => {
+                        await OBR.popover.close(rollLogPopoverId);
+                    }, 5000);
                 }
-
-                rollLogTimeOut = setTimeout(async () => {
-                    await OBR.popover.close(rollLogPopoverId);
-                }, 5000);
             }
         }
     });
