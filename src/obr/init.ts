@@ -275,10 +275,26 @@ const migrations = async () => {
 };
 
 const sceneReady = async () => {
-    await migrations();
-    await initItems();
-    await initRoom();
-    await initScene();
+    try {
+        await migrations();
+    } catch (e) {
+        console.warn("HP Tracker - Error while running migrations", e);
+    }
+    try {
+        await initItems();
+    } catch (e) {
+        console.warn("HP Tracker - Error while initializing items", e);
+    }
+    try {
+        await initRoom();
+    } catch (e) {
+        console.warn("HP Tracker - Error while initializing Room", e);
+    }
+    try {
+        await initScene();
+    } catch (e) {
+        console.warn("HP Tracker - Error while initializing Scene", e);
+    }
 };
 
 const initTokens = async () => {
@@ -298,7 +314,11 @@ const initTokens = async () => {
 OBR.onReady(async () => {
     console.info(`HP Tracker version ${version} initializing`);
     if ((await OBR.player.getRole()) === "GM") {
-        await setupContextMenu();
+        try {
+            await setupContextMenu();
+        } catch (e) {
+            console.warn("HP Tracker - error while setting up context menu");
+        }
         OBR.scene.onReadyChange(async (isReady) => {
             if (isReady) {
                 await sceneReady();
@@ -310,7 +330,11 @@ OBR.onReady(async () => {
             await sceneReady();
         }
 
-        await initTokens();
+        try {
+            await initTokens();
+        } catch (e) {
+            console.warn("HP Tracker - error while initializing Token event handler", e);
+        }
     }
     console.info(`HP Tracker initialization done`);
 });
