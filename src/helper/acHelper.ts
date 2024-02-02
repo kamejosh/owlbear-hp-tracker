@@ -1,7 +1,7 @@
 import OBR, { buildCurve, buildText, Curve, Image, isCurve, isText, Item, Text } from "@owlbear-rodeo/sdk";
 import { ACItemChanges, HpTrackerMetadata } from "./types.ts";
 import { attachmentFilter, deleteAttachments, getACOffset, getAttachedItems, getImageBounds } from "./helpers.ts";
-import { characterMetadata, infoMetadata } from "./variables.ts";
+import { itemMetadataKey, infoMetadataKey } from "./variables.ts";
 
 export const createAC = async (ac: number, token: Image) => {
     const bounds = await getImageBounds(token);
@@ -53,8 +53,8 @@ export const createAC = async (ac: number, token: Image) => {
         .visible(token.visible)
         .build();
 
-    acShape.metadata[infoMetadata] = { isHpText: true, attachmentType: "AC" };
-    acText.metadata[infoMetadata] = { isHPText: true, attachmentType: "AC" };
+    acShape.metadata[infoMetadataKey] = { isHpText: true, attachmentType: "AC" };
+    acText.metadata[infoMetadataKey] = { isHPText: true, attachmentType: "AC" };
     return [acShape, acText];
 };
 
@@ -78,7 +78,9 @@ const handleACOffsetUpdate = async (offset: { x: number; y: number }, ac: Item) 
 };
 
 export const updateAcOffset = async (offset: { x: number; y: number }) => {
-    const acCurves = await OBR.scene.items.getItems((item) => item.type === "CURVE" && infoMetadata in item.metadata);
+    const acCurves = await OBR.scene.items.getItems(
+        (item) => item.type === "CURVE" && infoMetadataKey in item.metadata
+    );
     const changeMap = new Map<string, ACItemChanges>();
     for (const acCurve of acCurves) {
         const change = await handleACOffsetUpdate(offset, acCurve);
@@ -179,7 +181,7 @@ export const updateAcVisibility = async (tokens: Array<Item>) => {
     const acChanges = new Map<string, ACItemChanges>();
     for (const token of tokens) {
         const acAttachments = (await getAttachedItems(token.id, ["CURVE"])).filter((a) => attachmentFilter(a, "AC"));
-        const data = token.metadata[characterMetadata] as HpTrackerMetadata;
+        const data = token.metadata[itemMetadataKey] as HpTrackerMetadata;
 
         acAttachments.forEach((curve) => {
             const change = acChanges.get(curve.id) ?? {};

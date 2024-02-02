@@ -1,10 +1,14 @@
+@import "base/animations";
+@import "base/variables";
 @import "base/base";
 @import "base/buttons";
 @import "base/input";
 @import "base/links";
+@import "base/tooltips";
 @import "base/typography";
 
 @import "components/character-sheet";
+@import "components/dddice";
 @import "components/e5ability";
 @import "components/e5spell";
 @import "components/global-settings";
@@ -16,4 +20,5 @@
 @import "components/token";
 @import "components/statblock-popover";
 @import "components/statblock-wrapper";
+@import "components/svg";
 @import "components/switch";

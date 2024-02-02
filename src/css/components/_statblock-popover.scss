@@ -11,6 +11,7 @@ body:has(.statblock-app) {
             position: fixed;
             top: 0;
             left: 0;
+            z-index: 100;
             background-color: var(--bg-color);
             width: 100%;
             height: calc(30px + 1rem);
@@ -18,7 +19,7 @@ body:has(.statblock-app) {
         }
 
         .help-buttons {
-            z-index: 10;
+            z-index: 200;
         }
 
         .statblock-list {
@@ -115,5 +116,11 @@ body:has(.statblock-app) {
                 }
             }
         }
+    }
+}
+
+.statblock-dice-tray {
+    .dice-tray-content {
+        max-height: 80vh;
     }
 }

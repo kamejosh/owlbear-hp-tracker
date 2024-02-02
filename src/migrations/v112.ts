@@ -1,13 +1,13 @@
 import OBR, { Metadata } from "@owlbear-rodeo/sdk";
-import { sceneMetadata } from "../helper/variables.ts";
-import { SceneMetadata } from "../helper/types.ts";
+import { metadataKey } from "../helper/variables.ts";
+import { SceneMetadata_Deprecated } from "../helper/types.ts";
 
 // in V1.1.1 we introduced new scene metadata fields
 
 export const migrate111To112 = async () => {
     console.log("Migration from 111 to 112 running");
     const metadata = (await OBR.scene.getMetadata()) as Metadata;
-    const data = metadata[sceneMetadata] as SceneMetadata;
+    const data = metadata[metadataKey] as SceneMetadata_Deprecated;
 
     if (data.hpBarSegments === undefined) {
         data.hpBarSegments = 0;
@@ -16,7 +16,7 @@ export const migrate111To112 = async () => {
         data.hpBarOffset = 0;
     }
 
-    metadata[sceneMetadata] = data;
+    metadata[metadataKey] = data;
 
     await OBR.scene.setMetadata(metadata);
 };

@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
-import { changelogModal, characterMetadata, sceneMetadata, version } from "../../helper/variables.ts";
-import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
+import { changelogModal, itemMetadataKey, version } from "../../helper/variables.ts";
+import { HpTrackerMetadata } from "../../helper/types.ts";
 import { DragDropContext, DraggableLocation, DropResult } from "react-beautiful-dnd";
 import { PlayerTokenList } from "./TokenList.tsx";
 import { useCharSheet } from "../../context/CharacterContext.ts";
@@ -13,11 +13,15 @@ import { DropGroup } from "./DropGroup.tsx";
 import { sortItems, sortItemsInitiative } from "../../helper/helpers.ts";
 import { compare } from "compare-versions";
 import { Helpbuttons } from "../general/Helpbuttons/Helpbuttons.tsx";
+import { DiceTray } from "../general/DiceRoller/DiceTray.tsx";
+import { useMetadataContext } from "../../context/MetadataContext.ts";
+import { uniq } from "lodash";
 
 export const HPTracker = () => {
     return (
-        <ContextWrapper>
+        <ContextWrapper component={"action_window"}>
             <Content />
+            <DiceTray classes={"hp-tracker-dice-tray"} />
         </ContextWrapper>
     );
 };
@@ -28,29 +32,36 @@ const Content = () => {
     const [playerTokens, setPlayerTokens] = useState<Array<Item>>([]);
     const [selectedTokens, setSelectedTokens] = useState<Array<string>>([]);
     const [tokenLists, setTokenLists] = useState<Map<string, Array<Item>>>(new Map());
-    const [currentSceneMetadata, setCurrentSceneMetadata] = useState<SceneMetadata | null>(null);
+    const [ignoredChanges, setIgnoredChanges] = useState<boolean>(false);
+    const { scene, room } = useMetadataContext();
     const { isReady } = SceneReadyContext();
     const { characterId } = useCharSheet();
 
     const initHpTracker = async () => {
         const initialItems = await OBR.scene.items.getItems(
             (item) =>
-                characterMetadata in item.metadata &&
-                (item.metadata[characterMetadata] as HpTrackerMetadata).hpTrackerActive
+                itemMetadataKey in item.metadata &&
+                (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpTrackerActive
         );
         setTokens(initialItems);
 
-        const sceneData = await OBR.scene.getMetadata();
-        const metadata = sceneData[sceneMetadata] as SceneMetadata;
-        if (metadata?.version && compare(metadata.version, version, "<")) {
+        if (
+            playerContext.role === "GM" &&
+            !room?.ignoreUpdateNotification &&
+            scene?.version &&
+            compare(scene.version, version, "<")
+        ) {
+            const width = await OBR.viewport.getWidth();
             await OBR.modal.open({
                 ...changelogModal,
                 fullScreen: false,
                 height: 600,
-                width: 600,
+                width: Math.min(width * 0.9, 600),
             });
+        } else if (playerContext.role === "GM" && scene?.version && compare(scene.version, version, "<")) {
+            setIgnoredChanges(true);
+            await OBR.notification.show(`HP Tracker has been updated to version ${version}`, "SUCCESS");
         }
-        setCurrentSceneMetadata(metadata);
     };
 
     useEffect(() => {
@@ -63,17 +74,12 @@ const Content = () => {
         OBR.scene.items.onChange(async (items) => {
             const filteredItems = items.filter(
                 (item) =>
-                    characterMetadata in item.metadata &&
-                    (item.metadata[characterMetadata] as HpTrackerMetadata).hpTrackerActive
+                    itemMetadataKey in item.metadata &&
+                    (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpTrackerActive
             );
             setTokens(Array.from(filteredItems));
         });
-        OBR.scene.onMetadataChange((sceneData) => {
-            const metadata = sceneData[sceneMetadata] as SceneMetadata;
-            if (metadata) {
-                setCurrentSceneMetadata(metadata);
-            }
-        });
+
         OBR.player.onChange((player) => {
             setSelectedTokens(player.selection ?? []);
         });
@@ -82,39 +88,66 @@ const Content = () => {
     useEffect(() => {
         const tokenMap = new Map<string, Array<Item>>();
 
-        currentSceneMetadata?.groups?.forEach((group) => {
+        scene?.groups?.forEach((group) => {
             const groupItems = tokens?.filter((item) => {
-                const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
+                const metadata = item.metadata[itemMetadataKey] as HpTrackerMetadata;
                 return (
                     (!metadata.group && group === "Default") ||
                     metadata.group === group ||
-                    (!currentSceneMetadata?.groups?.includes(metadata.group ?? "") && group === "Default")
+                    (!scene?.groups?.includes(metadata.group ?? "") && group === "Default")
                 );
             });
-            tokenMap.set(group, groupItems ?? []);
+            const indices = groupItems?.map((gi) => (gi.metadata[itemMetadataKey] as HpTrackerMetadata).index);
+
+            if (groupItems && indices && (indices.includes(undefined) || uniq(indices).length !== indices.length)) {
+                reorderMetadataIndex(groupItems, group);
+            } else {
+                tokenMap.set(group, groupItems ?? []);
+            }
         });
 
         setTokenLists(tokenMap);
-    }, [currentSceneMetadata?.groups, tokens]);
+    }, [scene?.groups, tokens]);
 
     useEffect(() => {
-        if (currentSceneMetadata?.playerSort && tokens) {
+        if (room?.playerSort && tokens) {
             const localTokens = [...tokens];
             setPlayerTokens(localTokens.sort(sortItemsInitiative));
         } else {
             setPlayerTokens(tokens ?? []);
         }
-    }, [currentSceneMetadata?.playerSort, tokens]);
+    }, [room?.playerSort, tokens]);
+
+    const reorderMetadataIndexMulti = (destList: Array<Item>, group: string, sourceList: Array<Item>) => {
+        const combinedList = destList.concat(sourceList);
+        const destinationIds = destList.map((d) => d.id);
+        OBR.scene.items.updateItems(combinedList, (items) => {
+            let destIndex = 0;
+            let sourceIndex = 0;
+            items.forEach((item) => {
+                const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+                if (destinationIds.includes(item.id)) {
+                    data.index = destIndex;
+                    destIndex += 1;
+                    data.group = group;
+                } else {
+                    data.index = sourceIndex;
+                    sourceIndex += 1;
+                }
+                item.metadata[itemMetadataKey] = { ...data };
+            });
+        });
+    };
 
     const reorderMetadataIndex = (list: Array<Item>, group?: string) => {
         OBR.scene.items.updateItems(list, (items) => {
             items.forEach((item, index) => {
-                const data = item.metadata[characterMetadata] as HpTrackerMetadata;
+                const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
                 data.index = index;
                 if (group) {
                     data.group = group;
                 }
-                item.metadata[characterMetadata] = { ...data };
+                item.metadata[itemMetadataKey] = { ...data };
             });
         });
     };
@@ -197,8 +230,7 @@ const Content = () => {
             destClone.splice(droppableDestination.index, 0, removed);
         }
 
-        reorderMetadataIndex(sourceClone);
-        reorderMetadataIndex(destClone, droppableDestination.droppableId);
+        reorderMetadataIndexMulti(destClone, droppableDestination.droppableId, sourceClone);
     };
 
     const onDragEnd = (result: DropResult) => {
@@ -235,8 +267,8 @@ const Content = () => {
         tokenLists.forEach((tokenList) => {
             const reordered = Array.from(tokenList);
             reordered.sort((a, b) => {
-                const aData = a.metadata[characterMetadata] as HpTrackerMetadata;
-                const bData = b.metadata[characterMetadata] as HpTrackerMetadata;
+                const aData = a.metadata[itemMetadataKey] as HpTrackerMetadata;
+                const bData = b.metadata[itemMetadataKey] as HpTrackerMetadata;
                 if (bData.initiative === aData.initiative) {
                     return (
                         bData.stats.initiativeBonus +
@@ -252,10 +284,10 @@ const Content = () => {
 
     return playerContext.role ? (
         characterId ? (
-            <CharacterSheet currentSceneMetadata={currentSceneMetadata} itemId={characterId} />
+            <CharacterSheet itemId={characterId} />
         ) : (
             <div className={"hp-tracker"}>
-                <Helpbuttons currentSceneMetadata={currentSceneMetadata} />
+                <Helpbuttons ignoredChanges={ignoredChanges} setIgnoredChange={setIgnoredChanges} />
                 <h1 className={"title"}>
                     HP Tracker<span className={"small"}>{version}</span>
                 </h1>
@@ -277,12 +309,12 @@ const Content = () => {
                             </button>
                         ) : null}
                     </span>
-                    <span className={"character-sheet"}>INFO</span>
+                    <span className={"statblock-heading"}>INFO</span>
                 </div>
-                {playerContext.role === "GM" && currentSceneMetadata ? (
+                {playerContext.role === "GM" ? (
                     <DragDropContext onDragEnd={onDragEnd}>
-                        {currentSceneMetadata.groups && currentSceneMetadata.groups?.length > 0 ? (
-                            currentSceneMetadata.groups?.map((group) => {
+                        {scene && scene.groups && scene.groups?.length > 0 ? (
+                            scene.groups?.map((group) => {
                                 const list = tokenLists.get(group) || [];
                                 return (
                                     <DropGroup
@@ -290,7 +322,6 @@ const Content = () => {
                                         title={group}
                                         list={list.sort(sortItems)}
                                         selected={selectedTokens}
-                                        metadata={currentSceneMetadata}
                                         tokenLists={tokenLists}
                                     />
                                 );
@@ -300,18 +331,12 @@ const Content = () => {
                                 title={"Default"}
                                 list={Array.from(tokens ?? []).sort(sortItems)}
                                 selected={selectedTokens}
-                                metadata={currentSceneMetadata}
                                 tokenLists={tokenLists}
                             />
                         )}
                     </DragDropContext>
                 ) : (
-                    <PlayerTokenList
-                        tokens={playerTokens}
-                        selected={selectedTokens}
-                        metadata={currentSceneMetadata!}
-                        tokenLists={tokenLists}
-                    />
+                    <PlayerTokenList tokens={playerTokens} selected={selectedTokens} tokenLists={tokenLists} />
                 )}
             </div>
         )

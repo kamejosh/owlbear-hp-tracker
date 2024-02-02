@@ -1,20 +1,23 @@
 import OBR, { Image, Item, Metadata } from "@owlbear-rodeo/sdk";
-import { characterMetadata, infoMetadata, sceneMetadata } from "./variables.ts";
-import { AttachmentMetadata, HpTrackerMetadata, SceneMetadata } from "./types.ts";
+import { infoMetadataKey, itemMetadataKey, metadataKey } from "./variables.ts";
+import { AttachmentMetadata, HpTrackerMetadata, RoomMetadata, SceneMetadata } from "./types.ts";
+import { isObject } from "lodash";
+import { IRoll, IRoomParticipant } from "dddice-js";
+import { RollLogEntryType } from "../context/RollLogContext.tsx";
 
 export const getYOffset = async (height: number) => {
-    const metadata = (await OBR.scene.getMetadata()) as Metadata;
-    const sceneData = metadata[sceneMetadata] as SceneMetadata;
-    let offset = sceneData ? sceneData.hpBarOffset ?? 0 : 0;
+    const metadata = (await OBR.room.getMetadata()) as Metadata;
+    const roomMetadata = metadata[metadataKey] as RoomMetadata;
+    let offset = roomMetadata ? roomMetadata.hpBarOffset ?? 0 : 0;
     const offsetFactor = height / 150;
     offset *= offsetFactor;
     return offset;
 };
 
 export const getACOffset = async (height: number, width: number) => {
-    const metadata = (await OBR.scene.getMetadata()) as Metadata;
-    const sceneData = metadata[sceneMetadata] as SceneMetadata;
-    let offset = sceneData ? sceneData.acOffset ?? { x: 0, y: 0 } : { x: 0, y: 0 };
+    const metadata = (await OBR.room.getMetadata()) as Metadata;
+    const roomMetadata = metadata[metadataKey] as RoomMetadata;
+    let offset = roomMetadata ? roomMetadata.acOffset ?? { x: 0, y: 0 } : { x: 0, y: 0 };
     offset.x = offset.x * (width / 150);
     offset.y = offset.y * (height / 150);
     return offset;
@@ -25,7 +28,7 @@ export const getAttachedItems = async (id: string, itemTypes: Array<string>) => 
     // why am I not using .filter()? because if I do there is a bug and I can't find it
     const attachments: Item[] = [];
     items.forEach((item) => {
-        if (infoMetadata in item.metadata && itemTypes.indexOf(item.type) >= 0) {
+        if (infoMetadataKey in item.metadata && itemTypes.indexOf(item.type) >= 0) {
             attachments.push(item);
         }
     });
@@ -34,9 +37,9 @@ export const getAttachedItems = async (id: string, itemTypes: Array<string>) => 
 };
 
 export const calculatePercentage = async (data: HpTrackerMetadata) => {
-    const metadata = (await OBR.scene.getMetadata()) as Metadata;
-    const sceneData = metadata[sceneMetadata] as SceneMetadata;
-    const segments = sceneData ? sceneData.hpBarSegments ?? 0 : 0;
+    const metadata = (await OBR.room.getMetadata()) as Metadata;
+    const roomMetadata = metadata[metadataKey] as RoomMetadata;
+    const segments = roomMetadata ? roomMetadata.hpBarSegments ?? 0 : 0;
 
     const tempHp = data.stats.tempHp ?? 0;
 
@@ -85,8 +88,8 @@ export const evalString = (s: string) => {
 };
 
 export const sortItems = (a: Item, b: Item) => {
-    const aData = a.metadata[characterMetadata] as HpTrackerMetadata;
-    const bData = b.metadata[characterMetadata] as HpTrackerMetadata;
+    const aData = a.metadata[itemMetadataKey] as HpTrackerMetadata;
+    const bData = b.metadata[itemMetadataKey] as HpTrackerMetadata;
     if (aData && bData && aData.index !== undefined && bData.index !== undefined) {
         if (aData.index < bData.index) {
             return -1;
@@ -100,8 +103,8 @@ export const sortItems = (a: Item, b: Item) => {
 };
 
 export const sortItemsInitiative = (a: Item, b: Item) => {
-    const aData = a.metadata[characterMetadata] as HpTrackerMetadata;
-    const bData = b.metadata[characterMetadata] as HpTrackerMetadata;
+    const aData = a.metadata[itemMetadataKey] as HpTrackerMetadata;
+    const bData = b.metadata[itemMetadataKey] as HpTrackerMetadata;
     if (aData && bData && aData.initiative !== undefined && bData.initiative !== undefined) {
         if (aData.initiative < bData.initiative) {
             return 1;
@@ -133,8 +136,8 @@ export const getDamage = (text: string) => {
 };
 
 export const attachmentFilter = (attachment: Item, attachmentType: "BAR" | "HP" | "AC") => {
-    if (infoMetadata in attachment.metadata) {
-        const metadata = attachment.metadata[infoMetadata] as AttachmentMetadata;
+    if (infoMetadataKey in attachment.metadata) {
+        const metadata = attachment.metadata[infoMetadataKey] as AttachmentMetadata;
         return metadata.isHpText && metadata.attachmentType === attachmentType;
     }
     return false;
@@ -150,4 +153,79 @@ export const getBgColor = (data: HpTrackerMetadata, opacity: string = "0.2") => 
     const g = 255 * percent;
     const r = 255 - 255 * percent;
     return "rgb(" + r + "," + g + `,0,${opacity})`;
+};
+
+export const objectsEqual = (obj1: Object, obj2: Object) => {
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+
+    if (keys1.length !== keys2.length) {
+        return false;
+    }
+
+    // a forEach loop is not disrupted by a return
+    for (const key of keys1) {
+        // @ts-ignore obj1 has key
+        const val1 = obj1[key];
+        // @ts-ignore obj1 has key
+        const val2 = obj2[key];
+
+        const areObjects = isObject(val1) && isObject(val2);
+        if ((areObjects && !objectsEqual(val1, val2)) || (!areObjects && val1 !== val2)) {
+            return false;
+        }
+    }
+
+    return true;
+};
+
+export const updateSceneMetadata = async (scene: SceneMetadata | null, data: Partial<SceneMetadata>) => {
+    const ownMetadata: Metadata = {};
+    ownMetadata[metadataKey] = { ...scene, ...data };
+
+    if (!scene || !objectsEqual(ownMetadata, scene)) {
+        await OBR.scene.setMetadata({ ...ownMetadata });
+    }
+};
+
+export const updateRoomMetadata = async (
+    room: RoomMetadata | null,
+    data: Partial<RoomMetadata>,
+    additionalData?: Metadata
+) => {
+    const ownMetadata: Metadata = additionalData ?? {};
+    ownMetadata[metadataKey] = { ...room, ...data };
+
+    if (!room || !objectsEqual(ownMetadata, room)) {
+        await OBR.room.setMetadata({ ...ownMetadata });
+    }
+};
+
+export const dddiceRollToRollLog = async (
+    roll: IRoll,
+    options?: { participant?: IRoomParticipant; owlbear_user_id?: string }
+): Promise<RollLogEntryType> => {
+    let username = roll.user.username;
+
+    if (roll.user.name === "Guest User") {
+        if (options && options.participant && options.participant.username) {
+            username = options.participant.username;
+        } else {
+            const particip = roll.room.participants.find((p) => p.user.uuid === roll.user.uuid);
+            if (particip && particip.username) {
+                username = particip.username;
+            }
+        }
+    }
+
+    return {
+        uuid: roll.uuid,
+        created_at: roll.created_at,
+        equation: roll.equation,
+        label: roll.label,
+        total_value: roll.total_value,
+        username: username,
+        values: roll.values,
+        owlbear_user_id: options?.owlbear_user_id,
+    };
 };

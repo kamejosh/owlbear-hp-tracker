@@ -1,53 +1,40 @@
-import { characterMetadata, sceneMetadata, statblockPopoverId } from "../../helper/variables.ts";
+import { itemMetadataKey, statblockPopoverId } from "../../helper/variables.ts";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
 import { useEffect, useState } from "react";
 import { StatblockList } from "./StatblockList.tsx";
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
-import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
+import { HpTrackerMetadata } from "../../helper/types.ts";
 import { sortItems } from "../../helper/helpers.ts";
+import { DiceTray } from "../general/DiceRoller/DiceTray.tsx";
+import { useMetadataContext } from "../../context/MetadataContext.ts";
 
 export const StatblockPopover = () => {
     const [minimized, setMinimized] = useState<boolean>(false);
     const [tokens, setTokens] = useState<Array<Item>>([]);
     const [sortedTokens, setSortedTokens] = useState<Array<Item>>([]);
-    const [currentSceneMetadata, setCurrentSceneMetadata] = useState<SceneMetadata | null>(null);
     const [pinned, setPinned] = useState<boolean>(false);
     const [data, setData] = useState<HpTrackerMetadata | null>(null);
+    const { room, scene } = useMetadataContext();
     const { isReady } = SceneReadyContext();
 
     const initPopover = async () => {
         const initialItems = await OBR.scene.items.getItems(
             (item) =>
-                characterMetadata in item.metadata &&
-                (item.metadata[characterMetadata] as HpTrackerMetadata).hpTrackerActive &&
-                (item.metadata[characterMetadata] as HpTrackerMetadata).sheet !== ""
+                itemMetadataKey in item.metadata &&
+                (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpTrackerActive &&
+                (item.metadata[itemMetadataKey] as HpTrackerMetadata).sheet !== ""
         );
         setTokens(initialItems.sort(sortItems));
-
-        const sceneData = await OBR.scene.getMetadata();
-        const metadata = sceneData[sceneMetadata] as SceneMetadata;
-        setCurrentSceneMetadata(metadata);
 
         OBR.scene.items.onChange(async (items) => {
             const filteredItems = items.filter(
                 (item) =>
-                    characterMetadata in item.metadata &&
-                    (item.metadata[characterMetadata] as HpTrackerMetadata).hpTrackerActive &&
-                    (item.metadata[characterMetadata] as HpTrackerMetadata).sheet !== ""
+                    itemMetadataKey in item.metadata &&
+                    (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpTrackerActive &&
+                    (item.metadata[itemMetadataKey] as HpTrackerMetadata).sheet !== ""
             );
             setTokens(Array.from(filteredItems.sort(sortItems)));
-        });
-
-        OBR.scene.onMetadataChange((sceneData) => {
-            const metadata = sceneData[sceneMetadata] as SceneMetadata;
-            if (metadata) {
-                setCurrentSceneMetadata(metadata);
-                if (!minimized) {
-                    OBR.popover.setHeight(statblockPopoverId, metadata.statblockPopover?.height || 600);
-                    OBR.popover.setWidth(statblockPopoverId, metadata.statblockPopover?.width || 500);
-                }
-            }
         });
 
         OBR.player.onChange(async (player) => {
@@ -55,8 +42,8 @@ export const StatblockPopover = () => {
                 const items = await OBR.scene.items.getItems(player.selection);
                 if (items.length > 0) {
                     const metadata = items[0].metadata;
-                    if (characterMetadata in metadata) {
-                        const data = metadata[characterMetadata] as HpTrackerMetadata;
+                    if (itemMetadataKey in metadata) {
+                        const data = metadata[itemMetadataKey] as HpTrackerMetadata;
                         setData(data);
                     }
                 }
@@ -65,22 +52,29 @@ export const StatblockPopover = () => {
     };
 
     useEffect(() => {
+        if (!minimized && isReady) {
+            OBR.popover.setHeight(statblockPopoverId, room?.statblockPopover?.height || 600);
+            OBR.popover.setWidth(statblockPopoverId, room?.statblockPopover?.width || 500);
+        }
+    }, [room, isReady]);
+
+    useEffect(() => {
         let tempList: Array<Item> = [];
 
-        currentSceneMetadata?.groups?.forEach((group) => {
+        scene?.groups?.forEach((group) => {
             const groupItems = tokens?.filter((item) => {
-                const metadata = item.metadata[characterMetadata] as HpTrackerMetadata;
+                const metadata = item.metadata[itemMetadataKey] as HpTrackerMetadata;
                 return (
                     (!metadata.group && group === "Default") ||
                     metadata.group === group ||
-                    (!currentSceneMetadata?.groups?.includes(metadata.group ?? "") && group === "Default")
+                    (!scene?.groups?.includes(metadata.group ?? "") && group === "Default")
                 );
             });
             tempList = tempList.concat(groupItems ?? []);
         });
 
         setSortedTokens(tempList);
-    }, [currentSceneMetadata?.groups, tokens]);
+    }, [scene?.groups, tokens]);
 
     useEffect(() => {
         if (isReady) {
@@ -89,17 +83,14 @@ export const StatblockPopover = () => {
     }, [isReady]);
 
     return (
-        <ContextWrapper>
+        <ContextWrapper component={"statblock_popover"}>
             <div className={"statblock-popover"}>
                 <div className={"help-buttons"}>
                     <button
                         className={"top-button"}
                         onClick={() => {
                             if (minimized) {
-                                OBR.popover.setHeight(
-                                    statblockPopoverId,
-                                    currentSceneMetadata?.statblockPopover?.height || 600
-                                );
+                                OBR.popover.setHeight(statblockPopoverId, room?.statblockPopover?.height || 600);
                             } else {
                                 OBR.popover.setHeight(statblockPopoverId, 100);
                             }
@@ -123,9 +114,9 @@ export const StatblockPopover = () => {
                     pinned={pinned}
                     setPinned={setPinned}
                     data={data}
-                    currentSceneMetadata={currentSceneMetadata}
                 />
             </div>
+            <DiceTray classes={"statblock-dice-tray"} />
         </ContextWrapper>
     );
 };

@@ -1,7 +1,7 @@
 import { useCharSheet } from "../../../context/CharacterContext.ts";
 import OBR from "@owlbear-rodeo/sdk";
-import { characterMetadata } from "../../../helper/variables.ts";
-import { HpTrackerMetadata, SceneMetadata } from "../../../helper/types.ts";
+import { itemMetadataKey } from "../../../helper/variables.ts";
+import { HpTrackerMetadata } from "../../../helper/types.ts";
 import { useEffect, useState } from "react";
 import { PfAbility } from "./PfAbility.tsx";
 import { useE5GetStatblock } from "../../../ttrpgapi/e5/useE5Api.ts";
@@ -9,6 +9,9 @@ import { usePfGetStatblock } from "../../../ttrpgapi/pf/usePfApi.ts";
 import { E5Ability } from "./E5Ability.tsx";
 import { E5Spells } from "./E5Spells.tsx";
 import { PfSpells } from "./PfSpells.tsx";
+import { useMetadataContext } from "../../../context/MetadataContext.ts";
+import { DiceButton } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { capitalize } from "lodash";
 
 const E5StatBlock = ({ slug }: { slug: string }) => {
     const statblockQuery = useE5GetStatblock(slug);
@@ -21,9 +24,9 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
         if (characterId) {
             OBR.scene.items.updateItems([characterId], (items) => {
                 items.forEach((item) => {
-                    const data = item.metadata[characterMetadata] as HpTrackerMetadata;
+                    const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
                     if (data.hp === 0 && data.maxHp === 0 && data.armorClass === 0) {
-                        item.metadata[characterMetadata] = {
+                        item.metadata[itemMetadataKey] = {
                             ...data,
                             maxHp: maxHp,
                             armorClass: ac,
@@ -57,7 +60,14 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                     {!!statblock.armor_class.special ? `(${statblock.armor_class.special})` : null}
                 </span>
                 <span className={"hp"}>
-                    <b>Hit Points</b> {statblock.hp.value} {statblock.hp.hit_dice ? `(${statblock.hp.hit_dice})` : null}
+                    <b>Hit Points</b> {statblock.hp.value}{" "}
+                    {statblock.hp.hit_dice ? (
+                        <DiceButton
+                            dice={statblock.hp.hit_dice}
+                            text={statblock.hp.hit_dice}
+                            context={slug + ": Hit Dice"}
+                        />
+                    ) : null}
                 </span>
                 <span className={"speed"}>
                     <b>Speed</b>{" "}
@@ -78,11 +88,16 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                         <div className={"stat"} key={stat}>
                             <div className={"stat-name"}>{stat.substring(0, 3)}</div>
                             <div className={"stat-value"}>
-                                {value} (
-                                {Intl.NumberFormat("en-US", { signDisplay: "exceptZero" }).format(
-                                    Math.floor((value - 10) / 2)
-                                )}
-                                )
+                                {value}
+                                <DiceButton
+                                    dice={`d20${Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
+                                        Math.floor((value - 10) / 2)
+                                    )}`}
+                                    text={Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
+                                        Math.floor((value - 10) / 2)
+                                    )}
+                                    context={`${capitalize(stat)}: Check`}
+                                />
                             </div>
                         </div>
                     );
@@ -90,16 +105,24 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
             </div>
             <div className={"tidbits"}>
                 {Object.entries(statblock.saving_throws).filter((st) => !!st[1]).length > 0 ? (
-                    <div className={"tidbit"}>
+                    <div className={"tidbit saving-throws"}>
                         <b>Saving Throws</b>{" "}
                         {Object.entries(statblock.saving_throws)
                             .map(([key, value]) => {
                                 if (value) {
-                                    return `${key.substring(0, 3)} +${value}`;
+                                    return (
+                                        <span className={"saving-throw"} key={key}>
+                                            {key.substring(0, 3)}:{" "}
+                                            <DiceButton
+                                                dice={`d20+${value}`}
+                                                text={`+${value}`}
+                                                context={`${capitalize(key)}: Save`}
+                                            />
+                                        </span>
+                                    );
                                 }
                             })
-                            .filter((v) => !!v)
-                            .join(", ")}
+                            .filter((v) => !!v)}
                     </div>
                 ) : null}
                 <div className={"tidbit"}>
@@ -119,9 +142,17 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                         {Object.entries(statblock.skills).map(([key, value], index) => {
                             if (value) {
                                 return (
-                                    <li key={index}>
+                                    <li className={"skill"} key={index}>
                                         <b>{key}</b>:{" "}
-                                        {Intl.NumberFormat("en-US", { signDisplay: "exceptZero" }).format(value)}
+                                        <DiceButton
+                                            dice={`d20${Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
+                                                Math.floor(value)
+                                            )}`}
+                                            text={Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
+                                                Math.floor(value)
+                                            )}
+                                            context={`${capitalize(key)}: Check`}
+                                        />
                                     </li>
                                 );
                             }
@@ -212,9 +243,9 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
         if (characterId) {
             OBR.scene.items.updateItems([characterId], (items) => {
                 items.forEach((item) => {
-                    const data = item.metadata[characterMetadata] as HpTrackerMetadata;
+                    const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
                     if (data.hp === 0 && data.maxHp === 0 && data.armorClass === 0) {
-                        item.metadata[characterMetadata] = {
+                        item.metadata[itemMetadataKey] = {
                             ...data,
                             maxHp: maxHp,
                             armorClass: ac,
@@ -265,9 +296,16 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                 <span className={"speed"}>
                     <b>Speed</b> {statblock.speed}
                 </span>
-                <span className={"perception"}>
-                    <b>Perception</b> {statblock.perception}
-                </span>
+                {statblock.perception ? (
+                    <span className={"perception"}>
+                        <b>Perception</b>{" "}
+                        <DiceButton
+                            dice={`d20${statblock.perception}`}
+                            text={statblock.perception}
+                            context={`Perception: Check`}
+                        />
+                    </span>
+                ) : null}
             </div>
             <div className={"stats"}>
                 {Object.entries(statblock.stats).map(([stat, value]) => {
@@ -275,8 +313,15 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                         <div className={"stat"} key={stat}>
                             <div className={"stat-name"}>{stat.substring(0, 3)}</div>
                             <div className={"stat-value"}>
-                                {value * 2 + 10} (
-                                {Intl.NumberFormat("en-US", { signDisplay: "exceptZero" }).format(value)})
+                                <DiceButton
+                                    dice={`d20${Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
+                                        Math.floor(value)
+                                    )}`}
+                                    text={Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
+                                        Math.floor(value)
+                                    )}
+                                    context={`${capitalize(stat)}: Check`}
+                                />
                             </div>
                         </div>
                     );
@@ -289,11 +334,20 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                         <ul className={"saving-throw-list"}>
                             {Object.entries(statblock.saving_throws).map(([key, value], index) => {
                                 if (value) {
-                                    return (
-                                        <li key={index}>
-                                            <span className={"name"}>{key}</span> +{value}
-                                        </li>
-                                    );
+                                    if (typeof value === "number") {
+                                        return (
+                                            <li key={index}>
+                                                <span className={"name"}>{key}</span>{" "}
+                                                <DiceButton
+                                                    dice={`d20+${value}`}
+                                                    text={`+${value}`}
+                                                    context={`${capitalize(key)}: Save`}
+                                                />
+                                            </li>
+                                        );
+                                    } else {
+                                        return <li key={index}>{value}</li>;
+                                    }
                                 }
                             })}
                         </ul>
@@ -305,10 +359,20 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                     <h3>Skills</h3>
                     <div className={"skill-list"}>
                         {statblock.skills?.map((skill) => {
+                            let value = skill.value;
+                            if (skill.value.includes(",")) {
+                                value = skill.value.split(",")[0];
+                            }
                             return (
                                 <div className={"skill"} key={skill.name}>
                                     <div className={"skill-name"}>{skill.name}</div>
-                                    <div className={"skill-value"}>{skill.value}</div>
+                                    <div className={"skill-value"}>
+                                        <DiceButton
+                                            dice={`d20+${value}`}
+                                            text={value}
+                                            context={`${capitalize(skill.name)}: Check`}
+                                        />
+                                    </div>
                                 </div>
                             );
                         })}
@@ -369,11 +433,8 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
     ) : null;
 };
 
-export const Statblock = (props: {
-    data: HpTrackerMetadata;
-    currentSceneMetadata: SceneMetadata | null;
-    itemId: string;
-}) => {
+export const Statblock = (props: { data: HpTrackerMetadata; itemId: string }) => {
+    const { room } = useMetadataContext();
     const [data, setData] = useState<HpTrackerMetadata>(props.data);
 
     useEffect(() => {
@@ -400,13 +461,13 @@ export const Statblock = (props: {
 
                         await OBR.scene.items.updateItems([props.itemId], (items) => {
                             items.forEach((item) => {
-                                item.metadata[characterMetadata] = { ...newData };
+                                item.metadata[itemMetadataKey] = { ...newData };
                             });
                         });
                     }}
                 />
             </div>
-            {props.currentSceneMetadata && props.currentSceneMetadata.ruleset === "e5" ? (
+            {room && room.ruleset === "e5" ? (
                 <E5StatBlock slug={props.data.sheet} />
             ) : (
                 <PfStatBlock slug={props.data.sheet} />

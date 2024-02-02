@@ -1,14 +1,13 @@
 import React from "react";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
-import { characterMetadata } from "../../helper/variables.ts";
-import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
+import { itemMetadataKey } from "../../helper/variables.ts";
+import { HpTrackerMetadata } from "../../helper/types.ts";
 import { Draggable } from "react-beautiful-dnd";
 import { Token } from "./Token.tsx";
 
 type TokenListProps = {
     tokens: Item[];
     selected: Array<string>;
-    metadata: SceneMetadata;
     tokenLists: Map<string, Array<Item>>;
 };
 
@@ -16,11 +15,11 @@ export const DraggableTokenList = React.memo(function DraggableTokenList(props: 
     const updateTokenIndex = (id: string, index: number) => {
         OBR.scene.items.updateItems([id], (items) => {
             items.forEach((item) => {
-                const data = item.metadata[characterMetadata] as HpTrackerMetadata;
+                const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
 
                 data.index = index;
 
-                item.metadata[characterMetadata] = { ...data };
+                item.metadata[itemMetadataKey] = { ...data };
             });
         });
     };
@@ -29,7 +28,7 @@ export const DraggableTokenList = React.memo(function DraggableTokenList(props: 
         <>
             {props.tokens.length > 0 ? (
                 props.tokens?.map((token, index) => {
-                    const data = token.metadata[characterMetadata] as HpTrackerMetadata;
+                    const data = token.metadata[itemMetadataKey] as HpTrackerMetadata;
                     if (data) {
                         if (data.index === undefined) {
                             updateTokenIndex(token.id, index);
@@ -47,7 +46,6 @@ export const DraggableTokenList = React.memo(function DraggableTokenList(props: 
                                             data={data}
                                             popover={false}
                                             selected={props.selected.includes(token.id)}
-                                            metadata={props.metadata}
                                             tokenLists={props.tokenLists}
                                         />
                                     </div>
@@ -69,7 +67,7 @@ export const PlayerTokenList = (props: TokenListProps) => {
     return (
         <>
             {props.tokens.map((token) => {
-                const data = token.metadata[characterMetadata] as HpTrackerMetadata;
+                const data = token.metadata[itemMetadataKey] as HpTrackerMetadata;
                 if (data) {
                     return (
                         <Token
@@ -78,7 +76,6 @@ export const PlayerTokenList = (props: TokenListProps) => {
                             data={data}
                             popover={false}
                             selected={props.selected.includes(token.id)}
-                            metadata={props.metadata}
                             tokenLists={props.tokenLists}
                         />
                     );

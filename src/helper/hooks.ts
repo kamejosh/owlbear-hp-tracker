@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Mutate, StoreApi, UseBoundStore } from "zustand";
 
 // See https://usehooks.com/useLocalStorage
 export const useLocalStorage = <T>(key: string, initialValue: T) => {
@@ -42,4 +43,59 @@ export const useLocalStorage = <T>(key: string, initialValue: T) => {
         }
     };
     return [storedValue, setValue] as const;
+};
+
+export const useInterval = (callback: Function, delay: number) => {
+    const savedCallback = useRef<Function>();
+    const intervalIdRef = useRef<number>();
+
+    // Remember the latest callback.
+    useEffect(() => {
+        savedCallback.current = callback;
+    }, [callback]);
+
+    // Set up the interval.
+    useEffect(() => {
+        function tick() {
+            if (savedCallback.current) {
+                savedCallback.current();
+            }
+        }
+        if (delay !== null) {
+            intervalIdRef.current = setInterval(tick, delay);
+            const id = intervalIdRef.current;
+            return () => {
+                clearInterval(id);
+            };
+        }
+    }, [delay]);
+
+    useEffect(() => {
+        const id = intervalIdRef.current;
+        return () => {
+            clearInterval(id);
+        };
+    }, []);
+
+    return useCallback(() => {
+        clearInterval(intervalIdRef.current);
+        if (savedCallback.current) {
+            intervalIdRef.current = setInterval(savedCallback.current, delay);
+        }
+    }, [delay]);
+};
+
+export type StoreWithPersists<T> = UseBoundStore<Mutate<StoreApi<T>, [["zustand/persist", T]]>>;
+export const withStorageDOMEvents = <T>(store: StoreWithPersists<T>) => {
+    const storageEventCallback = (e: StorageEvent) => {
+        if (e.key === store.persist.getOptions().name && e.newValue) {
+            store.persist.rehydrate();
+        }
+    };
+
+    window.addEventListener("storage", storageEventCallback);
+
+    return () => {
+        window.removeEventListener("storage", storageEventCallback);
+    };
 };

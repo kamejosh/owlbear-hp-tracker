@@ -1,3 +1,16 @@
+# 1.6.0
+
++ Add dice roller using dddice
++ Refactor Settings and split them into Room and Scene Settings
++ Update Changelog -> Changelog can now be hidden by default so it won't be displayed on updates any longer (you might miss new features)
++ Bugfixes:
+  + Fix error where copied items or new tokens were not properly order for drag and drop
+  + Improved base HP Tracker performance
+  + Improve modal styling to not completely cover screen
+  + Optimize Scene initialization to update the least amount of data possible
+
+![Dice Roller Preview](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/roll_preview.gif)
+
 # 1.5.2
 
 + Add multi-selection embedded context-menu 

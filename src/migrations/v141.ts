@@ -1,5 +1,5 @@
 import OBR, { Item } from "@owlbear-rodeo/sdk";
-import { characterMetadata, infoMetadata } from "../helper/variables.ts";
+import { itemMetadataKey, infoMetadataKey } from "../helper/variables.ts";
 import { deleteAttachments, getAttachedItems } from "../helper/helpers.ts";
 import { AttachmentMetadata } from "../helper/types.ts";
 
@@ -9,7 +9,7 @@ export const migrateTo141 = async () => {
     const playerRole = await OBR.player.getRole();
 
     if (playerRole === "GM") {
-        const items = await OBR.scene.items.getItems((item) => characterMetadata in item.metadata);
+        const items = await OBR.scene.items.getItems((item) => itemMetadataKey in item.metadata);
         const attachments: Array<Item> = [];
 
         // removing all old attachments
@@ -19,7 +19,8 @@ export const migrateTo141 = async () => {
         }
 
         const hpTrackerItems = await OBR.scene.items.getItems(
-            (item) => infoMetadata in item.metadata && (item.metadata[infoMetadata] as AttachmentMetadata).isHpText
+            (item) =>
+                infoMetadataKey in item.metadata && (item.metadata[infoMetadataKey] as AttachmentMetadata).isHpText
         );
 
         await deleteAttachments([...attachments, ...hpTrackerItems]);

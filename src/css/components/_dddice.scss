@@ -1,0 +1,703 @@
+#DiceCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 90svw;
+    height: 90svh;
+    pointer-events: none;
+
+    &.statblock-dice-tray {
+        top: calc(60px + 1rem);
+    }
+
+    &.hide {
+        display: none;
+    }
+}
+
+.dice-room {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100svw;
+    max-height: calc(100vh - 5rem);
+
+    &.statblock-dice-tray {
+        max-height: calc(100vh - (70px + 1rem));
+    }
+
+    &.open {
+        .dice-tray-wrapper {
+            grid-template-rows: 1fr;
+        }
+    }
+
+    button:not(.dice-button),
+    .button {
+        background: linear-gradient(-45deg, var(--bg1), var(--bg2), var(--bg3), var(--bg4));
+    }
+
+    .dice-room-buttons {
+        display: flex;
+        gap: 1px;
+
+        button {
+            box-shadow: 0 -2px 2px var(--button-shadow);
+            border: none;
+        }
+
+        .custom-dice-wrapper {
+            position: relative;
+            align-self: flex-end;
+            order: 4;
+            transition: all 0.25s ease;
+            height: 30px;
+
+            &:nth-child(-n + 4) {
+                order: 1;
+            }
+
+            &:hover,
+            &:focus-visible {
+                height: 35px;
+            }
+
+            &.has-dice {
+                align-self: flex-start;
+                height: 50px;
+            }
+
+            .custom-dice {
+                translate: 0 1px;
+                animation: gradient 15s ease infinite;
+                transition: all 0.25s ease, --bg3 0.25s ease, --bg4 0.25s ease;
+                border-bottom: none;
+                border-bottom-right-radius: 0;
+                border-bottom-left-radius: 0;
+                padding-inline: 0;
+                min-width: 30px;
+                height: 100%;
+
+                &.disabled {
+                    filter: grayscale(1);
+                    cursor: default;
+
+                    &:hover {
+                        background: linear-gradient(-45deg, var(--bg1), var(--bg2), var(--bg3), var(--bg4));
+                    }
+                }
+
+                &.rolling {
+                    .preview-image {
+                        animation: rotating 0.5s linear infinite;
+                    }
+                }
+
+                &:hover {
+                    --bg3: #556;
+                    --bg4: #778;
+                    background: linear-gradient(-45deg, var(--bg1), var(--bg2), var(--bg3), var(--bg4));
+                }
+
+                .add-svg {
+                    fill: white;
+                }
+
+                .custom-dice-preview-wrapper {
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-content: space-around;
+                    justify-content: space-around;
+                    align-items: center;
+                    max-width: 45px;
+                    max-height: 40px;
+                    overflow: hidden;
+
+                    * {
+                        flex: 1;
+                        width: 100%;
+                        min-width: 20px;
+                        height: 100%;
+                    }
+
+                    :nth-child(n + 5) {
+                        display: none;
+                    }
+
+                    .preview-image {
+                        max-width: 20px;
+                        overflow: hidden;
+                        object-fit: contain;
+
+                        &:only-child {
+                            max-width: 40px;
+                        }
+                    }
+
+                    .modifier {
+                        text-align: center;
+                    }
+                }
+            }
+
+            .add-custom-dice {
+                display: flex;
+                position: absolute;
+                top: 0;
+                left: 50%;
+                translate: -50% -100%;
+                z-index: 100;
+
+                .success {
+                    border-color: var(--success-border);
+                    background-color: rgb(var(--success-bg));
+                }
+
+                .error {
+                    border-color: var(--error-border);
+                    background-color: rgb(var(--error-bg));
+                }
+
+                .save-custom-dice {
+                    &:disabled {
+                        cursor: default;
+                    }
+                }
+            }
+
+            .remove-dice {
+                position: absolute;
+                top: 1px;
+                right: 0;
+                translate: -50% 0;
+                visibility: hidden;
+                opacity: 0;
+                z-index: 100;
+                transition: all 0.25s ease;
+
+                &.hover {
+                    translate: 75% 0;
+                    visibility: visible;
+                    opacity: 1;
+                }
+
+                &:hover {
+                    border-color: var(--error-border);
+                    background: rgb(var(--error-bg));
+                }
+            }
+        }
+
+        .open-dice-tray,
+        .quick-roll-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            align-self: flex-end;
+            order: 2;
+            translate: 0 1px;
+            transition: all 0.25s ease, --bg3 0.25s ease, --bg4 0.25s ease;
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 0;
+            width: 45px;
+            height: 45px;
+
+            &.open {
+                --bg1: #556;
+                --bg2: #778;
+                background: linear-gradient(-30deg, var(--bg4), var(--bg3), var(--bg2), var(--bg1));
+            }
+
+            .roll-log-svg {
+                fill: white;
+                width: 30px;
+            }
+
+            &:hover,
+            &:focus-visible {
+                --bg3: #556;
+                --bg4: #778;
+                background: linear-gradient(-45deg, var(--bg1), var(--bg2), var(--bg3), var(--bg4));
+                height: 50px;
+            }
+        }
+
+        .quick-button-wrapper {
+            position: relative;
+            align-self: flex-end;
+            order: 2;
+
+            &:has(.rolling) {
+                .dice-svg {
+                    animation: rotating 0.5s linear infinite;
+                }
+            }
+
+            .quick-roll-button {
+                .dice-svg {
+                    width: 30px;
+                }
+            }
+
+            .quick-button-list {
+                display: flex;
+                position: absolute;
+                top: 0;
+                left: 50%;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                translate: -50% 100%;
+                visibility: collapse;
+                transition: all 0.25s ease;
+                margin: 0;
+                padding: 0 0 1ch 0;
+                list-style: none;
+
+                &.open {
+                    display: flex;
+                    flex-direction: column;
+                    translate: -50% -100%;
+                    visibility: visible;
+                }
+
+                .quick-custom-roll {
+                    display: flex;
+                    gap: 1ch;
+
+                    &:has(.rolling) {
+                        .dice-svg {
+                            animation: rotating 0.25s linear infinite;
+                        }
+                    }
+
+                    .quick-custom-input {
+                        width: 40px;
+                        text-align: center;
+
+                        &.invalid {
+                            border-color: var(--error-border);
+                            background-color: rgb(var(--error-bg));
+                        }
+                    }
+                }
+
+                .quick-roll {
+                    cursor: pointer;
+                    max-width: 40px;
+
+                    &:hover {
+                        img {
+                            animation: shaking 0.1s alternate linear infinite;
+                        }
+                    }
+
+                    &.rolling {
+                        img {
+                            animation: rotating 0.5s linear infinite;
+                        }
+                    }
+
+                    img {
+                        max-width: 40px;
+                    }
+                }
+            }
+        }
+    }
+
+    .dice-tray-wrapper {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: all 0.25s ease-in-out;
+        box-shadow: 0 -15px 25px #1b1b1b;
+        background: linear-gradient(-45deg, var(--bg1), var(--bg2), var(--bg3), var(--bg4));
+        width: 100%;
+        overflow: hidden;
+
+        &:has(.dice-settings) {
+            min-height: 200px;
+        }
+
+        .dice-tray {
+            min-height: 0;
+            overflow-y: auto;
+
+            &::-webkit-scrollbar {
+                background-color: rgba(55, 55, 55, 0.1);
+                width: 10px;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+                border-radius: 10px;
+                background-color: rgba(255, 255, 255, 0.5);
+            }
+
+            .dice-tray-content {
+                padding: 10px 20px;
+
+                .top {
+                    display: flex;
+                    justify-content: space-between;
+
+                    .side-buttons {
+                        display: flex;
+                        gap: 1ch;
+                    }
+
+                    .room-link {
+                        display: flex;
+                        align-items: center;
+                        gap: 1ch;
+
+                        .copy-link {
+                            display: flex;
+                            transition: all 0.25s ease-in-out;
+                            padding: 3px;
+                            width: 20px;
+
+                            &:hover,
+                            &:focus {
+                                background: white;
+
+                                .copy-icon {
+                                    fill: var(--bg-color);
+                                }
+                            }
+
+                            .copy-icon {
+                                fill: white;
+                                transition: all 0.25s ease-in-out;
+                                object-fit: cover;
+                                object-position: center;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.dice-settings-wrapper {
+    position: relative;
+    height: 100%;
+
+    .dice-settings-button {
+        height: 100%;
+    }
+
+    .dice-settings {
+        display: flex;
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        flex-direction: column;
+        gap: 0.5ch;
+        translate: 0 100%;
+        z-index: 200;
+        box-shadow: -5px 5px 5px #111, 5px 5px 5px #111;
+        border: 1px solid lightgrey;
+        border-radius: 5px;
+        background-color: #2b2a33;
+        padding: 10px;
+        text-align: left;
+
+        .close-button {
+            align-self: flex-end;
+        }
+
+        .setting {
+            display: flex;
+            align-items: center;
+            gap: 1ch;
+            white-space: nowrap;
+
+            &.dice-rendering {
+                gap: 0;
+                .text {
+                    .small {
+                        font-size: 0.7rem;
+                    }
+                }
+            }
+
+            &.dice-theme {
+                &.invalid {
+                    .theme-input {
+                        border-color: red;
+                        background-color: rgba(255, 0, 0, 0.2);
+                    }
+                }
+
+                &.searching {
+                    .theme-preview {
+                        animation: rotating 0.3s linear infinite;
+                    }
+                }
+
+                .theme-input {
+                    width: 100px;
+                }
+
+                .theme-preview {
+                    width: auto;
+                    height: 2em;
+                }
+            }
+        }
+    }
+}
+
+.roll-log {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1ch;
+    padding: 0;
+    list-style: none;
+
+    &.popover {
+        .roll-log-entry {
+            border: none;
+            background-color: var(--bg-color);
+
+            .button-wrapper {
+                display: none;
+            }
+
+            .roll-equation {
+                display: flex;
+            }
+        }
+    }
+
+    .roll-log-entry {
+        display: grid;
+        grid-template-columns: 70px auto auto 80px;
+        grid-template-areas:
+            "context context divider total"
+            "user user divider total"
+            "detail detail divider total"
+            "reroll reroll divider total";
+        column-gap: 1ch;
+        align-content: flex-start;
+        border: 1px solid dimgrey;
+        border-radius: 5px;
+        background-color: var(--bg-color);
+        padding: 10px;
+        min-width: 250px;
+        max-width: 500px;
+        text-align: left;
+        white-space: nowrap;
+
+        &.self {
+            align-self: flex-end;
+        }
+
+        &.old-roll {
+            grid-template-columns: 70px auto auto 50px;
+            grid-template-areas:
+                "context context divider total"
+                "user user divider total";
+            padding-block: 2px;
+            min-width: 200px;
+
+            .detailed-result {
+                display: none;
+            }
+
+            .button-wrapper {
+                display: none;
+            }
+
+            .total {
+                font-size: 1.5rem;
+            }
+
+            .roll-context {
+                align-self: flex-end;
+            }
+        }
+
+        .roll-time {
+            grid-row: 1;
+            grid-column: 4/5;
+            justify-self: flex-end;
+            padding: 1px;
+            font-size: 0.8rem;
+        }
+
+        .roll-context {
+            grid-area: context;
+            font-weight: bolder;
+
+            .label-detail {
+                text-transform: capitalize;
+
+                &.to-hit,
+                &.attack {
+                    color: #1b9af0;
+                }
+
+                &.damage {
+                    color: #df7b7b;
+                }
+
+                &.check {
+                    color: #b55dff;
+                }
+
+                &.save {
+                    color: #6cbf5b;
+                }
+                &.custom,
+                &.roll {
+                    color: #f5a623;
+                }
+            }
+        }
+
+        .username {
+            grid-area: user;
+            color: dimgrey;
+            font-weight: bolder;
+            font-size: 0.9rem;
+        }
+
+        .button-wrapper {
+            grid-area: reroll;
+            justify-self: flex-start;
+        }
+
+        .roll-equation {
+            display: none;
+            grid-area: reroll;
+        }
+
+        .detailed-result {
+            grid-area: detail;
+            justify-self: flex-start;
+            max-width: 250px;
+            overflow: hidden;
+            font-weight: bolder;
+            font-size: 1.2rem;
+            text-overflow: ellipsis;
+        }
+
+        .divider {
+            grid-area: divider;
+            align-self: center;
+            color: dimgrey;
+            font-size: 3rem;
+        }
+
+        .total {
+            grid-area: total;
+            align-self: center;
+            justify-self: center;
+            font-weight: bold;
+            font-size: 3rem;
+        }
+
+        .dice {
+            display: flex;
+            column-gap: 1ch;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 0;
+            list-style: none;
+
+            .die {
+                display: flex;
+                align-items: center;
+                gap: 2px;
+            }
+        }
+    }
+}
+
+.dddice-login-modal {
+    justify-content: space-around;
+    background-color: black;
+    height: calc(100svh - 52px);
+    overflow: hidden;
+    text-align: center;
+
+    .content {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        gap: 0.5ch;
+        height: 100%;
+
+        .activate {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5ch;
+
+            a {
+                margin-bottom: 1ch;
+                font-weight: bolder;
+                font-size: 1.5rem;
+            }
+
+            .code {
+                display: flex;
+                align-self: center;
+                gap: 0.5ch;
+                font-size: 2rem;
+
+                .letter {
+                    background-color: #1b1b25;
+                    padding-inline: 0.7ch;
+                    line-height: 1.4;
+                }
+            }
+        }
+
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 1ch;
+            padding-block: 1ch;
+            color: #99a;
+        }
+
+        .or {
+            display: flex;
+            align-items: center;
+            gap: 1ch;
+            padding-bottom: 1ch;
+            color: #99a;
+
+            &::before,
+            &::after {
+                border-top: 1px solid #99a;
+                width: 100%;
+                height: 1px;
+                content: "";
+            }
+        }
+
+        .guest-button {
+            align-self: center;
+            transition: all 0.25s ease;
+            background-color: white;
+            padding-inline: 2ch;
+            height: 3rem;
+            color: black;
+            font-weight: bolder;
+            font-size: 1rem;
+
+            &:hover {
+                box-shadow: 0 0 15px white;
+            }
+        }
+    }
+}

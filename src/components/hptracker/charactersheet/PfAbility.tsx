@@ -1,6 +1,7 @@
 import { components } from "../../../ttrpgapi/schema";
 import { useState } from "react";
-import { highlightDice } from "../../../helper/diceHelper.tsx";
+import { DiceButtonWrapper } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { capitalize } from "lodash";
 
 type Action = components["schemas"]["ActionOut"];
 type Reaction = components["schemas"]["Reaction"];
@@ -56,7 +57,7 @@ export const PfAbility = ({ ability }: { ability: Action | Reaction | SpecialAbi
                     <b className={"ability-name"}>{ability.name}</b> {actionTypeConvert(ability)}
                     {Object.keys(ability).includes("description") && (ability as Action).description !== "" ? (
                         <div className={`ability-description ${isAction(ability) ? "action" : "ability"}`}>
-                            {(ability as Action).description}
+                            {DiceButtonWrapper((ability as Action).description!, capitalize(ability.name))}
                         </div>
                     ) : null}
                 </div>
@@ -71,7 +72,8 @@ export const PfAbility = ({ ability }: { ability: Action | Reaction | SpecialAbi
                         if (value !== null && value !== "" && !["name", "type", "description", "value"].includes(key)) {
                             return (
                                 <li key={index}>
-                                    <b>{key}</b>: {highlightDice(value)}
+                                    <b>{key}</b>:{" "}
+                                    {DiceButtonWrapper(value, `${capitalize(ability.name)} ${capitalize(key)}`)}
                                 </li>
                             );
                         }

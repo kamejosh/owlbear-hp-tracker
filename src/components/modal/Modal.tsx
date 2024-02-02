@@ -4,10 +4,11 @@ import { Changelog } from "./Components/Changelog.tsx";
 import OBR from "@owlbear-rodeo/sdk";
 import { modalId } from "../../helper/variables.ts";
 import { Settings } from "./Components/Settings.tsx";
+import { DiceLogin } from "./Components/DiceLogin.tsx";
 
 export const Modal = () => {
     return (
-        <ContextWrapper>
+        <ContextWrapper component={"modal"}>
             <Content />
         </ContextWrapper>
     );
@@ -23,6 +24,8 @@ const Content = () => {
             return <Changelog />;
         } else if (content === "settings") {
             return <Settings />;
+        } else if (content === "dddice") {
+            return <DiceLogin />;
         } else {
             OBR.modal.close(modalId);
         }

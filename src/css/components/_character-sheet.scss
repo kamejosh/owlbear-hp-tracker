@@ -1,6 +1,8 @@
 @use "../utilities/breakpoint";
 
 .character-sheet {
+    margin-bottom: 25px;
+
     .back-button {
         display: flex;
         position: fixed;
@@ -12,7 +14,7 @@
         cursor: pointer;
         border: 1px solid white;
         border-radius: 4px;
-        background-color: #1c1b22;
+        background-color: var(--bg-color);
         font-size: 0;
 
         @include breakpoint.laptop {
@@ -351,11 +353,32 @@
                 font-weight: 600;
                 text-transform: uppercase;
             }
+
+            .stat-value {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 1ch;
+            }
         }
     }
 
     .tidbits {
         grid-area: tidbits;
+
+        .saving-throws {
+            display: flex;
+            column-gap: 1ch;
+            flex-wrap: wrap;
+            align-items: center;
+            text-transform: capitalize;
+
+            .saving-throw {
+                display: flex;
+                align-items: center;
+                gap: 2px;
+            }
+        }
     }
 
     .skills {
@@ -377,7 +400,11 @@
                 grid-template-columns: repeat(2, 1fr);
             }
 
-            li {
+            .skill {
+                display: flex;
+                align-items: center;
+                gap: 2px;
+
                 b {
                     text-transform: capitalize;
                 }

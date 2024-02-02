@@ -6,7 +6,7 @@
   + [Adding Tokens to the HP Tracker](#adding-tokens-to-the-hp-tracker)
   + [Hp Tracker Action Window](#hp-tracker-action-window)
     - [Version Information and Help Buttons](#version-information-and-help-buttons)
-    - [Global Settings](#global-settings)
+    - [Settings](#settings)
     - [Token List](#token-list)
     - [Token](#token)
       * [Toggle Buttons](#toggle-buttons)
@@ -19,6 +19,18 @@
     - [Single Selection](#single-selection)
     - [Multi Selection](#multi-selection)
   + [Statblock Popover](#hp-tracker-statblock-popover)
+- [Dice Roller](#dice-roller)
+  + [Disclaimer](#disclaimer)
+  + [Getting Started](#getting-started)
+  + [Login into dddice](#login-into-dddice)
+  + [Dice Settings](#dice-settings)
+    - [Dice Theme](#dice-theme)
+    - [3D Rendering](#3d-rendering)
+  + [Using The Dice Roller](#using-the-dice-roller)
+    - [Dice Buttons in Statblocks](#dice-buttons-in-statblocks)
+    - [Initiative Buttons](#initiative-buttons)
+    - [Custom Roll Buttons](#custom-roll-buttons)
+    - [Quick Roll Buttons](#quick-roll-buttons)
 
 # HP Tracker - Owlbear Plugin
 
@@ -54,9 +66,9 @@ Because the documentation currently requires gif for moving content the quality 
 
 The extension has three windows:
 
-+ [HP Tracker action window](#hp-tracker-action-window) 
++ [HP Tracker Action Window](#hp-tracker-action-window) 
 + [HP Tracker Context Menu](#hp-tracker-popover)
-+ [HP Tracker statblock popover](#hp-tracker-statblock-popover)
++ [HP Tracker Statblock Popover](#hp-tracker-statblock-popover)
 
 As well as the following on-scene information:
 
@@ -102,11 +114,16 @@ The statblock popover button opens a popover, for more information see [here](#h
 
 The Patreon Link opens in a new window.
 
-#### Global Settings
+#### Settings
 
-![Action Window Global Settings](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/action_window_global_settings.png) 
+Settings are grouped into two categories:
 
-The global settings can be used to modify features affecting every token in the HP Tracker. The close button closes the global settings.
++ Room Settings - affecting all scenes in the current room
++ Scene Settings - affecting only the current scene
+
+##### Room Settings
+
+![Room Settings](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/room_settings.png) 
 
 The following settings are available:
 
@@ -116,8 +133,14 @@ The following settings are available:
 + Armorclass Icon and Text Offset: To have a more flexible positioning of the AC Background and Text an offset for the X- and Y-Axis can be added. This value is scaled considering the Token size. 
 + Allow negative HP/AC: By default negative HP and AC are not allowed but when this settings is checked then HP and AC can be set to negative numbers. The HP Bar will always display negative HP the same as when it is 0.
 + Sort Tokens in Player View: When active, the [Player Action Window](#player-action-window) will display Tokens ordered by their initiative value. If not active, Tokens will have the same order as they were added to the scene (so kind of random).
-+ Set Initiative Dice: This setting decides with which "dice" the roll initiative button in the groups and the token works. The default is 20, meaning a value from 1 to 20 (excl. modifiers) can be rolled. By setting it to 10 the value can only range from 1 to 10.
++ Set Initiative Dice: This setting decides with which "dice" the roll initiative button in the groups and the token works. The default is 20, meaning a value from 1 to 20 (excl. modifiers) can be rolled. By setting it to 10 the value can only range from 1 to 10. When using 3D dice only values that are available in the selected theme should be used.
 + Statblock Popover dimensions: This settings allows to set the width and height of the statblock popover. The default is 600x500. When changing the value (either press enter or move cursor outside of input field) while the statblock popover is open the size of the open statblock popover is automatically adjusted so you can preview what size fits you. The width and height cannot be lower than 200 and settings bigger than the viewport will be overwritten by the max viewport size.
++ Don't show Changelog on updates: This will disable the automatic popup when a new version of HP Tracker is loaded. If not selected a notification will be shown once the update process has been finished and the changelog icon will flash for 30 seconds to indicate that there are new changes available.
+
+##### Scene Settings
+
+![Scene Settings](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/scene_settings.png)
+
 + Groups: This setting allows you to define different Groups used for ordering Tokens. There is a permanent "Default" group. The groups can be rearranged by dragging and dropping them in the desired order. To add a group use the text input below the group list. Press "Enter" to add a group to the list. Tokens in the HP Tracker remember their group association (if the group is deleted) but are added into the default group until they are moved to a different group. So deleting and re-adding the same group restores the previously associated tokens to that same group.
 
 #### Token List
@@ -128,7 +151,7 @@ The Token List consists of the column headings, groups and tokens associated wit
 
 When clicking the button next to INIT in the header all Tokens will be ordered by there initiative value. This is done per group so Tokens in different groups will not be changing positions.
 
-Tokens can be moved between groups or reordered inside a group by dragging and dropping. By default this has no effect on the [Player Action Window](#player-action-window) but when the [setting](#global-settings) "Sort in Player View" is active, the Tokens in the Player Action Window follow the same order as in the GM Action Window.
+Tokens can be moved between groups or reordered inside a group by dragging and dropping. By default this has no effect on the [Player Action Window](#player-action-window) but when the [setting](#global-settings) "Sort in Player View" is active, the Tokens in the Player Action Window are **sorted by their initiative value regardless of group**.
 
 When a selected Token is moved all selected Tokens in the same group are moved as well.
 
@@ -148,7 +171,7 @@ Double-clicking a token focuses the scene on the corresponding icon:
 
 ![Action Window Token](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/action_window_token.png)
 
-A token in the HP Tracker represents a single Owlbear scene item where the HP Tracker Extension has been activated. It consists of the following parts:
+A token in the HP Tracker represents a single Owlbear Item where the HP Tracker Extension has been activated. It consists of the following parts:
 
 + Dynamic Color Background (based on ratio between HP and max HP)
 + Name
@@ -193,7 +216,7 @@ Values can be changed in a few different ways:
 + Arrow Keys: when focus is on HP, maxHP, tempHP or AC you can increase or decrease the values by 1 by pressing up or down arrow key respectively
 + Entering a number: when focused on any field, you can delete its content and enter a new value. 
   + Note that changing the maxHP or tempHP field influences the HP field.
-+ Rolling Initiative: When clicking the Initiative Button a random number between 1 and the chosen [Initiative Dice](#global-settings) (default: 20) is rolled and the dexterity modifier (5e) or perception (pf2e) from the [Statblock](#statblock) (if selected) is added and entered as the final initiative value. You can also change the initiative bonus to any number, once a statblock is assigned
++ Rolling Initiative: When clicking the Initiative Button a random number between 1 and the chosen [Initiative Dice](#global-settings) (default: 20) is rolled and the dexterity modifier (5e) or perception (pf2e) from the [Statblock](#statblock) (if selected) is added and entered as the final initiative value. You can also change the initiative bonus to any number, once a statblock is assigned. By default a 3D dice is rolled to determine the random value.
 
 **Note: The HP value can never exceed the maxHP value ([except when maxHP is 0](#initializing-token)). It can also not be a negative number if the [Global Setting](#global-settings) for "Allow negative numbers" is not selected. All symbols except numbers will be removed to maintain a compatible value.**
 
@@ -282,3 +305,100 @@ The Popover displays all available statblocks indicating which statblock is curr
 By default when selecting a Token either in the [HP Tracker Action Window](#hp-tracker-action-window) or in the Scene. The associated statblock of the selected Token is displayed. This can be prevented by "pinning" a statblocks. While pinned no automatic switching is done even when another statblock is selected. To reactivate automatic switching unselect the pin on the currently active statblock.
 
 ![Statblock Demo](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/statblock_demo.gif)
+
+# Dice Roller
+
+Starting with Version 1.6.0 HP Tracker comes with an integrated dice-roller. 
+
+![Dice Roller](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/dice_roller_log.png)
+
+## Disclaimer
+
+There are still a few things I want to add and also things that could be better (like dice rolling both in statblock popover and action window). I'm actively working on addressing those things and improving the dice roller. If you want to give feedback or have issues you want to report let me know on Patreon.
+
+## Getting Started
+
+By default HP Tracker uses the same account and room that dddice uses. So if you were already using dddice everything is setup. If you were not using the dddice extension you will be given a guest account and start a new dddice room. You should be able to start rolling dice after a few seconds where everything is setup.
+
+If you are using a guest account, the username that will appear under your rolls will be your owlbear username (or owlbear guest name). If you are logged in with you dddice account your dddice username will be used.
+
+You can now click on any dice button in your [statblocks](#statblock) and the dice will automatically roll.
+
+## Login into dddice
+
+The login process is the same with the official dddice extension (as this integration was done with their help). When you open the roll log (scroll button on the bottom of the Action Window) you will se a Login Button on the top left of the Roll Log. When you click this Button an overlay appears. Just click the purple link and you are done. It might take a few seconds to register the login. If the overlay doesn't disappear after 5 seconds you were already authenticated, if that is not the case please [let me know](https://github.com/kamejosh/owlbear-hp-tracker/issues).
+
+## Dice Settings
+
+When the Roll Log is open there is a settings button on the top right side of the roll log.
+
+![Statblock Buttons](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/roll_settings.png)
+
+There are currently two settings:
+
+### Dice Theme
+
+Each Owlbear user can chose their own dice theme (and the other users will see them roll with this theme). Because some dice themes in dddice cannot be used without errors and wrong dice HP Tracker is really stricked regarding what dice are available. If a dice theme contains errors the theme will not be used and the error will be shown beneath the text input
+
+### 3D Rendering
+
+**This setting needs a full reload of HP Tracker to work (refresh the owlbear page)**
+
+You can choose to use the 3D rendering of dddice, this is the default option. Should you already use the dddice owlbear extension you might want to turn of HP Trackers dice rendering to not have multiple dice showing the same thing being rendered. The only drawback is that there will be errors in the developer console and that you don't get to see shiny dice rolling around.
+
+## Using The Dice Roller
+
+There are multiple ways to use the dice roller:
+
++ Dice Buttons in Statblocks
++ Initiative Buttons
++ Custom Roll Buttons
++ Quick Roll Buttons
+
+### Dice Buttons in Statblocks
+
+Each rollable element inside a statblock is replaced by a dice button. Some of them might not make sense but the rule is as long as the text can be transformed to a rollable string it will be rollable.
+
+![Statblock Buttons](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/statblock_buttons.png)
+
+While hovering over a dice button the little dice inside the button begins to shake and a list of optional parameters is shown.
+
+These optional parameters are:
+
++ ADV
+  + changes the dice roll to 2d20kh1 (roll 2 d20 and keep the highest one) + modifier
++ DIS
+  + changes the dice roll to 2d20dh1 (roll 2 d20 and drop the highest one) + modifier
++ HIDE
+  + Dice roll will only be visible for you other people will not be notified and it will not show up in their dice log
+
+![Dice Button Hover](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/dice_button_hover.png)
+
+ADV and DIS are only available on d20s HIDE is available on all dice.
+
+When rolling Dice Buttons in statblocks the dice context is set as meaningful as possible. This means attack rolls usually contain the attack name and "To Hit", and Damage rolls usually contain the attack name and "Damage". This is not always possible but should be close enough.
+
+### Initiative Buttons
+
+Initiative Buttons can be used to roll for an individual entry or for the whole group. When rolling for the whole group a single roll with as many dice as creatures are in the group will be done and then the values assigned to each token.
+
+![Dice Button Hover](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/initiative_roll.gif)
+
+### Custom Roll Buttons
+
+At the Bottom of HP Tracker there are 8 freely assignable buttons where you can create your custom presets. You can see the documentation for custom dice rolls [here](https://docs.dddice.com/guides/roll20.html#roll-equation-compatibility).
+To get started click on a button with the "+" sign. A text input is opened where you can add your roll preset, if the preset is not valid the text input will be red. The dice roll will not be saved until a valid string has been found. To save the custom string press Enter or the "√"-button.
+
+Once the preset has been saved the button will show up to 4 parts of the dice equations to make it easier to identify which button does what. It will also display the full dice command when hovering over the button.
+
+To remove a preset hover over the button and press the now visible x-button in the top left corner. This delete button is off to the side and really small by design to make accidentally pressing it on mobile harder.
+
+![Custom Roll Buttons](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/custom_roll_buttons.gif)
+
+**Custom Dice Buttons are saved to your browsers localstorage. This means they will not be available on other devices or other browsers. Or you have to set them up there as well.**
+
+### Quick Roll Buttons
+
+The Quick Roll Buttons is the button next to the Roll Log toggle button. It will always display all available dice in the selected theme to quickly roll them. It also contains a text input field where you can enter a valid dice string and roll it without saving it.
+
+![Quick Roll Buttons](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/quick_roll_buttons.gif)

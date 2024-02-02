@@ -23,6 +23,12 @@
                 .spell-category-info {
                     color: lightgrey;
                     font-size: 12px;
+
+                    .text-roll {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 1ch;
+                    }
                 }
             }
         }

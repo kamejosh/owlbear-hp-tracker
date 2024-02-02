@@ -1,9 +1,15 @@
 import OBR from "@owlbear-rodeo/sdk";
 import { changelogModal, helpModal, settingsModal, statblockPopover } from "../../../helper/variables.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
-import { SceneMetadata } from "../../../helper/types.ts";
+import { useMetadataContext } from "../../../context/MetadataContext.ts";
 
-export const Helpbuttons = (props: { currentSceneMetadata: SceneMetadata | null }) => {
+type HelpButtonsProps = {
+    ignoredChanges?: boolean;
+    setIgnoredChange?: (ignoredChanges: boolean) => void;
+};
+
+export const Helpbuttons = (props: HelpButtonsProps) => {
+    const { room } = useMetadataContext();
     const playerContext = usePlayerContext();
 
     return (
@@ -31,8 +37,8 @@ export const Helpbuttons = (props: { currentSceneMetadata: SceneMetadata | null 
                             const height = await OBR.viewport.getHeight();
                             await OBR.popover.open({
                                 ...statblockPopover,
-                                width: Math.min(props.currentSceneMetadata?.statblockPopover?.width || 500, width),
-                                height: Math.min(props.currentSceneMetadata?.statblockPopover?.height || 600, height),
+                                width: Math.min(room?.statblockPopover?.width || 500, width),
+                                height: Math.min(room?.statblockPopover?.height || 600, height),
                                 anchorPosition: { top: 55, left: width - 70 },
                             });
                         }}
@@ -40,7 +46,15 @@ export const Helpbuttons = (props: { currentSceneMetadata: SceneMetadata | null 
                     ></button>
                     <button
                         className={"settings-button top-button"}
-                        onClick={async () => await OBR.modal.open(settingsModal)}
+                        onClick={async () => {
+                            const width = await OBR.viewport.getWidth();
+                            const height = await OBR.viewport.getHeight();
+                            await OBR.modal.open({
+                                ...settingsModal,
+                                width: Math.min(500, width * 0.9),
+                                height: Math.min(800, height * 0.9),
+                            });
+                        }}
                         title={"Settings"}
                     >
                         ⛭
@@ -48,15 +62,34 @@ export const Helpbuttons = (props: { currentSceneMetadata: SceneMetadata | null 
                 </>
             ) : null}
             <button
-                className={"change-log-button top-button"}
-                onClick={async () => await OBR.modal.open(changelogModal)}
+                className={`change-log-button top-button ${props.ignoredChanges ? "ignored" : ""}`}
+                onClick={async () => {
+                    if (props.setIgnoredChange !== undefined && props.ignoredChanges !== undefined) {
+                        props.setIgnoredChange(!props.ignoredChanges);
+                    }
+                    const width = await OBR.viewport.getWidth();
+                    const height = await OBR.viewport.getHeight();
+                    await OBR.modal.open({
+                        ...changelogModal,
+                        width: Math.min(600, width * 0.9),
+                        height: Math.min(800, height * 0.9),
+                    });
+                }}
                 title={"Changelog"}
             >
                 i
             </button>
             <button
                 className={"help-button top-button"}
-                onClick={async () => await OBR.modal.open(helpModal)}
+                onClick={async () => {
+                    const width = await OBR.viewport.getWidth();
+                    const height = await OBR.viewport.getHeight();
+                    await OBR.modal.open({
+                        ...helpModal,
+                        width: Math.min(700, width * 0.9),
+                        height: Math.min(800, height * 0.9),
+                    });
+                }}
                 title={"Help"}
             >
                 ?

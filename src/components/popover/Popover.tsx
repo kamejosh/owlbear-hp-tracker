@@ -2,8 +2,8 @@ import { ContextWrapper } from "../ContextWrapper.tsx";
 import { useEffect, useRef, useState } from "react";
 import { Token } from "../hptracker/Token.tsx";
 import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
-import { characterMetadata, sceneMetadata } from "../../helper/variables.ts";
-import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
+import { itemMetadataKey } from "../../helper/variables.ts";
+import { HpTrackerMetadata } from "../../helper/types.ts";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { Loader } from "../general/Loader.tsx";
 import { updateHp } from "../../helper/hpHelpers.ts";
@@ -19,6 +19,7 @@ import {
     toggleHpBar,
     toggleHpOnMap,
 } from "../../helper/multiTokenHelper.ts";
+import { useMetadataContext } from "../../context/MetadataContext.ts";
 
 export const Popover = () => {
     const [ids, setIds] = useState<Array<string>>([]);
@@ -39,7 +40,7 @@ export const Popover = () => {
     }, [isReady]);
 
     return (
-        <ContextWrapper>
+        <ContextWrapper component={"popover"}>
             {ids.length === 1 ? (
                 <Content id={ids[0]} />
             ) : ids.length > 1 ? (
@@ -53,43 +54,38 @@ export const Popover = () => {
 
 const MultiContent = ({ ids }: { ids: Array<string> }) => {
     const [items, setItems] = useState<Array<Item>>([]);
-    const [currentSceneMetadata, setCurrentSceneMetadata] = useState<SceneMetadata | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    const { room } = useMetadataContext();
     const { isReady } = SceneReadyContext();
     const playerContext = usePlayerContext();
 
     const initPopover = async () => {
         setItems(await OBR.scene.items.getItems(ids));
-        const metadata = await OBR.scene.getMetadata();
-        const data = metadata[sceneMetadata] as SceneMetadata;
-        if (data) {
-            setCurrentSceneMetadata(data);
-        }
     };
 
     const changeHP = async (value: number) => {
         await OBR.scene.items.updateItems(items, (uItems) => {
             uItems.forEach((item) => {
-                if (characterMetadata in item.metadata) {
-                    const itemData = item.metadata[characterMetadata] as HpTrackerMetadata;
+                if (itemMetadataKey in item.metadata) {
+                    const itemData = item.metadata[itemMetadataKey] as HpTrackerMetadata;
                     const newHp = itemData.hp + value;
                     if (newHp < itemData.hp && itemData.stats.tempHp && itemData.stats.tempHp > 0) {
                         itemData.stats.tempHp = Math.max(itemData.stats.tempHp - (itemData.hp - newHp), 0);
                     }
                     itemData.hp = Math.min(
-                        currentSceneMetadata?.allowNegativeNumbers ? newHp : Math.max(newHp, 0),
+                        room?.allowNegativeNumbers ? newHp : Math.max(newHp, 0),
                         itemData.maxHp + (itemData.stats.tempHp || 0)
                     );
                     const uItem = items.find((i) => i.id === item.id);
-                    if (uItem && characterMetadata in uItem.metadata) {
-                        const uItemData = uItem.metadata[characterMetadata] as HpTrackerMetadata;
+                    if (uItem && itemMetadataKey in uItem.metadata) {
+                        const uItemData = uItem.metadata[itemMetadataKey] as HpTrackerMetadata;
                         updateHp(uItem, {
                             ...uItemData,
                             hp: itemData.hp,
                             stats: { ...uItemData.stats, tempHp: itemData.stats.tempHp },
                         });
                     }
-                    item.metadata[characterMetadata] = { ...itemData };
+                    item.metadata[itemMetadataKey] = { ...itemData };
                 }
             });
         });
@@ -112,13 +108,6 @@ const MultiContent = ({ ids }: { ids: Array<string> }) => {
             }
             setItems(localItems);
         });
-
-        OBR.scene.onMetadataChange((sceneData) => {
-            const metadata = sceneData[sceneMetadata] as SceneMetadata;
-            if (metadata) {
-                setCurrentSceneMetadata(metadata);
-            }
-        });
     }, []);
 
     useEffect(() => {
@@ -131,8 +120,8 @@ const MultiContent = ({ ids }: { ids: Array<string> }) => {
         <div className={"popover multi-selection"}>
             <ul className={"token-names"}>
                 {items?.map((item, index) => {
-                    if (characterMetadata in item.metadata) {
-                        const d = item.metadata[characterMetadata] as HpTrackerMetadata;
+                    if (itemMetadataKey in item.metadata) {
+                        const d = item.metadata[itemMetadataKey] as HpTrackerMetadata;
                         return (
                             <li
                                 className={"token-entry"}
@@ -216,7 +205,6 @@ const MultiContent = ({ ids }: { ids: Array<string> }) => {
 const Content = (props: { id: string }) => {
     const id = props.id;
     const [data, setData] = useState<HpTrackerMetadata | null>(null);
-    const [currentSceneMetadata, setCurrentSceneMetadata] = useState<SceneMetadata | null>(null);
     const [item, setItem] = useState<Item | null>(null);
     const { isReady } = SceneReadyContext();
 
@@ -225,8 +213,8 @@ const Content = (props: { id: string }) => {
             const items = await OBR.scene.items.getItems([id]);
             if (items.length > 0) {
                 const item = items[0];
-                if (characterMetadata in item.metadata) {
-                    setData(item.metadata[characterMetadata] as HpTrackerMetadata);
+                if (itemMetadataKey in item.metadata) {
+                    setData(item.metadata[itemMetadataKey] as HpTrackerMetadata);
                     setItem(item);
                 }
             }
@@ -237,11 +225,6 @@ const Content = (props: { id: string }) => {
 
     const initPopover = async () => {
         await getData();
-        const metadata = await OBR.scene.getMetadata();
-        const data = metadata[sceneMetadata] as SceneMetadata;
-        if (data) {
-            setCurrentSceneMetadata(data);
-        }
     };
 
     useEffect(() => {
@@ -249,16 +232,9 @@ const Content = (props: { id: string }) => {
             const filteredItems = items.filter((item) => item.id === id);
             if (filteredItems.length > 0) {
                 const item = filteredItems[0];
-                if (characterMetadata in item.metadata) {
-                    setData(item.metadata[characterMetadata] as HpTrackerMetadata);
+                if (itemMetadataKey in item.metadata) {
+                    setData(item.metadata[itemMetadataKey] as HpTrackerMetadata);
                 }
-            }
-        });
-
-        OBR.scene.onMetadataChange((sceneData) => {
-            const metadata = sceneData[sceneMetadata] as SceneMetadata;
-            if (metadata) {
-                setCurrentSceneMetadata(metadata);
             }
         });
     }, []);
@@ -269,9 +245,9 @@ const Content = (props: { id: string }) => {
         }
     }, [isReady]);
 
-    return id && data && currentSceneMetadata && item ? (
+    return id && data && item ? (
         <div className={"popover"}>
-            <Token item={item} data={data} popover={true} selected={false} metadata={currentSceneMetadata} />
+            <Token item={item} data={data} popover={true} selected={false} />
         </div>
     ) : null;
 };

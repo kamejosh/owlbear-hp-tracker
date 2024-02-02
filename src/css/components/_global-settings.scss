@@ -11,8 +11,18 @@
         margin-bottom: 10px;
     }
 
-    h3 {
+    h2 {
         margin-block: 0;
+    }
+
+    .settings-context {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+
+        h3 {
+            margin-block: 0;
+        }
     }
 
     .setting {
@@ -28,15 +38,12 @@
             display: flex;
             flex-direction: column;
 
-            h4 {
-                margin: 0;
-                font-size: 1.1rem;
-            }
-
             .ac-position {
                 display: flex;
+                align-items: center;
                 gap: 2px;
             }
+
             .ac-shield {
                 border-bottom: none;
             }
@@ -53,7 +60,7 @@
         display: flex;
 
         input {
-            max-width: 4ch;
+            width: 5ch;
         }
     }
 

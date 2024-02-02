@@ -1,0 +1,40 @@
+:root {
+    --text-color: rgba(255, 255, 255, 0.87);
+    --bg-color: #1c1b22;
+    --bg-color-light: #3c3b42;
+    --button-shadow: #222;
+
+    --success-border: green;
+    --success-bg: 33, 79, 36;
+    --error-border: red;
+    --error-bg: 79, 33, 36;
+
+    --bg1: #161616;
+    --bg2: #1c1c1c;
+    --bg3: #202020;
+    --bg4: #282828;
+}
+
+@property --bg1 {
+    syntax: "<color>";
+    initial-value: #161616;
+    inherits: false;
+}
+
+@property --bg2 {
+    syntax: "<color>";
+    initial-value: #1c1c1c;
+    inherits: false;
+}
+
+@property --bg3 {
+    syntax: "<color>";
+    initial-value: #202020;
+    inherits: false;
+}
+
+@property --bg4 {
+    syntax: "<color>";
+    initial-value: #282828;
+    inherits: false;
+}
