@@ -1,3 +1,7 @@
+# 1.6.1
+
++ Fix issue where tokens could not be dragged over hidden groups
+
 # 1.6.0
 
 + Add dice roller using dddice

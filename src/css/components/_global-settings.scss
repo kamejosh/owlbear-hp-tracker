@@ -32,6 +32,7 @@
         gap: 1ch;
         border-bottom: 1px solid white;
         padding-bottom: 10px;
+        min-width: 250px;
         text-align: left;
 
         &.ac {
@@ -64,7 +65,8 @@
         }
     }
 
-    .statblock-popover {
+    .statblock-popover,
+    .hp-bar-size {
         display: block;
         .small {
             display: block;
