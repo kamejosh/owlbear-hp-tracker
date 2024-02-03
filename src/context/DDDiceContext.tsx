@@ -1,8 +1,10 @@
-import { ITheme, ThreeDDice } from "dddice-js";
+import { ITheme, ThreeDDice, ThreeDDiceAPI } from "dddice-js";
 import { create } from "zustand";
 
 export type DiceRoller = {
     roller: ThreeDDice;
+    rollerApi: ThreeDDiceAPI | null;
+    setRollerApi: (api: ThreeDDiceAPI) => void;
     initialized: boolean;
     setInitialized: (initialized: boolean) => void;
     theme: ITheme | null;
@@ -11,6 +13,8 @@ export type DiceRoller = {
 
 export const useDiceRoller = create<DiceRoller>()((set) => ({
     roller: new ThreeDDice(),
+    rollerApi: null,
+    setRollerApi: (api) => set(() => ({ rollerApi: api })),
     initialized: false,
     setInitialized: (initialized: boolean) => set(() => ({ initialized: initialized })),
     theme: null,

@@ -17,7 +17,7 @@ type DiceButtonProps = {
 export const DiceButton = (props: DiceButtonProps) => {
     const { addRoll } = useRollLogContext();
     const { room } = useMetadataContext();
-    const { roller, initialized } = useDiceRoller();
+    const { rollerApi, initialized } = useDiceRoller();
     const { component } = useComponentContext();
     const [context, setContext] = useState<boolean>(false);
     const rollButton = useRef<HTMLButtonElement>(null);
@@ -25,8 +25,8 @@ export const DiceButton = (props: DiceButtonProps) => {
 
     const getUserUuid = async () => {
         if (room?.diceRoom?.slug) {
-            const diceRoom = (await roller.api?.room.get(room?.diceRoom.slug))?.data;
-            const user = (await roller.api?.user.get())?.data;
+            const diceRoom = (await rollerApi?.room.get(room?.diceRoom.slug))?.data;
+            const user = (await rollerApi?.user.get())?.data;
             if (user && diceRoom) {
                 const participant = diceRoom.participants.find((p) => p.user.uuid === user.uuid);
                 if (participant) {
@@ -62,7 +62,7 @@ export const DiceButton = (props: DiceButtonProps) => {
             }
             if (parsed) {
                 try {
-                    const roll = await roller.roll(parsed.dice, {
+                    const roll = await rollerApi?.roll.create(parsed.dice, {
                         label: props.context,
                         operator: parsed.operator,
                         external_id: component,

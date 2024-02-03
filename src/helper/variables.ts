@@ -7,6 +7,7 @@ export const itemMetadataKey = `${ID}/data`;
 export const infoMetadataKey = `${ID}/text`;
 
 export const modalId = `${ID}/modal`;
+export const diceTrayModalId = `${ID}/diceTrayModal`;
 export const statblockPopoverId = `${ID}/statblock-popover`;
 export const rollLogPopoverId = `${ID}/dice-log`;
 
@@ -30,6 +31,15 @@ export const settingsModal: Modal = {
 export const diceModal: Modal = {
     id: modalId,
     url: "/modal.html?content=dddice",
+};
+
+export const diceTrayModal: Modal = {
+    id: diceTrayModalId,
+    url: "/modal.html?content=dicetray",
+    fullScreen: true,
+    hidePaper: true,
+    hideBackdrop: true,
+    disablePointerEvents: true,
 };
 
 export const rollLogPopover: Popover = {

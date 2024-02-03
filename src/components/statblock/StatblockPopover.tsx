@@ -116,7 +116,7 @@ export const StatblockPopover = () => {
                     data={data}
                 />
             </div>
-            <DiceTray classes={"statblock-dice-tray"} />
+            <DiceTray classes={"statblock-dice-tray"} overlay={false} />
         </ContextWrapper>
     );
 };
