@@ -7,18 +7,18 @@ import OBR, { Metadata } from "@owlbear-rodeo/sdk";
 
 export const Logout = () => {
     const { room } = useMetadataContext();
-    const { roller } = useDiceRoller();
+    const { rollerApi } = useDiceRoller();
     const playerContext = usePlayerContext();
 
     return (
         <button
             className={"dddice-disconnect"}
             onClick={async () => {
-                if (room && playerContext.id) {
-                    const participant = await getDiceParticipant(roller, room.diceRoom?.slug);
+                if (room && playerContext.id && rollerApi) {
+                    const participant = await getDiceParticipant(rollerApi, room.diceRoom?.slug);
 
                     if (participant && room.diceRoom?.slug) {
-                        roller.api?.room.leave(room.diceRoom.slug, participant.id.toString());
+                        rollerApi?.room.leave(room.diceRoom.slug, participant.id.toString());
                     }
 
                     const diceUser = room.diceUser;
