@@ -21,7 +21,7 @@ export const HPTracker = () => {
     return (
         <ContextWrapper component={"action_window"}>
             <Content />
-            <DiceTray classes={"hp-tracker-dice-tray"} />
+            <DiceTray classes={"hp-tracker-dice-tray"} overlay={false} />
         </ContextWrapper>
     );
 };

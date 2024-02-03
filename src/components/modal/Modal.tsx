@@ -2,9 +2,12 @@ import { ContextWrapper } from "../ContextWrapper.tsx";
 import { Help } from "./Components/Help.tsx";
 import { Changelog } from "./Components/Changelog.tsx";
 import OBR from "@owlbear-rodeo/sdk";
-import { modalId } from "../../helper/variables.ts";
+import { diceTrayModalId, modalId } from "../../helper/variables.ts";
 import { Settings } from "./Components/Settings.tsx";
 import { DiceLogin } from "./Components/DiceLogin.tsx";
+import { DiceTray } from "../general/DiceRoller/DiceTray.tsx";
+import { useMetadataContext } from "../../context/MetadataContext.ts";
+import { useShallow } from "zustand/react/shallow";
 
 export const Modal = () => {
     return (
@@ -16,6 +19,7 @@ export const Modal = () => {
 
 const Content = () => {
     const content = new URLSearchParams(window.location.search).get("content") ?? null;
+    const { room } = useMetadataContext(useShallow((state) => state));
 
     const getContent = () => {
         if (content === "help") {
@@ -26,6 +30,12 @@ const Content = () => {
             return <Settings />;
         } else if (content === "dddice") {
             return <DiceLogin />;
+        } else if (content === "dicetray") {
+            if (room && room.diceRendering) {
+                return <DiceTray classes={"overlay"} overlay={true} />;
+            } else {
+                OBR.modal.close(diceTrayModalId);
+            }
         } else {
             OBR.modal.close(modalId);
         }

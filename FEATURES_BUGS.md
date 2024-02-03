@@ -6,6 +6,8 @@
 
 ## Feature Ideas
 
++ Add customization to HP Bar settings
++ Make dice roller working outside of scenes
 + Pagination for statblocks
 + editable statblock (would probably require own hosting/database to not clog up players owlbear space)
 + Tooltips for mobile devices

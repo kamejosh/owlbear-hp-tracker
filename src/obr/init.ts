@@ -1,5 +1,5 @@
 import OBR, { Metadata } from "@owlbear-rodeo/sdk";
-import { ID, itemMetadataKey, metadataKey, version } from "../helper/variables.ts";
+import { diceTrayModal, ID, itemMetadataKey, metadataKey, version } from "../helper/variables.ts";
 import { migrate102To103 } from "../migrations/v103.ts";
 import { migrate105To106 } from "../migrations/v106.ts";
 import { compare } from "compare-versions";
@@ -336,5 +336,6 @@ OBR.onReady(async () => {
             console.warn("HP Tracker - error while initializing Token event handler", e);
         }
     }
+    await OBR.modal.open(diceTrayModal);
     console.info(`HP Tracker - initialization done`);
 });

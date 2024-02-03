@@ -5,12 +5,18 @@ import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { DiceRoom } from "./DiceRoom.tsx";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
-import { addRollerCallbacks, dddiceLogin } from "../../../helper/diceHelper.ts";
+import { addRollerApiCallbacks, addRollerCallbacks, dddiceApiLogin, dddiceLogin } from "../../../helper/diceHelper.ts";
 import { useComponentContext } from "../../../context/ComponentContext.tsx";
+import { ThreeDDiceAPI } from "dddice-js";
 
-export const DiceTray = ({ classes }: { classes: string }) => {
+type DiceTrayProps = {
+    classes: string;
+    overlay: boolean;
+};
+
+export const DiceTray = (props: DiceTrayProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const { roller, setInitialized, theme, setTheme } = useDiceRoller();
+    const { roller, setRollerApi, setInitialized, theme, setTheme } = useDiceRoller();
     const playerContext = usePlayerContext();
     const { addRoll } = useRollLogContext();
     const { isReady } = SceneReadyContext();
@@ -30,37 +36,50 @@ export const DiceTray = ({ classes }: { classes: string }) => {
     }, [room]);
 
     useEffect(() => {
-        if (isReady && canvasRef.current && apiKey !== undefined) {
+        if (isReady && apiKey !== undefined) {
             initDice(!!room?.diceRendering);
         }
     }, [apiKey]);
 
     const initDice = async (diceRendering: boolean = true) => {
-        if (canvasRef.current || !diceRendering) {
-            setInitialized(false);
-            if (diceRendering && canvasRef.current) {
-                await dddiceLogin(room, roller, canvasRef.current);
-            } else {
-                await dddiceLogin(room, roller);
+        let api: ThreeDDiceAPI | undefined = undefined;
+        setInitialized(false);
+        if (props.overlay && canvasRef.current) {
+            const success = await dddiceLogin(room, roller, canvasRef.current);
+            if (success) {
+                await addRollerCallbacks(roller, addRoll, component);
             }
-            await addRollerCallbacks(roller, addRoll, component, room?.diceRendering);
-            setInitialized(true);
-            if (!theme) {
-                const themeId = room?.diceUser?.find((user) => user.playerId === playerContext.id)?.diceTheme;
-                if (themeId) {
-                    const newTheme = (await roller.api?.theme.get(themeId))?.data;
-                    if (newTheme) {
-                        setTheme(newTheme);
-                    }
+        } else {
+            api = await dddiceApiLogin(room);
+            if (api) {
+                setRollerApi(api);
+                if (!diceRendering) {
+                    await addRollerApiCallbacks(api, addRoll, component);
                 }
             }
         }
+
+        if (!theme) {
+            const themeId = room?.diceUser?.find((user) => user.playerId === playerContext.id)?.diceTheme;
+            if (themeId) {
+                const newTheme = props.overlay
+                    ? (await roller.api?.theme.get(themeId))?.data
+                    : (await api?.theme.get(themeId))?.data;
+                if (newTheme) {
+                    setTheme(newTheme);
+                }
+            }
+        }
+        setInitialized(true);
     };
 
     return (
         <>
-            <DiceRoom className={classes} />
-            <canvas ref={canvasRef} id={"DiceCanvas"} className={classes}></canvas>
+            {props.overlay ? (
+                <canvas ref={canvasRef} id={"DiceCanvas"} className={props.classes}></canvas>
+            ) : (
+                <DiceRoom className={props.classes} />
+            )}
         </>
     );
 };

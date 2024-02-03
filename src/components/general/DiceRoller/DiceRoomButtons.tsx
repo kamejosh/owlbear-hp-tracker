@@ -24,7 +24,7 @@ type CustomDiceButtonProps = {
 };
 
 const CustomDiceButton = (props: CustomDiceButtonProps) => {
-    const { roller, theme, initialized } = useDiceRoller();
+    const { rollerApi, theme, initialized } = useDiceRoller();
     const { addRoll } = useRollLogContext();
     const { buttons, setButtons } = useDiceButtonsContext();
     const { component } = useComponentContext();
@@ -93,7 +93,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                 theme.id
             );
             if (parsed) {
-                const roll = await roller.roll(parsed.dice, {
+                const roll = await rollerApi?.roll.create(parsed.dice, {
                     operator: parsed.operator,
                     external_id: component,
                     label: "Roll: Custom",
@@ -199,7 +199,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
 };
 
 const QuickButtons = ({ open }: { open: boolean }) => {
-    const { theme, roller } = useDiceRoller();
+    const { theme, rollerApi } = useDiceRoller();
     const { addRoll } = useRollLogContext();
     const { component } = useComponentContext();
     const [validCustom, setValidCustom] = useState<boolean>(true);
@@ -209,7 +209,7 @@ const QuickButtons = ({ open }: { open: boolean }) => {
         if (theme && dice) {
             let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined = diceToRoll(dice, theme.id);
             if (parsed) {
-                const roll = await roller.roll(parsed.dice, {
+                const roll = await rollerApi?.roll.create(parsed.dice, {
                     operator: parsed.operator,
                     external_id: component,
                     label: "Roll: Custom",

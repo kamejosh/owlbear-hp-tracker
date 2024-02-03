@@ -8,7 +8,7 @@ import { updateRoomMetadataDiceUser } from "../../../helper/diceHelper.ts";
 
 export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean) => void }) => {
     const { room } = useMetadataContext();
-    const { roller, initialized, theme, setTheme } = useDiceRoller();
+    const { rollerApi, initialized, theme, setTheme } = useDiceRoller();
     const playerContext = usePlayerContext();
     const [validTheme, setValidTheme] = useState<boolean>(true);
     const [searching, setSearching] = useState<boolean>(false);
@@ -50,13 +50,12 @@ export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean)
     const findAndSetTheme = async (searchTheme: string, input?: HTMLInputElement) => {
         try {
             setSearching(true);
-            const newTheme = (await roller.api?.theme.get(searchTheme))?.data;
+            const newTheme = (await rollerApi?.theme.get(searchTheme))?.data;
 
             if (newTheme && validateTheme(newTheme)) {
                 if (newTheme.id !== theme?.id) {
                     if (room && playerContext.id) {
                         await updateRoomMetadataDiceUser(room, playerContext.id, { diceTheme: newTheme.id });
-                        roller.loadTheme(newTheme);
                         setValidTheme(true);
                         setTheme(newTheme);
                     } else {

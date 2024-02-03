@@ -1,3 +1,9 @@
+# 1.6.1
+
++ Fix issue where tokens could not be dragged over hidden groups
++ Fix issue when trying to rejoin a room as a guest
++ Move to general canvas to prevent multiple dice rolling in different windows
+
 # 1.6.0
 
 + Add dice roller using dddice

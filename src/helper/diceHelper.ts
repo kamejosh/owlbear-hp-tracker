@@ -3,6 +3,7 @@ import { dddiceRollToRollLog, updateRoomMetadata } from "./helpers.ts";
 import OBR, { Metadata } from "@owlbear-rodeo/sdk";
 import {
     IDiceRoll,
+    IRoll,
     IRoom,
     IUser,
     Operator,
@@ -79,17 +80,17 @@ export const updateRoomMetadataDiceRoom = async (room: RoomMetadata, slug: strin
     );
 };
 
-export const getDiceUser = async (roller: ThreeDDice) => {
-    return (await roller.api?.user.get())?.data;
+export const getDiceUser = async (rollerApi: ThreeDDiceAPI) => {
+    return (await rollerApi?.user.get())?.data;
 };
 
-export const getDiceParticipant = async (roller: ThreeDDice, roomSlug: string | undefined, user?: IUser) => {
+export const getDiceParticipant = async (rollerApi: ThreeDDiceAPI, roomSlug: string | undefined, user?: IUser) => {
     let diceUser: IUser | undefined = user;
     if (diceUser === undefined) {
-        diceUser = await getDiceUser(roller);
+        diceUser = await getDiceUser(rollerApi);
     }
     if (diceUser && roomSlug) {
-        const diceRoom = (await roller.api?.room.get(roomSlug))?.data;
+        const diceRoom = (await rollerApi.room.get(roomSlug))?.data;
         // @ts-ignore we test diceUser in the if above it will not be undefined
         return diceRoom?.participants.find((p) => p.user.uuid === diceUser.uuid);
     }
@@ -118,7 +119,7 @@ export const getApiKey = async (room: RoomMetadata | null) => {
     return apiKey;
 };
 
-export const getDiceRoom = async (roller: ThreeDDice, room: RoomMetadata | null): Promise<IRoom | undefined> => {
+export const getDiceRoom = async (rollerApi: ThreeDDiceAPI, room: RoomMetadata | null): Promise<IRoom | undefined> => {
     const roomMetadata = await OBR.room.getMetadata();
     let slug: string | undefined;
 
@@ -129,7 +130,7 @@ export const getDiceRoom = async (roller: ThreeDDice, room: RoomMetadata | null)
     }
 
     if (!slug) {
-        const diceRoom = (await roller.api?.room.create())?.data;
+        const diceRoom = (await rollerApi.room.create())?.data;
 
         if (room && diceRoom) {
             await updateRoomMetadataDiceRoom(room, diceRoom.slug);
@@ -137,83 +138,80 @@ export const getDiceRoom = async (roller: ThreeDDice, room: RoomMetadata | null)
 
         return diceRoom;
     } else {
-        const diceRoom = (await roller?.api?.room.get(slug))?.data;
-
-        if (room && diceRoom) {
-            await updateRoomMetadataDiceRoom(room, diceRoom.slug);
+        try {
+            const diceRoom = (await rollerApi?.room.get(slug))?.data;
+            if (room && diceRoom) {
+                await updateRoomMetadataDiceRoom(room, diceRoom.slug);
+                return diceRoom;
+            }
+        } catch {
+            // it seems like a room with no logged in users is removed after some time, so in that case we need to create a new one
+            const newDiceRoom = (await rollerApi?.room.create())?.data;
+            if (room && newDiceRoom) {
+                await updateRoomMetadataDiceRoom(room, newDiceRoom.slug);
+                return newDiceRoom;
+            } else {
+                console.warn("HP Tracker - unable to connect to dddice room");
+            }
         }
 
-        return diceRoom;
+        return undefined;
     }
 };
 
-export const prepareRoomUser = async (diceRoom: IRoom, roller: ThreeDDice) => {
-    const participant = await getDiceParticipant(roller, diceRoom.slug);
+export const prepareRoomUser = async (diceRoom: IRoom, rollerApi: ThreeDDiceAPI) => {
+    const participant = await getDiceParticipant(rollerApi, diceRoom.slug);
     const name = await OBR.player.getName();
 
     if (participant && participant.username !== name) {
-        await roller.api?.room.updateParticipant(diceRoom.slug, participant.id, {
+        await rollerApi.room.updateParticipant(diceRoom.slug, participant.id, {
             username: name,
         });
+    }
+};
+
+const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => void, component: string | undefined) => {
+    const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
+    const name = await OBR.player.getName();
+    const rollLogEntry = await dddiceRollToRollLog(e, { participant: participant });
+
+    if (participant && participant.username !== name) {
+        addRoll(rollLogEntry);
+    }
+
+    // only the action window triggers the popover or notification because it always exists
+    if (component === "modal" || component === "action_window") {
+        const width = await OBR.viewport.getWidth();
+        const height = await OBR.viewport.getHeight();
+        await OBR.popover.open({
+            ...rollLogPopover,
+            anchorPosition: { top: Math.max(height - 55, 0), left: width - 70 },
+        });
+
+        if (rollLogTimeOut) {
+            clearTimeout(rollLogTimeOut);
+        }
+
+        rollLogTimeOut = setTimeout(async () => {
+            await OBR.popover.close(rollLogPopoverId);
+        }, 5000);
     }
 };
 
 export const addRollerCallbacks = async (
     roller: ThreeDDice,
     addRoll: (entry: RollLogEntryType) => void,
-    component: string | undefined,
-    showPopover: boolean = true
+    component: string | undefined
 ) => {
-    roller.on(ThreeDDiceRollEvent.RollStarted, async (e) => {
-        const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
-        const name = await OBR.player.getName();
-        const rollLogEntry = await dddiceRollToRollLog(e, { participant: participant });
+    roller.on(ThreeDDiceRollEvent.RollFinished, (e) => rollerCallback(e, addRoll, component));
+};
 
-        if (participant && participant.username !== name) {
-            addRoll(rollLogEntry);
-        }
-
-        if (!showPopover) {
-            const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
-            const rollLogEntry = await dddiceRollToRollLog(e, { participant: participant });
-            await OBR.notification.show(
-                `${rollLogEntry.username} rolled ${rollLogEntry.equation} = ${rollLogEntry.total_value}`,
-                "INFO"
-            );
-        } else {
-            // only the action window triggers the popover or notification because it always exists
-            if (component === "action_window") {
-                if (showPopover) {
-                    const width = await OBR.viewport.getWidth();
-                    const height = await OBR.viewport.getHeight();
-                    await OBR.popover.open({
-                        ...rollLogPopover,
-                        anchorPosition: { top: Math.max(height - 55, 0), left: width - 70 },
-                    });
-
-                    if (rollLogTimeOut) {
-                        clearTimeout(rollLogTimeOut);
-                    }
-
-                    rollLogTimeOut = setTimeout(async () => {
-                        await OBR.popover.close(rollLogPopoverId);
-                    }, 5000);
-                }
-            }
-        }
-    });
-
-    roller.on(ThreeDDiceRollEvent.RollCreated, async (e) => {
-        const user = (await roller.api?.user.get())?.data;
-        if (e.external_id !== component && user && user.uuid === e.user.uuid) {
-            // roller.clear();
-            // TODO: this does currently not work, as dddice does not provide a way to prevent 3d rolls
-            /*e.values.forEach((value) => {
-                // @ts-ignore calling a private message
-                roller.removeDieByUuid(value.uuid);
-            });*/
-        }
-    });
+export const addRollerApiCallbacks = async (
+    rollerApi: ThreeDDiceAPI,
+    addRoll: (entry: RollLogEntryType) => void,
+    component: string | undefined
+) => {
+    rollerApi.listen(ThreeDDiceRollEvent.RollCreated, (e) => rollerCallback(e, addRoll, component));
 };
 
 export const removeRollerCallbacks = (roller: ThreeDDice) => {
@@ -221,29 +219,67 @@ export const removeRollerCallbacks = (roller: ThreeDDice) => {
     roller.off(ThreeDDiceRollEvent.RollCreated);
 };
 
-export const dddiceLogin = async (room: RoomMetadata | null, roller: ThreeDDice, canvas?: HTMLCanvasElement) => {
-    const diceUser = await getDiceUser(roller);
-    const participant = await getDiceParticipant(roller, room?.diceRoom?.slug, diceUser);
+export const dddiceLogin = async (room: RoomMetadata | null, roller: ThreeDDice, canvas: HTMLCanvasElement) => {
+    if (roller.api) {
+        const diceUser = await getDiceUser(roller.api);
+        const participant = await getDiceParticipant(roller.api, room?.diceRoom?.slug, diceUser);
 
-    if (diceUser && participant && room?.diceRoom?.slug) {
-        roller.api?.room.leave(room.diceRoom.slug, participant.id.toString());
-        removeRollerCallbacks(roller);
+        if (diceUser && participant && room?.diceRoom?.slug) {
+            roller.api?.room.leave(room.diceRoom.slug, participant.id.toString());
+            removeRollerCallbacks(roller);
+        }
     }
 
     try {
-        roller.initialize(canvas, await getApiKey(room), { autoClear: 3 }, `HP Tracker - ${OBR.room.id}`);
-        const diceRoom = await getDiceRoom(roller, room);
+        roller.initialize(canvas, await getApiKey(room), { autoClear: 3 }, `HP Tracker`);
+        if (roller.api) {
+            const diceRoom = await getDiceRoom(roller.api, room);
+            if (diceRoom) {
+                const user = (await roller.api?.user.get())?.data;
+                if (user) {
+                    const participant = diceRoom.participants.find((p) => p.user.uuid === user.uuid);
+                    if (participant) {
+                        await prepareRoomUser(diceRoom, roller.api);
+                    } else {
+                        try {
+                            const userDiceRoom = (await roller?.api?.room.join(diceRoom.slug, diceRoom.passcode))?.data;
+                            if (userDiceRoom) {
+                                await prepareRoomUser(userDiceRoom, roller.api);
+                            }
+                        } catch {
+                            /**
+                             * if we already joined. We already check that when
+                             * looking if the user is a participant in the room,
+                             * but better be safe than sorry
+                             */
+                        }
+                    }
+                    roller.connect(diceRoom.slug, diceRoom.passcode, user.uuid);
+                }
+            }
+            return true;
+        }
+    } catch (e) {
+        console.warn(e);
+        return false;
+    }
+};
+
+export const dddiceApiLogin = async (room: RoomMetadata | null) => {
+    try {
+        const rollerApi = new ThreeDDiceAPI(await getApiKey(room), "HP Tracker");
+        const diceRoom = await getDiceRoom(rollerApi, room);
         if (diceRoom) {
-            const user = (await roller.api?.user.get())?.data;
+            const user = (await rollerApi.user.get())?.data;
             if (user) {
                 const participant = diceRoom.participants.find((p) => p.user.uuid === user.uuid);
                 if (participant) {
-                    await prepareRoomUser(diceRoom, roller);
+                    await prepareRoomUser(diceRoom, rollerApi);
                 } else {
                     try {
-                        const userDiceRoom = (await roller?.api?.room.join(diceRoom.slug, diceRoom.passcode))?.data;
+                        const userDiceRoom = (await rollerApi?.room.join(diceRoom.slug, diceRoom.passcode))?.data;
                         if (userDiceRoom) {
-                            await prepareRoomUser(userDiceRoom, roller);
+                            await prepareRoomUser(userDiceRoom, rollerApi);
                         }
                     } catch {
                         /**
@@ -253,17 +289,12 @@ export const dddiceLogin = async (room: RoomMetadata | null, roller: ThreeDDice,
                          */
                     }
                 }
-                roller.connect(diceRoom.slug, diceRoom.passcode, user.uuid);
-            }
-
-            if (canvas) {
-                roller.start();
+                return rollerApi.connect(diceRoom.slug, diceRoom.passcode, user.uuid);
             }
         }
-        return true;
     } catch (e) {
         console.warn(e);
-        return false;
+        return undefined;
     }
 };
 

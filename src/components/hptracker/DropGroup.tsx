@@ -143,22 +143,18 @@ export const DropGroup = (props: DropGroupProps) => {
                     }}
                 ></button>
             </div>
-            <div className={"drop-list-wrapper"}>
-                <div className={"drop-list"}>
-                    <Droppable droppableId={props.title}>
-                        {(provided) => (
-                            <div ref={provided.innerRef} {...provided.droppableProps}>
-                                <DraggableTokenList
-                                    tokens={props.list}
-                                    selected={props.selected}
-                                    tokenLists={props.tokenLists}
-                                />
-                                {provided.placeholder}
-                            </div>
-                        )}
-                    </Droppable>
-                </div>
-            </div>
+            <Droppable droppableId={props.title}>
+                {(provided) => (
+                    <div ref={provided.innerRef} {...provided.droppableProps}>
+                        <DraggableTokenList
+                            tokens={props.list}
+                            selected={props.selected}
+                            tokenLists={props.tokenLists}
+                        />
+                        {provided.placeholder}
+                    </div>
+                )}
+            </Droppable>
         </div>
     );
 };
