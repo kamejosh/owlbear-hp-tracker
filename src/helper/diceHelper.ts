@@ -180,7 +180,7 @@ const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => vo
     }
 
     // only the action window triggers the popover or notification because it always exists
-    if (component === "modal") {
+    if (component === "modal" || component === "action_window") {
         const width = await OBR.viewport.getWidth();
         const height = await OBR.viewport.getHeight();
         await OBR.popover.open({
@@ -211,7 +211,7 @@ export const addRollerApiCallbacks = async (
     addRoll: (entry: RollLogEntryType) => void,
     component: string | undefined
 ) => {
-    rollerApi.listen(ThreeDDiceRollEvent.RollFinished, (e) => rollerCallback(e, addRoll, component));
+    rollerApi.listen(ThreeDDiceRollEvent.RollCreated, (e) => rollerCallback(e, addRoll, component));
 };
 
 export const removeRollerCallbacks = (roller: ThreeDDice) => {
