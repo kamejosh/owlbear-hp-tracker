@@ -32,7 +32,6 @@ export const getAttachedItems = async (id: string, itemTypes: Array<string>) => 
             attachments.push(item);
         }
     });
-    console.log(id, attachments);
 
     return attachments;
 };

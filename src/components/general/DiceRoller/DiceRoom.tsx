@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { RollLog } from "./RollLog.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
@@ -7,12 +7,29 @@ import OBR from "@owlbear-rodeo/sdk";
 import { diceModal } from "../../../helper/variables.ts";
 import { DiceRoomButtons } from "./DiceRoomButtons.tsx";
 import { CopySvg } from "../../svgs/CopySvg.tsx";
+import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
+import { getDiceUser } from "../../../helper/diceHelper.ts";
+import { IUser } from "dddice-js";
 
 export const DiceRoom = ({ className }: { className?: string }) => {
     const { room } = useMetadataContext();
     const { clear } = useRollLogContext();
+    const { rollerApi } = useDiceRoller();
     const [settings, setSettings] = useState<boolean>(false);
     const [open, setOpen] = useState<boolean>(false);
+    const [user, setUser] = useState<IUser>();
+
+    useEffect(() => {
+        const initUser = async () => {
+            if (rollerApi) {
+                const user = await getDiceUser(rollerApi);
+                if (user) {
+                    setUser(user);
+                }
+            }
+        };
+        initUser();
+    }, [rollerApi]);
 
     return (
         <div className={`dice-room ${className} ${open ? "open" : "closed"}`}>
@@ -33,7 +50,7 @@ export const DiceRoom = ({ className }: { className?: string }) => {
                                     });
                                 }}
                             >
-                                Login
+                                {user && user.name !== "Guest User" ? user.username : "Login"}
                             </button>
                             <div className={"room-link"}>
                                 <a href={`https://dddice.com/room/${room?.diceRoom?.slug}`} target={"_blank"}>

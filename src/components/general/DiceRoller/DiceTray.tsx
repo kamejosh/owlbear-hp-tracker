@@ -28,7 +28,7 @@ export const DiceTray = (props: DiceTrayProps) => {
 
     useEffect(() => {
         const newApiKey = room?.diceUser?.find((user) => user.playerId === playerContext.id)?.apiKey;
-        if (newApiKey && newApiKey !== apiKey) {
+        if (newApiKey !== undefined && newApiKey !== apiKey) {
             setApiKey(newApiKey);
         } else if (newApiKey === undefined && apiKey === undefined) {
             setApiKey("");
