@@ -3,6 +3,7 @@
 ## Bugs
 
 + When flipping a Token the Shapes and Texts need to be toggled to be in the right position
++ When Tokens are attached to Tokens all attachments will be changed when the toplevel token is changed
 
 ## Feature Ideas
 

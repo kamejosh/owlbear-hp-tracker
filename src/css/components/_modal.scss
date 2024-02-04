@@ -1,6 +1,13 @@
 @use "../utilities/breakpoint";
 
 .modal-app {
+    .initialization-loader {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        translate: -50% 50%;
+    }
+
     .close-button {
         display: flex;
         justify-content: center;

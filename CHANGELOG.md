@@ -3,6 +3,7 @@
 + Fix issue where tokens could not be dragged over hidden groups
 + Fix issue when trying to rejoin a room as a guest
 + Move to general canvas to prevent multiple dice rolling in different windows
++ Modals no longer get the default background when starting
 
 # 1.6.0
 

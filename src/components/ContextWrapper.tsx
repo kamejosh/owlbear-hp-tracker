@@ -85,7 +85,14 @@ export const ContextWrapper = (props: ContextWrapperProps) => {
             <PluginGate>
                 <QueryClientProvider client={queryClient}>
                     <PlayerContext.Provider value={playerContext}>
-                        {component && scene && room ? props.children : <Loader className={"initialization-loader"} />}
+                        {component && scene && room ? (
+                            props.children
+                        ) : (
+                            <div>
+                                HP Tracker - initializing...
+                                <Loader className={"initialization-loader"} />
+                            </div>
+                        )}
                     </PlayerContext.Provider>
                 </QueryClientProvider>
             </PluginGate>
