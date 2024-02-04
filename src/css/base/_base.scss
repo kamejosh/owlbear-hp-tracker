@@ -25,18 +25,6 @@ body {
     background: transparent;
     user-select: none;
 
-    &::after {
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: -1;
-        background: linear-gradient(to bottom, var(--bg-color) 85%, var(--bg-color-light));
-        width: 100svw;
-        height: 100svh;
-        overflow: hidden;
-        content: "";
-    }
-
     &::-webkit-scrollbar {
         background-color: rgba(55, 55, 55, 0.1);
         width: 10px;
@@ -48,10 +36,22 @@ body {
         background-color: rgba(255, 255, 255, 0.5);
     }
 
-    &:has(.roll-log-popover, .modal-wrapper) {
+    &:not(:has(.roll-log-popover, .modal-wrapper, .modal-app)) {
         &::after {
-            background: transparent;
+            background: linear-gradient(to bottom, var(--bg-color) 85%, var(--bg-color-light));
         }
+    }
+
+    &::after {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: -1;
+        background: transparent;
+        width: 100svw;
+        height: 100svh;
+        overflow: hidden;
+        content: "";
     }
 
     :has(.dddice-login-modal) {

@@ -28,7 +28,7 @@ export const getAttachedItems = async (id: string, itemTypes: Array<string>) => 
     // why am I not using .filter()? because if I do there is a bug and I can't find it
     const attachments: Item[] = [];
     items.forEach((item) => {
-        if (infoMetadataKey in item.metadata && itemTypes.indexOf(item.type) >= 0) {
+        if (infoMetadataKey in item.metadata && itemTypes.indexOf(item.type) >= 0 && item.attachedTo === id) {
             attachments.push(item);
         }
     });
