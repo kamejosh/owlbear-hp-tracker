@@ -6,6 +6,7 @@
 
 ## Feature Ideas
 
++ Allow dddice user to switch rooms
 + Add customization to HP Bar settings
 + Make dice roller working outside of scenes
 + Pagination for statblocks
