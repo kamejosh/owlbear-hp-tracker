@@ -343,9 +343,7 @@ Each Owlbear user can chose their own dice theme (and the other users will see t
 
 ### 3D Rendering
 
-**This setting needs a full reload of HP Tracker to work (refresh the owlbear page)**
-
-You can choose to use the 3D rendering of dddice, this is the default option. Should you already use the dddice owlbear extension you might want to turn of HP Trackers dice rendering to not have multiple dice showing the same thing being rendered. The only drawback is that there will be errors in the developer console and that you don't get to see shiny dice rolling around.
+You can choose to use the 3D rendering of dddice, this is the default option. Should you already use the dddice owlbear extension you might want to turn HP Trackers dice rendering off to not have multiple dice showing the same thing.
 
 ## Using The Dice Roller
 
