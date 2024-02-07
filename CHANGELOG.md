@@ -1,3 +1,12 @@
+# 1.6.2
+
++ Add documentation for integrating DnDBeyond rolls into HP Tracker
++ Fix issue with initiative roller when dice were used
++ Add dice rendering is now a setting per player and can be changed without a restart
++ Fix custom roll text input could not be closed without entering a valid roll equation
++ Fix an open dice settings menu would prevent the dice tray from fully closing
++ Fix entering just "-" in the HP Bar Offset setting deletes it instantly
+
 # 1.6.1
 
 + Fix issue where tokens could not be dragged over hidden groups

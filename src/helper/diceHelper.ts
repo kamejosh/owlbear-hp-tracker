@@ -179,7 +179,10 @@ const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => vo
     const name = await OBR.player.getName();
     const rollLogEntry = await dddiceRollToRollLog(e, { participant: participant });
 
-    if (participant && participant.username !== name) {
+    if (
+        participant &&
+        (participant.username !== name || (e.external_id !== "action_window" && e.external_id !== "statblock_popover"))
+    ) {
         addRoll(rollLogEntry);
     }
 

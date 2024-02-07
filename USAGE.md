@@ -31,6 +31,7 @@
     - [Initiative Buttons](#initiative-buttons)
     - [Custom Roll Buttons](#custom-roll-buttons)
     - [Quick Roll Buttons](#quick-roll-buttons)
+  + [DnD Beyond Dice Rolls](#dnd-beyond-dice-rolls)
 
 # HP Tracker - Owlbear Plugin
 
@@ -402,3 +403,14 @@ To remove a preset hover over the button and press the now visible x-button in t
 The Quick Roll Buttons is the button next to the Roll Log toggle button. It will always display all available dice in the selected theme to quickly roll them. It also contains a text input field where you can enter a valid dice string and roll it without saving it.
 
 ![Quick Roll Buttons](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/quick_roll_buttons.gif)
+
+## DnD Beyond Dice Rolls
+
+Using dddice you can roll dice in your DnD Beyond Character Sheets and see those rolls directly in Owlbear Rodeo. All you have to do is:
+
+- Install the dddice browser extension
+- Open your DnD Beyond Character Sheet in this browser
+- Open the Dice Log in HP Tracker
+- Copy the link to the dddice room
+- Paste this link into the dddice browser extension (you must be in the DnD Beyond tab)
+- start rolling
