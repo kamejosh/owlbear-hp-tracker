@@ -46,6 +46,14 @@ export type SceneMetadata = {
     openGroups?: Array<string>;
 };
 
+export type DiceUser = {
+    diceRendering: boolean;
+    playerId: string;
+    apiKey: string | undefined;
+    lastUse: number;
+    diceTheme: string;
+};
+
 export type RoomMetadata = {
     ruleset?: Ruleset;
     allowNegativeNumbers?: boolean;
@@ -58,13 +66,7 @@ export type RoomMetadata = {
     initiativeDice?: number;
     ignoreUpdateNotification?: boolean;
     diceRoom?: { slug: string | undefined };
-    diceRendering?: boolean;
-    diceUser?: Array<{
-        playerId: string;
-        apiKey: string | undefined;
-        lastUse: number;
-        diceTheme: string;
-    }>;
+    diceUser?: Array<DiceUser>;
 };
 
 export type AttachmentMetadata = {

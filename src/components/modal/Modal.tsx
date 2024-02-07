@@ -8,6 +8,7 @@ import { DiceLogin } from "./Components/DiceLogin.tsx";
 import { DiceTray } from "../general/DiceRoller/DiceTray.tsx";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { useShallow } from "zustand/react/shallow";
+import { getRoomDiceUser } from "../../helper/helpers.ts";
 
 export const Modal = () => {
     return (
@@ -31,7 +32,8 @@ const Content = () => {
         } else if (content === "dddice") {
             return <DiceLogin />;
         } else if (content === "dicetray") {
-            if (room && room.diceRendering) {
+            const id = OBR.player.id;
+            if (room && getRoomDiceUser(room, id)?.diceRendering) {
                 return <DiceTray classes={"overlay"} overlay={true} />;
             } else {
                 OBR.modal.close(diceTrayModalId);

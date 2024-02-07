@@ -17,9 +17,10 @@ import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { useDiceRoller } from "../../context/DDDiceContext.tsx";
 import { IDiceRoll, IRoll, Operator } from "dddice-js";
 import { diceToRoll } from "../../helper/diceHelper.ts";
-import { dddiceRollToRollLog } from "../../helper/helpers.ts";
+import { dddiceRollToRollLog, getRoomDiceUser } from "../../helper/helpers.ts";
 import { useComponentContext } from "../../context/ComponentContext.tsx";
 import { useRollLogContext } from "../../context/RollLogContext.tsx";
+import { usePlayerContext } from "../../context/PlayerContext.ts";
 
 type DropGroupProps = {
     title: string;
@@ -32,7 +33,8 @@ export const DropGroup = (props: DropGroupProps) => {
     const { room, scene } = useMetadataContext();
     const { component } = useComponentContext();
     const { addRoll } = useRollLogContext();
-    const { roller, initialized, theme } = useDiceRoller();
+    const { rollerApi, initialized, theme } = useDiceRoller();
+    const playerContext = usePlayerContext();
 
     const setOpenGroupSetting = async (name: string) => {
         const metadata: Metadata = await OBR.scene.getMetadata();
@@ -52,7 +54,7 @@ export const DropGroup = (props: DropGroupProps) => {
         if (theme) {
             let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined = diceToRoll(dice, theme.id);
             if (parsed) {
-                const roll = await roller.roll(parsed.dice, {
+                const roll = await rollerApi?.roll.create(parsed.dice, {
                     operator: parsed.operator,
                     external_id: component,
                     label: "Initiative: Roll",
@@ -71,7 +73,8 @@ export const DropGroup = (props: DropGroupProps) => {
 
     const setInitiative = async (button: HTMLButtonElement) => {
         let rollData: IRoll | undefined;
-        if (room?.diceRendering) {
+        const id = OBR.player.id;
+        if (getRoomDiceUser(room, id)?.diceRendering) {
             rollData = await roll(button, `${props.list.length}d${room?.initiativeDice ?? 20}`);
         }
         await OBR.scene.items.updateItems(props.list, (items) => {
@@ -131,7 +134,7 @@ export const DropGroup = (props: DropGroupProps) => {
                 <button
                     title={"Roll Initiative (including initiative modifier from statblock)"}
                     className={`toggle-button initiative-button`}
-                    disabled={room?.diceRendering && !initialized}
+                    disabled={getRoomDiceUser(room, playerContext.id)?.diceRendering && !initialized}
                     onClick={async (e) => {
                         await setInitiative(e.currentTarget);
                     }}

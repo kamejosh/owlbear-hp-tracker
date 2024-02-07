@@ -3,6 +3,7 @@
 ## Bugs
 
 + When flipping a Token the Shapes and Texts need to be toggled to be in the right position
++ entering just - in text inputs for numbers deletes the minus because -1 * 0 is 0
 
 ## Feature Ideas
 
