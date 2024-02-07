@@ -8,6 +8,10 @@ import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { addRollerApiCallbacks, addRollerCallbacks, dddiceApiLogin, dddiceLogin } from "../../../helper/diceHelper.ts";
 import { useComponentContext } from "../../../context/ComponentContext.tsx";
 import { ThreeDDiceAPI } from "dddice-js";
+import { DiceUser } from "../../../helper/types.ts";
+import { getRoomDiceUser } from "../../../helper/helpers.ts";
+import { diceTrayModalId } from "../../../helper/variables.ts";
+import OBR from "@owlbear-rodeo/sdk";
 
 type DiceTrayProps = {
     classes: string;
@@ -22,24 +26,39 @@ export const DiceTray = (props: DiceTrayProps) => {
     const { isReady } = SceneReadyContext();
     const { room } = useMetadataContext();
     const { component } = useComponentContext();
-    const [apiKey, setApiKey] = useState<string | undefined>();
+    const [diceUser, setDiceUser] = useState<DiceUser>();
 
     useEffect(() => {}, [room?.diceUser]);
 
     useEffect(() => {
-        const newApiKey = room?.diceUser?.find((user) => user.playerId === playerContext.id)?.apiKey;
-        if (newApiKey !== undefined && newApiKey !== apiKey) {
-            setApiKey(newApiKey);
-        } else if (newApiKey === undefined && apiKey === undefined) {
-            setApiKey("");
+        const newDiceUser = getRoomDiceUser(room, playerContext.id);
+        if (newDiceUser) {
+            const newApiKey = newDiceUser.apiKey;
+            const diceRendering = newDiceUser.diceRendering;
+
+            if (diceUser) {
+                if (
+                    (newApiKey !== undefined && newApiKey !== diceUser.apiKey) ||
+                    diceRendering !== diceUser.diceRendering
+                ) {
+                    setDiceUser({ ...newDiceUser });
+                }
+            } else {
+                setDiceUser({ ...newDiceUser });
+            }
         }
     }, [room]);
 
     useEffect(() => {
-        if (isReady && apiKey !== undefined) {
-            initDice(!!room?.diceRendering);
+        if (isReady && diceUser && diceUser.apiKey !== undefined) {
+            //when turning off dice rendering we need to close the modal
+            if (props.overlay && !diceUser.diceRendering) {
+                OBR.modal.close(diceTrayModalId);
+            } else {
+                initDice(diceUser.diceRendering);
+            }
         }
-    }, [apiKey]);
+    }, [diceUser]);
 
     const initDice = async (diceRendering: boolean = true) => {
         let api: ThreeDDiceAPI | undefined = undefined;

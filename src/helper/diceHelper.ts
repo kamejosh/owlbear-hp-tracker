@@ -23,6 +23,7 @@ export const updateRoomMetadataDiceUser = async (
     options?: {
         apiKey?: string;
         diceTheme?: string;
+        diceRendering?: boolean;
     }
 ) => {
     const diceUser: Array<{
@@ -30,6 +31,7 @@ export const updateRoomMetadataDiceUser = async (
         apiKey: string | undefined;
         lastUse: number;
         diceTheme: string;
+        diceRendering: boolean;
     }> = room.diceUser === undefined ? [] : room.diceUser;
 
     let apiKey = options?.apiKey;
@@ -44,6 +46,7 @@ export const updateRoomMetadataDiceUser = async (
             apiKey: options?.apiKey ?? user.apiKey,
             lastUse: new Date().getTime(),
             diceTheme: options?.diceTheme ?? user.diceTheme ?? "silvie-lr1gjqod",
+            diceRendering: options?.diceRendering ?? user.diceRendering ?? true,
         });
     } else {
         diceUser.push({
@@ -51,6 +54,7 @@ export const updateRoomMetadataDiceUser = async (
             apiKey: options?.apiKey,
             lastUse: new Date().getTime(),
             diceTheme: options?.diceTheme ?? "silvie-lr1gjqod",
+            diceRendering: options?.diceRendering ?? true,
         });
     }
 
@@ -175,7 +179,10 @@ const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => vo
     const name = await OBR.player.getName();
     const rollLogEntry = await dddiceRollToRollLog(e, { participant: participant });
 
-    if (participant && participant.username !== name) {
+    if (
+        participant &&
+        (participant.username !== name || (e.external_id !== "action_window" && e.external_id !== "statblock_popover"))
+    ) {
         addRoll(rollLogEntry);
     }
 

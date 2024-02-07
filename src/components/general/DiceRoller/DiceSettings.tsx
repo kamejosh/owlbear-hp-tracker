@@ -1,10 +1,12 @@
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
-import { updateRoomMetadata } from "../../../helper/helpers.ts";
 import { IAvailableDie, IDieType, ITheme } from "dddice-js";
 import { useCallback, useEffect, useState } from "react";
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { updateRoomMetadataDiceUser } from "../../../helper/diceHelper.ts";
+import OBR from "@owlbear-rodeo/sdk";
+import { getRoomDiceUser } from "../../../helper/helpers.ts";
+import { diceTrayModal } from "../../../helper/variables.ts";
 
 export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean) => void }) => {
     const { room } = useMetadataContext();
@@ -82,7 +84,7 @@ export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean)
 
     useEffect(() => {
         const initTheme = async () => {
-            const themeId = room?.diceUser?.find((user) => user.playerId === playerContext.id)?.diceTheme;
+            const themeId = getRoomDiceUser(room, playerContext.id)?.diceTheme;
             if (themeId) {
                 await findAndSetTheme(themeId);
             }
@@ -129,7 +131,7 @@ export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean)
                 <input
                     className={"theme-input"}
                     type={"text"}
-                    defaultValue={room?.diceUser?.find((user) => user.playerId === playerContext.id)?.diceTheme}
+                    defaultValue={getRoomDiceUser(room, playerContext.id)?.diceTheme}
                     onKeyDown={async (e) => {
                         if (e.key === "Enter") {
                             await findAndSetTheme(e.currentTarget.value, e.currentTarget);
@@ -143,15 +145,19 @@ export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean)
             </div>
             {error ? <span>{error}</span> : null}
             <div className={"setting dice-rendering"}>
-                <span className={"text"}>
-                    {"Render 3D Dice "}
-                    <span className={"small"}>(requires restart)</span>:
-                </span>
+                <span className={"text"}>{"Render 3D Dice "}</span>
                 <input
                     type={"checkbox"}
-                    checked={room?.diceRendering}
+                    checked={getRoomDiceUser(room, playerContext.id)?.diceRendering}
                     onChange={async () => {
-                        await updateRoomMetadata(room, { diceRendering: !room?.diceRendering });
+                        if (room) {
+                            const id = OBR.player.id;
+                            const diceRendering = getRoomDiceUser(room, id)?.diceRendering;
+                            await updateRoomMetadataDiceUser(room, id, { diceRendering: !diceRendering });
+                            if (!diceRendering) {
+                                await OBR.modal.open(diceTrayModal);
+                            }
+                        }
                     }}
                 />
             </div>

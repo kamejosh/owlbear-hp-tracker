@@ -158,6 +158,8 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                                 setButtons(newButton);
                                 setAddCustom(false);
                                 setValidCustom(false);
+                            } else if (e.key === "Escape") {
+                                setAddCustom(false);
                             }
                         }}
                     />
@@ -176,6 +178,14 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                         }}
                     >
                         √
+                    </button>
+                    <button
+                        className={"abort-custom-dice"}
+                        onClick={() => {
+                            setAddCustom(false);
+                        }}
+                    >
+                        X
                     </button>
                 </div>
             ) : null}

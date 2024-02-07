@@ -229,3 +229,7 @@ export const dddiceRollToRollLog = async (
         owlbear_user_id: options?.owlbear_user_id,
     };
 };
+
+export const getRoomDiceUser = (room: RoomMetadata | null, id: string | null) => {
+    return room?.diceUser?.find((user) => user.playerId === id);
+};

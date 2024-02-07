@@ -72,17 +72,24 @@ export const Settings = () => {
                         <input
                             type={"text"}
                             size={2}
-                            value={room?.hpBarOffset || 0}
+                            defaultValue={room?.hpBarOffset || 0}
                             onChange={(e) => {
                                 const factor = e.target.value.startsWith("-") ? -1 : 1;
                                 const nValue = Number(e.target.value.replace(/[^0-9]/g, ""));
                                 handleOffsetChange(nValue * factor);
+                                if (factor < 0 && nValue === 0) {
+                                    e.currentTarget.value = "-";
+                                } else {
+                                    e.currentTarget.value = (nValue * factor).toString();
+                                }
                             }}
                             onKeyDown={(e) => {
                                 if (e.key === "ArrowUp") {
                                     handleOffsetChange((room?.hpBarOffset || 0) + 1);
+                                    e.currentTarget.value = ((room?.hpBarOffset || 0) + 1).toString();
                                 } else if (e.key === "ArrowDown") {
                                     handleOffsetChange((room?.hpBarOffset || 0) - 1);
+                                    e.currentTarget.value = ((room?.hpBarOffset || 0) + 1).toString();
                                 }
                             }}
                         />

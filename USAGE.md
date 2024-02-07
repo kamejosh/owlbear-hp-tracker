@@ -31,6 +31,7 @@
     - [Initiative Buttons](#initiative-buttons)
     - [Custom Roll Buttons](#custom-roll-buttons)
     - [Quick Roll Buttons](#quick-roll-buttons)
+  + [DnD Beyond Dice Rolls](#dnd-beyond-dice-rolls)
 
 # HP Tracker - Owlbear Plugin
 
@@ -342,9 +343,7 @@ Each Owlbear user can chose their own dice theme (and the other users will see t
 
 ### 3D Rendering
 
-**This setting needs a full reload of HP Tracker to work (refresh the owlbear page)**
-
-You can choose to use the 3D rendering of dddice, this is the default option. Should you already use the dddice owlbear extension you might want to turn of HP Trackers dice rendering to not have multiple dice showing the same thing being rendered. The only drawback is that there will be errors in the developer console and that you don't get to see shiny dice rolling around.
+You can choose to use the 3D rendering of dddice, this is the default option. Should you already use the dddice owlbear extension you might want to turn HP Trackers dice rendering off to not have multiple dice showing the same thing.
 
 ## Using The Dice Roller
 
@@ -402,3 +401,14 @@ To remove a preset hover over the button and press the now visible x-button in t
 The Quick Roll Buttons is the button next to the Roll Log toggle button. It will always display all available dice in the selected theme to quickly roll them. It also contains a text input field where you can enter a valid dice string and roll it without saving it.
 
 ![Quick Roll Buttons](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/quick_roll_buttons.gif)
+
+## DnD Beyond Dice Rolls
+
+Using dddice you can roll dice in your DnD Beyond Character Sheets and see those rolls directly in Owlbear Rodeo. All you have to do is:
+
+- Install the dddice browser extension
+- Open your DnD Beyond Character Sheet in this browser
+- Open the Dice Log in HP Tracker
+- Copy the link to the dddice room
+- Paste this link into the dddice browser extension (you must be in the DnD Beyond tab)
+- start rolling

@@ -31,6 +31,12 @@ export const DiceRoom = ({ className }: { className?: string }) => {
         initUser();
     }, [rollerApi]);
 
+    useEffect(() => {
+        if (!open) {
+            setSettings(false);
+        }
+    }, [open]);
+
     return (
         <div className={`dice-room ${className} ${open ? "open" : "closed"}`}>
             <DiceRoomButtons open={open} setOpen={setOpen} />

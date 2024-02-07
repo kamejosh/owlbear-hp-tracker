@@ -5,7 +5,7 @@ import OBR, { Item } from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "../../helper/variables.ts";
 import { useCharSheet } from "../../context/CharacterContext.ts";
 import { updateHp } from "../../helper/hpHelpers.ts";
-import { dddiceRollToRollLog, evalString, getBgColor } from "../../helper/helpers.ts";
+import { dddiceRollToRollLog, evalString, getBgColor, getRoomDiceUser } from "../../helper/helpers.ts";
 import { updateAc } from "../../helper/acHelper.ts";
 import _ from "lodash";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
@@ -31,7 +31,7 @@ export const Token = (props: TokenProps) => {
     const { setId } = useCharSheet();
     const { component } = useComponentContext();
     const { addRoll } = useRollLogContext();
-    const { roller, initialized, theme } = useDiceRoller();
+    const { rollerApi, initialized, theme } = useDiceRoller();
     const hpRef = useRef<HTMLInputElement>(null);
     const maxHpRef = useRef<HTMLInputElement>(null);
     const tempHpRef = useRef<HTMLInputElement>(null);
@@ -270,7 +270,7 @@ export const Token = (props: TokenProps) => {
         if (theme) {
             let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined = diceToRoll(dice, theme.id);
             if (parsed) {
-                const roll = await roller.roll(parsed.dice, {
+                const roll = await rollerApi?.roll.create(parsed.dice, {
                     operator: parsed.operator,
                     external_id: component,
                     label: "Initiative: Roll",
@@ -494,10 +494,10 @@ export const Token = (props: TokenProps) => {
                 <button
                     title={"Roll Initiative (including initiative modifier from statblock)"}
                     className={`toggle-button initiative-button`}
-                    disabled={room?.diceRendering && !initialized}
+                    disabled={getRoomDiceUser(room, playerContext.id)?.diceRendering && !initialized}
                     onClick={async (e) => {
                         let rollData: IRoll | undefined;
-                        if (room?.diceRendering) {
+                        if (getRoomDiceUser(room, playerContext.id)?.diceRendering) {
                             rollData = await roll(e.currentTarget, `1d${room?.initiativeDice ?? 20}`);
                         }
                         let value = 0;
