@@ -132,6 +132,7 @@ The following settings are available:
 + HP Bar Segments: This setting can be used to obfuscate the real HP loss of a creature. E.g. when set to "2" the HP Bar differentiates between 3 states: Full HP, less than half HP, and 0 HP. When changing the settings HP Bars are not updated until the HP value is changed at least once.
 + Text and Bar Offset: To have a more flexible positioning of the HP Bar and Text, a value can be entered (negative or positive number) and the position of the HP Bar and Text is then adjusted by this value.
 + Armorclass Icon and Text Offset: To have a more flexible positioning of the AC Background and Text an offset for the X- and Y-Axis can be added. This value is scaled considering the Token size. 
++ Disable Dice Roller: By default the dice roller is enabled if you don't want to have the dice roller (e.g. you want to have a more lightweight experience) you can check this box to disable it. All components from the dice roller will be removed.
 + Allow negative HP/AC: By default negative HP and AC are not allowed but when this settings is checked then HP and AC can be set to negative numbers. The HP Bar will always display negative HP the same as when it is 0.
 + Sort Tokens in Player View: When active, the [Player Action Window](#player-action-window) will display Tokens ordered by their initiative value. If not active, Tokens will have the same order as they were added to the scene (so kind of random).
 + Set Initiative Dice: This setting decides with which "dice" the roll initiative button in the groups and the token works. The default is 20, meaning a value from 1 to 20 (excl. modifiers) can be rolled. By setting it to 10 the value can only range from 1 to 10. When using 3D dice only values that are available in the selected theme should be used.
@@ -309,7 +310,7 @@ By default when selecting a Token either in the [HP Tracker Action Window](#hp-t
 
 # Dice Roller
 
-Starting with Version 1.6.0 HP Tracker comes with an integrated dice-roller. 
+Starting with Version 1.6.0 HP Tracker comes with an integrated dice-roller. It can be disabled (removed) by changing the [Disable Dice Roller Setting](#room-settings);
 
 ![Dice Roller](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/dice_roller_log.png)
 

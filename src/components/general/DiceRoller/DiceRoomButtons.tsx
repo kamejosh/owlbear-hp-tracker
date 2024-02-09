@@ -5,13 +5,14 @@ import { IAvailableDie, IDiceRoll, IDieType, Operator, parseRollEquation } from 
 import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { AddSvg } from "../../svgs/AddSvg.tsx";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
-import { diceToRoll } from "../../../helper/diceHelper.ts";
+import { diceToRoll, getDiceParticipant } from "../../../helper/diceHelper.ts";
 import { dddiceRollToRollLog } from "../../../helper/helpers.ts";
 import { useComponentContext } from "../../../context/ComponentContext.tsx";
 import tippy, { Instance } from "tippy.js";
 import { RollLogSvg } from "../../svgs/RollLogSvg.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import OBR from "@owlbear-rodeo/sdk";
+import { useMetadataContext } from "../../../context/MetadataContext.ts";
 
 type DiceRoomButtonsProps = {
     open: boolean;
@@ -210,11 +211,23 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
 
 const QuickButtons = ({ open }: { open: boolean }) => {
     const { theme, rollerApi } = useDiceRoller();
+    const { room } = useMetadataContext();
     const { addRoll } = useRollLogContext();
     const { component } = useComponentContext();
     const [validCustom, setValidCustom] = useState<boolean>(true);
 
-    const roll = async (element: HTMLElement, dice: string) => {
+    const getUserUuid = async () => {
+        if (room?.diceRoom?.slug && rollerApi) {
+            const participant = await getDiceParticipant(rollerApi, room.diceRoom.slug);
+
+            if (participant) {
+                return [participant.id];
+            }
+        }
+        return undefined;
+    };
+
+    const roll = async (element: HTMLElement, dice: string, hide: boolean = false) => {
         element.classList.add("rolling");
         if (theme && dice) {
             let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined = diceToRoll(dice, theme.id);
@@ -223,6 +236,7 @@ const QuickButtons = ({ open }: { open: boolean }) => {
                     operator: parsed.operator,
                     external_id: component,
                     label: "Roll: Custom",
+                    whisper: hide ? await getUserUuid() : undefined,
                 });
                 if (roll && roll.data) {
                     const data = roll.data;
@@ -263,11 +277,24 @@ const QuickButtons = ({ open }: { open: boolean }) => {
                                         onClick={async (e) => {
                                             await roll(e.currentTarget, name);
                                         }}
-                                        onLoad={(e) => {
-                                            tippy(e.currentTarget, { content: name });
+                                        ref={(e) => {
+                                            if (e) {
+                                                tippy(e, { content: name });
+                                            }
                                         }}
                                     >
                                         <img src={preview} alt={name} />
+                                        <button
+                                            className={"self"}
+                                            onClick={async (e) => {
+                                                e.stopPropagation();
+                                                if (e.currentTarget.parentElement) {
+                                                    await roll(e.currentTarget.parentElement, name, true);
+                                                }
+                                            }}
+                                        >
+                                            SELF
+                                        </button>
                                     </li>
                                 );
                             }
@@ -334,11 +361,11 @@ export const DiceRoomButtons = (props: DiceRoomButtonsProps) => {
             >
                 <RollLogSvg />
             </button>
-            <div className={"quick-button-wrapper"}>
+            <div className={`quick-button-wrapper`}>
                 <QuickButtons open={quick} />
                 <button
                     onClick={() => setQuick(!quick)}
-                    className={"quick-roll-button button icon"}
+                    className={`quick-roll-button button icon ${quick ? "open" : ""}`}
                     ref={(e) => {
                         if (e) {
                             tippy(e, { content: "Quick roll" });

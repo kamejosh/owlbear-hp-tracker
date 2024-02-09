@@ -2,6 +2,7 @@
 
 + Make dice roller completely optional by disabling it in the settings
 + Auto adjust size of quick roll input
++ React to player role changes without needing to reload site
 
 # 1.6.2
 
