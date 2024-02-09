@@ -50,12 +50,12 @@ export const DiceTray = (props: DiceTrayProps) => {
     }, [room]);
 
     useEffect(() => {
-        if (isReady && diceUser && diceUser.apiKey !== undefined) {
+        if (isReady && ((diceUser && diceUser.apiKey !== undefined) || !diceUser)) {
             //when turning off dice rendering we need to close the modal
-            if (props.overlay && (!diceUser.diceRendering || !!room?.disableDiceRoller)) {
+            if (props.overlay && diceUser && (!diceUser.diceRendering || !!room?.disableDiceRoller)) {
                 OBR.modal.close(diceTrayModalId);
             } else if (!room?.disableDiceRoller) {
-                initDice(diceUser.diceRendering);
+                initDice((diceUser && diceUser.diceRendering) || true);
             }
         }
     }, [diceUser, room?.disableDiceRoller]);

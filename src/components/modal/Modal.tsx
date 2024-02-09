@@ -33,7 +33,8 @@ const Content = () => {
             return <DiceLogin />;
         } else if (content === "dicetray") {
             const id = OBR.player.id;
-            if (room && getRoomDiceUser(room, id)?.diceRendering && !room.disableDiceRoller) {
+            const diceUser = getRoomDiceUser(room, id);
+            if (room && (!diceUser || (diceUser && diceUser.diceRendering)) && !room.disableDiceRoller) {
                 return <DiceTray classes={"overlay"} overlay={true} />;
             } else {
                 OBR.modal.close(diceTrayModalId);

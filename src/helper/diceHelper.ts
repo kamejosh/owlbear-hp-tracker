@@ -228,13 +228,15 @@ export const removeRollerCallbacks = (roller: ThreeDDice) => {
 
 export const dddiceLogin = async (room: RoomMetadata | null, roller: ThreeDDice, canvas: HTMLCanvasElement) => {
     if (roller.api) {
-        const diceUser = await getDiceUser(roller.api);
-        const participant = await getDiceParticipant(roller.api, room?.diceRoom?.slug, diceUser);
+        try {
+            const diceUser = await getDiceUser(roller.api);
+            const participant = await getDiceParticipant(roller.api, room?.diceRoom?.slug, diceUser);
 
-        if (diceUser && participant && room?.diceRoom?.slug) {
-            roller.api?.room.leave(room.diceRoom.slug, participant.id.toString());
-            removeRollerCallbacks(roller);
-        }
+            if (diceUser && participant && room?.diceRoom?.slug) {
+                roller.api?.room.leave(room.diceRoom.slug, participant.id.toString());
+                removeRollerCallbacks(roller);
+            }
+        } catch {}
     }
 
     try {
