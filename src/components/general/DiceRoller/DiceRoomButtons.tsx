@@ -282,6 +282,7 @@ const QuickButtons = ({ open }: { open: boolean }) => {
                             type={"text"}
                             size={2}
                             onChange={(e) => {
+                                e.currentTarget.style.width = `${e.currentTarget.value.length}ch`;
                                 if (e.currentTarget.value === "") {
                                     setValidCustom(true);
                                     return;

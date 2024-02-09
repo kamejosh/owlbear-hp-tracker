@@ -1,3 +1,8 @@
+# 1.6.3
+
++ Make dice roller completely optional by disabling it in the settings
++ Auto adjust size of quick roll input
+
 # 1.6.2
 
 + Add documentation for integrating DnDBeyond rolls into HP Tracker
