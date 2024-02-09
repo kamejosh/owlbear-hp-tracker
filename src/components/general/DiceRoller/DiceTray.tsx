@@ -52,9 +52,9 @@ export const DiceTray = (props: DiceTrayProps) => {
     useEffect(() => {
         if (isReady && diceUser && diceUser.apiKey !== undefined) {
             //when turning off dice rendering we need to close the modal
-            if (props.overlay && !diceUser.diceRendering) {
+            if (props.overlay && (!diceUser.diceRendering || !!room?.disableDiceRoller)) {
                 OBR.modal.close(diceTrayModalId);
-            } else {
+            } else if (!room?.disableDiceRoller) {
                 initDice(diceUser.diceRendering);
             }
         }
@@ -94,7 +94,7 @@ export const DiceTray = (props: DiceTrayProps) => {
 
     return (
         <>
-            {props.overlay ? (
+            {room?.disableDiceRoller ? null : props.overlay ? (
                 <canvas ref={canvasRef} id={"DiceCanvas"} className={props.classes}></canvas>
             ) : (
                 <DiceRoom className={props.classes} />

@@ -1,4 +1,4 @@
-import { modalId } from "../../../helper/variables.ts";
+import { diceTrayModal, modalId } from "../../../helper/variables.ts";
 import OBR from "@owlbear-rodeo/sdk";
 import { updateHpOffset } from "../../../helper/hpHelpers.ts";
 import { Groups } from "./Groups.tsx";
@@ -119,6 +119,20 @@ export const Settings = () => {
                                 }}
                             />
                         </div>
+                    </div>
+                    <div className={"dice-roller-enabled setting"}>
+                        Disable Dice Roller:
+                        <input
+                            type={"checkbox"}
+                            checked={room?.disableDiceRoller || false}
+                            onChange={async () => {
+                                const disableDiceRoller = !room?.disableDiceRoller;
+                                await updateRoomMetadata(room, { disableDiceRoller: disableDiceRoller });
+                                if (!disableDiceRoller) {
+                                    await OBR.modal.open(diceTrayModal);
+                                }
+                            }}
+                        />
                     </div>
                     <div className={"negative-numbers setting"}>
                         Allow negative HP/AC:

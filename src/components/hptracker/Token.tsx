@@ -494,10 +494,14 @@ export const Token = (props: TokenProps) => {
                 <button
                     title={"Roll Initiative (including initiative modifier from statblock)"}
                     className={`toggle-button initiative-button`}
-                    disabled={getRoomDiceUser(room, playerContext.id)?.diceRendering && !initialized}
+                    disabled={
+                        getRoomDiceUser(room, playerContext.id)?.diceRendering &&
+                        !initialized &&
+                        !room?.disableDiceRoller
+                    }
                     onClick={async (e) => {
                         let rollData: IRoll | undefined;
-                        if (getRoomDiceUser(room, playerContext.id)?.diceRendering) {
+                        if (getRoomDiceUser(room, playerContext.id)?.diceRendering && !room?.disableDiceRoller) {
                             rollData = await roll(e.currentTarget, `1d${room?.initiativeDice ?? 20}`);
                         }
                         let value = 0;

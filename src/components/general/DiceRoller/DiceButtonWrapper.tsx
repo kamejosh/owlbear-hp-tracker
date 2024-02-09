@@ -83,7 +83,7 @@ export const DiceButton = (props: DiceButtonProps) => {
 
     return (
         <div
-            className={`button-wrapper ${initialized ? "enabled" : "disabled"}`}
+            className={`button-wrapper ${initialized && !room?.disableDiceRoller ? "enabled" : "disabled"}`}
             onMouseEnter={() => {
                 setContext(true);
             }}
