@@ -4,6 +4,7 @@
 + Auto adjust size of quick roll input
 + React to player role changes without needing to reload site
 + Add self-roll button to quickrolls
++ New users sometimes cannot use dice roller.
 
 # 1.6.2
 
