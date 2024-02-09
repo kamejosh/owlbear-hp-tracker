@@ -74,7 +74,7 @@ export const DropGroup = (props: DropGroupProps) => {
     const setInitiative = async (button: HTMLButtonElement) => {
         let rollData: IRoll | undefined;
         const id = OBR.player.id;
-        if (getRoomDiceUser(room, id)?.diceRendering) {
+        if (getRoomDiceUser(room, id)?.diceRendering && !room?.disableDiceRoller) {
             rollData = await roll(button, `${props.list.length}d${room?.initiativeDice ?? 20}`);
         }
         await OBR.scene.items.updateItems(props.list, (items) => {
@@ -134,7 +134,11 @@ export const DropGroup = (props: DropGroupProps) => {
                 <button
                     title={"Roll Initiative (including initiative modifier from statblock)"}
                     className={`toggle-button initiative-button`}
-                    disabled={getRoomDiceUser(room, playerContext.id)?.diceRendering && !initialized}
+                    disabled={
+                        getRoomDiceUser(room, playerContext.id)?.diceRendering &&
+                        !initialized &&
+                        !room?.disableDiceRoller
+                    }
                     onClick={async (e) => {
                         await setInitiative(e.currentTarget);
                     }}

@@ -50,15 +50,15 @@ export const DiceTray = (props: DiceTrayProps) => {
     }, [room]);
 
     useEffect(() => {
-        if (isReady && diceUser && diceUser.apiKey !== undefined) {
+        if (isReady && ((diceUser && diceUser.apiKey !== undefined) || !diceUser)) {
             //when turning off dice rendering we need to close the modal
-            if (props.overlay && !diceUser.diceRendering) {
+            if (props.overlay && diceUser && (!diceUser.diceRendering || !!room?.disableDiceRoller)) {
                 OBR.modal.close(diceTrayModalId);
-            } else {
-                initDice(diceUser.diceRendering);
+            } else if (!room?.disableDiceRoller) {
+                initDice((diceUser && diceUser.diceRendering) || true);
             }
         }
-    }, [diceUser]);
+    }, [diceUser, room?.disableDiceRoller]);
 
     const initDice = async (diceRendering: boolean = true) => {
         let api: ThreeDDiceAPI | undefined = undefined;
@@ -94,7 +94,7 @@ export const DiceTray = (props: DiceTrayProps) => {
 
     return (
         <>
-            {props.overlay ? (
+            {room?.disableDiceRoller ? null : props.overlay ? (
                 <canvas ref={canvasRef} id={"DiceCanvas"} className={props.classes}></canvas>
             ) : (
                 <DiceRoom className={props.classes} />

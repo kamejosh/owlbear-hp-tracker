@@ -34,6 +34,12 @@ export const ContextWrapper = (props: ContextWrapperProps) => {
                 setRole(await OBR.player.getRole());
                 setPlayerId(OBR.player.id);
                 setPlayerName(await OBR.player.getName());
+
+                OBR.player.onChange((player) => {
+                    setRole(player.role);
+                    setPlayerId(player.id);
+                    setPlayerName(player.name);
+                });
             });
         }
     }, []);

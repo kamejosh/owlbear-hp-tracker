@@ -1,3 +1,11 @@
+# 1.6.3
+
++ Make dice roller completely optional by disabling it in the settings
++ Auto adjust size of quick roll input
++ React to player role changes without needing to reload site
++ Add self-roll button to quickrolls
++ New users sometimes cannot use dice roller.
+
 # 1.6.2
 
 + Add documentation for integrating DnDBeyond rolls into HP Tracker

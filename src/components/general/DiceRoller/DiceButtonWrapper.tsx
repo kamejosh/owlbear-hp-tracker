@@ -5,9 +5,10 @@ import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { dddiceRollToRollLog } from "../../../helper/helpers.ts";
 import { useComponentContext } from "../../../context/ComponentContext.tsx";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { diceToRoll } from "../../../helper/diceHelper.ts";
+import tippy, { Instance } from "tippy.js";
 
 type DiceButtonProps = {
     dice: string;
@@ -20,8 +21,37 @@ export const DiceButton = (props: DiceButtonProps) => {
     const { rollerApi, initialized } = useDiceRoller();
     const { component } = useComponentContext();
     const [context, setContext] = useState<boolean>(false);
+    const [tooltip, setTooltip] = useState<Instance>();
     const rollButton = useRef<HTMLButtonElement>(null);
+    const buttonWrapper = useRef<HTMLDivElement>(null);
     const playerContext = usePlayerContext();
+
+    useEffect(() => {
+        if (buttonWrapper.current) {
+            if (!tooltip) {
+                if (!initialized || !!room?.disableDiceRoller) {
+                    setTooltip(
+                        tippy(buttonWrapper.current, {
+                            content: !!room?.disableDiceRoller
+                                ? "Dice Roller is disabled, enable it in the settings"
+                                : "Dice Roller is not initialized",
+                        })
+                    );
+                }
+            } else {
+                if (!initialized || !!room?.disableDiceRoller) {
+                    tooltip.enable();
+                    tooltip.setContent(
+                        !!room?.disableDiceRoller
+                            ? "Dice Roller is disabled, enable it in the settings"
+                            : "Dice Roller is not initialized"
+                    );
+                } else {
+                    tooltip.disable();
+                }
+            }
+        }
+    }, [initialized, room?.disableDiceRoller]);
 
     const getUserUuid = async () => {
         if (room?.diceRoom?.slug) {
@@ -83,15 +113,16 @@ export const DiceButton = (props: DiceButtonProps) => {
 
     return (
         <div
-            className={`button-wrapper ${initialized ? "enabled" : "disabled"}`}
+            className={`button-wrapper ${initialized && !room?.disableDiceRoller ? "enabled" : "disabled"}`}
             onMouseEnter={() => {
                 setContext(true);
             }}
             onMouseLeave={() => setContext(false)}
+            ref={buttonWrapper}
         >
             <button
                 ref={rollButton}
-                disabled={!initialized}
+                disabled={!initialized && room?.disableDiceRoller}
                 className={"dice-button button"}
                 onClick={async () => {
                     await roll();

@@ -67,6 +67,7 @@ export type RoomMetadata = {
     ignoreUpdateNotification?: boolean;
     diceRoom?: { slug: string | undefined };
     diceUser?: Array<DiceUser>;
+    disableDiceRoller?: boolean;
 };
 
 export type AttachmentMetadata = {

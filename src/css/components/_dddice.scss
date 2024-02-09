@@ -218,7 +218,8 @@
             }
 
             &:hover,
-            &:focus-visible {
+            &:focus-visible,
+            &.open {
                 --bg3: #556;
                 --bg4: #778;
                 background: linear-gradient(-45deg, var(--bg1), var(--bg2), var(--bg3), var(--bg4));
@@ -255,7 +256,7 @@
                 visibility: collapse;
                 transition: all 0.25s ease;
                 margin: 0;
-                padding: 0 0 1ch 0;
+                padding: 1ch;
                 list-style: none;
 
                 &.open {
@@ -263,11 +264,15 @@
                     flex-direction: column;
                     translate: -50% -100%;
                     visibility: visible;
+                    box-shadow: 0 0 20px var(--button-shadow);
+                    background-color: rgba(16, 16, 16, 0.3);
                 }
 
                 .quick-custom-roll {
-                    display: flex;
-                    gap: 1ch;
+                    display: grid;
+                    grid-template-columns: 40px auto;
+                    justify-content: space-between;
+                    width: 100%;
 
                     &:has(.rolling) {
                         .dice-svg {
@@ -275,8 +280,13 @@
                         }
                     }
 
+                    .dice-svg {
+                        align-self: center;
+                        justify-self: center;
+                    }
+
                     .quick-custom-input {
-                        width: 40px;
+                        min-width: 40px;
                         text-align: center;
 
                         &.invalid {
@@ -287,8 +297,10 @@
                 }
 
                 .quick-roll {
+                    display: flex;
+                    align-items: center;
                     cursor: pointer;
-                    max-width: 40px;
+                    min-width: 40px;
 
                     &:hover {
                         img {
@@ -304,6 +316,10 @@
 
                     img {
                         max-width: 40px;
+                    }
+
+                    .self {
+                        border: 1px solid white;
                     }
                 }
             }
