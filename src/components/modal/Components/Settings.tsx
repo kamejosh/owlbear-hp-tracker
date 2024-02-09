@@ -1,4 +1,4 @@
-import { diceTrayModal, modalId } from "../../../helper/variables.ts";
+import { diceTrayModal, diceTrayModalId, modalId } from "../../../helper/variables.ts";
 import OBR from "@owlbear-rodeo/sdk";
 import { updateHpOffset } from "../../../helper/hpHelpers.ts";
 import { Groups } from "./Groups.tsx";
@@ -130,6 +130,8 @@ export const Settings = () => {
                                 await updateRoomMetadata(room, { disableDiceRoller: disableDiceRoller });
                                 if (!disableDiceRoller) {
                                     await OBR.modal.open(diceTrayModal);
+                                } else {
+                                    await OBR.modal.close(diceTrayModalId);
                                 }
                             }}
                         />

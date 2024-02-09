@@ -58,7 +58,7 @@ export const DiceTray = (props: DiceTrayProps) => {
                 initDice(diceUser.diceRendering);
             }
         }
-    }, [diceUser]);
+    }, [diceUser, room?.disableDiceRoller]);
 
     const initDice = async (diceRendering: boolean = true) => {
         let api: ThreeDDiceAPI | undefined = undefined;
