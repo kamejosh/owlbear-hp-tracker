@@ -11,6 +11,7 @@
     "engines": {
         "node": ">=18"
     },
+    "packageManager": "yarn@1.22.21",
     "prettier": "@bitperfect-software/prettier-config",
     "devDependencies": {
         "@bitperfect-software/prettier-config": "^2.0.1",
