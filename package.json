@@ -39,7 +39,7 @@
         "compare-versions": "^6.0.0",
         "dddice-js": "^0.17.23",
         "react-beautiful-dnd": "^13.1.1",
-        "react-loader-spinner": "^5.4.5",
+        "react-loader-spinner": "^6.1.6",
         "react-markdown": "^8.0.7",
         "remark-gfm": "^3.0.1",
         "swiper": "^11.0.5",
