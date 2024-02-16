@@ -188,12 +188,7 @@ const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => vo
 
     // only the action window triggers the popover or notification because it always exists
     if (component === "modal" || component === "action_window") {
-        const width = await OBR.viewport.getWidth();
-        const height = await OBR.viewport.getHeight();
-        await OBR.popover.open({
-            ...rollLogPopover,
-            anchorPosition: { top: Math.max(height - 55, 0), left: width - 70 },
-        });
+        await OBR.popover.open(rollLogPopover);
 
         if (rollLogTimeOut) {
             clearTimeout(rollLogTimeOut);

@@ -551,7 +551,10 @@
 
         .roll-context {
             grid-area: context;
+            max-width: 250px;
+            overflow: hidden;
             font-weight: bolder;
+            text-overflow: ellipsis;
 
             .label-detail {
                 text-transform: capitalize;
@@ -581,9 +584,12 @@
 
         .username {
             grid-area: user;
+            max-width: 250px;
+            overflow: hidden;
             color: dimgrey;
             font-weight: bolder;
             font-size: 0.9rem;
+            text-overflow: ellipsis;
         }
 
         .button-wrapper {
@@ -715,5 +721,13 @@
                 box-shadow: 0 0 15px white;
             }
         }
+    }
+}
+
+.roll-log.popover {
+    .detailed-result,
+    .username,
+    .roll-log-context {
+        max-width: 175px;
     }
 }

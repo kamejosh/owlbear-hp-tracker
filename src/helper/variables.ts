@@ -11,7 +11,7 @@ export const diceTrayModalId = `${ID}/diceTrayModal`;
 export const statblockPopoverId = `${ID}/statblock-popover`;
 export const rollLogPopoverId = `${ID}/dice-log`;
 
-export const version = "1.6.3";
+export const version = "1.6.4";
 
 export const changelogModal: Modal = {
     id: modalId,
@@ -47,9 +47,9 @@ export const rollLogPopover: Popover = {
     url: "/rolllog.html",
     width: 350,
     height: 200,
+    anchorOrigin: { horizontal: "RIGHT", vertical: "BOTTOM" },
     transformOrigin: { vertical: "BOTTOM", horizontal: "RIGHT" },
     marginThreshold: 10,
-    anchorReference: "POSITION",
     disableClickAway: true,
     hidePaper: true,
 };

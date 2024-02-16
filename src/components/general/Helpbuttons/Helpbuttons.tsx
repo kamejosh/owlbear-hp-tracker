@@ -33,8 +33,14 @@ export const Helpbuttons = (props: HelpButtonsProps) => {
                     <button
                         className={"statblock-button top-button"}
                         onClick={async () => {
-                            const width = await OBR.viewport.getWidth();
-                            const height = await OBR.viewport.getHeight();
+                            // width needs to be big, to position statblock popover to the right
+                            let width = 10000;
+                            let height = 600;
+                            try {
+                                width = await OBR.viewport.getWidth();
+                                height = await OBR.viewport.getHeight();
+                            } catch {}
+
                             await OBR.popover.open({
                                 ...statblockPopover,
                                 width: Math.min(room?.statblockPopover?.width || 500, width),
@@ -47,8 +53,12 @@ export const Helpbuttons = (props: HelpButtonsProps) => {
                     <button
                         className={"settings-button top-button"}
                         onClick={async () => {
-                            const width = await OBR.viewport.getWidth();
-                            const height = await OBR.viewport.getHeight();
+                            let width = 600;
+                            let height = 900;
+                            try {
+                                width = await OBR.viewport.getWidth();
+                                height = await OBR.viewport.getHeight();
+                            } catch {}
                             await OBR.modal.open({
                                 ...settingsModal,
                                 width: Math.min(500, width * 0.9),
@@ -67,8 +77,12 @@ export const Helpbuttons = (props: HelpButtonsProps) => {
                     if (props.setIgnoredChange !== undefined && props.ignoredChanges !== undefined) {
                         props.setIgnoredChange(!props.ignoredChanges);
                     }
-                    const width = await OBR.viewport.getWidth();
-                    const height = await OBR.viewport.getHeight();
+                    let width = 700;
+                    let height = 900;
+                    try {
+                        width = await OBR.viewport.getWidth();
+                        height = await OBR.viewport.getHeight();
+                    } catch {}
                     await OBR.modal.open({
                         ...changelogModal,
                         width: Math.min(600, width * 0.9),
@@ -82,8 +96,12 @@ export const Helpbuttons = (props: HelpButtonsProps) => {
             <button
                 className={"help-button top-button"}
                 onClick={async () => {
-                    const width = await OBR.viewport.getWidth();
-                    const height = await OBR.viewport.getHeight();
+                    let width = 800;
+                    let height = 900;
+                    try {
+                        width = await OBR.viewport.getWidth();
+                        height = await OBR.viewport.getHeight();
+                    } catch {}
                     await OBR.modal.open({
                         ...helpModal,
                         width: Math.min(700, width * 0.9),
