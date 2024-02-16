@@ -1,3 +1,8 @@
+# 1.6.4
+
++ HP Tracker can be initialized without a scene
++ Improve styling
+
 # 1.6.3
 
 + Make dice roller completely optional by disabling it in the settings

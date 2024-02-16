@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
-import { SceneReadyContext } from "../../../context/SceneReadyContext.ts";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { DiceRoom } from "./DiceRoom.tsx";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
@@ -23,12 +22,9 @@ export const DiceTray = (props: DiceTrayProps) => {
     const { roller, setRollerApi, setInitialized, theme, setTheme } = useDiceRoller();
     const playerContext = usePlayerContext();
     const { addRoll } = useRollLogContext();
-    const { isReady } = SceneReadyContext();
     const { room } = useMetadataContext();
     const { component } = useComponentContext();
     const [diceUser, setDiceUser] = useState<DiceUser>();
-
-    useEffect(() => {}, [room?.diceUser]);
 
     useEffect(() => {
         const newDiceUser = getRoomDiceUser(room, playerContext.id);
@@ -50,7 +46,7 @@ export const DiceTray = (props: DiceTrayProps) => {
     }, [room]);
 
     useEffect(() => {
-        if (isReady && ((diceUser && diceUser.apiKey !== undefined) || !diceUser)) {
+        if ((diceUser && diceUser.apiKey !== undefined) || (!diceUser && component === "modal")) {
             //when turning off dice rendering we need to close the modal
             if (props.overlay && diceUser && (!diceUser.diceRendering || !!room?.disableDiceRoller)) {
                 OBR.modal.close(diceTrayModalId);

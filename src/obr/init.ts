@@ -286,11 +286,6 @@ const sceneReady = async () => {
         console.warn("HP Tracker - Error while initializing items", e);
     }
     try {
-        await initRoom();
-    } catch (e) {
-        console.warn("HP Tracker - Error while initializing Room", e);
-    }
-    try {
         await initScene();
     } catch (e) {
         console.warn("HP Tracker - Error while initializing Scene", e);
@@ -319,6 +314,13 @@ OBR.onReady(async () => {
         } catch (e) {
             console.warn("HP Tracker - error while setting up context menu");
         }
+
+        try {
+            await initRoom();
+        } catch (e) {
+            console.warn("HP Tracker - Error while initializing Room", e);
+        }
+
         OBR.scene.onReadyChange(async (isReady) => {
             if (isReady) {
                 await sceneReady();

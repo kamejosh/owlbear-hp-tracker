@@ -67,19 +67,19 @@ const Content = () => {
     useEffect(() => {
         if (isReady) {
             initHpTracker();
+
+            return OBR.scene.items.onChange(async (items) => {
+                const filteredItems = items.filter(
+                    (item) =>
+                        itemMetadataKey in item.metadata &&
+                        (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpTrackerActive
+                );
+                setTokens(Array.from(filteredItems));
+            });
         }
     }, [isReady]);
 
     useEffect(() => {
-        OBR.scene.items.onChange(async (items) => {
-            const filteredItems = items.filter(
-                (item) =>
-                    itemMetadataKey in item.metadata &&
-                    (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpTrackerActive
-            );
-            setTokens(Array.from(filteredItems));
-        });
-
         OBR.player.onChange((player) => {
             setSelectedTokens(player.selection ?? []);
         });

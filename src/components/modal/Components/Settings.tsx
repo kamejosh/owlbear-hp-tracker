@@ -9,7 +9,7 @@ import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { updateRoomMetadata } from "../../../helper/helpers.ts";
 
 export const Settings = () => {
-    const { room } = useMetadataContext();
+    const { room, scene } = useMetadataContext();
 
     const handleOffsetChange = (value: number) => {
         updateHpOffset(value);
@@ -246,7 +246,11 @@ export const Settings = () => {
                         <h3>Scene Settings</h3>
                         <span className={"small"}>(Settings only affect the current Scene)</span>
                     </div>
-                    <Groups />
+                    {scene ? (
+                        <Groups />
+                    ) : (
+                        <span className={"warning"}>Scene Settings only available once Scene is open</span>
+                    )}
                 </>
             </div>
         </>

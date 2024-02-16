@@ -47,8 +47,12 @@ export const DiceRoom = ({ className }: { className?: string }) => {
                             <button
                                 className={"dddice-login"}
                                 onClick={async () => {
-                                    const width = await OBR.viewport.getWidth();
-                                    const height = await OBR.viewport.getHeight();
+                                    let width = 500;
+                                    let height = 600;
+                                    try {
+                                        width = await OBR.viewport.getWidth();
+                                        height = await OBR.viewport.getHeight();
+                                    } catch {}
                                     await OBR.modal.open({
                                         ...diceModal,
                                         width: Math.min(400, width * 0.9),
