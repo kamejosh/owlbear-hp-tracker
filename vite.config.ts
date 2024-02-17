@@ -1,11 +1,11 @@
 import { defineConfig } from "vite";
 import { resolve } from "path";
 import mkcert from "vite-plugin-mkcert";
+import copy from "rollup-plugin-copy";
 
 declare var __dirname: string;
 export default defineConfig({
     server: { https: true, host: "0.0.0.0" },
-    plugins: [mkcert()],
     assetsInclude: ["**/*.md"],
     build: {
         rollupOptions: {
@@ -29,4 +29,11 @@ export default defineConfig({
             },
         },
     },
+    plugins: [
+        mkcert(),
+        copy({
+            targets: [{ src: resolve(__dirname, "_headers"), dest: "dist/" }],
+            hook: "writeBundle",
+        }),
+    ],
 });
