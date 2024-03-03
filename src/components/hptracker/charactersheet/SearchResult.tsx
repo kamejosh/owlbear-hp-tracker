@@ -6,16 +6,23 @@ import { Loader } from "../../general/Loader.tsx";
 import { E5Statblock, useE5SearchStatblock } from "../../../ttrpgapi/e5/useE5Api.ts";
 import { PfStatblock, usePfStatblockSearch } from "../../../ttrpgapi/pf/usePfApi.ts";
 import { useEffect } from "react";
+import { useMetadataContext } from "../../../context/MetadataContext.ts";
 
 type SearchResultProps = {
     search: string;
+    setForceSearch: (forceSearch: boolean) => void;
+    current: string;
     setEmpty: (empty: boolean) => void;
 };
 
 export const SearchResult5e = (props: SearchResultProps) => {
     const { characterId } = useCharSheet();
+    const { room } = useMetadataContext();
     const setSheet = (slug: string, bonus: number) => {
         if (characterId) {
+            if (slug === props.current) {
+                props.setForceSearch(false);
+            }
             OBR.scene.items.updateItems([characterId], (items) => {
                 items.forEach((item) => {
                     const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
@@ -30,7 +37,7 @@ export const SearchResult5e = (props: SearchResultProps) => {
         }
     };
 
-    const searchQuery = useE5SearchStatblock(props.search, 100, 0);
+    const searchQuery = useE5SearchStatblock(props.search, 100, 0, room?.tabletopAlmanacAPIKey);
 
     useEffect(() => {
         if (searchQuery.isSuccess) {
@@ -48,7 +55,7 @@ export const SearchResult5e = (props: SearchResultProps) => {
                 {entries.map((entry: E5Statblock) => {
                     return (
                         <li
-                            className={"search-result"}
+                            className={`search-result ${entry.slug === props.current ? "current" : ""}`}
                             key={entry.slug}
                             onClick={() => setSheet(entry.slug, Math.floor((entry.stats.dexterity - 10) / 2))}
                         >
@@ -72,9 +79,13 @@ export const SearchResult5e = (props: SearchResultProps) => {
 };
 
 export const SearchResultPf = (props: SearchResultProps) => {
+    const { room } = useMetadataContext();
     const { characterId } = useCharSheet();
     const setSheet = (slug: string, bonus: number) => {
         if (characterId) {
+            if (slug === props.current) {
+                props.setForceSearch(false);
+            }
             OBR.scene.items.updateItems([characterId], (items) => {
                 items.forEach((item) => {
                     const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
@@ -89,7 +100,7 @@ export const SearchResultPf = (props: SearchResultProps) => {
         }
     };
 
-    const searchQuery = usePfStatblockSearch(props.search, 100, 0);
+    const searchQuery = usePfStatblockSearch(props.search, 100, 0, room?.tabletopAlmanacAPIKey);
 
     useEffect(() => {
         if (searchQuery.isSuccess) {
@@ -107,7 +118,7 @@ export const SearchResultPf = (props: SearchResultProps) => {
                 {entries.map((entry: PfStatblock) => {
                     return (
                         <li
-                            className={"search-result"}
+                            className={`search-result ${entry.slug === props.current ? "current" : ""}`}
                             key={entry.slug}
                             onClick={() => setSheet(entry.slug, entry.perception ? parseInt(entry.perception) : 0)}
                         >

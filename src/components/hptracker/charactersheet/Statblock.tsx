@@ -14,7 +14,8 @@ import { DiceButton } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { capitalize } from "lodash";
 
 const E5StatBlock = ({ slug }: { slug: string }) => {
-    const statblockQuery = useE5GetStatblock(slug);
+    const { room } = useMetadataContext();
+    const statblockQuery = useE5GetStatblock(slug, room?.tabletopAlmanacAPIKey);
 
     const statblock = statblockQuery.isSuccess && statblockQuery.data ? statblockQuery.data : null;
 
@@ -65,7 +66,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                         <DiceButton
                             dice={statblock.hp.hit_dice}
                             text={statblock.hp.hit_dice}
-                            context={slug + ": Hit Dice"}
+                            context={statblock.name + ": Hit Dice"}
                         />
                     ) : null}
                 </span>
@@ -116,7 +117,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                                             <DiceButton
                                                 dice={`d20+${value}`}
                                                 text={`+${value}`}
-                                                context={`${capitalize(key)}: Save`}
+                                                context={`${capitalize(key.substring(0, 3))}: Save`}
                                             />
                                         </span>
                                     );
@@ -234,8 +235,9 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
 };
 
 const PfStatBlock = ({ slug }: { slug: string }) => {
+    const { room } = useMetadataContext();
     const { characterId } = useCharSheet();
-    const statblockQuery = usePfGetStatblock(slug);
+    const statblockQuery = usePfGetStatblock(slug, room?.tabletopAlmanacAPIKey);
 
     const statblock = statblockQuery.isSuccess && statblockQuery.data ? statblockQuery.data : null;
 
@@ -354,6 +356,25 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                     </>
                 ) : null}
             </div>
+            {statblock.traits && statblock.traits.length > 0 ? (
+                <div className={"skills"}>
+                    <h3>Traits</h3>
+                    <div className={"skill-list"}>
+                        {statblock.traits?.map((trait) => {
+                            let value = trait.value;
+                            if (trait.value.includes(",")) {
+                                value = trait.value.split(",")[0];
+                            }
+                            return (
+                                <div className={"skill"} key={trait.name}>
+                                    <div className={"skill-name"}>{trait.name}</div>
+                                    <div className={"skill-value"}>{value}</div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            ) : null}
             {statblock.skills && statblock.skills.length > 0 ? (
                 <div className={"skills"}>
                     <h3>Skills</h3>

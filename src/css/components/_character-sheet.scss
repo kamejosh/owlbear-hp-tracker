@@ -114,6 +114,11 @@
                 padding: 2px;
                 text-align: left;
 
+                &.current {
+                    box-shadow: inset rgba(255, 255, 255, 0.8) 3px 0 3px;
+                    text-shadow: rgba(255, 255, 255, 0.8) 0 0 5px;
+                }
+
                 > * {
                     white-space: nowrap;
 
@@ -211,7 +216,7 @@
                 min-width: 250px;
 
                 .skill-name {
-                    font-weight: 500;
+                    font-weight: 800;
                 }
             }
         }

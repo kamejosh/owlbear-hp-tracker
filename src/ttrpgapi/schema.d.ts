@@ -29,6 +29,10 @@ export interface paths {
     /** Update Api Keys */
     patch: operations["update_api_keys_api_v1_users_me_api_key_patch"];
   };
+  "/api/v1/users/me/statblocks": {
+    /** List Statblocks */
+    get: operations["list_statblocks_api_v1_users_me_statblocks_get"];
+  };
   "/api/v1/pf/statblock/": {
     /** List Pf Statblocks */
     get: operations["list_pf_statblocks_api_v1_pf_statblock__get"];
@@ -42,10 +46,10 @@ export interface paths {
   "/api/v1/pf/statblock/{slug}": {
     /** Get Pf Statblock Slug */
     get: operations["get_pf_statblock_slug_api_v1_pf_statblock__slug__get"];
-  };
-  "/api/v1/pf/statblock/migrate": {
-    /** Migrate Pf Statblock */
-    post: operations["migrate_pf_statblock_api_v1_pf_statblock_migrate_post"];
+    /** Set Active Pf Statblock */
+    put: operations["set_active_pf_statblock_api_v1_pf_statblock__slug__put"];
+    /** Delete Pf Statblock */
+    delete: operations["delete_pf_statblock_api_v1_pf_statblock__slug__delete"];
   };
   "/api/v1/pf/spell/": {
     /** List Pf Spells */
@@ -70,10 +74,20 @@ export interface paths {
   "/api/v1/e5/statblock/{slug}": {
     /** Get E5 Statblock Slug */
     get: operations["get_e5_statblock_slug_api_v1_e5_statblock__slug__get"];
+    /** Set Active E5 Statblock */
+    put: operations["set_active_e5_statblock_api_v1_e5_statblock__slug__put"];
+    /** Delete E5 Statblock */
+    delete: operations["delete_e5_statblock_api_v1_e5_statblock__slug__delete"];
   };
   "/api/v1/e5/spell/": {
+    /** List E5 Spells */
+    get: operations["list_e5_spells_api_v1_e5_spell__get"];
     /** Create Spell */
     post: operations["create_spell_api_v1_e5_spell__post"];
+  };
+  "/api/v1/e5/spell/{slug}": {
+    /** Get E5 Spells Slug */
+    get: operations["get_e5_spells_slug_api_v1_e5_spell__slug__get"];
   };
   "/legal/": {
     /** Get Legal */
@@ -229,13 +243,13 @@ export interface components {
       perception?: number | null;
       skills?: components["schemas"]["Skills"] | null;
       /** Damage Vulnerabilities */
-      damage_vulnerabilities: string;
+      damage_vulnerabilities?: string | null;
       /** Damage Resistances */
-      damage_resistances: string;
+      damage_resistances?: string | null;
       /** Damage Immunities */
-      damage_immunities: string;
+      damage_immunities?: string | null;
       /** Condition Immunities */
-      condition_immunities: string;
+      condition_immunities?: string | null;
       /**
        * Senses
        * @default []
@@ -247,9 +261,9 @@ export interface components {
        */
       languages?: string[];
       /** Challenge Rating */
-      challenge_rating: string;
+      challenge_rating?: string | null;
       /** Cr */
-      cr: number;
+      cr?: number | null;
       /**
        * Actions
        * @default []
@@ -261,7 +275,7 @@ export interface components {
        */
       reactions?: components["schemas"]["src__types__e5__Action"][];
       /** Legendary Desc */
-      legendary_desc: string;
+      legendary_desc?: string | null;
       /**
        * Legendary Actions
        * @default []
@@ -305,13 +319,13 @@ export interface components {
       perception?: number | null;
       skills?: components["schemas"]["Skills"] | null;
       /** Damage Vulnerabilities */
-      damage_vulnerabilities: string;
+      damage_vulnerabilities?: string | null;
       /** Damage Resistances */
-      damage_resistances: string;
+      damage_resistances?: string | null;
       /** Damage Immunities */
-      damage_immunities: string;
+      damage_immunities?: string | null;
       /** Condition Immunities */
-      condition_immunities: string;
+      condition_immunities?: string | null;
       /**
        * Senses
        * @default []
@@ -323,9 +337,9 @@ export interface components {
        */
       languages?: string[];
       /** Challenge Rating */
-      challenge_rating: string;
+      challenge_rating?: string | null;
       /** Cr */
-      cr: number;
+      cr?: number | null;
       /**
        * Actions
        * @default []
@@ -337,7 +351,7 @@ export interface components {
        */
       reactions?: components["schemas"]["Action-Output"][];
       /** Legendary Desc */
-      legendary_desc: string;
+      legendary_desc?: string | null;
       /**
        * Legendary Actions
        * @default []
@@ -358,7 +372,12 @@ export interface components {
       /** Slug */
       slug: string;
       /** License */
-      license: string;
+      license?: string | null;
+      /**
+       * Active
+       * @default false
+       */
+      active?: boolean;
     };
     /** HTTPValidationError */
     HTTPValidationError: {
@@ -451,75 +470,6 @@ export interface components {
        */
       special_abilities?: components["schemas"]["SpecialAbility"][];
     };
-    /** PFStatblockMigrate */
-    PFStatblockMigrate: {
-      /** Name */
-      name: string;
-      /** Slug */
-      slug: string;
-      /** Type */
-      type: string;
-      /** Level */
-      level: number;
-      /** Traits */
-      traits: components["schemas"]["Trait"][];
-      /** Senses */
-      senses?: string[] | null;
-      /** Perception */
-      perception?: string | null;
-      /** Languages */
-      languages?: string[] | null;
-      /** Skills */
-      skills?: components["schemas"]["Skill"][] | null;
-      stats: components["schemas"]["Stats"];
-      /**
-       * Items
-       * @default []
-       */
-      items?: string[];
-      armor_class: components["schemas"]["ArmorClass"];
-      saving_throws: components["schemas"]["src__types__pf__SavingThrows"];
-      hp: components["schemas"]["src__types__pf__Hitpoints"];
-      /**
-       * Immunities
-       * @default []
-       */
-      immunities?: string[];
-      /**
-       * Weaknesses
-       * @default []
-       */
-      weaknesses?: string[];
-      /**
-       * Resistances
-       * @default []
-       */
-      resistances?: string[];
-      /** Speed */
-      speed: string;
-      /**
-       * Actions
-       * @default []
-       */
-      actions?: components["schemas"]["src__types__pf__Action"][];
-      /**
-       * Reactions
-       * @default []
-       */
-      reactions?: components["schemas"]["Reaction"][];
-      /**
-       * Spells
-       * @default []
-       */
-      spells?: components["schemas"]["SpellCategoryMigrate"][];
-      /** About */
-      about?: string | null;
-      /**
-       * Special Abilities
-       * @default []
-       */
-      special_abilities?: components["schemas"]["SpecialAbility"][];
-    };
     /** PFStatblockOut */
     PFStatblockOut: {
       /** Name */
@@ -585,8 +535,10 @@ export interface components {
       special_abilities?: components["schemas"]["SpecialAbility"][];
       /** Slug */
       slug: string;
-      /** License */
-      license: string;
+      /** Active */
+      active: boolean;
+      /** Source */
+      source?: string | null;
     };
     /** Reaction */
     Reaction: {
@@ -702,20 +654,6 @@ export interface components {
        */
       spell_lists?: components["schemas"]["Spelllist"][] | null;
     };
-    /** SpellCategoryMigrate */
-    SpellCategoryMigrate: {
-      /** Name */
-      name: string;
-      /** Dc */
-      dc: number;
-      /** Attack */
-      attack?: number | null;
-      /**
-       * Spell Lists
-       * @default []
-       */
-      spell_lists?: components["schemas"]["SpelllistMigrate"][] | null;
-    };
     /** SpellCategoryOut */
     SpellCategoryOut: {
       /** Name */
@@ -764,11 +702,6 @@ export interface components {
       /** Name */
       name: string;
     };
-    /**
-     * SpellTypeEnumMigrate
-     * @enum {string}
-     */
-    SpellTypeEnumMigrate: "spell" | "cantrip" | "constant";
     /** Spelllist */
     Spelllist: {
       /** Type */
@@ -777,14 +710,6 @@ export interface components {
       level: string;
       /** Spells */
       spells: components["schemas"]["SpellInfo"][];
-    };
-    /** SpelllistMigrate */
-    SpelllistMigrate: {
-      type: components["schemas"]["SpellTypeEnumMigrate"];
-      /** Level */
-      level: string;
-      /** Spells */
-      spells: string[];
     };
     /** SpelllistOut */
     SpelllistOut: {
@@ -836,6 +761,13 @@ export interface components {
     UserPartial: {
       /** Username */
       username: string;
+    };
+    /** UserStatblocks */
+    UserStatblocks: {
+      /** E5 */
+      e5: components["schemas"]["E5StatblockOut"][];
+      /** Pf */
+      pf: components["schemas"]["PFStatblockOut"][];
     };
     /** UserWithApiKey */
     UserWithApiKey: {
@@ -1286,12 +1218,23 @@ export interface operations {
       };
     };
   };
+  /** List Statblocks */
+  list_statblocks_api_v1_users_me_statblocks_get: {
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["UserStatblocks"];
+        };
+      };
+    };
+  };
   /** List Pf Statblocks */
   list_pf_statblocks_api_v1_pf_statblock__get: {
     parameters: {
       query?: {
-        take?: number;
-        skip?: number;
+        take?: number | null;
+        skip?: number | null;
       };
     };
     responses: {
@@ -1378,11 +1321,36 @@ export interface operations {
       };
     };
   };
-  /** Migrate Pf Statblock */
-  migrate_pf_statblock_api_v1_pf_statblock_migrate_post: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PFStatblockMigrate"];
+  /** Set Active Pf Statblock */
+  set_active_pf_statblock_api_v1_pf_statblock__slug__put: {
+    parameters: {
+      query: {
+        active: boolean;
+      };
+      path: {
+        slug: string;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Delete Pf Statblock */
+  delete_pf_statblock_api_v1_pf_statblock__slug__delete: {
+    parameters: {
+      path: {
+        slug: string;
       };
     };
     responses: {
@@ -1471,8 +1439,8 @@ export interface operations {
   list_e5_statblocks_api_v1_e5_statblock__get: {
     parameters: {
       query?: {
-        take?: number;
-        skip?: number;
+        take?: number | null;
+        skip?: number | null;
       };
     };
     responses: {
@@ -1560,11 +1528,103 @@ export interface operations {
       };
     };
   };
+  /** Set Active E5 Statblock */
+  set_active_e5_statblock_api_v1_e5_statblock__slug__put: {
+    parameters: {
+      query: {
+        active: boolean;
+      };
+      path: {
+        slug: string;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Delete E5 Statblock */
+  delete_e5_statblock_api_v1_e5_statblock__slug__delete: {
+    parameters: {
+      path: {
+        slug: string;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** List E5 Spells */
+  list_e5_spells_api_v1_e5_spell__get: {
+    parameters: {
+      query?: {
+        take?: number;
+        skip?: number;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["src__types__e5__Spell"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
   /** Create Spell */
   create_spell_api_v1_e5_spell__post: {
     requestBody: {
       content: {
         "application/json": components["schemas"]["src__types__e5__SpellIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["src__types__e5__Spell"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Get E5 Spells Slug */
+  get_e5_spells_slug_api_v1_e5_spell__slug__get: {
+    parameters: {
+      path: {
+        slug: string;
       };
     };
     responses: {

@@ -19,6 +19,7 @@ type SearchWrapperProps = {
 type StatblockWrapperProps = {
     data: HpTrackerMetadata;
     forceSearch: boolean;
+    setForceSearch: (forceSearch: boolean) => void;
     search: string;
     itemId: string;
     setEmpty: (empty: boolean) => void;
@@ -79,8 +80,24 @@ const SearchWrapper = (props: SearchWrapperProps) => {
 const StatblockWrapper = (props: StatblockWrapperProps) => {
     const { room } = useMetadataContext();
     const ruleSetMap = new Map<Ruleset, ReactElement>([
-        ["pf", <SearchResultPf search={props.search} setEmpty={props.setEmpty} />],
-        ["e5", <SearchResult5e search={props.search} setEmpty={props.setEmpty} />],
+        [
+            "pf",
+            <SearchResultPf
+                search={props.search}
+                setForceSearch={props.setForceSearch}
+                current={props.data.sheet}
+                setEmpty={props.setEmpty}
+            />,
+        ],
+        [
+            "e5",
+            <SearchResult5e
+                search={props.search}
+                setForceSearch={props.setForceSearch}
+                current={props.data.sheet}
+                setEmpty={props.setEmpty}
+            />,
+        ],
     ]);
 
     return (
@@ -169,6 +186,7 @@ export const CharacterSheet = (props: { itemId: string }) => {
                                 data={data}
                                 search={search}
                                 forceSearch={forceSearch}
+                                setForceSearch={setForceSearch}
                                 itemId={props.itemId}
                                 setEmpty={setEmptySearch}
                             />
