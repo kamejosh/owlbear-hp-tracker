@@ -23,11 +23,13 @@ export interface paths {
     /** Update User */
     patch: operations["update_user_api_v1_users_me__patch"];
   };
-  "/api/v1/users/me/api_key": {
+  "/api/v1/users/me/api_keys": {
     /** List Api Keys */
-    get: operations["list_api_keys_api_v1_users_me_api_key_get"];
+    get: operations["list_api_keys_api_v1_users_me_api_keys_get"];
     /** Update Api Keys */
-    patch: operations["update_api_keys_api_v1_users_me_api_key_patch"];
+    put: operations["update_api_keys_api_v1_users_me_api_keys_put"];
+    /** Update Api Keys */
+    delete: operations["update_api_keys_api_v1_users_me_api_keys_delete"];
   };
   "/api/v1/users/me/statblocks": {
     /** List Statblocks */
@@ -260,6 +262,11 @@ export interface components {
        * @default []
        */
       languages?: string[];
+      /**
+       * Items
+       * @default []
+       */
+      items?: string[];
       /** Challenge Rating */
       challenge_rating?: string | null;
       /** Cr */
@@ -336,6 +343,11 @@ export interface components {
        * @default []
        */
       languages?: string[];
+      /**
+       * Items
+       * @default []
+       */
+      items?: string[];
       /** Challenge Rating */
       challenge_rating?: string | null;
       /** Cr */
@@ -775,8 +787,8 @@ export interface components {
       username: string;
       /** Email */
       email: string;
-      /** Api Key */
-      api_key: string;
+      /** Api Keys */
+      api_keys: string[];
     };
     /** UserWithScopes */
     UserWithScopes: {
@@ -1197,7 +1209,7 @@ export interface operations {
     };
   };
   /** List Api Keys */
-  list_api_keys_api_v1_users_me_api_key_get: {
+  list_api_keys_api_v1_users_me_api_keys_get: {
     responses: {
       /** @description Successful Response */
       200: {
@@ -1208,12 +1220,34 @@ export interface operations {
     };
   };
   /** Update Api Keys */
-  update_api_keys_api_v1_users_me_api_key_patch: {
+  update_api_keys_api_v1_users_me_api_keys_put: {
     responses: {
       /** @description Successful Response */
       200: {
         content: {
           "application/json": components["schemas"]["UserWithApiKey"];
+        };
+      };
+    };
+  };
+  /** Update Api Keys */
+  update_api_keys_api_v1_users_me_api_keys_delete: {
+    parameters: {
+      query: {
+        api_key: string;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["UserWithApiKey"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
         };
       };
     };

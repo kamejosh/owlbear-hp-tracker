@@ -133,6 +133,9 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                     <b>Languages</b> {statblock.languages?.join(", ")}
                 </div>
                 <div className={"tidbit"}>
+                    <b>Items</b> {statblock.items?.join(", ")}
+                </div>
+                <div className={"tidbit"}>
                     <b>Challenge</b> {statblock.challenge_rating}
                 </div>
             </div>
