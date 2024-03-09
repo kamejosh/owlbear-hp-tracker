@@ -5,10 +5,10 @@ import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { dddiceRollToRollLog } from "../../../helper/helpers.ts";
 import { useComponentContext } from "../../../context/ComponentContext.tsx";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { diceToRoll } from "../../../helper/diceHelper.ts";
-//import tippy, { Instance } from "tippy.js";
+import tippy, { Instance } from "tippy.js";
 
 type DiceButtonProps = {
     dice: string;
@@ -21,12 +21,12 @@ export const DiceButton = (props: DiceButtonProps) => {
     const { rollerApi, initialized } = useDiceRoller();
     const { component } = useComponentContext();
     const [context, setContext] = useState<boolean>(false);
-    // const [tooltip, setTooltip] = useState<Instance>();
+    const [tooltip, setTooltip] = useState<Instance>();
     const rollButton = useRef<HTMLButtonElement>(null);
     const buttonWrapper = useRef<HTMLDivElement>(null);
     const playerContext = usePlayerContext();
 
-    /*useEffect(() => {
+    useEffect(() => {
         if (buttonWrapper.current) {
             if (!tooltip) {
                 if (!initialized || !!room?.disableDiceRoller) {
@@ -51,7 +51,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                 }
             }
         }
-    }, [initialized, room?.disableDiceRoller]);*/
+    }, [initialized, room?.disableDiceRoller]);
 
     const getUserUuid = async () => {
         if (room?.diceRoom?.slug) {
