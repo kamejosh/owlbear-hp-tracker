@@ -68,6 +68,7 @@ export type RoomMetadata = {
     diceRoom?: { slug: string | undefined };
     diceUser?: Array<DiceUser>;
     disableDiceRoller?: boolean;
+    tabletopAlmanacAPIKey?: string;
 };
 
 export type AttachmentMetadata = {

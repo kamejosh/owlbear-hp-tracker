@@ -48,6 +48,16 @@ export const Settings = () => {
                             backgroundImages={{ left: dndSvg, right: pfSvg }}
                         />
                     </div>
+                    <div className={"tabletop-almanac setting"}>
+                        Tabletop Almanac API Key:
+                        <input
+                            type={"text"}
+                            value={room?.tabletopAlmanacAPIKey || ""}
+                            onChange={(e) => {
+                                updateRoomMetadata(room, { tabletopAlmanacAPIKey: e.currentTarget.value });
+                            }}
+                        />
+                    </div>
                     <div className={"hp-mode setting"}>
                         HP Bar Segments:{" "}
                         <input
