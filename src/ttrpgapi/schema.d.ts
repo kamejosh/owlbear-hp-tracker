@@ -48,10 +48,14 @@ export interface paths {
   "/api/v1/pf/statblock/{slug}": {
     /** Get Pf Statblock Slug */
     get: operations["get_pf_statblock_slug_api_v1_pf_statblock__slug__get"];
-    /** Set Active Pf Statblock */
-    put: operations["set_active_pf_statblock_api_v1_pf_statblock__slug__put"];
+    /** Edit Pf Statblock */
+    put: operations["edit_pf_statblock_api_v1_pf_statblock__slug__put"];
     /** Delete Pf Statblock */
     delete: operations["delete_pf_statblock_api_v1_pf_statblock__slug__delete"];
+  };
+  "/api/v1/pf/statblock/{slug}/active": {
+    /** Set Active Pf Statblock */
+    put: operations["set_active_pf_statblock_api_v1_pf_statblock__slug__active_put"];
   };
   "/api/v1/pf/spell/": {
     /** List Pf Spells */
@@ -76,10 +80,14 @@ export interface paths {
   "/api/v1/e5/statblock/{slug}": {
     /** Get E5 Statblock Slug */
     get: operations["get_e5_statblock_slug_api_v1_e5_statblock__slug__get"];
-    /** Set Active E5 Statblock */
-    put: operations["set_active_e5_statblock_api_v1_e5_statblock__slug__put"];
+    /** Edit E5 Statblock */
+    put: operations["edit_e5_statblock_api_v1_e5_statblock__slug__put"];
     /** Delete E5 Statblock */
     delete: operations["delete_e5_statblock_api_v1_e5_statblock__slug__delete"];
+  };
+  "/api/v1/e5/statblock/{slug}/active": {
+    /** Set Active E5 Statblock */
+    put: operations["set_active_e5_statblock_api_v1_e5_statblock__slug__active_put"];
   };
   "/api/v1/e5/spell/": {
     /** List E5 Spells */
@@ -225,7 +233,7 @@ export interface components {
       /** Name */
       name: string;
       /** About */
-      about: string;
+      about?: string | null;
       /** Size */
       size: string;
       /** Type */
@@ -277,6 +285,21 @@ export interface components {
        */
       actions?: components["schemas"]["src__types__e5__Action"][];
       /**
+       * Bonus Actions
+       * @default []
+       */
+      bonus_actions?: components["schemas"]["src__types__e5__Action"][];
+      /**
+       * Lair Actions
+       * @default []
+       */
+      lair_actions?: components["schemas"]["src__types__e5__Action"][];
+      /**
+       * Mythic Actions
+       * @default []
+       */
+      mythic_actions?: components["schemas"]["src__types__e5__Action"][];
+      /**
        * Reactions
        * @default []
        */
@@ -306,7 +329,7 @@ export interface components {
       /** Name */
       name: string;
       /** About */
-      about: string;
+      about?: string | null;
       /** Size */
       size: string;
       /** Type */
@@ -357,6 +380,21 @@ export interface components {
        * @default []
        */
       actions?: components["schemas"]["Action-Output"][];
+      /**
+       * Bonus Actions
+       * @default []
+       */
+      bonus_actions?: components["schemas"]["Action-Output"][];
+      /**
+       * Lair Actions
+       * @default []
+       */
+      lair_actions?: components["schemas"]["Action-Output"][];
+      /**
+       * Mythic Actions
+       * @default []
+       */
+      mythic_actions?: components["schemas"]["Action-Output"][];
       /**
        * Reactions
        * @default []
@@ -1355,14 +1393,16 @@ export interface operations {
       };
     };
   };
-  /** Set Active Pf Statblock */
-  set_active_pf_statblock_api_v1_pf_statblock__slug__put: {
+  /** Edit Pf Statblock */
+  edit_pf_statblock_api_v1_pf_statblock__slug__put: {
     parameters: {
-      query: {
-        active: boolean;
-      };
       path: {
         slug: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PFStatblockIn"];
       };
     };
     responses: {
@@ -1383,6 +1423,31 @@ export interface operations {
   /** Delete Pf Statblock */
   delete_pf_statblock_api_v1_pf_statblock__slug__delete: {
     parameters: {
+      path: {
+        slug: string;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Set Active Pf Statblock */
+  set_active_pf_statblock_api_v1_pf_statblock__slug__active_put: {
+    parameters: {
+      query: {
+        active: boolean;
+      };
       path: {
         slug: string;
       };
@@ -1562,14 +1627,16 @@ export interface operations {
       };
     };
   };
-  /** Set Active E5 Statblock */
-  set_active_e5_statblock_api_v1_e5_statblock__slug__put: {
+  /** Edit E5 Statblock */
+  edit_e5_statblock_api_v1_e5_statblock__slug__put: {
     parameters: {
-      query: {
-        active: boolean;
-      };
       path: {
         slug: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["E5StatblockIn"];
       };
     };
     responses: {
@@ -1590,6 +1657,31 @@ export interface operations {
   /** Delete E5 Statblock */
   delete_e5_statblock_api_v1_e5_statblock__slug__delete: {
     parameters: {
+      path: {
+        slug: string;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Set Active E5 Statblock */
+  set_active_e5_statblock_api_v1_e5_statblock__slug__active_put: {
+    parameters: {
+      query: {
+        active: boolean;
+      };
       path: {
         slug: string;
       };

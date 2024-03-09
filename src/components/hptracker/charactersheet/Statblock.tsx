@@ -191,6 +191,16 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                     ) : null}
                 </div>
             ) : null}
+            {statblock.special_abilities && statblock.special_abilities.length > 0 ? (
+                <div className={"special-abilities"}>
+                    <h3>Special Abilities</h3>
+                    <ul className={"ability-list"}>
+                        {statblock.special_abilities?.map((ability, index) => (
+                            <E5Ability ability={ability} key={ability.name + index} />
+                        ))}
+                    </ul>
+                </div>
+            ) : null}
             {statblock.actions && statblock.actions.length > 0 ? (
                 <div className={"actions"}>
                     <h3>Actions</h3>
@@ -211,12 +221,32 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                     </ul>
                 </div>
             ) : null}
-            {statblock.special_abilities && statblock.special_abilities.length > 0 ? (
-                <div className={"special-abilities"}>
-                    <h3>Special Abilities</h3>
+            {statblock.bonus_actions && statblock.bonus_actions.length > 0 ? (
+                <div className={"bonus-actions"}>
+                    <h3>Bonus Actions</h3>
                     <ul className={"ability-list"}>
-                        {statblock.special_abilities?.map((ability, index) => (
-                            <E5Ability ability={ability} key={ability.name + index} />
+                        {statblock.bonus_actions.map((action, index) => (
+                            <E5Ability ability={action} key={action.name + index} />
+                        ))}
+                    </ul>
+                </div>
+            ) : null}
+            {statblock.lair_actions && statblock.lair_actions.length > 0 ? (
+                <div className={"lair-actions"}>
+                    <h3>Lair Actions</h3>
+                    <ul className={"ability-list"}>
+                        {statblock.lair_actions.map((action, index) => (
+                            <E5Ability ability={action} key={action.name + index} />
+                        ))}
+                    </ul>
+                </div>
+            ) : null}
+            {statblock.mythic_actions && statblock.mythic_actions.length > 0 ? (
+                <div className={"mythic-actions"}>
+                    <h3>Mythic Actions</h3>
+                    <ul className={"ability-list"}>
+                        {statblock.mythic_actions.map((action, index) => (
+                            <E5Ability ability={action} key={action.name + index} />
                         ))}
                     </ul>
                 </div>

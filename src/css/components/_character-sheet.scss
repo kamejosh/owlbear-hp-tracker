@@ -283,16 +283,23 @@
         "tidbits"
         "skills"
         "resistances"
-        "actions"
-        "actions"
-        "reactions"
-        "reactions"
         "specials"
         "specials"
+        "actions"
+        "actions"
+        "bonus-actions"
+        "bonus-actions"
+        "lair-actions"
+        "lair-actions"
+        "mythic-actions"
+        "mythic-actions"
+        "reactions"
+        "reactions"
         "legendary"
         "legendary"
         "spells"
-        "spells";
+        "spells"
+        "license";
     gap: 10px 30px;
     margin-top: 20px;
     text-align: left;
@@ -304,11 +311,15 @@
             "abilities tidbits"
             "skills skills"
             "resistances resistances"
-            "actions actions"
-            "reactions reactions"
             "specials specials"
+            "actions actions"
+            "bonus-actions bonus-actions"
+            "lair-actions lair-actions"
+            "mythic-actions mythic-actions"
+            "reactions reactions"
             "legendary legendary"
-            "spells spells";
+            "spells spells"
+            "license license";
     }
 
     > * {
@@ -434,6 +445,33 @@
         }
     }
 
+    .bonus-actions {
+        grid-area: bonus-actions;
+
+        h3 {
+            border-bottom: 1px solid white;
+            width: 100%;
+        }
+    }
+
+    .lair-actions {
+        grid-area: lair-actions;
+
+        h3 {
+            border-bottom: 1px solid white;
+            width: 100%;
+        }
+    }
+
+    .mythic-actions {
+        grid-area: mythic-actions;
+
+        h3 {
+            border-bottom: 1px solid white;
+            width: 100%;
+        }
+    }
+
     .reactions {
         grid-area: reactions;
 
@@ -474,6 +512,10 @@
             flex-direction: column;
             gap: 10px;
         }
+    }
+
+    .license {
+        grid-area: license;
     }
 }
 
