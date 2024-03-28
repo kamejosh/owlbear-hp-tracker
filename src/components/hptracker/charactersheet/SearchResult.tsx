@@ -1,12 +1,10 @@
 import { useCharSheet } from "../../../context/CharacterContext.ts";
-import OBR from "@owlbear-rodeo/sdk";
-import { itemMetadataKey } from "../../../helper/variables.ts";
-import { HpTrackerMetadata } from "../../../helper/types.ts";
 import { Loader } from "../../general/Loader.tsx";
 import { E5Statblock, useE5SearchStatblock } from "../../../ttrpgapi/e5/useE5Api.ts";
 import { PfStatblock, usePfStatblockSearch } from "../../../ttrpgapi/pf/usePfApi.ts";
 import { useEffect } from "react";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
+import { updateTokenSheet } from "../../../helper/helpers.ts";
 
 type SearchResultProps = {
     search: string;
@@ -18,22 +16,12 @@ type SearchResultProps = {
 export const SearchResult5e = (props: SearchResultProps) => {
     const { characterId } = useCharSheet();
     const { room } = useMetadataContext();
-    const setSheet = (slug: string, bonus: number) => {
+    const setSheet = (slug: string, bonus: number, hp: number, ac: number) => {
         if (characterId) {
             if (slug === props.current) {
                 props.setForceSearch(false);
             }
-            OBR.scene.items.updateItems([characterId], (items) => {
-                items.forEach((item) => {
-                    const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
-                    item.metadata[itemMetadataKey] = {
-                        ...data,
-                        sheet: slug,
-                        ruleset: "e5",
-                        stats: { initiativeBonus: bonus },
-                    };
-                });
-            });
+            updateTokenSheet(slug, bonus, hp, ac, characterId, "e5");
         }
     };
 
@@ -57,7 +45,14 @@ export const SearchResult5e = (props: SearchResultProps) => {
                         <li
                             className={`search-result ${entry.slug === props.current ? "current" : ""}`}
                             key={entry.slug}
-                            onClick={() => setSheet(entry.slug, Math.floor((entry.stats.dexterity - 10) / 2))}
+                            onClick={() =>
+                                setSheet(
+                                    entry.slug,
+                                    Math.floor((entry.stats.dexterity - 10) / 2),
+                                    entry.hp.value,
+                                    entry.armor_class.value
+                                )
+                            }
                         >
                             <span>
                                 {entry.name}
@@ -81,22 +76,12 @@ export const SearchResult5e = (props: SearchResultProps) => {
 export const SearchResultPf = (props: SearchResultProps) => {
     const { room } = useMetadataContext();
     const { characterId } = useCharSheet();
-    const setSheet = (slug: string, bonus: number) => {
+    const setSheet = (slug: string, bonus: number, hp: number, ac: number) => {
         if (characterId) {
             if (slug === props.current) {
                 props.setForceSearch(false);
             }
-            OBR.scene.items.updateItems([characterId], (items) => {
-                items.forEach((item) => {
-                    const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
-                    item.metadata[itemMetadataKey] = {
-                        ...data,
-                        sheet: slug,
-                        ruleset: "pf",
-                        stats: { initiativeBonus: bonus },
-                    };
-                });
-            });
+            updateTokenSheet(slug, bonus, hp, ac, characterId, "pf");
         }
     };
 
@@ -120,7 +105,14 @@ export const SearchResultPf = (props: SearchResultProps) => {
                         <li
                             className={`search-result ${entry.slug === props.current ? "current" : ""}`}
                             key={entry.slug}
-                            onClick={() => setSheet(entry.slug, entry.perception ? parseInt(entry.perception) : 0)}
+                            onClick={() =>
+                                setSheet(
+                                    entry.slug,
+                                    entry.perception ? parseInt(entry.perception) : 0,
+                                    entry.hp.value,
+                                    entry.armor_class.value
+                                )
+                            }
                         >
                             <span>{entry.name}</span>
                             <span>HP: {entry.hp.value}</span>

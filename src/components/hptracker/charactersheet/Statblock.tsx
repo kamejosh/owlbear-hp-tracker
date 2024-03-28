@@ -1,4 +1,3 @@
-import { useCharSheet } from "../../../context/CharacterContext.ts";
 import OBR from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "../../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../../helper/types.ts";
@@ -18,32 +17,6 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
     const statblockQuery = useE5GetStatblock(slug, room?.tabletopAlmanacAPIKey);
 
     const statblock = statblockQuery.isSuccess && statblockQuery.data ? statblockQuery.data : null;
-
-    const { characterId } = useCharSheet();
-
-    const updateValues = (maxHp: number, ac: number) => {
-        if (characterId) {
-            OBR.scene.items.updateItems([characterId], (items) => {
-                items.forEach((item) => {
-                    const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
-                    if (data.hp === 0 && data.maxHp === 0 && data.armorClass === 0) {
-                        item.metadata[itemMetadataKey] = {
-                            ...data,
-                            maxHp: maxHp,
-                            armorClass: ac,
-                            hp: maxHp,
-                        };
-                    }
-                });
-            });
-        }
-    };
-
-    useEffect(() => {
-        if (statblockQuery.isSuccess && statblock) {
-            updateValues(statblock.hp.value, statblock.armor_class.value);
-        }
-    }, [statblockQuery.isSuccess]);
 
     return statblock ? (
         <div className={"open5e-sheet"}>
@@ -269,34 +242,9 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
 
 const PfStatBlock = ({ slug }: { slug: string }) => {
     const { room } = useMetadataContext();
-    const { characterId } = useCharSheet();
     const statblockQuery = usePfGetStatblock(slug, room?.tabletopAlmanacAPIKey);
 
     const statblock = statblockQuery.isSuccess && statblockQuery.data ? statblockQuery.data : null;
-
-    const updateValues = (maxHp: number, ac: number) => {
-        if (characterId) {
-            OBR.scene.items.updateItems([characterId], (items) => {
-                items.forEach((item) => {
-                    const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
-                    if (data.hp === 0 && data.maxHp === 0 && data.armorClass === 0) {
-                        item.metadata[itemMetadataKey] = {
-                            ...data,
-                            maxHp: maxHp,
-                            armorClass: ac,
-                            hp: maxHp,
-                        };
-                    }
-                });
-            });
-        }
-    };
-
-    useEffect(() => {
-        if (statblockQuery.isSuccess && statblock) {
-            updateValues(statblock.hp.value, statblock.armor_class.value);
-        }
-    }, [statblockQuery.isSuccess]);
 
     return statblock ? (
         <div className={"pf-sheet"}>

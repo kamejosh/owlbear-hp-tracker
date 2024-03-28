@@ -158,7 +158,7 @@ export const CharacterSheet = (props: { itemId: string }) => {
     useEffect(() => {
         if (data?.sheet && data?.ruleset === room?.ruleset) {
             setForceSearch(false);
-        } else {
+        } else if (!data?.sheet || data?.ruleset === room?.ruleset) {
             setForceSearch(true);
         }
     }, [data?.sheet]);
