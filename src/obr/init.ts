@@ -27,6 +27,7 @@ import { saveOrChangeAC, updateAc, updateAcChanges, updateAcVisibility } from ".
 import { migrateTo141 } from "../migrations/v141.ts";
 import { attachmentFilter, getAttachedItems } from "../helper/helpers.ts";
 import { migrateTo160 } from "../migrations/v160.ts";
+import { migrateTo200 } from "../migrations/v200.ts";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -269,6 +270,9 @@ const migrations = async () => {
             }
             if (compare(data.version, "1.6.0", "<")) {
                 await migrateTo160();
+            }
+            if (compare(data.version, "2.0.0", "<")) {
+                await migrateTo200();
             }
         }
     }

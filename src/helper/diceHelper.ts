@@ -1,6 +1,6 @@
 import { RoomMetadata } from "./types.ts";
 import { dddiceRollToRollLog, updateRoomMetadata } from "./helpers.ts";
-import OBR, { Metadata } from "@owlbear-rodeo/sdk";
+import OBR from "@owlbear-rodeo/sdk";
 import {
     IDiceRoll,
     IRoll,
@@ -34,13 +34,10 @@ export const updateRoomMetadataDiceUser = async (
         diceRendering: boolean;
     }> = room.diceUser === undefined ? [] : room.diceUser;
 
-    let apiKey = options?.apiKey;
-
     // This first removes the current entry for the user if it finds it
     const index = diceUser.findIndex((user) => user.playerId === playerId);
     if (index >= 0) {
         const user = diceUser[index];
-        apiKey = options?.apiKey ?? user.apiKey;
         diceUser.splice(index, 1, {
             playerId: playerId,
             apiKey: options?.apiKey ?? user.apiKey,
@@ -63,25 +60,15 @@ export const updateRoomMetadataDiceUser = async (
         return user.lastUse > new Date().getTime() - 1000 * 60 * 60 * 24 * 30;
     });
 
-    // to keep in sync with dddice I save the dddice metadata as well (Approved by CelesteBloodreign)
-    const dddiceMetadata: Metadata = {};
-    dddiceMetadata[`com.dddice/${playerId}`] = apiKey;
-    await updateRoomMetadata(room, { diceUser: filteredUser }, dddiceMetadata);
+    await updateRoomMetadata(room, { diceUser: filteredUser });
 };
 
 export const updateRoomMetadataDiceRoom = async (room: RoomMetadata, slug: string | undefined) => {
-    // to keep in sync with dddice I save the dddice metadata as well (Approved by CelesteBloodreign)
-    const dddiceMetadata: Metadata = {};
-    dddiceMetadata["com.dddice/roomSlug"] = slug;
-    await updateRoomMetadata(
-        room,
-        {
-            diceRoom: {
-                slug: slug,
-            },
+    await updateRoomMetadata(room, {
+        diceRoom: {
+            slug: slug,
         },
-        dddiceMetadata
-    );
+    });
 };
 
 export const getDiceUser = async (rollerApi: ThreeDDiceAPI) => {

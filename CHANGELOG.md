@@ -1,3 +1,9 @@
+# 2.0.0
+
++ You can now create and use custom statblocks with [tabletop-almanac.com](https://tabletop-almanac.com)
++ Reset all selected dice-themes to [dddice-bees](https://dddice.com/dice/dddice-bees). Because all other themes will only be available for dddice Patreon Supports see [here](https://blog.dddice.com/dddice-is-rolling-into-beta/#%F0%9F%9A%80-what-will-change).
++ 
+
 # 1.6.4
 
 + HP Tracker can be initialized without a scene
