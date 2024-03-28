@@ -9,6 +9,14 @@ export interface paths {
     /** Login For Access Token */
     post: operations["login_for_access_token_token_post"];
   };
+  "/password-reset": {
+    /** Reset Password */
+    post: operations["reset_password_password_reset_post"];
+  };
+  "/activation-link": {
+    /** Get Activation Mail */
+    post: operations["get_activation_mail_activation_link_post"];
+  };
   "/api/v1/users/": {
     /** Create User */
     post: operations["create_user_api_v1_users__post"];
@@ -34,6 +42,14 @@ export interface paths {
   "/api/v1/users/me/statblocks": {
     /** List Statblocks */
     get: operations["list_statblocks_api_v1_users_me_statblocks_get"];
+  };
+  "/api/v1/users/change-password": {
+    /** Change Password */
+    post: operations["change_password_api_v1_users_change_password_post"];
+  };
+  "/api/v1/users/activate": {
+    /** Activate User */
+    post: operations["activate_user_api_v1_users_activate_post"];
   };
   "/api/v1/pf/statblock/": {
     /** List Pf Statblocks */
@@ -590,6 +606,13 @@ export interface components {
       /** Source */
       source?: string | null;
     };
+    /** PasswordResetIn */
+    PasswordResetIn: {
+      /** Token */
+      token: string;
+      /** Password */
+      password: string;
+    };
     /** Reaction */
     Reaction: {
       /** Name */
@@ -799,6 +822,22 @@ export interface components {
       name: string;
       /** Value */
       value: string;
+    };
+    /** UpdateUserIn */
+    UpdateUserIn: {
+      /** Email */
+      email?: string | null;
+      /** Password */
+      password?: string | null;
+    };
+    /** UserIn */
+    UserIn: {
+      /** Username */
+      username: string;
+      /** Email */
+      email: string;
+      /** Password */
+      password: string;
     };
     /** UserOut */
     UserOut: {
@@ -1161,13 +1200,55 @@ export interface operations {
       };
     };
   };
-  /** Create User */
-  create_user_api_v1_users__post: {
+  /** Reset Password */
+  reset_password_password_reset_post: {
+    parameters: {
+      query: {
+        email: string;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Get Activation Mail */
+  get_activation_mail_activation_link_post: {
     parameters: {
       query: {
         username: string;
-        email: string;
-        password: string;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Create User */
+  create_user_api_v1_users__post: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UserIn"];
       };
     };
     responses: {
@@ -1225,10 +1306,9 @@ export interface operations {
   };
   /** Update User */
   update_user_api_v1_users_me__patch: {
-    parameters: {
-      query: {
-        email: string;
-        password: string;
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateUserIn"];
       };
     };
     responses: {
@@ -1297,6 +1377,39 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["UserStatblocks"];
+        };
+      };
+    };
+  };
+  /** Change Password */
+  change_password_api_v1_users_change_password_post: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PasswordResetIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Activate User */
+  activate_user_api_v1_users_activate_post: {
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": unknown;
         };
       };
     };
