@@ -85,7 +85,7 @@ export const StatblockPopover = () => {
     return (
         <ContextWrapper component={"statblock_popover"}>
             <div className={"statblock-popover"}>
-                <div className={"help-buttons"}>
+                <div className={"help-buttons statblock"}>
                     <button
                         className={"top-button"}
                         onClick={() => {

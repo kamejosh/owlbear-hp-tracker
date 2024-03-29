@@ -268,7 +268,7 @@ export const updateTokenSheet = (
 };
 
 export const getInitialValues = async (items: Array<Item>) => {
-    const roomData = OBR.room.getMetadata();
+    const roomData = await OBR.room.getMetadata();
     let ruleset = "e5";
     let apiKey = undefined;
     if (metadataKey in roomData) {

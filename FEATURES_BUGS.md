@@ -9,11 +9,8 @@
 + Allow dddice user to switch rooms
 + Add customization to HP Bar settings
 + Pagination for statblocks
-+ editable statblock (would probably require own hosting/database to not clog up players owlbear space)
-+ Auto Load statblock for tokens
 + add Spellslots and Items to statblocks
 + Tooltips for mobile devices
-+ Support generic statblocks to support other [game systems](https://discord.com/channels/795808973743194152/1157319743196364971/1157319743196364971)
 + Add default settings for Visibility Buttons
 + Make first HP Bar Segment only worth 1 HP (see [here](https://github.com/kamejosh/owlbear-hp-tracker/issues/23))
 + Battleround and Effect tracking (low prio)

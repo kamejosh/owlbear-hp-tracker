@@ -42,7 +42,7 @@ export const updateRoomMetadataDiceUser = async (
             playerId: playerId,
             apiKey: options?.apiKey ?? user.apiKey,
             lastUse: new Date().getTime(),
-            diceTheme: options?.diceTheme ?? user.diceTheme ?? "silvie-lr1gjqod",
+            diceTheme: options?.diceTheme ?? user.diceTheme ?? "dddice-bees",
             diceRendering: options?.diceRendering ?? user.diceRendering ?? true,
         });
     } else {
@@ -50,7 +50,7 @@ export const updateRoomMetadataDiceUser = async (
             playerId: playerId,
             apiKey: options?.apiKey,
             lastUse: new Date().getTime(),
-            diceTheme: options?.diceTheme ?? "silvie-lr1gjqod",
+            diceTheme: options?.diceTheme ?? "dddice-bees",
             diceRendering: options?.diceRendering ?? true,
         });
     }

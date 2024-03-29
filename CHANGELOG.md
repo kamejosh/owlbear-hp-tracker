@@ -1,8 +1,11 @@
 # 2.0.0
 
-+ You can now create and use custom statblocks with [tabletop-almanac.com](https://tabletop-almanac.com)
+**Custom Statblocks are finally here register now at [tabletop-almanac.com](https://tabletop-almanac.com)** 
+
++ You can now create and use custom statblocks using [Tabletop Almanac](https://tabletop-almanac.com)
 + Reset all selected dice-themes to [dddice-bees](https://dddice.com/dice/dddice-bees). Because all other themes will only be available for dddice Patreon Supports see [here](https://blog.dddice.com/dddice-is-rolling-into-beta/#%F0%9F%9A%80-what-will-change).
 + Add auto statblock assignment when Activating HP Tracker
++ Smaller bug fixes and improvements
 
 # 1.6.4
 

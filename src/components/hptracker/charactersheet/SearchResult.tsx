@@ -40,30 +40,52 @@ export const SearchResult5e = (props: SearchResultProps) => {
     ) : searchQuery.isSuccess ? (
         entries.length > 0 ? (
             <ul className={"search-results"}>
-                {entries.map((entry: E5Statblock) => {
-                    return (
-                        <li
-                            className={`search-result ${entry.slug === props.current ? "current" : ""}`}
-                            key={entry.slug}
-                            onClick={() =>
-                                setSheet(
-                                    entry.slug,
-                                    Math.floor((entry.stats.dexterity - 10) / 2),
-                                    entry.hp.value,
-                                    entry.armor_class.value
-                                )
+                {entries
+                    .sort((a, b) => {
+                        if (a.source && ["cc", "tob2", "tob", "tob3", "menagerie", "wotc-srd"].includes(a.source)) {
+                            return 1;
+                        } else if (
+                            b.source &&
+                            ["cc", "tob2", "tob", "tob3", "menagerie", "wotc-srd"].includes(b.source)
+                        ) {
+                            return -1;
+                        } else {
+                            if (a.name < b.name) {
+                                return -1;
+                            } else {
+                                return 0;
                             }
-                        >
-                            <span>
-                                {entry.name}
-                                {entry.source ? ` (${entry.source})` : null}
-                            </span>
-                            <span>HP: {entry.hp.value}</span>
-                            <span>AC: {entry.armor_class.value}</span>
-                            <span>CR: {entry.cr}</span>
-                        </li>
-                    );
-                })}
+                        }
+                    })
+                    .map((entry: E5Statblock) => {
+                        return (
+                            <li
+                                className={`search-result ${entry.slug === props.current ? "current" : ""} ${
+                                    entry.source &&
+                                    !["cc", "tob2", "tob", "tob3", "menagerie", "wotc-srd"].includes(entry.source)
+                                        ? "custom"
+                                        : ""
+                                }`}
+                                key={entry.slug}
+                                onClick={() =>
+                                    setSheet(
+                                        entry.slug,
+                                        Math.floor((entry.stats.dexterity - 10) / 2),
+                                        entry.hp.value,
+                                        entry.armor_class.value
+                                    )
+                                }
+                            >
+                                <span>
+                                    {entry.name}
+                                    {entry.source ? ` (${entry.source})` : null}
+                                </span>
+                                <span>HP: {entry.hp.value}</span>
+                                <span>AC: {entry.armor_class.value}</span>
+                                <span>CR: {entry.cr}</span>
+                            </li>
+                        );
+                    })}
             </ul>
         ) : (
             <div className={"empty-search"}>Nothing found for "{props.search}"</div>
@@ -100,27 +122,46 @@ export const SearchResultPf = (props: SearchResultProps) => {
     ) : searchQuery.isSuccess ? (
         entries.length > 0 ? (
             <ul className={"search-results"}>
-                {entries.map((entry: PfStatblock) => {
-                    return (
-                        <li
-                            className={`search-result ${entry.slug === props.current ? "current" : ""}`}
-                            key={entry.slug}
-                            onClick={() =>
-                                setSheet(
-                                    entry.slug,
-                                    entry.perception ? parseInt(entry.perception) : 0,
-                                    entry.hp.value,
-                                    entry.armor_class.value
-                                )
+                {entries
+                    .sort((a, b) => {
+                        if (a.source) {
+                            return -1;
+                        } else if (b.source) {
+                            return 1;
+                        } else {
+                            if (a.name < b.name) {
+                                return -1;
+                            } else {
+                                return 0;
                             }
-                        >
-                            <span>{entry.name}</span>
-                            <span>HP: {entry.hp.value}</span>
-                            <span>AC: {entry.armor_class.value}</span>
-                            <span>Level: {entry.level}</span>
-                        </li>
-                    );
-                })}
+                        }
+                    })
+                    .map((entry: PfStatblock) => {
+                        return (
+                            <li
+                                className={`search-result ${entry.slug === props.current ? "current" : ""} ${
+                                    entry.source ? "custom" : ""
+                                }`}
+                                key={entry.slug}
+                                onClick={() =>
+                                    setSheet(
+                                        entry.slug,
+                                        entry.perception ? parseInt(entry.perception) : 0,
+                                        entry.hp.value,
+                                        entry.armor_class.value
+                                    )
+                                }
+                            >
+                                <span>
+                                    {entry.name}
+                                    {entry.source ? ` (${entry.source})` : null}
+                                </span>
+                                <span>HP: {entry.hp.value}</span>
+                                <span>AC: {entry.armor_class.value}</span>
+                                <span>Level: {entry.level}</span>
+                            </li>
+                        );
+                    })}
             </ul>
         ) : (
             <div className={"empty-search"}>Nothing found for "{props.search}"</div>

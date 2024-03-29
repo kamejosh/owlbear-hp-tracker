@@ -15,7 +15,7 @@ export const migrateTo200 = async () => {
         });
 
         const ownRoomMetadata: Metadata = {};
-        ownRoomMetadata[metadataKey] = { ...roomMetadata, diceUser: diceUsers };
+        ownRoomMetadata[metadataKey] = { ...data, diceUser: diceUsers };
 
         await OBR.room.setMetadata(ownRoomMetadata);
     }

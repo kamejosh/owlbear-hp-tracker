@@ -8,6 +8,7 @@ import { SearchResult5e, SearchResultPf } from "./SearchResult.tsx";
 import { Statblock } from "./Statblock.tsx";
 import { Helpbuttons } from "../../general/Helpbuttons/Helpbuttons.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
+import { updateRoomMetadata } from "../../../helper/helpers.ts";
 
 type SearchWrapperProps = {
     data: HpTrackerMetadata;
@@ -36,41 +37,59 @@ const getSearchString = (name: string): string => {
 
 const SearchWrapper = (props: SearchWrapperProps) => {
     const playerContext = usePlayerContext();
+    const { room } = useMetadataContext();
 
     const searchRef = useRef<HTMLInputElement>(null);
 
     return (
         <>
             {playerContext.role === "GM" ? (
-                <div className={"search-wrapper"}>
-                    <input
-                        ref={searchRef}
-                        type={"text"}
-                        className={props.empty ? "empty" : ""}
-                        title={
-                            props.empty
-                                ? "No results for this input, try another name"
-                                : "Enter the name of the creature you're searching"
-                        }
-                        defaultValue={getSearchString(props.data.name)}
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                                props.setSearch(e.currentTarget.value);
-                                props.setForceSearch(true);
+                <div className={"top-wrapper"}>
+                    {!room?.tabletopAlmanacAPIKey ? (
+                        <div className={"custom-statblock-wrapper"}>
+                            To create custom statblocks go to{" "}
+                            <a href={"https://tabletop-almanac.com"} target={"_blank"}>
+                                Tabletop Alamanc
+                            </a>{" "}
+                            and enter you API Key here:
+                            <input
+                                type={"text"}
+                                onBlur={(e) => {
+                                    updateRoomMetadata(room, { tabletopAlmanacAPIKey: e.currentTarget.value });
+                                }}
+                            />
+                        </div>
+                    ) : null}
+                    <div className={"search-wrapper"}>
+                        <input
+                            ref={searchRef}
+                            type={"text"}
+                            className={props.empty ? "empty" : ""}
+                            title={
+                                props.empty
+                                    ? "No results for this input, try another name"
+                                    : "Enter the name of the creature you're searching"
                             }
-                        }}
-                        onBlur={(e) => {
-                            props.setSearch(e.target.value);
-                            props.setForceSearch(true);
-                        }}
-                    />
-                    <button
-                        className={"only-icon search"}
-                        onClick={() => {
-                            props.setForceSearch(true);
-                            props.setSearch(searchRef.current!.value);
-                        }}
-                    />
+                            defaultValue={getSearchString(props.data.name)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    props.setSearch(e.currentTarget.value);
+                                    props.setForceSearch(true);
+                                }
+                            }}
+                            onBlur={(e) => {
+                                props.setSearch(e.target.value);
+                                props.setForceSearch(true);
+                            }}
+                        />
+                        <button
+                            className={"only-icon search"}
+                            onClick={() => {
+                                props.setForceSearch(true);
+                                props.setSearch(searchRef.current!.value);
+                            }}
+                        />
+                    </div>
                 </div>
             ) : null}
         </>
