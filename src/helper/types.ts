@@ -13,6 +13,7 @@ export type HpTrackerMetadata = {
     stats: {
         initiativeBonus: number;
         tempHp?: number;
+        initial?: boolean;
     };
     ruleset?: Ruleset;
     index?: number;
@@ -68,6 +69,7 @@ export type RoomMetadata = {
     diceRoom?: { slug: string | undefined };
     diceUser?: Array<DiceUser>;
     disableDiceRoller?: boolean;
+    tabletopAlmanacAPIKey?: string;
 };
 
 export type AttachmentMetadata = {
@@ -95,3 +97,11 @@ export type ACItemChanges = {
 };
 
 export type Ruleset = "e5" | "pf";
+
+export type InitialStatblockData = {
+    hp: number;
+    ac: number;
+    bonus: number;
+    slug: string;
+    ruleset: Ruleset;
+};

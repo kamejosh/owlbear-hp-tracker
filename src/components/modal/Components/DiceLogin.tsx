@@ -96,19 +96,6 @@ export const DiceLogin = () => {
                         })}
                     </div>
                 ) : null}
-                <div className={"or"}>or</div>
-                <button
-                    className={"button guest-button"}
-                    onClick={async () => {
-                        if (room) {
-                            const id = OBR.player.id;
-                            await updateRoomMetadataDiceUser(room, id, { apiKey: "" });
-                        }
-                        OBR.modal.close(modalId);
-                    }}
-                >
-                    Continue as guest
-                </button>
             </div>
         </div>
     );

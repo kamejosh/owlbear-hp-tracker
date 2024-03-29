@@ -44,6 +44,7 @@ learn-more: https://github.com/kamejosh/owlbear-hp-tracker
     - [Single Selection](#single-selection)
     - [Multi Selection](#multi-selection)
   + [Statblock Popover](#hp-tracker-statblock-popover)
+- [Custom Statblocks](#custom-statblocks)
 - [Dice Roller](#dice-roller)
   + [Disclaimer](#disclaimer)
   + [Getting Started](#getting-started)
@@ -76,8 +77,8 @@ The PCs start the combat with three temporary HP because of effect that was acti
 ## How
 
 + Create a new scene based on a map you have in your collection.
-+ Drop all the PC Tokens you need and fill in their info.
-+ Drop an Ogre and Hobgoblin Token on scene and connect them with their statblocks
++ Drop all the PC Tokens you need and fill in their info (or create custom statblocks for your PC).
++ Drop an Ogre and Hobgoblin Token on scene and connect them with their statblocks (this will be done automatically for all statblocks where a matching entry is found)
 + Copy the Hobgoblin Token four times
 + Roll initiative for the whole group and sort by initiative
 + Start combat
@@ -129,7 +130,7 @@ The Action Window can be opened by clicking the HP Tracker Action Icon in the Ow
 
 ![Action Window Top](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/action_window_top.png)
 
-At the top of the action window the current version of the extension is displayed as well as three system buttons, the statblock popover button and a link to the HP Tracker Patreon page.
+At the top of the action window the current version of the extension is displayed as well as the link to the Tabletop Alamanac (to create custom statblocks), three system buttons, the statblock popover button, a link to the HP Tracker Patreon page, and a link to the HP Tracker/Tabletop Alamanac Discord.
 
 The system buttons open a new modal (changelog and help are opened in fullscreen mode):
 + The [⛭] buttons opens the [global settings](#global-settings).
@@ -138,7 +139,7 @@ The system buttons open a new modal (changelog and help are opened in fullscreen
 
 The statblock popover button opens a popover, for more information see [here](#hp-tracker-statblock-popover).
 
-The Patreon Link opens in a new window.
+The TA Link, Patreon Link and Discord Link open in a new window.
 
 #### Settings
 
@@ -154,6 +155,7 @@ Settings are grouped into two categories:
 The following settings are available:
 
 + Statblock Game Rules: You can choose between DnD 5e and Pathfinder 2e as source for your statblocks. This will impact what statblocks are found, how they are displayed, and the content (including spells).
++ Tabletop Almanac API Key: Here you can enter the Tabletop Almanac API Key to access your custom statblocks
 + HP Bar Segments: This setting can be used to obfuscate the real HP loss of a creature. E.g. when set to "2" the HP Bar differentiates between 3 states: Full HP, less than half HP, and 0 HP. When changing the settings HP Bars are not updated until the HP value is changed at least once.
 + Text and Bar Offset: To have a more flexible positioning of the HP Bar and Text, a value can be entered (negative or positive number) and the position of the HP Bar and Text is then adjusted by this value.
 + Armorclass Icon and Text Offset: To have a more flexible positioning of the AC Background and Text an offset for the X- and Y-Axis can be added. This value is scaled considering the Token size.
@@ -268,13 +270,15 @@ When initializing manually you enter the 4 available fields manually. Normally t
 
 #### Statblock
 
-The statblock offers a search field for creature statblocks on ttrpg-api.bitperfect-software.com. By default the Token Name is used to make an initial search. If the Token name has a modifier like A, B, A1, C, 1, 3, or similar at the end it will be automatically ignored for the search.
+The statblock offers a search field for creature statblocks on api.tabletop-almanac.com. By default the Token Name is used to make an initial search. If the Token name has a modifier like A, B, A1, C, 1, 3, or similar at the end it will be automatically ignored for the search.
 
 All results for the current search are displayed with their HP, AC and CR visible.
 
 ![Statblock Search](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/statblock_search.png)
 
-By clicking on one of the options this statblock is selected for the Token. If there are no values set for the Token, the values of the creature statblock are automatically used.
+Available Statblocks have varying background depending on their source. Custom Statblocks created on tabletop-almanac.com are displayed first and with a slight green background. The currently selected statblock has a white glow.
+
+By clicking on one of the options this statblock is selected for the Token. If there are no values set for the Token or the Token still has its automatically assigned values, the values of the creature statblock are automatically used.
 
 ![Statblock Selected](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/statblock_selected.png)
 
@@ -333,6 +337,10 @@ By default when selecting a Token either in the [HP Tracker Action Window](#hp-t
 
 ![Statblock Demo](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/statblock_demo.gif)
 
+# Custom Statblocks
+
+Custom statblocks can be created at tabletop-almanac.com. Free accounts can create up to 20 statblocks and activate 10 statblocks at the same time. To increase this limit go to my patreon and consider supporting me.
+
 # Dice Roller
 
 Starting with Version 1.6.0 HP Tracker comes with an integrated dice-roller. It can be disabled (removed) by changing the [Disable Dice Roller Setting](#room-settings);
@@ -341,7 +349,7 @@ Starting with Version 1.6.0 HP Tracker comes with an integrated dice-roller. It 
 
 ## Disclaimer
 
-There are still a few things I want to add and also things that could be better (like dice rolling both in statblock popover and action window). I'm actively working on addressing those things and improving the dice roller. If you want to give feedback or have issues you want to report let me know on Patreon.
+There are still a few things I want to add and also things that could be better. I'm actively working on addressing those things and improving the dice roller. If you want to give feedback or have issues you want to report let me know on Patreon or Discord.
 
 ## Getting Started
 

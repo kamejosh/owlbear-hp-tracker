@@ -1,4 +1,3 @@
-import { useCharSheet } from "../../../context/CharacterContext.ts";
 import OBR from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "../../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../../helper/types.ts";
@@ -14,35 +13,10 @@ import { DiceButton } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { capitalize } from "lodash";
 
 const E5StatBlock = ({ slug }: { slug: string }) => {
-    const statblockQuery = useE5GetStatblock(slug);
+    const { room } = useMetadataContext();
+    const statblockQuery = useE5GetStatblock(slug, room?.tabletopAlmanacAPIKey);
 
     const statblock = statblockQuery.isSuccess && statblockQuery.data ? statblockQuery.data : null;
-
-    const { characterId } = useCharSheet();
-
-    const updateValues = (maxHp: number, ac: number) => {
-        if (characterId) {
-            OBR.scene.items.updateItems([characterId], (items) => {
-                items.forEach((item) => {
-                    const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
-                    if (data.hp === 0 && data.maxHp === 0 && data.armorClass === 0) {
-                        item.metadata[itemMetadataKey] = {
-                            ...data,
-                            maxHp: maxHp,
-                            armorClass: ac,
-                            hp: maxHp,
-                        };
-                    }
-                });
-            });
-        }
-    };
-
-    useEffect(() => {
-        if (statblockQuery.isSuccess && statblock) {
-            updateValues(statblock.hp.value, statblock.armor_class.value);
-        }
-    }, [statblockQuery.isSuccess]);
 
     return statblock ? (
         <div className={"open5e-sheet"}>
@@ -65,7 +39,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                         <DiceButton
                             dice={statblock.hp.hit_dice}
                             text={statblock.hp.hit_dice}
-                            context={slug + ": Hit Dice"}
+                            context={statblock.name + ": Hit Dice"}
                         />
                     ) : null}
                 </span>
@@ -116,7 +90,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                                             <DiceButton
                                                 dice={`d20+${value}`}
                                                 text={`+${value}`}
-                                                context={`${capitalize(key)}: Save`}
+                                                context={`${capitalize(key.substring(0, 3))}: Save`}
                                             />
                                         </span>
                                     );
@@ -130,6 +104,9 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                 </div>
                 <div className={"tidbit"}>
                     <b>Languages</b> {statblock.languages?.join(", ")}
+                </div>
+                <div className={"tidbit"}>
+                    <b>Items</b> {statblock.items?.join(", ")}
                 </div>
                 <div className={"tidbit"}>
                     <b>Challenge</b> {statblock.challenge_rating}
@@ -187,6 +164,16 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                     ) : null}
                 </div>
             ) : null}
+            {statblock.special_abilities && statblock.special_abilities.length > 0 ? (
+                <div className={"special-abilities"}>
+                    <h3>Special Abilities</h3>
+                    <ul className={"ability-list"}>
+                        {statblock.special_abilities?.map((ability, index) => (
+                            <E5Ability ability={ability} key={ability.name + index} />
+                        ))}
+                    </ul>
+                </div>
+            ) : null}
             {statblock.actions && statblock.actions.length > 0 ? (
                 <div className={"actions"}>
                     <h3>Actions</h3>
@@ -207,12 +194,32 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                     </ul>
                 </div>
             ) : null}
-            {statblock.special_abilities && statblock.special_abilities.length > 0 ? (
-                <div className={"special-abilities"}>
-                    <h3>Special Abilities</h3>
+            {statblock.bonus_actions && statblock.bonus_actions.length > 0 ? (
+                <div className={"bonus-actions"}>
+                    <h3>Bonus Actions</h3>
                     <ul className={"ability-list"}>
-                        {statblock.special_abilities?.map((ability, index) => (
-                            <E5Ability ability={ability} key={ability.name + index} />
+                        {statblock.bonus_actions.map((action, index) => (
+                            <E5Ability ability={action} key={action.name + index} />
+                        ))}
+                    </ul>
+                </div>
+            ) : null}
+            {statblock.lair_actions && statblock.lair_actions.length > 0 ? (
+                <div className={"lair-actions"}>
+                    <h3>Lair Actions</h3>
+                    <ul className={"ability-list"}>
+                        {statblock.lair_actions.map((action, index) => (
+                            <E5Ability ability={action} key={action.name + index} />
+                        ))}
+                    </ul>
+                </div>
+            ) : null}
+            {statblock.mythic_actions && statblock.mythic_actions.length > 0 ? (
+                <div className={"mythic-actions"}>
+                    <h3>Mythic Actions</h3>
+                    <ul className={"ability-list"}>
+                        {statblock.mythic_actions.map((action, index) => (
+                            <E5Ability ability={action} key={action.name + index} />
                         ))}
                     </ul>
                 </div>
@@ -234,34 +241,10 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
 };
 
 const PfStatBlock = ({ slug }: { slug: string }) => {
-    const { characterId } = useCharSheet();
-    const statblockQuery = usePfGetStatblock(slug);
+    const { room } = useMetadataContext();
+    const statblockQuery = usePfGetStatblock(slug, room?.tabletopAlmanacAPIKey);
 
     const statblock = statblockQuery.isSuccess && statblockQuery.data ? statblockQuery.data : null;
-
-    const updateValues = (maxHp: number, ac: number) => {
-        if (characterId) {
-            OBR.scene.items.updateItems([characterId], (items) => {
-                items.forEach((item) => {
-                    const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
-                    if (data.hp === 0 && data.maxHp === 0 && data.armorClass === 0) {
-                        item.metadata[itemMetadataKey] = {
-                            ...data,
-                            maxHp: maxHp,
-                            armorClass: ac,
-                            hp: maxHp,
-                        };
-                    }
-                });
-            });
-        }
-    };
-
-    useEffect(() => {
-        if (statblockQuery.isSuccess && statblock) {
-            updateValues(statblock.hp.value, statblock.armor_class.value);
-        }
-    }, [statblockQuery.isSuccess]);
 
     return statblock ? (
         <div className={"pf-sheet"}>
@@ -354,6 +337,25 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                     </>
                 ) : null}
             </div>
+            {statblock.traits && statblock.traits.length > 0 ? (
+                <div className={"skills"}>
+                    <h3>Traits</h3>
+                    <div className={"skill-list"}>
+                        {statblock.traits?.map((trait) => {
+                            let value = trait.value;
+                            if (trait.value.includes(",")) {
+                                value = trait.value.split(",")[0];
+                            }
+                            return (
+                                <div className={"skill"} key={trait.name}>
+                                    <div className={"skill-name"}>{trait.name}</div>
+                                    <div className={"skill-value"}>{value}</div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            ) : null}
             {statblock.skills && statblock.skills.length > 0 ? (
                 <div className={"skills"}>
                     <h3>Skills</h3>

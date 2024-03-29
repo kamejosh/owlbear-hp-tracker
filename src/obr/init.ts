@@ -25,8 +25,9 @@ import { v4 as uuidv4 } from "uuid";
 import { migrateTo140 } from "../migrations/v140.ts";
 import { saveOrChangeAC, updateAc, updateAcChanges, updateAcVisibility } from "../helper/acHelper.ts";
 import { migrateTo141 } from "../migrations/v141.ts";
-import { attachmentFilter, getAttachedItems } from "../helper/helpers.ts";
+import { attachmentFilter, getAttachedItems, getInitialValues } from "../helper/helpers.ts";
 import { migrateTo160 } from "../migrations/v160.ts";
+import { migrateTo200 } from "../migrations/v200.ts";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -200,6 +201,7 @@ const setupContextMenu = async () => {
         onClick: async (context) => {
             const tokenIds: Array<string> = [];
             const initTokens = async () => {
+                const itemStatblocks = await getInitialValues(context.items);
                 await OBR.scene.items.updateItems(context.items, (items) => {
                     items.forEach((item) => {
                         tokenIds.push(item.id);
@@ -223,8 +225,18 @@ const setupContextMenu = async () => {
                                 sheet: "",
                                 stats: {
                                     initiativeBonus: 0,
+                                    initial: true,
                                 },
                             };
+                            if (item.id in itemStatblocks) {
+                                defaultMetadata.sheet = itemStatblocks[item.id].slug;
+                                defaultMetadata.ruleset = itemStatblocks[item.id].ruleset;
+                                defaultMetadata.maxHp = itemStatblocks[item.id].hp;
+                                defaultMetadata.hp = itemStatblocks[item.id].hp;
+                                defaultMetadata.armorClass = itemStatblocks[item.id].ac;
+                                defaultMetadata.stats.initiativeBonus = itemStatblocks[item.id].bonus;
+                                defaultMetadata.stats.initial = true;
+                            }
                             item.metadata[itemMetadataKey] = defaultMetadata;
                         }
                     });
@@ -269,6 +281,9 @@ const migrations = async () => {
             }
             if (compare(data.version, "1.6.0", "<")) {
                 await migrateTo160();
+            }
+            if (compare(data.version, "2.0.0", "<")) {
+                await migrateTo200();
             }
         }
     }

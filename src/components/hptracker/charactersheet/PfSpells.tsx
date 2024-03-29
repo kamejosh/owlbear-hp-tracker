@@ -5,15 +5,17 @@ import { PfSpell, usePfGetSpell } from "../../../ttrpgapi/pf/usePfApi.ts";
 import { components } from "../../../ttrpgapi/schema";
 import { SpellFilter } from "./SpellFilter.tsx";
 import { capitalize } from "lodash";
+import { useMetadataContext } from "../../../context/MetadataContext.ts";
 
 export type PfSpellCategory = components["schemas"]["SpellCategoryOut"];
 export type PfSpellList = components["schemas"]["SpelllistOut"];
 export type PfSpellOut = components["schemas"]["SpellOut"];
 
 const Spell = (props: { spell: PfSpellOut }) => {
+    const { room } = useMetadataContext();
     const [open, setOpen] = useState<boolean>(false);
 
-    const spellQuery = usePfGetSpell(props.spell.slug);
+    const spellQuery = usePfGetSpell(props.spell.slug, room?.tabletopAlmanacAPIKey);
 
     const spell: PfSpell | null = spellQuery.isSuccess && spellQuery.data ? spellQuery.data : null;
 

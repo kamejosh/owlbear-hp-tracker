@@ -1,9 +1,15 @@
 import OBR, { Image, Item, Metadata } from "@owlbear-rodeo/sdk";
 import { infoMetadataKey, itemMetadataKey, metadataKey } from "./variables.ts";
-import { AttachmentMetadata, HpTrackerMetadata, RoomMetadata, SceneMetadata } from "./types.ts";
+import { AttachmentMetadata, HpTrackerMetadata, InitialStatblockData, RoomMetadata, SceneMetadata } from "./types.ts";
 import { isObject } from "lodash";
 import { IRoll, IRoomParticipant } from "dddice-js";
 import { RollLogEntryType } from "../context/RollLogContext.tsx";
+import { TTRPG_URL } from "../config.ts";
+import axios from "axios";
+import diff_match_patch from "./diff/diff_match_patch.ts";
+import { E5Statblock } from "../ttrpgapi/e5/useE5Api.ts";
+import { PfStatblock } from "../ttrpgapi/pf/usePfApi.ts";
+import axiosRetry from "axios-retry";
 
 export const getYOffset = async (height: number) => {
     const metadata = (await OBR.room.getMetadata()) as Metadata;
@@ -232,4 +238,130 @@ export const dddiceRollToRollLog = async (
 
 export const getRoomDiceUser = (room: RoomMetadata | null, id: string | null) => {
     return room?.diceUser?.find((user) => user.playerId === id);
+};
+
+export const updateTokenSheet = (
+    slug: string,
+    bonus: number,
+    hp: number,
+    ac: number,
+    characterId: string,
+    ruleset: "e5" | "pf"
+) => {
+    OBR.scene.items.updateItems([characterId], (items) => {
+        items.forEach((item) => {
+            const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+            const newValues =
+                (data.stats.initial && data.sheet !== slug) ||
+                (data.hp === 0 && data.maxHp === 0 && data.armorClass === 0);
+            item.metadata[itemMetadataKey] = {
+                ...data,
+                sheet: slug,
+                ruleset: ruleset,
+                maxHp: newValues ? hp : data.hp,
+                armorClass: newValues ? ac : data.armorClass,
+                hp: newValues ? hp : data.hp,
+                stats: { ...data.stats, initiativeBonus: bonus, initial: false },
+            };
+        });
+    });
+};
+
+export const getInitialValues = async (items: Array<Item>) => {
+    const roomData = await OBR.room.getMetadata();
+    let ruleset = "e5";
+    let apiKey = undefined;
+    if (metadataKey in roomData) {
+        const room = roomData[metadataKey] as RoomMetadata;
+        ruleset = room.ruleset || "e5";
+        apiKey = room.tabletopAlmanacAPIKey;
+    }
+    const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
+    const itemInitValues: Record<string, InitialStatblockData> = {};
+
+    axiosRetry(axios, {
+        retries: 2,
+        retryDelay: (_) => 200,
+        retryCondition: (error) => error.message === "Network Error",
+    });
+
+    for (const item of items) {
+        try {
+            if (!(itemMetadataKey in item.metadata)) {
+                if (ruleset === "e5") {
+                    const statblocks = await axios.request({
+                        url: `${TTRPG_URL}/e5/statblock/search/`,
+                        method: "GET",
+                        headers: headers,
+                        params: {
+                            name: item.name,
+                            take: 10,
+                            skip: 0,
+                        },
+                    });
+                    let bestMatch: { distance: number; statblock: InitialStatblockData } | undefined = undefined;
+                    const diff = new diff_match_patch();
+                    statblocks.data.forEach((statblock: E5Statblock) => {
+                        const d = diff.diff_main(statblock.name, item.name);
+                        const dist = diff.diff_levenshtein(d);
+                        if (bestMatch === undefined || dist < bestMatch.distance) {
+                            bestMatch = {
+                                distance: dist,
+                                statblock: {
+                                    hp: statblock.hp.value,
+                                    ac: statblock.armor_class.value,
+                                    bonus: Math.floor((statblock.stats.dexterity - 10) / 2),
+                                    slug: statblock.slug,
+                                    ruleset: "e5",
+                                },
+                            };
+                        }
+                    });
+                    if (bestMatch !== undefined) {
+                        // @ts-ignore statblock exists on bestMatch;
+                        itemInitValues[item.id] = bestMatch.statblock;
+                    }
+                } else if (ruleset === "pf") {
+                    const statblocks = await axios.request({
+                        url: `${TTRPG_URL}/pf/statblock/search/`,
+                        method: "GET",
+                        headers: headers,
+                        params: {
+                            name: item.name,
+                            take: 10,
+                            skip: 0,
+                        },
+                    });
+                    let bestMatch: { distance: number; statblock: InitialStatblockData } | undefined = undefined;
+                    const diff = new diff_match_patch();
+                    statblocks.data.forEach((statblock: PfStatblock) => {
+                        const d = diff.diff_main(statblock.name, item.name);
+                        const dist = diff.diff_levenshtein(d);
+                        if (bestMatch === undefined || dist < bestMatch.distance) {
+                            bestMatch = {
+                                distance: dist,
+                                statblock: {
+                                    hp: statblock.hp.value,
+                                    ac: statblock.armor_class.value,
+                                    bonus: statblock.perception
+                                        ? parseInt(statblock.perception)
+                                        : statblock.skills && "perception" in statblock.skills
+                                        ? parseInt(statblock.skills["perception"] as string)
+                                        : 0,
+                                    slug: statblock.slug,
+                                    ruleset: "pf",
+                                },
+                            };
+                        }
+                    });
+                    if (bestMatch !== undefined) {
+                        // @ts-ignore statblock exists on bestMatch;
+                        itemInitValues[item.id] = bestMatch.statblock;
+                    }
+                }
+            }
+        } catch {}
+    }
+
+    return itemInitValues;
 };

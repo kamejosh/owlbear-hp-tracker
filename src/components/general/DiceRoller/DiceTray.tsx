@@ -50,7 +50,7 @@ export const DiceTray = (props: DiceTrayProps) => {
             //when turning off dice rendering we need to close the modal
             if (props.overlay && diceUser && (!diceUser.diceRendering || !!room?.disableDiceRoller)) {
                 OBR.modal.close(diceTrayModalId);
-            } else if (!room?.disableDiceRoller) {
+            } else if (!room?.disableDiceRoller && (props.overlay || diceUser?.apiKey)) {
                 initDice((diceUser && diceUser.diceRendering) || true);
             }
         }
