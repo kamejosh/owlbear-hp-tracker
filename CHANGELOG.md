@@ -10,7 +10,7 @@
 # 1.6.4
 
 + HP Tracker can be initialized without a scene
-+ Improve styling
++ Improve styling 
 
 # 1.6.3
 
