@@ -166,7 +166,6 @@ button,
 
         &:hover,
         &:focus {
-            overflow: hidden;
             svg {
                 animation: shaking 0.2s alternate linear infinite;
             }
