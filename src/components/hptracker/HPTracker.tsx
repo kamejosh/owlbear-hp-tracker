@@ -45,12 +45,6 @@ const Content = () => {
         );
         setTokens(initialItems);
 
-        console.log(
-            playerContext.role === "GM",
-            !room?.ignoreUpdateNotification,
-            scene?.version,
-            compare(scene?.version as string, version, "<")
-        );
         if (
             playerContext.role === "GM" &&
             !room?.ignoreUpdateNotification &&
