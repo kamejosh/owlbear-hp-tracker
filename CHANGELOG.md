@@ -1,3 +1,7 @@
+# 2.0.1
+
++ Fix mobile browsers show an overlay background
+
 # 2.0.0
 
 **Custom Statblocks are finally here register now at [tabletop-almanac.com](https://tabletop-almanac.com)** 
