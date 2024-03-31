@@ -1,6 +1,7 @@
 # 2.0.1
 
 + Fix mobile browsers show an overlay background
++ Fix mobile styling of header
 
 # 2.0.0
 

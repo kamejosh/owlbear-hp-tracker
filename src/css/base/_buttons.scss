@@ -1,3 +1,5 @@
+@use "../utilities/breakpoint";
+
 button,
 .button {
     cursor: pointer;
@@ -15,6 +17,41 @@ button,
     grid-template-columns: repeat(5, 25px);
     grid-auto-flow: row;
     gap: 0.5ch;
+
+    @include breakpoint.mobile-and-tablet-only {
+        grid-template-columns: repeat(8, 25px);
+        grid-template-areas:
+            "statblock settings patreon discord changelog help ta ta"
+            ". . . . . . ta ta";
+
+        .tabletop-almanac-button {
+            grid-area: ta;
+        }
+
+        .patreon-button {
+            grid-area: patreon;
+        }
+
+        .statblock-button {
+            grid-area: statblock;
+        }
+
+        .settings-button {
+            grid-area: settings;
+        }
+
+        .discord-button {
+            grid-area: discord;
+        }
+
+        .change-log-button {
+            grid-area: changelog;
+        }
+
+        .help-button {
+            grid-area: help;
+        }
+    }
 
     .statblock-button {
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 -960 960 960' width='24'%3E%3Cpath d='M320-240h320v-80H320v80Zm0-160h320v-80H320v80ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z' fill='%23dddddd'/%3E%3C/svg%3E");
