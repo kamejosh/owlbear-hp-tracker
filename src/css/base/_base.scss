@@ -36,12 +36,6 @@ body {
         background-color: rgba(255, 255, 255, 0.5);
     }
 
-    &:not(:has(.overlay)) {
-        &::after {
-            background: var(--bg-color);
-        }
-    }
-
     &:not(:has(.roll-log-popover, .modal-wrapper, .modal-app)) {
         &::after {
             background: linear-gradient(to bottom, var(--bg-color) 85%, var(--bg-color-light));
