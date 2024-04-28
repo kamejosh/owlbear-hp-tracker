@@ -11,7 +11,7 @@ type RollLogEntryProps = {
 };
 
 export const RollLog = () => {
-    const { log } = useRollLogContext();
+    const log = useRollLogContext((state) => state.log);
 
     return (
         <ul className={"roll-log"}>

@@ -1,5 +1,6 @@
+import { createStore } from "zustand/vanilla";
 import { ITheme, ThreeDDice, ThreeDDiceAPI } from "dddice-js";
-import { create } from "zustand";
+import { useStore } from "zustand";
 
 export type DiceRoller = {
     roller: ThreeDDice;
@@ -11,7 +12,7 @@ export type DiceRoller = {
     setTheme: (theme: ITheme | null) => void;
 };
 
-export const useDiceRoller = create<DiceRoller>()((set) => ({
+export const diceRollerStore = createStore<DiceRoller>()((set) => ({
     roller: new ThreeDDice(),
     rollerApi: null,
     setRollerApi: (api) => set(() => ({ rollerApi: api })),
@@ -28,3 +29,9 @@ export const useDiceRoller = create<DiceRoller>()((set) => ({
             return state;
         }),
 }));
+
+export function useDiceRoller(): DiceRoller;
+export function useDiceRoller<T>(selector: (state: DiceRoller) => T): T;
+export function useDiceRoller<T>(selector?: (state: DiceRoller) => T) {
+    return useStore(diceRollerStore, selector!);
+}

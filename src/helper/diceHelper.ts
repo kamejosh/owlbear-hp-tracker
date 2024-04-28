@@ -13,7 +13,7 @@ import {
     ThreeDDiceRollEvent,
 } from "dddice-js";
 import { RollLogEntryType } from "../context/RollLogContext.tsx";
-import { rollLogPopover, rollLogPopoverId } from "./variables.ts";
+import { diceTrayModal, rollLogPopover, rollLogPopoverId } from "./variables.ts";
 
 let rollLogTimeOut: number;
 
@@ -92,18 +92,21 @@ export const getApiKey = async (room: RoomMetadata | null) => {
     const roomMetadata = await OBR.room.getMetadata();
     const playerId = await OBR.player.getId();
     let apiKey: string | undefined;
+    let updateKey: boolean = false;
 
     if (`com.dddice/${playerId}` in roomMetadata) {
         apiKey = roomMetadata[`com.dddice/${playerId}`] as string;
+        updateKey = true;
     } else {
         apiKey = room?.diceUser?.find((user) => user.playerId === playerId)?.apiKey;
     }
 
     if (!apiKey) {
         apiKey = (await new ThreeDDiceAPI(undefined, "HP Tracker").user.guest()).data;
+        updateKey = true;
     }
 
-    if (room) {
+    if (room && updateKey) {
         await updateRoomMetadataDiceUser(room, playerId, { apiKey: apiKey });
     }
 
@@ -161,30 +164,21 @@ export const prepareRoomUser = async (diceRoom: IRoom, rollerApi: ThreeDDiceAPI)
     }
 };
 
-const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => void, component: string | undefined) => {
+const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => void) => {
     const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
-    const name = await OBR.player.getName();
     const rollLogEntry = await dddiceRollToRollLog(e, { participant: participant });
 
-    if (
-        participant &&
-        (participant.username !== name || (e.external_id !== "action_window" && e.external_id !== "statblock_popover"))
-    ) {
-        addRoll(rollLogEntry);
+    addRoll(rollLogEntry);
+
+    await OBR.popover.open(rollLogPopover);
+
+    if (rollLogTimeOut) {
+        clearTimeout(rollLogTimeOut);
     }
 
-    // only the action window triggers the popover or notification because it always exists
-    if (component === "modal" || component === "action_window") {
-        await OBR.popover.open(rollLogPopover);
-
-        if (rollLogTimeOut) {
-            clearTimeout(rollLogTimeOut);
-        }
-
-        rollLogTimeOut = setTimeout(async () => {
-            await OBR.popover.close(rollLogPopoverId);
-        }, 5000);
-    }
+    rollLogTimeOut = setTimeout(async () => {
+        await OBR.popover.close(rollLogPopoverId);
+    }, 5000);
 };
 
 export const addRollerCallbacks = async (
@@ -192,7 +186,14 @@ export const addRollerCallbacks = async (
     addRoll: (entry: RollLogEntryType) => void,
     component: string | undefined
 ) => {
-    roller.on(ThreeDDiceRollEvent.RollFinished, (e) => rollerCallback(e, addRoll, component));
+    // roller.on(ThreeDDiceRollEvent.RollFinished, (e) => rollerCallback(e, addRoll, component));
+};
+
+export const addRollerBackgroundCallbacks = async (
+    rollerApi: ThreeDDiceAPI,
+    addRoll: (entry: RollLogEntryType) => void
+) => {
+    rollerApi.listen(ThreeDDiceRollEvent.RollCreated, (e) => rollerCallback(e, addRoll));
 };
 
 export const addRollerApiCallbacks = async (
@@ -200,7 +201,7 @@ export const addRollerApiCallbacks = async (
     addRoll: (entry: RollLogEntryType) => void,
     component: string | undefined
 ) => {
-    rollerApi.listen(ThreeDDiceRollEvent.RollCreated, (e) => rollerCallback(e, addRoll, component));
+    // rollerApi.listen(ThreeDDiceRollEvent.RollCreated, (e) => rollerCallback(e, addRoll, component));
 };
 
 export const removeRollerCallbacks = (roller: ThreeDDice) => {

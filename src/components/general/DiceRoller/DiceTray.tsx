@@ -21,9 +21,9 @@ export const DiceTray = (props: DiceTrayProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const { roller, setRollerApi, setInitialized, theme, setTheme } = useDiceRoller();
     const playerContext = usePlayerContext();
-    const { addRoll } = useRollLogContext();
-    const { room } = useMetadataContext();
-    const { component } = useComponentContext();
+    const addRoll = useRollLogContext((state) => state.addRoll);
+    const room = useMetadataContext((state) => state.room);
+    const component = useComponentContext((state) => state.component);
     const [diceUser, setDiceUser] = useState<DiceUser>();
 
     useEffect(() => {
@@ -59,18 +59,12 @@ export const DiceTray = (props: DiceTrayProps) => {
     const initDice = async (diceRendering: boolean = true) => {
         let api: ThreeDDiceAPI | undefined = undefined;
         setInitialized(false);
-        if (props.overlay && canvasRef.current) {
-            const success = await dddiceLogin(room, roller, canvasRef.current);
-            if (success) {
-                await addRollerCallbacks(roller, addRoll, component);
-            }
-        } else {
-            api = await dddiceApiLogin(room);
-            if (api) {
-                setRollerApi(api);
-                if (!diceRendering) {
-                    await addRollerApiCallbacks(api, addRoll, component);
-                }
+
+        api = await dddiceApiLogin(room);
+        if (api) {
+            setRollerApi(api);
+            if (!diceRendering) {
+                await addRollerApiCallbacks(api, addRoll, component);
             }
         }
 

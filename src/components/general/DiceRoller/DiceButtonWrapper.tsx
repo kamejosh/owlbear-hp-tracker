@@ -1,9 +1,7 @@
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { IDiceRoll, Operator } from "dddice-js";
 import { DiceSvg } from "../../svgs/DiceSvg.tsx";
-import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
-import { dddiceRollToRollLog } from "../../../helper/helpers.ts";
 import { useComponentContext } from "../../../context/ComponentContext.tsx";
 import { useEffect, useRef, useState } from "react";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
@@ -16,10 +14,9 @@ type DiceButtonProps = {
     context: string;
 };
 export const DiceButton = (props: DiceButtonProps) => {
-    const { addRoll } = useRollLogContext();
-    const { room } = useMetadataContext();
-    const { rollerApi, initialized } = useDiceRoller();
-    const { component } = useComponentContext();
+    const room = useMetadataContext((state) => state.room);
+    const [rollerApi, initialized] = useDiceRoller((state) => [state.rollerApi, state.initialized]);
+    const component = useComponentContext((state) => state.component);
     const [context, setContext] = useState<boolean>(false);
     const [tooltip, setTooltip] = useState<Instance>();
     const rollButton = useRef<HTMLButtonElement>(null);
@@ -92,16 +89,12 @@ export const DiceButton = (props: DiceButtonProps) => {
             }
             if (parsed) {
                 try {
-                    const roll = await rollerApi?.roll.create(parsed.dice, {
+                    await rollerApi?.roll.create(parsed.dice, {
                         label: props.context,
                         operator: parsed.operator,
                         external_id: component,
                         whisper: modifier === "SELF" ? await getUserUuid() : undefined,
                     });
-                    if (roll && roll.data) {
-                        const data = roll.data;
-                        addRoll(await dddiceRollToRollLog(data, { owlbear_user_id: playerContext.id || undefined }));
-                    }
                 } catch {
                     console.warn("error in dice roll", parsed.dice, parsed.operator, component);
                 }

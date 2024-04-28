@@ -1,8 +1,9 @@
-import { create, StateCreator } from "zustand";
-import { persist } from "zustand/middleware";
+import { useStore } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 import { ID } from "../helper/variables.ts";
 import { IRollValue, IRollValueImage } from "dddice-js";
 import { withStorageDOMEvents } from "../helper/hooks.ts";
+import { createStore } from "zustand/vanilla";
 
 export type RollLogEntryType = {
     uuid: string;
@@ -21,23 +22,37 @@ export type RollLogContextType = {
     clear: () => void;
 };
 
-const rollLogSlice: StateCreator<RollLogContextType, [["zustand/persist", unknown]]> = (set) => ({
-    log: [],
-    addRoll: (roll) =>
-        set((state) => {
-            state.log.push(roll);
-            return { ...state };
+export const rollLogStore = createStore<RollLogContextType>()(
+    persist(
+        (set) => ({
+            log: [],
+            addRoll: (roll) =>
+                set((state) => {
+                    state.log.push(roll);
+                    if (state.log.length > 100) {
+                        state.log.splice(0, state.log.length - 100);
+                    }
+                    window.dispatchEvent(new StorageEvent("storage", { newValue: "new roll", key: `${ID}.roll-log` }));
+                    return { ...state };
+                }),
+            clear: () => {
+                set(() => {
+                    window.dispatchEvent(new StorageEvent("storage", { newValue: "clear", key: `${ID}.roll-log` }));
+                    return { log: [] };
+                });
+            },
         }),
-    clear: () => {
-        set(() => {
-            return { log: [] };
-        });
-    },
-});
-export const useRollLogContext = create<RollLogContextType>()(
-    persist(rollLogSlice, {
-        name: `${ID}.roll-log`,
-    })
+        {
+            name: `${ID}.roll-log`,
+            storage: createJSONStorage(() => localStorage),
+        }
+    )
 );
 
-withStorageDOMEvents(useRollLogContext);
+export function useRollLogContext(): RollLogContextType;
+export function useRollLogContext<T>(selector: (state: RollLogContextType) => T): T;
+export function useRollLogContext<T>(selector?: (state: RollLogContextType) => T) {
+    return useStore(rollLogStore, selector!);
+}
+
+withStorageDOMEvents(rollLogStore);
