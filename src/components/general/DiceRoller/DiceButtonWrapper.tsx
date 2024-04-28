@@ -72,7 +72,7 @@ export const DiceButton = (props: DiceButtonProps) => {
             baseDie += `+${props.dice.split("+").pop()}`;
         }
         if (originalDie.includes("-")) {
-            baseDie += `+${props.dice.split("-").pop()}`;
+            baseDie += `-${props.dice.split("-").pop()}`;
         }
         return baseDie;
     };

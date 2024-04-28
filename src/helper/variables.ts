@@ -11,7 +11,7 @@ export const diceTrayModalId = `${ID}/diceTrayModal`;
 export const statblockPopoverId = `${ID}/statblock-popover`;
 export const rollLogPopoverId = `${ID}/dice-log`;
 
-export const version = "2.0.1";
+export const version = "2.0.2";
 
 export const changelogModal: Modal = {
     id: modalId,

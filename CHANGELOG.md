@@ -1,3 +1,7 @@
+# 2.0.2
+
++ Fix Disadvantage rolls add a negative modifier with a "+".
+
 # 2.0.1
 
 + Fix mobile browsers show an overlay background
