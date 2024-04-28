@@ -5,9 +5,14 @@ import OBR from "@owlbear-rodeo/sdk";
 import { modalId } from "../../helper/variables.ts";
 import { Settings } from "./Components/Settings.tsx";
 import { DiceLogin } from "./Components/DiceLogin.tsx";
+import { DiceCanvas } from "../general/DiceRoller/DiceCanvas.tsx";
 
 export const Modal = () => {
-    return (
+    const content = new URLSearchParams(window.location.search).get("content") ?? null;
+
+    return content === "dicetray" ? (
+        <DiceCanvas />
+    ) : (
         <ContextWrapper component={"modal"}>
             <Content />
         </ContextWrapper>

@@ -5,7 +5,7 @@ import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useComponentContext } from "../../../context/ComponentContext.tsx";
 import { useEffect, useRef, useState } from "react";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
-import { diceToRoll } from "../../../helper/diceHelper.ts";
+import { diceToRoll, rollWrapper } from "../../../helper/diceHelper.ts";
 import tippy, { Instance } from "tippy.js";
 
 type DiceButtonProps = {
@@ -87,9 +87,9 @@ export const DiceButton = (props: DiceButtonProps) => {
             } else {
                 parsed = diceToRoll(props.dice, theme);
             }
-            if (parsed) {
+            if (parsed && rollerApi) {
                 try {
-                    await rollerApi?.roll.create(parsed.dice, {
+                    await rollWrapper(rollerApi, parsed.dice, {
                         label: props.context,
                         operator: parsed.operator,
                         external_id: component,

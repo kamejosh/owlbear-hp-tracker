@@ -1,10 +1,10 @@
 import OBR, { Metadata } from "@owlbear-rodeo/sdk";
-import { metadataKey } from "../helper/variables.ts";
+import { diceTrayModal, diceTrayModalId, metadataKey } from "../helper/variables.ts";
 import { DiceUser, RoomMetadata } from "../helper/types.ts";
 import { getRoomDiceUser } from "../helper/helpers.ts";
 import { AsyncLock } from "../helper/AsyncLock.ts";
 import { ThreeDDiceAPI } from "dddice-js";
-import { addRollerBackgroundCallbacks, dddiceApiLogin } from "../helper/diceHelper.ts";
+import { addRollerApiCallbacks, dddiceApiLogin } from "../helper/diceHelper.ts";
 import { rollLogStore } from "../context/RollLogContext.tsx";
 
 const lock = new AsyncLock();
@@ -17,8 +17,13 @@ const initDice = async (room: RoomMetadata) => {
     let api: ThreeDDiceAPI | undefined = undefined;
 
     api = await dddiceApiLogin(room);
-    if (api) {
-        await addRollerBackgroundCallbacks(api, rollLogStore.getState().addRoll);
+    if (api && !diceRollerState.diceUser?.diceRendering) {
+        await addRollerApiCallbacks(api, rollLogStore.getState().addRoll);
+    }
+    if (diceRollerState.diceUser?.diceRendering) {
+        await OBR.modal.open(diceTrayModal);
+    } else {
+        await OBR.modal.close(diceTrayModalId);
     }
 };
 
@@ -26,6 +31,8 @@ const initDiceRoller = async (room: RoomMetadata) => {
     if ((diceRollerState.diceUser && diceRollerState.diceUser.apiKey !== undefined) || !diceRollerState.diceUser) {
         if (!room?.disableDiceRoller) {
             await initDice(room);
+        } else {
+            await OBR.modal.close(diceTrayModalId);
         }
     }
 };
@@ -36,7 +43,7 @@ const roomCallback = async (metadata: Metadata) => {
     const roomData = metadataKey in metadata ? (metadata[metadataKey] as RoomMetadata) : null;
     let initialized: boolean = false;
     const reInitialize: boolean = diceRollerState.disableDiceRoller !== roomData?.disableDiceRoller;
-    diceRollerState.disableDiceRoller = roomData?.disableDiceRoller || true;
+    diceRollerState.disableDiceRoller = roomData?.disableDiceRoller === undefined ? false : roomData.disableDiceRoller;
 
     if (roomData) {
         const newDiceUser = getRoomDiceUser(roomData, OBR.player.id);

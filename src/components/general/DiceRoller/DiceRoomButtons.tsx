@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { IAvailableDie, IDiceRoll, IDieType, Operator, parseRollEquation } from "dddice-js";
 import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { AddSvg } from "../../svgs/AddSvg.tsx";
-import { diceToRoll, getDiceParticipant } from "../../../helper/diceHelper.ts";
+import { diceToRoll, getDiceParticipant, rollWrapper } from "../../../helper/diceHelper.ts";
 import { useComponentContext } from "../../../context/ComponentContext.tsx";
 import tippy, { Instance } from "tippy.js";
 import { RollLogSvg } from "../../svgs/RollLogSvg.tsx";
@@ -87,8 +87,8 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                 props.dice,
                 theme.id
             );
-            if (parsed) {
-                await rollerApi?.roll.create(parsed.dice, {
+            if (parsed && rollerApi) {
+                await rollWrapper(rollerApi, parsed.dice, {
                     operator: parsed.operator,
                     external_id: component,
                     label: "Roll: Custom",
@@ -220,8 +220,8 @@ const QuickButtons = ({ open }: { open: boolean }) => {
         element.classList.add("rolling");
         if (theme && dice) {
             let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined = diceToRoll(dice, theme.id);
-            if (parsed) {
-                await rollerApi?.roll.create(parsed.dice, {
+            if (parsed && rollerApi) {
+                await rollWrapper(rollerApi, parsed.dice, {
                     operator: parsed.operator,
                     external_id: component,
                     label: "Roll: Custom",

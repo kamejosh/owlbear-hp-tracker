@@ -3,6 +3,7 @@ import { dddiceRollToRollLog, updateRoomMetadata } from "./helpers.ts";
 import OBR from "@owlbear-rodeo/sdk";
 import {
     IDiceRoll,
+    IDiceRollOptions,
     IRoll,
     IRoom,
     IUser,
@@ -165,6 +166,7 @@ export const prepareRoomUser = async (diceRoom: IRoom, rollerApi: ThreeDDiceAPI)
 };
 
 const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => void) => {
+    console.log("callback");
     const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
 
     const rollLogEntry = await dddiceRollToRollLog(e, { participant: participant });
@@ -182,64 +184,16 @@ const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => vo
     }, 5000);
 };
 
-export const addRollerBackgroundCallbacks = async (
-    rollerApi: ThreeDDiceAPI,
-    addRoll: (entry: RollLogEntryType) => void
-) => {
-    rollerApi.listen(ThreeDDiceRollEvent.RollCreated, (e) => rollerCallback(e, addRoll));
+export const addRollerCallbacks = async (roller: ThreeDDice, addRoll: (entry: RollLogEntryType) => void) => {
+    roller.on(ThreeDDiceRollEvent.RollFinished, (e) => rollerCallback(e, addRoll));
 };
 
-export const removeRollerCallbacks = (roller: ThreeDDice) => {
-    roller.off(ThreeDDiceRollEvent.RollStarted);
-    roller.off(ThreeDDiceRollEvent.RollCreated);
+export const addRollerApiCallbacks = async (roller: ThreeDDiceAPI, addRoll: (entry: RollLogEntryType) => void) => {
+    roller.listen(ThreeDDiceRollEvent.RollCreated, (e) => rollerCallback(e, addRoll));
 };
 
-export const dddiceLogin = async (room: RoomMetadata | null, roller: ThreeDDice, canvas: HTMLCanvasElement) => {
-    if (roller.api) {
-        try {
-            const diceUser = await getDiceUser(roller.api);
-            const participant = await getDiceParticipant(roller.api, room?.diceRoom?.slug, diceUser);
-
-            if (diceUser && participant && room?.diceRoom?.slug) {
-                roller.api?.room.leave(room.diceRoom.slug, participant.id.toString());
-                removeRollerCallbacks(roller);
-            }
-        } catch {}
-    }
-
-    try {
-        roller.initialize(canvas, await getApiKey(room), { autoClear: 3 }, `HP Tracker`);
-        if (roller.api) {
-            const diceRoom = await getDiceRoom(roller.api, room);
-            if (diceRoom) {
-                const user = (await roller.api?.user.get())?.data;
-                if (user) {
-                    const participant = diceRoom.participants.find((p) => p.user.uuid === user.uuid);
-                    if (participant) {
-                        await prepareRoomUser(diceRoom, roller.api);
-                    } else {
-                        try {
-                            const userDiceRoom = (await roller?.api?.room.join(diceRoom.slug, diceRoom.passcode))?.data;
-                            if (userDiceRoom) {
-                                await prepareRoomUser(userDiceRoom, roller.api);
-                            }
-                        } catch {
-                            /**
-                             * if we already joined. We already check that when
-                             * looking if the user is a participant in the room,
-                             * but better be safe than sorry
-                             */
-                        }
-                    }
-                    roller.connect(diceRoom.slug, diceRoom.passcode, user.uuid);
-                }
-            }
-            return true;
-        }
-    } catch (e) {
-        console.warn(e);
-        return false;
-    }
+export const removeRollerApiCallbacks = async (roller: ThreeDDiceAPI) => {
+    roller;
 };
 
 export const dddiceApiLogin = async (room: RoomMetadata | null) => {
@@ -322,4 +276,12 @@ export const diceToRoll = (diceString: string, theme: string) => {
         console.warn("found dice string that could not be parsed", diceString);
     }
     return { dice, operator };
+};
+
+export const rollWrapper = async (api: ThreeDDiceAPI, dice: Array<IDiceRoll>, options?: Partial<IDiceRollOptions>) => {
+    // await OBR.modal.open(diceTrayModal);
+    const roll = await api.roll.create(dice, options);
+    if (roll && roll.data) {
+        return roll.data;
+    }
 };
