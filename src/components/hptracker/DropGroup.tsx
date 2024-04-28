@@ -17,9 +17,8 @@ import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { useDiceRoller } from "../../context/DDDiceContext.tsx";
 import { IDiceRoll, IRoll, Operator } from "dddice-js";
 import { diceToRoll } from "../../helper/diceHelper.ts";
-import { dddiceRollToRollLog, getRoomDiceUser } from "../../helper/helpers.ts";
+import { getRoomDiceUser } from "../../helper/helpers.ts";
 import { useComponentContext } from "../../context/ComponentContext.tsx";
-import { useRollLogContext } from "../../context/RollLogContext.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 
 type DropGroupProps = {
@@ -32,7 +31,6 @@ type DropGroupProps = {
 export const DropGroup = (props: DropGroupProps) => {
     const { room, scene } = useMetadataContext();
     const { component } = useComponentContext();
-    const { addRoll } = useRollLogContext();
     const { rollerApi, initialized, theme } = useDiceRoller();
     const playerContext = usePlayerContext();
 
@@ -54,17 +52,11 @@ export const DropGroup = (props: DropGroupProps) => {
         if (theme) {
             let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined = diceToRoll(dice, theme.id);
             if (parsed) {
-                const roll = await rollerApi?.roll.create(parsed.dice, {
+                await rollerApi?.roll.create(parsed.dice, {
                     operator: parsed.operator,
                     external_id: component,
                     label: "Initiative: Roll",
                 });
-                if (roll && roll.data) {
-                    const data = roll.data;
-                    addRoll(await dddiceRollToRollLog(data, { owlbear_user_id: OBR.player.id || undefined }));
-                    button.classList.remove("rolling");
-                    return data;
-                }
             }
         }
         button.classList.remove("rolling");
@@ -75,7 +67,7 @@ export const DropGroup = (props: DropGroupProps) => {
         let rollData: IRoll | undefined;
         const id = OBR.player.id;
         if (getRoomDiceUser(room, id)?.diceRendering && !room?.disableDiceRoller) {
-            rollData = await roll(button, `${props.list.length}d${room?.initiativeDice ?? 20}`);
+            await roll(button, `${props.list.length}d${room?.initiativeDice ?? 20}`);
         }
         await OBR.scene.items.updateItems(props.list, (items) => {
             items.forEach((item, index) => {

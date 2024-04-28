@@ -212,16 +212,18 @@ export const dddiceRollToRollLog = async (
     options?: { participant?: IRoomParticipant; owlbear_user_id?: string }
 ): Promise<RollLogEntryType> => {
     let username = roll.user.username;
+    let participantName = "";
+    if (options && options.participant && options.participant.username) {
+        participantName = options.participant.username;
+    } else {
+        const particip = roll.room.participants.find((p) => p.user.uuid === roll.user.uuid);
+        if (particip && particip.username) {
+            participantName = particip.username;
+        }
+    }
 
     if (roll.user.name === "Guest User") {
-        if (options && options.participant && options.participant.username) {
-            username = options.participant.username;
-        } else {
-            const particip = roll.room.participants.find((p) => p.user.uuid === roll.user.uuid);
-            if (particip && particip.username) {
-                username = particip.username;
-            }
-        }
+        username = participantName;
     }
 
     return {
@@ -233,6 +235,7 @@ export const dddiceRollToRollLog = async (
         username: username,
         values: roll.values,
         owlbear_user_id: options?.owlbear_user_id,
+        participantUsername: participantName,
     };
 };
 

@@ -13,7 +13,7 @@ import {
     ThreeDDiceRollEvent,
 } from "dddice-js";
 import { RollLogEntryType } from "../context/RollLogContext.tsx";
-import { diceTrayModal, rollLogPopover, rollLogPopoverId } from "./variables.ts";
+import { rollLogPopover, rollLogPopoverId } from "./variables.ts";
 
 let rollLogTimeOut: number;
 
@@ -166,6 +166,7 @@ export const prepareRoomUser = async (diceRoom: IRoom, rollerApi: ThreeDDiceAPI)
 
 const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => void) => {
     const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
+
     const rollLogEntry = await dddiceRollToRollLog(e, { participant: participant });
 
     addRoll(rollLogEntry);
@@ -181,27 +182,11 @@ const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => vo
     }, 5000);
 };
 
-export const addRollerCallbacks = async (
-    roller: ThreeDDice,
-    addRoll: (entry: RollLogEntryType) => void,
-    component: string | undefined
-) => {
-    // roller.on(ThreeDDiceRollEvent.RollFinished, (e) => rollerCallback(e, addRoll, component));
-};
-
 export const addRollerBackgroundCallbacks = async (
     rollerApi: ThreeDDiceAPI,
     addRoll: (entry: RollLogEntryType) => void
 ) => {
     rollerApi.listen(ThreeDDiceRollEvent.RollCreated, (e) => rollerCallback(e, addRoll));
-};
-
-export const addRollerApiCallbacks = async (
-    rollerApi: ThreeDDiceAPI,
-    addRoll: (entry: RollLogEntryType) => void,
-    component: string | undefined
-) => {
-    // rollerApi.listen(ThreeDDiceRollEvent.RollCreated, (e) => rollerCallback(e, addRoll, component));
 };
 
 export const removeRollerCallbacks = (roller: ThreeDDice) => {
@@ -258,35 +243,31 @@ export const dddiceLogin = async (room: RoomMetadata | null, roller: ThreeDDice,
 };
 
 export const dddiceApiLogin = async (room: RoomMetadata | null) => {
-    try {
-        const rollerApi = new ThreeDDiceAPI(await getApiKey(room), "HP Tracker");
-        const diceRoom = await getDiceRoom(rollerApi, room);
-        if (diceRoom) {
-            const user = (await rollerApi.user.get())?.data;
-            if (user) {
-                const participant = diceRoom.participants.find((p) => p.user.uuid === user.uuid);
-                if (participant) {
-                    await prepareRoomUser(diceRoom, rollerApi);
-                } else {
-                    try {
-                        const userDiceRoom = (await rollerApi?.room.join(diceRoom.slug, diceRoom.passcode))?.data;
-                        if (userDiceRoom) {
-                            await prepareRoomUser(userDiceRoom, rollerApi);
-                        }
-                    } catch {
-                        /**
-                         * if we already joined. We already check that when
-                         * looking if the user is a participant in the room,
-                         * but better be safe than sorry
-                         */
+    const rollerApi = new ThreeDDiceAPI(await getApiKey(room), "HP Tracker");
+    const diceRoom = await getDiceRoom(rollerApi, room);
+    if (diceRoom) {
+        const user = (await rollerApi.user.get())?.data;
+        if (user) {
+            const participant = diceRoom.participants.find((p) => p.user.uuid === user.uuid);
+            if (participant) {
+                await prepareRoomUser(diceRoom, rollerApi);
+            } else {
+                try {
+                    const userDiceRoom = (await rollerApi?.room.join(diceRoom.slug, diceRoom.passcode))?.data;
+                    if (userDiceRoom) {
+                        await prepareRoomUser(userDiceRoom, rollerApi);
                     }
+                } catch (e) {
+                    console.warn(e);
+                    /**
+                     * if we already joined. We already check that when
+                     * looking if the user is a participant in the room,
+                     * but better be safe than sorry
+                     */
                 }
-                return rollerApi.connect(diceRoom.slug, diceRoom.passcode, user.uuid);
             }
+            return rollerApi.connect(diceRoom.slug, diceRoom.passcode, user.uuid);
         }
-    } catch (e) {
-        console.warn(e);
-        return undefined;
     }
 };
 

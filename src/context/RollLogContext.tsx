@@ -13,6 +13,7 @@ export type RollLogEntryType = {
     total_value: string | Array<string | IRollValueImage>;
     username: string;
     owlbear_user_id?: string;
+    participantUsername?: string;
     values: Array<IRollValue>;
 };
 
@@ -28,11 +29,15 @@ export const rollLogStore = createStore<RollLogContextType>()(
             log: [],
             addRoll: (roll) =>
                 set((state) => {
-                    state.log.push(roll);
-                    if (state.log.length > 100) {
-                        state.log.splice(0, state.log.length - 100);
+                    if (!state.log.find((r) => r.uuid === roll.uuid)) {
+                        state.log.push(roll);
+                        if (state.log.length > 100) {
+                            state.log.splice(0, state.log.length - 100);
+                        }
+                        window.dispatchEvent(
+                            new StorageEvent("storage", { newValue: "new roll", key: `${ID}.roll-log` })
+                        );
                     }
-                    window.dispatchEvent(new StorageEvent("storage", { newValue: "new roll", key: `${ID}.roll-log` }));
                     return { ...state };
                 }),
             clear: () => {

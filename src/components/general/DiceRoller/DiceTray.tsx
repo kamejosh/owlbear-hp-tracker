@@ -2,9 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { DiceRoom } from "./DiceRoom.tsx";
-import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
-import { addRollerApiCallbacks, addRollerCallbacks, dddiceApiLogin, dddiceLogin } from "../../../helper/diceHelper.ts";
+import { dddiceApiLogin } from "../../../helper/diceHelper.ts";
 import { useComponentContext } from "../../../context/ComponentContext.tsx";
 import { ThreeDDiceAPI } from "dddice-js";
 import { DiceUser } from "../../../helper/types.ts";
@@ -21,7 +20,6 @@ export const DiceTray = (props: DiceTrayProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const { roller, setRollerApi, setInitialized, theme, setTheme } = useDiceRoller();
     const playerContext = usePlayerContext();
-    const addRoll = useRollLogContext((state) => state.addRoll);
     const room = useMetadataContext((state) => state.room);
     const component = useComponentContext((state) => state.component);
     const [diceUser, setDiceUser] = useState<DiceUser>();
@@ -64,7 +62,7 @@ export const DiceTray = (props: DiceTrayProps) => {
         if (api) {
             setRollerApi(api);
             if (!diceRendering) {
-                await addRollerApiCallbacks(api, addRoll, component);
+                // await addRollerApiCallbacks(api, addRoll, component);
             }
         }
 
