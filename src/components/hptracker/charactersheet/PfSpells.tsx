@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { DiceButton, DiceButtonWrapper } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { getDamage } from "../../../helper/helpers.ts";
-import { PfSpell, usePfGetSpell } from "../../../ttrpgapi/pf/usePfApi.ts";
-import { components } from "../../../ttrpgapi/schema";
+import { PfSpell, usePfGetSpell } from "../../../api/pf/usePfApi.ts";
+import { components } from "../../../api/schema";
 import { SpellFilter } from "./SpellFilter.tsx";
 import { capitalize } from "lodash";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";

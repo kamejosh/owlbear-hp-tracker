@@ -7,8 +7,8 @@ import { RollLogEntryType } from "../context/RollLogContext.tsx";
 import { TTRPG_URL } from "../config.ts";
 import axios from "axios";
 import diff_match_patch from "./diff/diff_match_patch.ts";
-import { E5Statblock } from "../ttrpgapi/e5/useE5Api.ts";
-import { PfStatblock } from "../ttrpgapi/pf/usePfApi.ts";
+import { E5Statblock } from "../api/e5/useE5Api.ts";
+import { PfStatblock } from "../api/pf/usePfApi.ts";
 import axiosRetry from "axios-retry";
 
 export const getYOffset = async (height: number) => {

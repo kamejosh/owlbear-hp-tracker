@@ -9,7 +9,6 @@ import {
     IUser,
     Operator,
     parseRollEquation,
-    ThreeDDice,
     ThreeDDiceAPI,
     ThreeDDiceRollEvent,
 } from "dddice-js";
@@ -92,14 +91,12 @@ export const getDiceParticipant = async (rollerApi: ThreeDDiceAPI, roomSlug: str
 export const getApiKey = async (room: RoomMetadata | null) => {
     const roomMetadata = await OBR.room.getMetadata();
     const playerId = await OBR.player.getId();
-    let apiKey: string | undefined;
+    let apiKey: string | undefined = room?.diceUser?.find((user) => user.playerId === playerId)?.apiKey;
     let updateKey: boolean = false;
 
-    if (`com.dddice/${playerId}` in roomMetadata) {
+    if (!apiKey && `com.dddice/${playerId}` in roomMetadata) {
         apiKey = roomMetadata[`com.dddice/${playerId}`] as string;
         updateKey = true;
-    } else {
-        apiKey = room?.diceUser?.find((user) => user.playerId === playerId)?.apiKey;
     }
 
     if (!apiKey) {
@@ -166,7 +163,6 @@ export const prepareRoomUser = async (diceRoom: IRoom, rollerApi: ThreeDDiceAPI)
 };
 
 const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => void) => {
-    console.log("callback");
     const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
 
     const rollLogEntry = await dddiceRollToRollLog(e, { participant: participant });
@@ -184,16 +180,8 @@ const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => vo
     }, 5000);
 };
 
-export const addRollerCallbacks = async (roller: ThreeDDice, addRoll: (entry: RollLogEntryType) => void) => {
-    roller.on(ThreeDDiceRollEvent.RollFinished, (e) => rollerCallback(e, addRoll));
-};
-
 export const addRollerApiCallbacks = async (roller: ThreeDDiceAPI, addRoll: (entry: RollLogEntryType) => void) => {
     roller.listen(ThreeDDiceRollEvent.RollCreated, (e) => rollerCallback(e, addRoll));
-};
-
-export const removeRollerApiCallbacks = async (roller: ThreeDDiceAPI) => {
-    roller;
 };
 
 export const dddiceApiLogin = async (room: RoomMetadata | null) => {

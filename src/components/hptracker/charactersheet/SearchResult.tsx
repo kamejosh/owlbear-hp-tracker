@@ -1,7 +1,7 @@
 import { useCharSheet } from "../../../context/CharacterContext.ts";
 import { Loader } from "../../general/Loader.tsx";
-import { E5Statblock, useE5SearchStatblock } from "../../../ttrpgapi/e5/useE5Api.ts";
-import { PfStatblock, usePfStatblockSearch } from "../../../ttrpgapi/pf/usePfApi.ts";
+import { E5Statblock, useE5SearchStatblock } from "../../../api/e5/useE5Api.ts";
+import { PfStatblock, usePfStatblockSearch } from "../../../api/pf/usePfApi.ts";
 import { useEffect } from "react";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { updateTokenSheet } from "../../../helper/helpers.ts";

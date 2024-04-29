@@ -1,4 +1,4 @@
-import { components } from "../../../ttrpgapi/schema";
+import { components } from "../../../api/schema";
 import { useState } from "react";
 import { DiceButtonWrapper } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { capitalize } from "lodash";

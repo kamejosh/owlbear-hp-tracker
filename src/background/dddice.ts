@@ -17,11 +17,14 @@ const initDice = async (room: RoomMetadata) => {
     let api: ThreeDDiceAPI | undefined = undefined;
 
     api = await dddiceApiLogin(room);
-    if (api && !diceRollerState.diceUser?.diceRendering) {
+    if (api) {
         await addRollerApiCallbacks(api, rollLogStore.getState().addRoll);
     }
     if (diceRollerState.diceUser?.diceRendering) {
-        await OBR.modal.open(diceTrayModal);
+        await OBR.modal.open({
+            ...diceTrayModal,
+            url: `https://dddice.com/room/${room.diceRoom!.slug}/stream?key=${diceRollerState.diceUser.apiKey}`,
+        });
     } else {
         await OBR.modal.close(diceTrayModalId);
     }
@@ -66,7 +69,7 @@ const roomCallback = async (metadata: Metadata) => {
                 initialized = true;
             }
         }
-        if (reInitialize && !initialized) {
+        if (reInitialize || !initialized) {
             await initDiceRoller(roomData);
         }
     }
