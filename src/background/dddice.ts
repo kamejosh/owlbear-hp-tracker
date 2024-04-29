@@ -48,7 +48,7 @@ const roomCallback = async (metadata: Metadata) => {
     const reInitialize: boolean = diceRollerState.disableDiceRoller !== roomData?.disableDiceRoller;
     diceRollerState.disableDiceRoller = roomData?.disableDiceRoller === undefined ? false : roomData.disableDiceRoller;
 
-    if (roomData) {
+    if (roomData && (!roomData.disableDiceRoller || reInitialize)) {
         const newDiceUser = getRoomDiceUser(roomData, OBR.player.id);
         if (newDiceUser) {
             const newApiKey = newDiceUser.apiKey;
