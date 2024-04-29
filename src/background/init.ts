@@ -1,5 +1,5 @@
 import OBR, { Metadata } from "@owlbear-rodeo/sdk";
-import { diceTrayModal, ID, itemMetadataKey, metadataKey, version } from "../helper/variables.ts";
+import { ID, itemMetadataKey, metadataKey, version } from "../helper/variables.ts";
 import { migrate102To103 } from "../migrations/v103.ts";
 import { migrate105To106 } from "../migrations/v106.ts";
 import { compare } from "compare-versions";
@@ -28,6 +28,7 @@ import { migrateTo141 } from "../migrations/v141.ts";
 import { attachmentFilter, getAttachedItems, getInitialValues } from "../helper/helpers.ts";
 import { migrateTo160 } from "../migrations/v160.ts";
 import { migrateTo200 } from "../migrations/v200.ts";
+import { setupDddice } from "./dddice.ts";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -353,6 +354,14 @@ OBR.onReady(async () => {
             console.warn("HP Tracker - error while initializing Token event handler", e);
         }
     }
-    await OBR.modal.open(diceTrayModal);
+    try {
+        await setupDddice();
+    } catch (e) {
+        await OBR.notification.show(
+            "HP Tracker dice roller initialization error. Check browser logs for more info.",
+            "ERROR"
+        );
+        console.warn("HP Tracker - error while intializing dddice", e);
+    }
     console.info(`HP Tracker - initialization done`);
 });

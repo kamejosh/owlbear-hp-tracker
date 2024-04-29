@@ -7,8 +7,8 @@ import { RollLogEntryType } from "../context/RollLogContext.tsx";
 import { TTRPG_URL } from "../config.ts";
 import axios from "axios";
 import diff_match_patch from "./diff/diff_match_patch.ts";
-import { E5Statblock } from "../ttrpgapi/e5/useE5Api.ts";
-import { PfStatblock } from "../ttrpgapi/pf/usePfApi.ts";
+import { E5Statblock } from "../api/e5/useE5Api.ts";
+import { PfStatblock } from "../api/pf/usePfApi.ts";
 import axiosRetry from "axios-retry";
 
 export const getYOffset = async (height: number) => {
@@ -212,16 +212,18 @@ export const dddiceRollToRollLog = async (
     options?: { participant?: IRoomParticipant; owlbear_user_id?: string }
 ): Promise<RollLogEntryType> => {
     let username = roll.user.username;
+    let participantName = "";
+    if (options && options.participant && options.participant.username) {
+        participantName = options.participant.username;
+    } else {
+        const particip = roll.room.participants.find((p) => p.user.uuid === roll.user.uuid);
+        if (particip && particip.username) {
+            participantName = particip.username;
+        }
+    }
 
     if (roll.user.name === "Guest User") {
-        if (options && options.participant && options.participant.username) {
-            username = options.participant.username;
-        } else {
-            const particip = roll.room.participants.find((p) => p.user.uuid === roll.user.uuid);
-            if (particip && particip.username) {
-                username = particip.username;
-            }
-        }
+        username = participantName;
     }
 
     return {
@@ -233,6 +235,7 @@ export const dddiceRollToRollLog = async (
         username: username,
         values: roll.values,
         owlbear_user_id: options?.owlbear_user_id,
+        participantUsername: participantName,
     };
 };
 

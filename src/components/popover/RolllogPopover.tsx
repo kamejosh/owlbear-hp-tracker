@@ -1,5 +1,5 @@
 import { ContextWrapper } from "../ContextWrapper.tsx";
-import { useRollLogContext } from "../../context/RollLogContext.tsx";
+import { rollLogStore, useRollLogContext } from "../../context/RollLogContext.tsx";
 import { RollLogEntry } from "../general/DiceRoller/RollLog.tsx";
 import { useInterval } from "../../helper/hooks.ts";
 
@@ -12,10 +12,10 @@ export const RollLogPopover = () => {
 };
 
 const Content = () => {
-    const { log } = useRollLogContext();
+    const log = useRollLogContext((state) => state.log);
 
     useInterval(() => {
-        useRollLogContext.persist.rehydrate();
+        rollLogStore.persist.rehydrate();
     }, 1000);
 
     return (

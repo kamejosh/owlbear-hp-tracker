@@ -37,7 +37,7 @@ const getSearchString = (name: string): string => {
 
 const SearchWrapper = (props: SearchWrapperProps) => {
     const playerContext = usePlayerContext();
-    const { room } = useMetadataContext();
+    const room = useMetadataContext((state) => state.room);
 
     const searchRef = useRef<HTMLInputElement>(null);
 
@@ -97,7 +97,7 @@ const SearchWrapper = (props: SearchWrapperProps) => {
 };
 
 const StatblockWrapper = (props: StatblockWrapperProps) => {
-    const { room } = useMetadataContext();
+    const room = useMetadataContext((state) => state.room);
     const ruleSetMap = new Map<Ruleset, ReactElement>([
         [
             "pf",
@@ -134,7 +134,7 @@ const StatblockWrapper = (props: StatblockWrapperProps) => {
 
 export const CharacterSheet = (props: { itemId: string }) => {
     const { characterId, setId } = useCharSheet();
-    const { room } = useMetadataContext();
+    const room = useMetadataContext((state) => state.room);
     const [token, setToken] = useState<Item | null>(null);
     const [data, setData] = useState<HpTrackerMetadata | null>(null);
     const [search, setSearch] = useState<string>("");

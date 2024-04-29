@@ -12,9 +12,9 @@ import { getDiceUser } from "../../../helper/diceHelper.ts";
 import { IUser } from "dddice-js";
 
 export const DiceRoom = ({ className }: { className?: string }) => {
-    const { room } = useMetadataContext();
-    const { clear } = useRollLogContext();
-    const { rollerApi } = useDiceRoller();
+    const room = useMetadataContext((state) => state.room);
+    const clear = useRollLogContext((state) => state.clear);
+    const rollerApi = useDiceRoller((state) => state.rollerApi);
     const [settings, setSettings] = useState<boolean>(false);
     const [open, setOpen] = useState<boolean>(false);
     const [user, setUser] = useState<IUser>();

@@ -9,7 +9,7 @@ import { usePlayerContext } from "../../../context/PlayerContext.ts";
 export const DiceLogin = () => {
     const [activate, setActivate] = useState<{ code: string; expires_at: string; secret: string } | null>(null);
     const [timeLeft, setTimeLeft] = useState<number | null>(null);
-    const { room } = useMetadataContext();
+    const room = useMetadataContext((state) => state.room);
     const playerContext = usePlayerContext();
 
     const initAuth = async () => {

@@ -4,14 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { IAvailableDie, IDiceRoll, IDieType, Operator, parseRollEquation } from "dddice-js";
 import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { AddSvg } from "../../svgs/AddSvg.tsx";
-import { useRollLogContext } from "../../../context/RollLogContext.tsx";
-import { diceToRoll, getDiceParticipant } from "../../../helper/diceHelper.ts";
-import { dddiceRollToRollLog } from "../../../helper/helpers.ts";
+import { diceToRoll, getDiceParticipant, rollWrapper } from "../../../helper/diceHelper.ts";
 import { useComponentContext } from "../../../context/ComponentContext.tsx";
 import tippy, { Instance } from "tippy.js";
 import { RollLogSvg } from "../../svgs/RollLogSvg.tsx";
-import { usePlayerContext } from "../../../context/PlayerContext.ts";
-import OBR from "@owlbear-rodeo/sdk";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 
 type DiceRoomButtonsProps = {
@@ -25,11 +21,9 @@ type CustomDiceButtonProps = {
 };
 
 const CustomDiceButton = (props: CustomDiceButtonProps) => {
-    const { rollerApi, theme, initialized } = useDiceRoller();
-    const { addRoll } = useRollLogContext();
+    const [rollerApi, theme, initialized] = useDiceRoller((state) => [state.rollerApi, state.theme, state.initialized]);
     const { buttons, setButtons } = useDiceButtonsContext();
-    const { component } = useComponentContext();
-    const playerContext = usePlayerContext();
+    const component = useComponentContext((state) => state.component);
     const [hover, setHover] = useState<boolean>(false);
     const [addCustom, setAddCustom] = useState<boolean>(false);
     const [validCustom, setValidCustom] = useState<boolean>(false);
@@ -93,16 +87,12 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                 props.dice,
                 theme.id
             );
-            if (parsed) {
-                const roll = await rollerApi?.roll.create(parsed.dice, {
+            if (parsed && rollerApi) {
+                await rollWrapper(rollerApi, parsed.dice, {
                     operator: parsed.operator,
                     external_id: component,
                     label: "Roll: Custom",
                 });
-                if (roll && roll.data) {
-                    const data = roll.data;
-                    addRoll(await dddiceRollToRollLog(data, { owlbear_user_id: playerContext.id || undefined }));
-                }
             }
         }
         button.classList.remove("rolling");
@@ -212,7 +202,6 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
 const QuickButtons = ({ open }: { open: boolean }) => {
     const { theme, rollerApi } = useDiceRoller();
     const { room } = useMetadataContext();
-    const { addRoll } = useRollLogContext();
     const { component } = useComponentContext();
     const [validCustom, setValidCustom] = useState<boolean>(true);
 
@@ -231,17 +220,13 @@ const QuickButtons = ({ open }: { open: boolean }) => {
         element.classList.add("rolling");
         if (theme && dice) {
             let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined = diceToRoll(dice, theme.id);
-            if (parsed) {
-                const roll = await rollerApi?.roll.create(parsed.dice, {
+            if (parsed && rollerApi) {
+                await rollWrapper(rollerApi, parsed.dice, {
                     operator: parsed.operator,
                     external_id: component,
                     label: "Roll: Custom",
                     whisper: hide ? await getUserUuid() : undefined,
                 });
-                if (roll && roll.data) {
-                    const data = roll.data;
-                    addRoll(await dddiceRollToRollLog(data, { owlbear_user_id: OBR.player.id || undefined }));
-                }
             }
         }
         element.classList.remove("rolling");

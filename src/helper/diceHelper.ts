@@ -3,12 +3,12 @@ import { dddiceRollToRollLog, updateRoomMetadata } from "./helpers.ts";
 import OBR from "@owlbear-rodeo/sdk";
 import {
     IDiceRoll,
+    IDiceRollOptions,
     IRoll,
     IRoom,
     IUser,
     Operator,
     parseRollEquation,
-    ThreeDDice,
     ThreeDDiceAPI,
     ThreeDDiceRollEvent,
 } from "dddice-js";
@@ -91,19 +91,20 @@ export const getDiceParticipant = async (rollerApi: ThreeDDiceAPI, roomSlug: str
 export const getApiKey = async (room: RoomMetadata | null) => {
     const roomMetadata = await OBR.room.getMetadata();
     const playerId = await OBR.player.getId();
-    let apiKey: string | undefined;
+    let apiKey: string | undefined = room?.diceUser?.find((user) => user.playerId === playerId)?.apiKey;
+    let updateKey: boolean = false;
 
-    if (`com.dddice/${playerId}` in roomMetadata) {
+    if (!apiKey && `com.dddice/${playerId}` in roomMetadata) {
         apiKey = roomMetadata[`com.dddice/${playerId}`] as string;
-    } else {
-        apiKey = room?.diceUser?.find((user) => user.playerId === playerId)?.apiKey;
+        updateKey = true;
     }
 
     if (!apiKey) {
         apiKey = (await new ThreeDDiceAPI(undefined, "HP Tracker").user.guest()).data;
+        updateKey = true;
     }
 
-    if (room) {
+    if (room && updateKey) {
         await updateRoomMetadataDiceUser(room, playerId, { apiKey: apiKey });
     }
 
@@ -161,131 +162,54 @@ export const prepareRoomUser = async (diceRoom: IRoom, rollerApi: ThreeDDiceAPI)
     }
 };
 
-const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => void, component: string | undefined) => {
+const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => void) => {
     const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
-    const name = await OBR.player.getName();
+
     const rollLogEntry = await dddiceRollToRollLog(e, { participant: participant });
 
-    if (
-        participant &&
-        (participant.username !== name || (e.external_id !== "action_window" && e.external_id !== "statblock_popover"))
-    ) {
-        addRoll(rollLogEntry);
+    addRoll(rollLogEntry);
+
+    await OBR.popover.open(rollLogPopover);
+
+    if (rollLogTimeOut) {
+        clearTimeout(rollLogTimeOut);
     }
 
-    // only the action window triggers the popover or notification because it always exists
-    if (component === "modal" || component === "action_window") {
-        await OBR.popover.open(rollLogPopover);
-
-        if (rollLogTimeOut) {
-            clearTimeout(rollLogTimeOut);
-        }
-
-        rollLogTimeOut = setTimeout(async () => {
-            await OBR.popover.close(rollLogPopoverId);
-        }, 5000);
-    }
+    rollLogTimeOut = setTimeout(async () => {
+        await OBR.popover.close(rollLogPopoverId);
+    }, 5000);
 };
 
-export const addRollerCallbacks = async (
-    roller: ThreeDDice,
-    addRoll: (entry: RollLogEntryType) => void,
-    component: string | undefined
-) => {
-    roller.on(ThreeDDiceRollEvent.RollFinished, (e) => rollerCallback(e, addRoll, component));
-};
-
-export const addRollerApiCallbacks = async (
-    rollerApi: ThreeDDiceAPI,
-    addRoll: (entry: RollLogEntryType) => void,
-    component: string | undefined
-) => {
-    rollerApi.listen(ThreeDDiceRollEvent.RollCreated, (e) => rollerCallback(e, addRoll, component));
-};
-
-export const removeRollerCallbacks = (roller: ThreeDDice) => {
-    roller.off(ThreeDDiceRollEvent.RollStarted);
-    roller.off(ThreeDDiceRollEvent.RollCreated);
-};
-
-export const dddiceLogin = async (room: RoomMetadata | null, roller: ThreeDDice, canvas: HTMLCanvasElement) => {
-    if (roller.api) {
-        try {
-            const diceUser = await getDiceUser(roller.api);
-            const participant = await getDiceParticipant(roller.api, room?.diceRoom?.slug, diceUser);
-
-            if (diceUser && participant && room?.diceRoom?.slug) {
-                roller.api?.room.leave(room.diceRoom.slug, participant.id.toString());
-                removeRollerCallbacks(roller);
-            }
-        } catch {}
-    }
-
-    try {
-        roller.initialize(canvas, await getApiKey(room), { autoClear: 3 }, `HP Tracker`);
-        if (roller.api) {
-            const diceRoom = await getDiceRoom(roller.api, room);
-            if (diceRoom) {
-                const user = (await roller.api?.user.get())?.data;
-                if (user) {
-                    const participant = diceRoom.participants.find((p) => p.user.uuid === user.uuid);
-                    if (participant) {
-                        await prepareRoomUser(diceRoom, roller.api);
-                    } else {
-                        try {
-                            const userDiceRoom = (await roller?.api?.room.join(diceRoom.slug, diceRoom.passcode))?.data;
-                            if (userDiceRoom) {
-                                await prepareRoomUser(userDiceRoom, roller.api);
-                            }
-                        } catch {
-                            /**
-                             * if we already joined. We already check that when
-                             * looking if the user is a participant in the room,
-                             * but better be safe than sorry
-                             */
-                        }
-                    }
-                    roller.connect(diceRoom.slug, diceRoom.passcode, user.uuid);
-                }
-            }
-            return true;
-        }
-    } catch (e) {
-        console.warn(e);
-        return false;
-    }
+export const addRollerApiCallbacks = async (roller: ThreeDDiceAPI, addRoll: (entry: RollLogEntryType) => void) => {
+    roller.listen(ThreeDDiceRollEvent.RollCreated, (e) => rollerCallback(e, addRoll));
 };
 
 export const dddiceApiLogin = async (room: RoomMetadata | null) => {
-    try {
-        const rollerApi = new ThreeDDiceAPI(await getApiKey(room), "HP Tracker");
-        const diceRoom = await getDiceRoom(rollerApi, room);
-        if (diceRoom) {
-            const user = (await rollerApi.user.get())?.data;
-            if (user) {
-                const participant = diceRoom.participants.find((p) => p.user.uuid === user.uuid);
-                if (participant) {
-                    await prepareRoomUser(diceRoom, rollerApi);
-                } else {
-                    try {
-                        const userDiceRoom = (await rollerApi?.room.join(diceRoom.slug, diceRoom.passcode))?.data;
-                        if (userDiceRoom) {
-                            await prepareRoomUser(userDiceRoom, rollerApi);
-                        }
-                    } catch {
-                        /**
-                         * if we already joined. We already check that when
-                         * looking if the user is a participant in the room,
-                         * but better be safe than sorry
-                         */
+    const rollerApi = new ThreeDDiceAPI(await getApiKey(room), "HP Tracker");
+    const diceRoom = await getDiceRoom(rollerApi, room);
+    if (diceRoom) {
+        const user = (await rollerApi.user.get())?.data;
+        if (user) {
+            const participant = diceRoom.participants.find((p) => p.user.uuid === user.uuid);
+            if (participant) {
+                await prepareRoomUser(diceRoom, rollerApi);
+            } else {
+                try {
+                    const userDiceRoom = (await rollerApi?.room.join(diceRoom.slug, diceRoom.passcode))?.data;
+                    if (userDiceRoom) {
+                        await prepareRoomUser(userDiceRoom, rollerApi);
                     }
+                } catch (e) {
+                    console.warn(e);
+                    /**
+                     * if we already joined. We already check that when
+                     * looking if the user is a participant in the room,
+                     * but better be safe than sorry
+                     */
                 }
-                return rollerApi.connect(diceRoom.slug, diceRoom.passcode, user.uuid);
             }
+            return rollerApi.connect(diceRoom.slug, diceRoom.passcode, user.uuid);
         }
-    } catch (e) {
-        console.warn(e);
-        return undefined;
     }
 };
 
@@ -340,4 +264,12 @@ export const diceToRoll = (diceString: string, theme: string) => {
         console.warn("found dice string that could not be parsed", diceString);
     }
     return { dice, operator };
+};
+
+export const rollWrapper = async (api: ThreeDDiceAPI, dice: Array<IDiceRoll>, options?: Partial<IDiceRollOptions>) => {
+    // await OBR.modal.open(diceTrayModal);
+    const roll = await api.roll.create(dice, options);
+    if (roll && roll.data) {
+        return roll.data;
+    }
 };

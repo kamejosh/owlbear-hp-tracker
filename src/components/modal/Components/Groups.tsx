@@ -1,8 +1,8 @@
 import React from "react";
-import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { updateSceneMetadata } from "../../../helper/helpers.ts";
+import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 
 const updateGroups = (value: string, groups: Array<string>) => {
     if (value !== "") {
@@ -24,7 +24,7 @@ const updateGroups = (value: string, groups: Array<string>) => {
 };
 
 const DraggableGroupList = React.memo(function DraggableGroupList() {
-    const { scene } = useMetadataContext();
+    const scene = useMetadataContext((state) => state.scene);
     return (
         <div className={"group-list"}>
             {scene && scene.groups
@@ -65,7 +65,7 @@ const DraggableGroupList = React.memo(function DraggableGroupList() {
     );
 });
 export const Groups = () => {
-    const { scene } = useMetadataContext();
+    const scene = useMetadataContext((state) => state.scene);
 
     const reorder = (list: string[], startIndex: number, endIndex: number) => {
         const result = Array.from(list);

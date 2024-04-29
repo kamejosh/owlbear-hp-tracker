@@ -11,7 +11,7 @@ type RollLogEntryProps = {
 };
 
 export const RollLog = () => {
-    const { log } = useRollLogContext();
+    const log = useRollLogContext((state) => state.log);
 
     return (
         <ul className={"roll-log"}>
@@ -102,7 +102,10 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
     return (
         <li
             className={`roll-log-entry ${props.classes} ${
-                props.entry.owlbear_user_id === playerContext.id ? "self" : ""
+                props.entry.owlbear_user_id === playerContext.id ||
+                props.entry.participantUsername === playerContext.name
+                    ? "self"
+                    : ""
             }`}
         >
             <div className={"roll-time"}>{rollTimeText}</div>

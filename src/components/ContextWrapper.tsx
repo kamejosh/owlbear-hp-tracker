@@ -21,7 +21,11 @@ export const ContextWrapper = (props: ContextWrapperProps) => {
     const [playerId, setPlayerId] = useState<string | null>(null);
     const [playerName, setPlayerName] = useState<string | null>(null);
     const [ready, setReady] = useState<boolean>(false);
-    const { room, setSceneMetadata, setRoomMetadata } = useMetadataContext();
+    const [room, setSceneMetadata, setRoomMetadata] = useMetadataContext((state) => [
+        state.room,
+        state.setSceneMetadata,
+        state.setRoomMetadata,
+    ]);
     const { component, setComponent } = useComponentContext();
     const queryClient = new QueryClient();
     const { isReady } = SceneReadyContext();

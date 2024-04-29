@@ -9,6 +9,10 @@ export interface paths {
     /** Login For Access Token */
     post: operations["login_for_access_token_token_post"];
   };
+  "/refresh": {
+    /** Refresh Access Token */
+    get: operations["refresh_access_token_refresh_get"];
+  };
   "/password-reset": {
     /** Reset Password */
     post: operations["reset_password_password_reset_post"];
@@ -16,6 +20,10 @@ export interface paths {
   "/activation-link": {
     /** Get Activation Mail */
     post: operations["get_activation_mail_activation_link_post"];
+  };
+  "/stats/": {
+    /** Get Stats */
+    get: operations["get_stats_stats__get"];
   };
   "/api/v1/users/": {
     /** Create User */
@@ -104,6 +112,10 @@ export interface paths {
   "/api/v1/e5/statblock/{slug}/active": {
     /** Set Active E5 Statblock */
     put: operations["set_active_e5_statblock_api_v1_e5_statblock__slug__active_put"];
+  };
+  "/api/v1/e5/statblock/external": {
+    /** Create Statblock From External Source */
+    post: operations["create_statblock_from_external_source_api_v1_e5_statblock_external_post"];
   };
   "/api/v1/e5/spell/": {
     /** List E5 Spells */
@@ -258,12 +270,15 @@ export interface components {
       subtype?: string | null;
       /** Group */
       group?: string | null;
-      /** Alignment */
-      alignment: string;
+      /**
+       * Alignment
+       * @default
+       */
+      alignment?: string;
       armor_class: components["schemas"]["ArmorClass"];
       hp: components["schemas"]["src__types__e5__Hitpoints"];
       speed: components["schemas"]["Speed"];
-      stats: components["schemas"]["Stats"];
+      stats: components["schemas"]["Stats-Input"];
       saving_throws: components["schemas"]["src__types__e5__SavingThrows"];
       /** Perception */
       perception?: number | null;
@@ -354,12 +369,15 @@ export interface components {
       subtype?: string | null;
       /** Group */
       group?: string | null;
-      /** Alignment */
-      alignment: string;
+      /**
+       * Alignment
+       * @default
+       */
+      alignment?: string;
       armor_class: components["schemas"]["ArmorClass"];
       hp: components["schemas"]["src__types__e5__Hitpoints"];
       speed: components["schemas"]["Speed"];
-      stats: components["schemas"]["Stats"];
+      stats: components["schemas"]["src__types__e5__Stats"];
       saving_throws: components["schemas"]["src__types__e5__SavingThrows"];
       /** Perception */
       perception?: number | null;
@@ -445,6 +463,11 @@ export interface components {
        */
       active?: boolean;
     };
+    /** ExternalIn */
+    ExternalIn: {
+      /** Id */
+      id: string;
+    };
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
@@ -487,7 +510,7 @@ export interface components {
       languages?: string[] | null;
       /** Skills */
       skills?: components["schemas"]["Skill"][] | null;
-      stats: components["schemas"]["Stats"];
+      stats: components["schemas"]["Stats-Input"];
       /**
        * Items
        * @default []
@@ -554,7 +577,7 @@ export interface components {
       languages?: string[] | null;
       /** Skills */
       skills?: components["schemas"]["Skill"][] | null;
-      stats: components["schemas"]["Stats"];
+      stats: components["schemas"]["src__types__pf__Stats"];
       /**
        * Items
        * @default []
@@ -797,7 +820,7 @@ export interface components {
       spells?: components["schemas"]["SpellOut"][] | null;
     };
     /** Stats */
-    Stats: {
+    "Stats-Input": {
       /** Strength */
       strength: number;
       /** Dexterity */
@@ -1010,6 +1033,21 @@ export interface components {
        */
       circles?: components["schemas"]["SpellCircle"][] | null;
     };
+    /** Stats */
+    src__types__e5__Stats: {
+      /** Strength */
+      strength: number;
+      /** Dexterity */
+      dexterity: number;
+      /** Constitution */
+      constitution: number;
+      /** Intelligence */
+      intelligence: number;
+      /** Wisdom */
+      wisdom: number;
+      /** Charisma */
+      charisma: number;
+    };
     /** Action */
     src__types__pf__Action: {
       /** Name */
@@ -1164,6 +1202,30 @@ export interface components {
       /** Heightened */
       heightened?: components["schemas"]["Heightened"][] | null;
     };
+    /** Stats */
+    src__types__pf__Stats: {
+      /** Strength */
+      strength: number;
+      /** Dexterity */
+      dexterity: number;
+      /** Constitution */
+      constitution: number;
+      /** Intelligence */
+      intelligence: number;
+      /** Wisdom */
+      wisdom: number;
+      /** Charisma */
+      charisma: number;
+    };
+    /** Stats */
+    src__types__types__Stats: {
+      /** Users */
+      users: number;
+      /** Statblocks */
+      statblocks: number;
+      /** Patreon */
+      patreon?: number | null;
+    };
   };
   responses: never;
   parameters: never;
@@ -1196,6 +1258,17 @@ export interface operations {
       422: {
         content: {
           "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Refresh Access Token */
+  refresh_access_token_refresh_get: {
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": unknown;
         };
       };
     };
@@ -1240,6 +1313,17 @@ export interface operations {
       422: {
         content: {
           "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Get Stats */
+  get_stats_stats__get: {
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["src__types__types__Stats"];
         };
       };
     };
@@ -1797,6 +1881,28 @@ export interface operations {
       };
       path: {
         slug: string;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Create Statblock From External Source */
+  create_statblock_from_external_source_api_v1_e5_statblock_external_post: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ExternalIn"];
       };
     };
     responses: {

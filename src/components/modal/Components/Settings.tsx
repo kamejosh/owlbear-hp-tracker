@@ -9,7 +9,7 @@ import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { updateRoomMetadata } from "../../../helper/helpers.ts";
 
 export const Settings = () => {
-    const { room, scene } = useMetadataContext();
+    const [room, scene] = useMetadataContext((state) => [state.room, state.scene]);
 
     const handleOffsetChange = (value: number) => {
         updateHpOffset(value);

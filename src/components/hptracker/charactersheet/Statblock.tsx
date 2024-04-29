@@ -3,8 +3,8 @@ import { itemMetadataKey } from "../../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../../helper/types.ts";
 import { useEffect, useState } from "react";
 import { PfAbility } from "./PfAbility.tsx";
-import { useE5GetStatblock } from "../../../ttrpgapi/e5/useE5Api.ts";
-import { usePfGetStatblock } from "../../../ttrpgapi/pf/usePfApi.ts";
+import { useE5GetStatblock } from "../../../api/e5/useE5Api.ts";
+import { usePfGetStatblock } from "../../../api/pf/usePfApi.ts";
 import { E5Ability } from "./E5Ability.tsx";
 import { E5Spells } from "./E5Spells.tsx";
 import { PfSpells } from "./PfSpells.tsx";
@@ -13,7 +13,7 @@ import { DiceButton } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { capitalize } from "lodash";
 
 const E5StatBlock = ({ slug }: { slug: string }) => {
-    const { room } = useMetadataContext();
+    const room = useMetadataContext((state) => state.room);
     const statblockQuery = useE5GetStatblock(slug, room?.tabletopAlmanacAPIKey);
 
     const statblock = statblockQuery.isSuccess && statblockQuery.data ? statblockQuery.data : null;
@@ -241,7 +241,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
 };
 
 const PfStatBlock = ({ slug }: { slug: string }) => {
-    const { room } = useMetadataContext();
+    const room = useMetadataContext((state) => state.room);
     const statblockQuery = usePfGetStatblock(slug, room?.tabletopAlmanacAPIKey);
 
     const statblock = statblockQuery.isSuccess && statblockQuery.data ? statblockQuery.data : null;
@@ -436,7 +436,7 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
 };
 
 export const Statblock = (props: { data: HpTrackerMetadata; itemId: string }) => {
-    const { room } = useMetadataContext();
+    const room = useMetadataContext((state) => state.room);
     const [data, setData] = useState<HpTrackerMetadata>(props.data);
 
     useEffect(() => {

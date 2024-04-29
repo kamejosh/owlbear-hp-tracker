@@ -1,4 +1,4 @@
-import { components } from "../../../ttrpgapi/schema";
+import { components } from "../../../api/schema";
 import { useState } from "react";
 import { DiceButton, DiceButtonWrapper } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { getDamage } from "../../../helper/helpers.ts";

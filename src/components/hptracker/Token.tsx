@@ -5,12 +5,11 @@ import OBR, { Item } from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "../../helper/variables.ts";
 import { useCharSheet } from "../../context/CharacterContext.ts";
 import { updateHp } from "../../helper/hpHelpers.ts";
-import { dddiceRollToRollLog, evalString, getBgColor, getRoomDiceUser } from "../../helper/helpers.ts";
+import { evalString, getBgColor, getRoomDiceUser } from "../../helper/helpers.ts";
 import { updateAc } from "../../helper/acHelper.ts";
 import _ from "lodash";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { useComponentContext } from "../../context/ComponentContext.tsx";
-import { useRollLogContext } from "../../context/RollLogContext.tsx";
 import { useDiceRoller } from "../../context/DDDiceContext.tsx";
 import { IDiceRoll, IRoll, Operator } from "dddice-js";
 import { diceToRoll } from "../../helper/diceHelper.ts";
@@ -27,11 +26,10 @@ export const Token = (props: TokenProps) => {
     const playerContext = usePlayerContext();
     const [data, setData] = useState<HpTrackerMetadata>(props.data);
     const [editName, setEditName] = useState<boolean>(false);
-    const { room } = useMetadataContext();
-    const { setId } = useCharSheet();
-    const { component } = useComponentContext();
-    const { addRoll } = useRollLogContext();
-    const { rollerApi, initialized, theme } = useDiceRoller();
+    const room = useMetadataContext((state) => state.room);
+    const setId = useCharSheet((state) => state.setId);
+    const component = useComponentContext((state) => state.component);
+    const [rollerApi, initialized, theme] = useDiceRoller((state) => [state.rollerApi, state.initialized, state.theme]);
     const hpRef = useRef<HTMLInputElement>(null);
     const maxHpRef = useRef<HTMLInputElement>(null);
     const tempHpRef = useRef<HTMLInputElement>(null);
@@ -277,7 +275,6 @@ export const Token = (props: TokenProps) => {
                 });
                 if (roll && roll.data) {
                     const data = roll.data;
-                    addRoll(await dddiceRollToRollLog(data, { owlbear_user_id: OBR.player.id || undefined }));
                     button.classList.remove("rolling");
                     return data;
                 }

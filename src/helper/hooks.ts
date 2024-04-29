@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Mutate, StoreApi, UseBoundStore } from "zustand";
 
 // See https://usehooks.com/useLocalStorage
 export const useLocalStorage = <T>(key: string, initialValue: T) => {
@@ -85,10 +84,9 @@ export const useInterval = (callback: Function, delay: number) => {
     }, [delay]);
 };
 
-export type StoreWithPersists<T> = UseBoundStore<Mutate<StoreApi<T>, [["zustand/persist", T]]>>;
-export const withStorageDOMEvents = <T>(store: StoreWithPersists<T>) => {
+export const withStorageDOMEvents = (store: any) => {
     const storageEventCallback = (e: StorageEvent) => {
-        if (e.key === store.persist.getOptions().name && e.newValue) {
+        if (store.persist && e.key === store.persist.getOptions().name && e.newValue) {
             store.persist.rehydrate();
         }
     };
