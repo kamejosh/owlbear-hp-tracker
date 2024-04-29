@@ -1,3 +1,10 @@
+# 2.1.0
+
++ Refactor dddice integration
+  + Fix Safari issue not recognizing scroll events
+  + Themes are now fetched directly from dddice account
++ Performance improvements
+
 # 2.0.2
 
 + Fix Disadvantage rolls add a negative modifier with a "+".

@@ -79,6 +79,7 @@ const roomCallback = async (metadata: Metadata) => {
 export const setupDddice = async () => {
     const metadata = await OBR.room.getMetadata();
     await roomCallback(metadata);
+
     OBR.room.onMetadataChange(roomCallback);
     console.info("HP Tracker - Finished setting up dddice");
 };

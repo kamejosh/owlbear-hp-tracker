@@ -502,7 +502,7 @@
                         border: 1px solid white;
                         border-radius: 5px;
                         background-color: #00000033;
-                        width: 100%;
+                        width: calc(100% - 2px);
 
                         .current {
                             display: flex;
@@ -519,13 +519,16 @@
                         grid-template-rows: 0fr;
                         grid-area: all;
                         transition: all 0.25s linear;
+                        width: min-content;
+                        overflow: hidden;
 
                         .options-wrapper {
                             display: flex;
+                            justify-content: space-between;
                             border: 1px solid white;
                             border-radius: 5px;
                             background-color: #00000033;
-                            width: 100%;
+                            width: min-content;
                             min-height: 0;
 
                             .select-options {

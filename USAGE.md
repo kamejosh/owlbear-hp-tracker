@@ -348,7 +348,7 @@ There are currently two settings:
 
 ### Dice Theme
 
-Each Owlbear user can chose their own dice theme (and the other users will see them roll with this theme). Because some dice themes in dddice cannot be used without errors and wrong dice HP Tracker is really stricked regarding what dice are available. If a dice theme contains errors the theme will not be used and the error will be shown beneath the text input
+Each Owlbear user can chose their own dice theme (and the other users will see them roll with this theme). When logged in the dropdown menu list all compatible dice themes (theme has d4, d6, d8, d10, d12 and d20 with matching labeling) will be shown. Users can switch between those themes. Guest users only have access to the default dddice theme (bees).
 
 ### 3D Rendering
 
