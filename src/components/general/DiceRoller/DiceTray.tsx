@@ -14,7 +14,8 @@ type DiceTrayProps = {
 };
 
 export const DiceTray = (props: DiceTrayProps) => {
-    const [setRollerApi, setInitialized, theme, setTheme] = useDiceRoller((state) => [
+    const [rollerApi, setRollerApi, setInitialized, theme, setTheme] = useDiceRoller((state) => [
+        state.rollerApi,
         state.setRollerApi,
         state.setInitialized,
         state.theme,
@@ -24,6 +25,7 @@ export const DiceTray = (props: DiceTrayProps) => {
     const room = useMetadataContext((state) => state.room);
     const component = useComponentContext((state) => state.component);
     const [diceUser, setDiceUser] = useState<DiceUser>();
+    const [apiKey, setApiKey] = useState<string>();
 
     useEffect(() => {
         const newDiceUser = getRoomDiceUser(room, playerContext.id);
@@ -52,21 +54,33 @@ export const DiceTray = (props: DiceTrayProps) => {
         }
     }, [diceUser, room?.disableDiceRoller]);
 
-    const initDice = async () => {
-        setInitialized(false);
-        const api: ThreeDDiceAPI | undefined = await dddiceApiLogin(room);
-        if (api) {
-            setRollerApi(api);
-        }
-        if (!theme) {
-            const themeId = room?.diceUser?.find((user) => user.playerId === playerContext.id)?.diceTheme;
-            if (themeId) {
-                const newTheme = (await api?.theme.get(themeId))?.data;
-                if (newTheme) {
-                    setTheme(newTheme);
+    useEffect(() => {
+        const initTheme = async () => {
+            if (!theme) {
+                const themeId = room?.diceUser?.find((user) => user.playerId === playerContext.id)?.diceTheme;
+                if (themeId) {
+                    const newTheme = (await rollerApi?.theme.get(themeId))?.data;
+                    if (newTheme) {
+                        setTheme(newTheme);
+                    }
                 }
             }
+        };
+
+        initTheme();
+    }, [rollerApi]);
+
+    const initDice = async () => {
+        let api: ThreeDDiceAPI | undefined;
+        setInitialized(false);
+        if (diceUser?.apiKey !== apiKey && diceUser?.apiKey !== undefined) {
+            setApiKey(diceUser?.apiKey);
+            api = await dddiceApiLogin(room);
+            if (api) {
+                setRollerApi(api);
+            }
         }
+
         setInitialized(true);
     };
 

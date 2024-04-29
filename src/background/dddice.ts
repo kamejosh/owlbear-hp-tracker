@@ -13,12 +13,14 @@ const diceRollerState: { diceUser: DiceUser | null; disableDiceRoller: boolean }
     disableDiceRoller: false,
 };
 
-const initDice = async (room: RoomMetadata) => {
+const initDice = async (room: RoomMetadata, updateApi: boolean) => {
     let api: ThreeDDiceAPI | undefined = undefined;
 
-    api = await dddiceApiLogin(room);
-    if (api) {
-        await addRollerApiCallbacks(api, rollLogStore.getState().addRoll);
+    if (updateApi) {
+        api = await dddiceApiLogin(room);
+        if (api) {
+            await addRollerApiCallbacks(api, rollLogStore.getState().addRoll);
+        }
     }
     if (diceRollerState.diceUser?.diceRendering) {
         await OBR.modal.open({
@@ -30,10 +32,10 @@ const initDice = async (room: RoomMetadata) => {
     }
 };
 
-const initDiceRoller = async (room: RoomMetadata) => {
+const initDiceRoller = async (room: RoomMetadata, updateApi: boolean) => {
     if ((diceRollerState.diceUser && diceRollerState.diceUser.apiKey !== undefined) || !diceRollerState.diceUser) {
         if (!room?.disableDiceRoller) {
-            await initDice(room);
+            await initDice(room, updateApi);
         } else {
             await OBR.modal.close(diceTrayModalId);
         }
@@ -59,18 +61,18 @@ const roomCallback = async (metadata: Metadata) => {
                     (newApiKey !== undefined && newApiKey !== diceRollerState.diceUser.apiKey) ||
                     diceRendering !== diceRollerState.diceUser.diceRendering
                 ) {
+                    await initDiceRoller(roomData, newApiKey !== diceRollerState.diceUser.apiKey);
                     diceRollerState.diceUser = newDiceUser;
-                    await initDiceRoller(roomData);
                     initialized = true;
                 }
             } else {
                 diceRollerState.diceUser = newDiceUser;
-                await initDiceRoller(roomData);
+                await initDiceRoller(roomData, true);
                 initialized = true;
             }
         }
         if (reInitialize || !initialized) {
-            await initDiceRoller(roomData);
+            await initDiceRoller(roomData, false);
         }
     }
     lock.disable(null);
