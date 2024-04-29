@@ -26,10 +26,10 @@ export const Token = (props: TokenProps) => {
     const playerContext = usePlayerContext();
     const [data, setData] = useState<HpTrackerMetadata>(props.data);
     const [editName, setEditName] = useState<boolean>(false);
-    const { room } = useMetadataContext();
-    const { setId } = useCharSheet();
-    const { component } = useComponentContext();
-    const { rollerApi, initialized, theme } = useDiceRoller();
+    const room = useMetadataContext((state) => state.room);
+    const setId = useCharSheet((state) => state.setId);
+    const component = useComponentContext((state) => state.component);
+    const [rollerApi, initialized, theme] = useDiceRoller((state) => [state.rollerApi, state.initialized, state.theme]);
     const hpRef = useRef<HTMLInputElement>(null);
     const maxHpRef = useRef<HTMLInputElement>(null);
     const tempHpRef = useRef<HTMLInputElement>(null);

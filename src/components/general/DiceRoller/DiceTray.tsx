@@ -70,5 +70,5 @@ export const DiceTray = (props: DiceTrayProps) => {
         setInitialized(true);
     };
 
-    return <DiceRoom className={props.classes} />;
+    return room?.disableDiceRoller ? null : <DiceRoom className={props.classes} />;
 };

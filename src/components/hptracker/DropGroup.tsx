@@ -29,9 +29,9 @@ type DropGroupProps = {
 };
 
 export const DropGroup = (props: DropGroupProps) => {
-    const { room, scene } = useMetadataContext();
-    const { component } = useComponentContext();
-    const { rollerApi, initialized, theme } = useDiceRoller();
+    const [room, scene] = useMetadataContext((state) => [state.room, state.scene]);
+    const component = useComponentContext((state) => state.component);
+    const [rollerApi, initialized, theme] = useDiceRoller((state) => [state.rollerApi, state.initialized, state.theme]);
     const playerContext = usePlayerContext();
 
     const setOpenGroupSetting = async (name: string) => {

@@ -15,7 +15,7 @@ export const StatblockPopover = () => {
     const [sortedTokens, setSortedTokens] = useState<Array<Item>>([]);
     const [pinned, setPinned] = useState<boolean>(false);
     const [data, setData] = useState<HpTrackerMetadata | null>(null);
-    const { room, scene } = useMetadataContext();
+    const [room, scene] = useMetadataContext((state) => [state.room, state.scene]);
     const { isReady } = SceneReadyContext();
 
     const initPopover = async () => {
@@ -116,7 +116,7 @@ export const StatblockPopover = () => {
                     data={data}
                 />
             </div>
-            <DiceTray classes={"statblock-dice-tray"} overlay={false} />
+            <DiceTray classes={"statblock-dice-tray"} />
         </ContextWrapper>
     );
 };

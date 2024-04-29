@@ -21,7 +21,7 @@ export const HPTracker = () => {
     return (
         <ContextWrapper component={"action_window"}>
             <Content />
-            <DiceTray classes={"hp-tracker-dice-tray"} overlay={false} />
+            <DiceTray classes={"hp-tracker-dice-tray"} />
         </ContextWrapper>
     );
 };
@@ -33,9 +33,9 @@ const Content = () => {
     const [selectedTokens, setSelectedTokens] = useState<Array<string>>([]);
     const [tokenLists, setTokenLists] = useState<Map<string, Array<Item>>>(new Map());
     const [ignoredChanges, setIgnoredChanges] = useState<boolean>(false);
-    const { scene, room } = useMetadataContext();
+    const [scene, room] = useMetadataContext((state) => [state.scene, state.room]);
     const { isReady } = SceneReadyContext();
-    const { characterId } = useCharSheet();
+    const characterId = useCharSheet((state) => state.characterId);
 
     const initHpTracker = async () => {
         const initialItems = await OBR.scene.items.getItems(

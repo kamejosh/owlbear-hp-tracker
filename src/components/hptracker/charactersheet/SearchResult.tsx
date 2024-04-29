@@ -14,8 +14,8 @@ type SearchResultProps = {
 };
 
 export const SearchResult5e = (props: SearchResultProps) => {
-    const { characterId } = useCharSheet();
-    const { room } = useMetadataContext();
+    const characterId = useCharSheet((state) => state.characterId);
+    const room = useMetadataContext((state) => state.room);
     const setSheet = (slug: string, bonus: number, hp: number, ac: number) => {
         if (characterId) {
             if (slug === props.current) {
@@ -96,8 +96,8 @@ export const SearchResult5e = (props: SearchResultProps) => {
 };
 
 export const SearchResultPf = (props: SearchResultProps) => {
-    const { room } = useMetadataContext();
-    const { characterId } = useCharSheet();
+    const room = useMetadataContext((state) => state.room);
+    const characterId = useCharSheet((state) => state.characterId);
     const setSheet = (slug: string, bonus: number, hp: number, ac: number) => {
         if (characterId) {
             if (slug === props.current) {

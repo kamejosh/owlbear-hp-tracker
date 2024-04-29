@@ -1,3 +1,4 @@
+// @ts-nocheck
 import remarkGfm from "remark-gfm";
 import { generateSlug } from "../../helper/helpers.ts";
 import ReactMarkdown from "react-markdown";

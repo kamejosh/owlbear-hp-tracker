@@ -13,7 +13,7 @@ import { DiceButton } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { capitalize } from "lodash";
 
 const E5StatBlock = ({ slug }: { slug: string }) => {
-    const { room } = useMetadataContext();
+    const room = useMetadataContext((state) => state.room);
     const statblockQuery = useE5GetStatblock(slug, room?.tabletopAlmanacAPIKey);
 
     const statblock = statblockQuery.isSuccess && statblockQuery.data ? statblockQuery.data : null;
@@ -241,7 +241,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
 };
 
 const PfStatBlock = ({ slug }: { slug: string }) => {
-    const { room } = useMetadataContext();
+    const room = useMetadataContext((state) => state.room);
     const statblockQuery = usePfGetStatblock(slug, room?.tabletopAlmanacAPIKey);
 
     const statblock = statblockQuery.isSuccess && statblockQuery.data ? statblockQuery.data : null;
@@ -436,7 +436,7 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
 };
 
 export const Statblock = (props: { data: HpTrackerMetadata; itemId: string }) => {
-    const { room } = useMetadataContext();
+    const room = useMetadataContext((state) => state.room);
     const [data, setData] = useState<HpTrackerMetadata>(props.data);
 
     useEffect(() => {

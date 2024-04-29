@@ -10,7 +10,7 @@ type HelpButtonsProps = {
 };
 
 export const Helpbuttons = (props: HelpButtonsProps) => {
-    const { room } = useMetadataContext();
+    const room = useMetadataContext((state) => state.room);
     const playerContext = usePlayerContext();
 
     return (
