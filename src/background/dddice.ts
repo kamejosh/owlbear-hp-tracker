@@ -20,6 +20,8 @@ const initDice = async (room: RoomMetadata, updateApi: boolean) => {
         api = await dddiceApiLogin(room);
         if (api) {
             await addRollerApiCallbacks(api, rollLogStore.getState().addRoll);
+        } else {
+            throw Error("Error connecting to dddice");
         }
     }
     if (diceRollerState.diceUser?.diceRendering) {
@@ -33,21 +35,22 @@ const initDice = async (room: RoomMetadata, updateApi: boolean) => {
 };
 
 const initDiceRoller = async (room: RoomMetadata, updateApi: boolean) => {
-    if ((diceRollerState.diceUser && diceRollerState.diceUser.apiKey !== undefined) || !diceRollerState.diceUser) {
-        if (!room?.disableDiceRoller) {
-            await initDice(room, updateApi);
-        } else {
-            await OBR.modal.close(diceTrayModalId);
-        }
+    if (!room?.disableDiceRoller) {
+        await initDice(room, updateApi);
+    } else {
+        await OBR.modal.close(diceTrayModalId);
     }
 };
 
-const roomCallback = async (metadata: Metadata) => {
+const roomCallback = async (metadata: Metadata, forceLogin: boolean) => {
     await lock.promise;
     lock.enable();
     const roomData = metadataKey in metadata ? (metadata[metadataKey] as RoomMetadata) : null;
     let initialized: boolean = false;
-    const reInitialize: boolean = diceRollerState.disableDiceRoller !== roomData?.disableDiceRoller;
+    let reInitialize: boolean = diceRollerState.disableDiceRoller !== roomData?.disableDiceRoller;
+    reInitialize =
+        reInitialize ||
+        diceRollerState.diceUser?.diceRendering !== getRoomDiceUser(roomData, OBR.player.id)?.diceRendering;
     diceRollerState.disableDiceRoller = roomData?.disableDiceRoller === undefined ? false : roomData.disableDiceRoller;
 
     if (roomData && (!roomData.disableDiceRoller || reInitialize)) {
@@ -61,18 +64,18 @@ const roomCallback = async (metadata: Metadata) => {
                     (newApiKey !== undefined && newApiKey !== diceRollerState.diceUser.apiKey) ||
                     diceRendering !== diceRollerState.diceUser.diceRendering
                 ) {
-                    await initDiceRoller(roomData, newApiKey !== diceRollerState.diceUser.apiKey);
+                    await initDiceRoller(roomData, forceLogin || newApiKey !== diceRollerState.diceUser.apiKey);
                     diceRollerState.diceUser = newDiceUser;
                     initialized = true;
                 }
             } else {
                 diceRollerState.diceUser = newDiceUser;
-                await initDiceRoller(roomData, true);
+                await initDiceRoller(roomData, forceLogin || true);
                 initialized = true;
             }
         }
         if (reInitialize || !initialized) {
-            await initDiceRoller(roomData, false);
+            await initDiceRoller(roomData, forceLogin || false);
         }
     }
     lock.disable(null);
@@ -80,8 +83,8 @@ const roomCallback = async (metadata: Metadata) => {
 
 export const setupDddice = async () => {
     const metadata = await OBR.room.getMetadata();
-    await roomCallback(metadata);
+    await roomCallback(metadata, true);
 
-    OBR.room.onMetadataChange(roomCallback);
+    OBR.room.onMetadataChange((metadata) => roomCallback(metadata, false));
     console.info("HP Tracker - Finished setting up dddice");
 };

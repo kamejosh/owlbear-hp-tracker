@@ -2,10 +2,13 @@ import { RoomMetadata } from "./types.ts";
 import { dddiceRollToRollLog, updateRoomMetadata } from "./helpers.ts";
 import OBR from "@owlbear-rodeo/sdk";
 import {
+    IAvailableDie,
     IDiceRoll,
     IDiceRollOptions,
+    IDieType,
     IRoll,
     IRoom,
+    ITheme,
     IUser,
     Operator,
     parseRollEquation,
@@ -177,7 +180,7 @@ const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => vo
 
     rollLogTimeOut = setTimeout(async () => {
         await OBR.popover.close(rollLogPopoverId);
-    }, 5000);
+    }, 10000);
 };
 
 export const addRollerApiCallbacks = async (roller: ThreeDDiceAPI, addRoll: (entry: RollLogEntryType) => void) => {
@@ -266,10 +269,57 @@ export const diceToRoll = (diceString: string, theme: string) => {
     return { dice, operator };
 };
 
+export const validateTheme = (t: ITheme) => {
+    for (const d of t.available_dice) {
+        if (d.hasOwnProperty("type")) {
+            const die = d as IAvailableDie;
+            if (die.notation === "d10x" && (die.notation !== die.id || die.type !== "d10")) {
+                return false;
+            } else if (die.notation !== "d10x" && (die.notation !== die.id || die.id !== die.type)) {
+                return false;
+            }
+        } else {
+            const dice = t.available_dice as Array<IDieType>;
+            if (
+                dice.includes(IDieType.D4) &&
+                dice.includes(IDieType.D6) &&
+                dice.includes(IDieType.D8) &&
+                dice.includes(IDieType.D10) &&
+                dice.includes(IDieType.D12) &&
+                dice.includes(IDieType.D20)
+            ) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+    const dice = t.available_dice;
+    const diceIds = dice.map((d) => {
+        d = d as IAvailableDie;
+        return d.type;
+    });
+    return (
+        diceIds.includes(IDieType.D4) &&
+        diceIds.includes(IDieType.D6) &&
+        diceIds.includes(IDieType.D8) &&
+        diceIds.includes(IDieType.D10) &&
+        diceIds.includes(IDieType.D12) &&
+        diceIds.includes(IDieType.D20)
+    );
+};
+
 export const rollWrapper = async (api: ThreeDDiceAPI, dice: Array<IDiceRoll>, options?: Partial<IDiceRollOptions>) => {
-    // await OBR.modal.open(diceTrayModal);
-    const roll = await api.roll.create(dice, options);
-    if (roll && roll.data) {
-        return roll.data;
+    try {
+        const roll = await api.roll.create(dice, options);
+        if (roll && roll.data) {
+            return roll.data;
+        }
+    } catch {
+        await OBR.notification.show(
+            "Error while rolling dice - check if the selected dice theme is available",
+            "WARNING"
+        );
+        return null;
     }
 };

@@ -1,3 +1,10 @@
+# 2.1.1
+
++ Reset dddice themes that are not available
++ Fix dddice initialization bug
++ Fix dddice 3d rendering settings needing a refresh
++ Increase time dicelog popover is shown
+
 # 2.1.0
 
 + Refactor dddice integration

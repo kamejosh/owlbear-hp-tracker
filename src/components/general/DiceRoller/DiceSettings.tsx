@@ -1,9 +1,9 @@
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
-import { IAvailableDie, IDieType, ITheme } from "dddice-js";
+import { ITheme } from "dddice-js";
 import { useEffect, useState } from "react";
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
-import { updateRoomMetadataDiceUser } from "../../../helper/diceHelper.ts";
+import { updateRoomMetadataDiceUser, validateTheme } from "../../../helper/diceHelper.ts";
 import OBR from "@owlbear-rodeo/sdk";
 import { getRoomDiceUser } from "../../../helper/helpers.ts";
 import { diceTrayModal } from "../../../helper/variables.ts";
@@ -19,54 +19,6 @@ export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean)
     const [error, setError] = useState<string | null>(null);
 
     const themesQuery = useListThemes(getRoomDiceUser(room, playerContext.id)?.apiKey ?? "");
-
-    const validateTheme = (t: ITheme) => {
-        for (const d of t.available_dice) {
-            if (d.hasOwnProperty("type")) {
-                const die = d as IAvailableDie;
-                if (die.notation === "d10x" && (die.notation !== die.id || die.type !== "d10")) {
-                    // setError("d100 invalid - does not match die ID or notation");
-                    return false;
-                } else if (die.notation !== "d10x" && (die.notation !== die.id || die.id !== die.type)) {
-                    // setError(`${die.type} invalid - does not match dice ID or notation`);
-                    return false;
-                }
-            } else {
-                const dice = t.available_dice as Array<IDieType>;
-                if (
-                    dice.includes(IDieType.D4) &&
-                    dice.includes(IDieType.D6) &&
-                    dice.includes(IDieType.D8) &&
-                    dice.includes(IDieType.D10) &&
-                    dice.includes(IDieType.D12) &&
-                    dice.includes(IDieType.D20)
-                ) {
-                    return true;
-                } else {
-                    // setError("theme invalid - theme missing required die in proper notation");
-                    return false;
-                }
-            }
-        }
-        const dice = t.available_dice;
-        const diceIds = dice.map((d) => {
-            d = d as IAvailableDie;
-            return d.type;
-        });
-        if (
-            diceIds.includes(IDieType.D4) &&
-            diceIds.includes(IDieType.D6) &&
-            diceIds.includes(IDieType.D8) &&
-            diceIds.includes(IDieType.D10) &&
-            diceIds.includes(IDieType.D12) &&
-            diceIds.includes(IDieType.D20)
-        ) {
-            return true;
-        } else {
-            // setError("theme invalid - theme missing required die in proper notation");
-            return false;
-        }
-    };
 
     const themes: Array<ITheme> = themesQuery.isSuccess
         ? themesQuery.data.data.filter((t: ITheme) => validateTheme(t))
@@ -166,7 +118,7 @@ export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean)
                 <span className={"text"}>{"Render 3D Dice "}</span>
                 <input
                     type={"checkbox"}
-                    checked={getRoomDiceUser(room, playerContext.id)?.diceRendering}
+                    checked={getRoomDiceUser(room, playerContext.id)?.diceRendering ?? true}
                     onChange={async () => {
                         if (room) {
                             const id = OBR.player.id;
