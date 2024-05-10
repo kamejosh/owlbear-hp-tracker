@@ -3,7 +3,7 @@ import { IDiceRoll, Operator } from "dddice-js";
 import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useComponentContext } from "../../../context/ComponentContext.tsx";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { diceToRoll, rollWrapper } from "../../../helper/diceHelper.ts";
 import tippy, { Instance } from "tippy.js";
@@ -30,7 +30,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                     setTooltip(
                         tippy(buttonWrapper.current, {
                             content: !!room?.disableDiceRoller
-                                ? "Dice Roller is disabled, enable it in the settings"
+                                ? "dddice is disabled, no 3d dice are rendered"
                                 : "Dice Roller is not initialized",
                         })
                     );
@@ -40,7 +40,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                     tooltip.enable();
                     tooltip.setContent(
                         !!room?.disableDiceRoller
-                            ? "Dice Roller is disabled, enable it in the settings"
+                            ? "dddice is disabled, no 3d dice are rendered"
                             : "Dice Roller is not initialized"
                     );
                 } else {
@@ -87,7 +87,7 @@ export const DiceButton = (props: DiceButtonProps) => {
             } else {
                 parsed = diceToRoll(props.dice, theme);
             }
-            if (parsed && rollerApi) {
+            if (parsed) {
                 try {
                     await rollWrapper(rollerApi, parsed.dice, {
                         label: props.context,
@@ -104,9 +104,13 @@ export const DiceButton = (props: DiceButtonProps) => {
         }
     };
 
+    const isEnabled = useCallback(() => {
+        return (initialized && !room?.disableDiceRoller) || room?.disableDiceRoller;
+    }, [initialized, room?.disableDiceRoller]);
+
     return (
         <div
-            className={`button-wrapper ${initialized && !room?.disableDiceRoller ? "enabled" : "disabled"}`}
+            className={`button-wrapper ${isEnabled() ? "enabled" : "disabled"}`}
             onMouseEnter={() => {
                 setContext(true);
             }}
@@ -115,7 +119,7 @@ export const DiceButton = (props: DiceButtonProps) => {
         >
             <button
                 ref={rollButton}
-                disabled={!initialized && room?.disableDiceRoller}
+                disabled={!isEnabled()}
                 className={"dice-button button"}
                 onClick={async () => {
                     await roll();
@@ -125,7 +129,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                 {props.text.replace(/\s/g, "")}
             </button>
             <div
-                className={`dice-context-button ${context && initialized ? "visible" : ""} ${
+                className={`dice-context-button ${context && isEnabled() ? "visible" : ""} ${
                     props.dice.startsWith("1d20") ||
                     props.dice.startsWith("d20") ||
                     props.dice.startsWith("+") ||
@@ -141,7 +145,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                     <>
                         <button
                             className={"advantage"}
-                            disabled={!initialized}
+                            disabled={!isEnabled()}
                             onClick={async () => {
                                 await roll("ADV");
                             }}
@@ -150,7 +154,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                         </button>
                         <button
                             className={"disadvantage"}
-                            disabled={!initialized}
+                            disabled={!isEnabled()}
                             onClick={async () => {
                                 await roll("DIS");
                             }}
@@ -161,7 +165,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                 ) : null}
                 <button
                     className={"self"}
-                    disabled={!initialized}
+                    disabled={!isEnabled()}
                     onClick={async () => {
                         await roll("SELF");
                     }}

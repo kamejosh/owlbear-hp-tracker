@@ -10,6 +10,7 @@ import { DiceUser } from "../../../helper/types.ts";
 import { getRoomDiceUser } from "../../../helper/helpers.ts";
 import { useListThemes } from "../../../api/dddiceApi.ts";
 import OBR from "@owlbear-rodeo/sdk";
+import { DDDICE_API_KEY } from "../../../config.ts";
 
 type DiceTrayProps = {
     classes: string;
@@ -55,6 +56,20 @@ export const DiceTray = (props: DiceTrayProps) => {
     }, [room]);
 
     useEffect(() => {
+        const initDice = async () => {
+            let api: ThreeDDiceAPI | undefined;
+            setInitialized(false);
+            if (diceUser?.apiKey !== apiKey && diceUser?.apiKey !== undefined) {
+                setApiKey(diceUser?.apiKey);
+                api = await dddiceApiLogin(room);
+                if (api) {
+                    setRollerApi(api);
+                }
+            }
+
+            setInitialized(true);
+        };
+
         if ((diceUser && diceUser.apiKey !== undefined) || (!diceUser && component === "modal")) {
             if (!room?.disableDiceRoller && diceUser?.apiKey) {
                 initDice();
@@ -79,7 +94,7 @@ export const DiceTray = (props: DiceTrayProps) => {
                 }
             }
         };
-        const initTheme = async () => {
+        const initUserTheme = async () => {
             if (!theme) {
                 const themeId = room?.diceUser?.find((user) => user.playerId === playerContext.id)?.diceTheme;
                 if (themeId && diceThemes.map((t) => t.id).includes(themeId)) {
@@ -97,22 +112,24 @@ export const DiceTray = (props: DiceTrayProps) => {
             }
         };
 
-        initTheme();
+        const initDefaultTheme = async () => {
+            if (room?.disableDiceRoller) {
+                const api = new ThreeDDiceAPI(DDDICE_API_KEY, "HP Tracker");
+                if (api) {
+                    const defaultTheme = (await api.theme.get("dddice-bees")).data;
+                    if (defaultTheme) {
+                        setTheme(defaultTheme);
+                    }
+                }
+            }
+        };
+
+        if (rollerApi) {
+            initUserTheme();
+        } else {
+            initDefaultTheme();
+        }
     }, [rollerApi, diceThemeQuery.isSuccess, diceUser?.diceTheme]);
 
-    const initDice = async () => {
-        let api: ThreeDDiceAPI | undefined;
-        setInitialized(false);
-        if (diceUser?.apiKey !== apiKey && diceUser?.apiKey !== undefined) {
-            setApiKey(diceUser?.apiKey);
-            api = await dddiceApiLogin(room);
-            if (api) {
-                setRollerApi(api);
-            }
-        }
-
-        setInitialized(true);
-    };
-
-    return room?.disableDiceRoller ? null : <DiceRoom className={props.classes} />;
+    return <DiceRoom className={props.classes} />;
 };

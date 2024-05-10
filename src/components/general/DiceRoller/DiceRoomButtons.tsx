@@ -1,6 +1,6 @@
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { useDiceButtonsContext } from "../../../context/DiceButtonContext.tsx";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { IAvailableDie, IDiceRoll, IDieType, Operator, parseRollEquation } from "dddice-js";
 import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { AddSvg } from "../../svgs/AddSvg.tsx";
@@ -23,6 +23,7 @@ type CustomDiceButtonProps = {
 const CustomDiceButton = (props: CustomDiceButtonProps) => {
     const [rollerApi, theme, initialized] = useDiceRoller((state) => [state.rollerApi, state.theme, state.initialized]);
     const { buttons, setButtons } = useDiceButtonsContext();
+    const room = useMetadataContext((state) => state.room);
     const component = useComponentContext((state) => state.component);
     const [hover, setHover] = useState<boolean>(false);
     const [addCustom, setAddCustom] = useState<boolean>(false);
@@ -87,7 +88,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                 props.dice,
                 theme.id
             );
-            if (parsed && rollerApi) {
+            if (parsed) {
                 await rollWrapper(rollerApi, parsed.dice, {
                     operator: parsed.operator,
                     external_id: component,
@@ -99,6 +100,10 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
         button.blur();
     };
 
+    const isEnabled = useCallback(() => {
+        return (initialized && !room?.disableDiceRoller) || room?.disableDiceRoller;
+    }, [initialized, room?.disableDiceRoller]);
+
     return (
         <div
             className={`custom-dice-wrapper ${props.dice ? "has-dice" : ""}`}
@@ -107,7 +112,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
         >
             <button
                 ref={buttonRef}
-                className={`button custom-dice dice-${props.button} ${initialized ? "enabled" : "disabled"} `}
+                className={`button custom-dice dice-${props.button} ${isEnabled() ? "enabled" : "disabled"} `}
                 onClick={async (e) => {
                     if (!props.dice && buttons.hasOwnProperty(props.button.toString())) {
                         setAddCustom(true);
@@ -121,7 +126,6 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
             {addCustom ? (
                 <div className={"add-custom-dice"}>
                     <input
-                        disabled={!theme}
                         ref={inputRef}
                         type={"text"}
                         onChange={(e) => {

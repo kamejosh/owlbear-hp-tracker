@@ -12,7 +12,7 @@ import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { useComponentContext } from "../../context/ComponentContext.tsx";
 import { useDiceRoller } from "../../context/DDDiceContext.tsx";
 import { IDiceRoll, IRoll, Operator } from "dddice-js";
-import { diceToRoll } from "../../helper/diceHelper.ts";
+import { diceToRoll, rollWrapper } from "../../helper/diceHelper.ts";
 
 type TokenProps = {
     item: Item;
@@ -263,20 +263,24 @@ export const Token = (props: TokenProps) => {
         return room?.allowNegativeNumbers ? hp : Math.max(hp, 0);
     };
 
-    const roll = async (button: HTMLButtonElement, dice: string) => {
+    const roll = async (button: HTMLButtonElement, dice: string, bonus: number) => {
         button.classList.add("rolling");
+        if (bonus > 0) {
+            dice += `+${bonus}`;
+        } else if (bonus < 0) {
+            dice += `-${bonus}`;
+        }
         if (theme) {
             let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined = diceToRoll(dice, theme.id);
             if (parsed) {
-                const roll = await rollerApi?.roll.create(parsed.dice, {
+                const rollData = await rollWrapper(rollerApi, parsed.dice, {
                     operator: parsed.operator,
                     external_id: component,
                     label: "Initiative: Roll",
                 });
-                if (roll && roll.data) {
-                    const data = roll.data;
+                if (rollData) {
                     button.classList.remove("rolling");
-                    return data;
+                    return rollData;
                 }
             }
         }
@@ -499,12 +503,16 @@ export const Token = (props: TokenProps) => {
                     onClick={async (e) => {
                         let rollData: IRoll | undefined;
                         if (getRoomDiceUser(room, playerContext.id)?.diceRendering && !room?.disableDiceRoller) {
-                            rollData = await roll(e.currentTarget, `1d${room?.initiativeDice ?? 20}`);
+                            rollData = await roll(
+                                e.currentTarget,
+                                `1d${room?.initiativeDice ?? 20}`,
+                                data.stats.initiativeBonus
+                            );
                         }
                         let value = 0;
                         let bonus = data.stats.initiativeBonus;
-                        if (rollData && rollData.values.length >= 1) {
-                            value = rollData.values[0].value + bonus;
+                        if (rollData) {
+                            value = Number(rollData.total_value);
                         } else {
                             value = Math.floor(Math.random() * (room?.initiativeDice ?? 20)) + 1 + bonus;
                         }

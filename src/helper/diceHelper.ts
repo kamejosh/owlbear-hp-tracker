@@ -94,6 +94,7 @@ export const getDiceParticipant = async (rollerApi: ThreeDDiceAPI, roomSlug: str
 export const getApiKey = async (room: RoomMetadata | null) => {
     const roomMetadata = await OBR.room.getMetadata();
     const playerId = await OBR.player.getId();
+    //TODO: we currently use the playerId but this changes a lot. player names would probably be better.
     let apiKey: string | undefined = room?.diceUser?.find((user) => user.playerId === playerId)?.apiKey;
     let updateKey: boolean = false;
 
@@ -309,17 +310,30 @@ export const validateTheme = (t: ITheme) => {
     );
 };
 
-export const rollWrapper = async (api: ThreeDDiceAPI, dice: Array<IDiceRoll>, options?: Partial<IDiceRollOptions>) => {
-    try {
-        const roll = await api.roll.create(dice, options);
-        if (roll && roll.data) {
-            return roll.data;
+const getLocalDiceRoll = (dice: Array<IDiceRoll>, options?: Partial<IDiceRollOptions>) => {
+    console.log(dice, options);
+};
+
+export const rollWrapper = async (
+    api: ThreeDDiceAPI | null,
+    dice: Array<IDiceRoll>,
+    options?: Partial<IDiceRollOptions>
+) => {
+    if (api) {
+        try {
+            const roll = await api.roll.create(dice, options);
+            if (roll && roll.data) {
+                console.log(roll.data);
+                return roll.data;
+            }
+        } catch {
+            await OBR.notification.show(
+                "Error while rolling dice - check if the selected dice theme is available",
+                "WARNING"
+            );
+            return null;
         }
-    } catch {
-        await OBR.notification.show(
-            "Error while rolling dice - check if the selected dice theme is available",
-            "WARNING"
-        );
-        return null;
+    } else {
+        getLocalDiceRoll(dice, options);
     }
 };
