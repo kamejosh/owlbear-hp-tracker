@@ -4,6 +4,7 @@
 + Fix dddice initialization bug
 + Fix dddice 3d rendering settings needing a refresh
 + Increase time dicelog popover is shown
++ Add option to allow reversed initiative
 
 # 2.1.0
 
