@@ -34,6 +34,7 @@ const Content = () => {
     const [tokenLists, setTokenLists] = useState<Map<string, Array<Item>>>(new Map());
     const [ignoredChanges, setIgnoredChanges] = useState<boolean>(false);
     const [scene, room] = useMetadataContext((state) => [state.scene, state.room]);
+    const [reverseInitiativeOrder, setReverseInitiativeOrder] = useState<boolean>(false);
     const { isReady } = SceneReadyContext();
     const characterId = useCharSheet((state) => state.characterId);
 
@@ -263,7 +264,7 @@ const Content = () => {
         );
     };
 
-    const orderByInitiative = () => {
+    const orderByInitiative = (reverse: boolean = false) => {
         tokenLists.forEach((tokenList) => {
             const reordered = Array.from(tokenList);
             reordered.sort((a, b) => {
@@ -278,6 +279,9 @@ const Content = () => {
                 }
                 return bData.initiative - aData.initiative;
             });
+            if (reverse) {
+                reordered.reverse();
+            }
             reorderMetadataIndex(reordered);
         });
     };
@@ -301,9 +305,12 @@ const Content = () => {
                         INIT
                         {playerContext.role === "GM" ? (
                             <button
-                                className={"sort-button settings-button"}
+                                className={`sort-button ${reverseInitiativeOrder ? "reverse" : ""}`}
                                 title={"Order By Initiative"}
-                                onClick={orderByInitiative}
+                                onClick={() => {
+                                    orderByInitiative(reverseInitiativeOrder);
+                                    setReverseInitiativeOrder(!reverseInitiativeOrder);
+                                }}
                             >
                                 ↓
                             </button>

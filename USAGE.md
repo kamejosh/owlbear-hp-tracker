@@ -153,7 +153,7 @@ The following settings are available:
 
 The Token List consists of the column headings, groups and tokens associated with each group. HP Tracker remembers which groups are open or collapsed between sessions. Collapsing a group hides the tokens it contains in the list, but they are still tracked by the HP Tracker and the [Popover](#hp-tracker-popover) is still available.
 
-When clicking the button next to INIT in the header all Tokens will be ordered by there initiative value. This is done per group so Tokens in different groups will not be changing positions.
+When clicking the button next to INIT in the header all Tokens will be ordered by there initiative value. This is done per group so Tokens in different groups will not be changing positions. Once clicked the button changes direction and now orders the tokens from smallest to biggest value.
 
 Tokens can be moved between groups or reordered inside a group by dragging and dropping. By default this has no effect on the [Player Action Window](#player-action-window) but when the [setting](#global-settings) "Sort in Player View" is active, the Tokens in the Player Action Window are **sorted by their initiative value regardless of group**.
 
