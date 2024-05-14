@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useInterval } from "../../../helper/hooks.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import tippy from "tippy.js";
+import { isObject } from "lodash";
 
 type RollLogEntryProps = {
     entry: RollLogEntryType;
@@ -69,14 +70,17 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
     }, [detailsRef]);
 
     const getDetailedResult = useCallback(() => {
-        let result = "";
-        props.entry.values.forEach((value) => {
-            result += Intl.NumberFormat("en-US", { signDisplay: "always" }).format(Math.floor(value.value));
-        });
-        if (result.length > 0) {
-            result = result.substring(1, result.length);
+        if (
+            props.entry.values.length > 0 &&
+            isObject(props.entry.values[0]) &&
+            // @ts-ignore before the switch values had the property "value"
+            props.entry.values[0].hasOwnProperty("value")
+        ) {
+            // @ts-ignore before the switch values had the property "value"
+            return props.entry.values.map((v) => v.value).join(", ");
+        } else {
+            return props.entry.values.join(", ");
         }
-        return result;
     }, [props.entry.values]);
 
     const formatLabel = useCallback(() => {

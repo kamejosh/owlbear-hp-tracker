@@ -233,7 +233,7 @@ export const dddiceRollToRollLog = async (
         label: roll.label,
         total_value: roll.total_value,
         username: username,
-        values: roll.values,
+        values: roll.values.map((v) => v.value.toString()),
         owlbear_user_id: options?.owlbear_user_id,
         participantUsername: participantName,
     };

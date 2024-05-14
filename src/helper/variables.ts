@@ -10,6 +10,7 @@ export const modalId = `${ID}/modal`;
 export const diceTrayModalId = `${ID}/diceTrayModal`;
 export const statblockPopoverId = `${ID}/statblock-popover`;
 export const rollLogPopoverId = `${ID}/dice-log`;
+export const rollMessageChannel = `${ID}.roll-event`;
 
 export const version = "2.1.1";
 

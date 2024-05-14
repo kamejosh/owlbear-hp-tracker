@@ -4,11 +4,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { IAvailableDie, IDiceRoll, IDieType, Operator, parseRollEquation } from "dddice-js";
 import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { AddSvg } from "../../svgs/AddSvg.tsx";
-import { diceToRoll, getDiceParticipant, rollWrapper } from "../../../helper/diceHelper.ts";
+import { diceToRoll, getDiceParticipant, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
 import { useComponentContext } from "../../../context/ComponentContext.tsx";
 import tippy, { Instance } from "tippy.js";
 import { RollLogSvg } from "../../svgs/RollLogSvg.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
+import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 
 type DiceRoomButtonsProps = {
     open: boolean;
@@ -22,6 +23,7 @@ type CustomDiceButtonProps = {
 
 const CustomDiceButton = (props: CustomDiceButtonProps) => {
     const [rollerApi, theme, initialized] = useDiceRoller((state) => [state.rollerApi, state.theme, state.initialized]);
+    const addRoll = useRollLogContext((state) => state.addRoll);
     const { buttons, setButtons } = useDiceButtonsContext();
     const room = useMetadataContext((state) => state.room);
     const component = useComponentContext((state) => state.component);
@@ -83,7 +85,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
 
     const roll = async (button: HTMLButtonElement) => {
         button.classList.add("rolling");
-        if (theme && props.dice) {
+        if (!room?.disableDiceRoller && rollerApi && theme && props.dice) {
             let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined = diceToRoll(
                 props.dice,
                 theme.id
@@ -95,6 +97,8 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                     label: "Roll: Custom",
                 });
             }
+        } else if (props.dice) {
+            await localRoll(props.dice, "Roll: Custom", addRoll);
         }
         button.classList.remove("rolling");
         button.blur();
