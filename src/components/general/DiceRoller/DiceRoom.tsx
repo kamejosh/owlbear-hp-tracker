@@ -48,15 +48,26 @@ export const DiceRoom = ({ className }: { className?: string }) => {
                     <div className={"dice-tray-content"}>
                         <div className={"top"}>
                             {room?.disableDiceRoller ? (
-                                playerContext.role === "GM" ? (
+                                <>
                                     <button
-                                        onClick={async () => {
-                                            await updateRoomMetadata(room, { disableDiceRoller: false });
+                                        className={"clear-log"}
+                                        onClick={() => {
+                                            clear();
                                         }}
                                     >
-                                        Enabled dddice Integration
+                                        Clear
                                     </button>
-                                ) : null
+
+                                    {playerContext.role === "GM" ? (
+                                        <button
+                                            onClick={async () => {
+                                                await updateRoomMetadata(room, { disableDiceRoller: false });
+                                            }}
+                                        >
+                                            Enabled dddice Integration
+                                        </button>
+                                    ) : null}
+                                </>
                             ) : (
                                 <>
                                     <button

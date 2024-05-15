@@ -10,7 +10,6 @@ import { DiceUser } from "../../../helper/types.ts";
 import { getRoomDiceUser } from "../../../helper/helpers.ts";
 import { useListThemes } from "../../../api/dddiceApi.ts";
 import OBR from "@owlbear-rodeo/sdk";
-import { DDDICE_API_KEY } from "../../../config.ts";
 
 type DiceTrayProps = {
     classes: string;
@@ -112,22 +111,8 @@ export const DiceTray = (props: DiceTrayProps) => {
             }
         };
 
-        const initDefaultTheme = async () => {
-            if (room?.disableDiceRoller) {
-                const api = new ThreeDDiceAPI(DDDICE_API_KEY, "HP Tracker");
-                if (api) {
-                    const defaultTheme = (await api.theme.get("dddice-bees")).data;
-                    if (defaultTheme) {
-                        setTheme(defaultTheme);
-                    }
-                }
-            }
-        };
-
         if (rollerApi) {
             initUserTheme();
-        } else {
-            initDefaultTheme();
         }
     }, [rollerApi, diceThemeQuery.isSuccess, diceUser?.diceTheme]);
 

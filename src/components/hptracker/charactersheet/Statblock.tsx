@@ -10,7 +10,7 @@ import { E5Spells } from "./E5Spells.tsx";
 import { PfSpells } from "./PfSpells.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { DiceButton } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
-import { capitalize } from "lodash";
+import { capitalize, isNull } from "lodash";
 
 const E5StatBlock = ({ slug }: { slug: string }) => {
     const room = useMetadataContext((state) => state.room);
@@ -83,7 +83,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                         <b>Saving Throws</b>{" "}
                         {Object.entries(statblock.saving_throws)
                             .map(([key, value]) => {
-                                if (value) {
+                                if (isNull(value)) {
                                     return (
                                         <span className={"saving-throw"} key={key}>
                                             {key.substring(0, 3)}:{" "}

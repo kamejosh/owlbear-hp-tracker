@@ -178,7 +178,7 @@ export const DiceButton = (props: DiceButtonProps) => {
 };
 
 export const DiceButtonWrapper = (text: string, context: string) => {
-    const regex = /((\d+?d\d+)( ?[\+\-] ?\d+)?)|([\+\-]\d+)/gi;
+    const regex = /((\d*?d\d+)( ?[\+\-] ?\d+)?)|([\+\-]\d+)/gi;
     const dice = text.match(regex);
     dice?.forEach((die) => {
         text = text.split(die).join("|||");

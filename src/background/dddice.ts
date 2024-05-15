@@ -87,7 +87,6 @@ export const setupDddice = async () => {
 
     OBR.room.onMetadataChange((metadata) => roomCallback(metadata, false));
     OBR.broadcast.onMessage(rollMessageChannel, (event) => {
-        console.log("here");
         handleNewRoll(rollLogStore.getState().addRoll, event.data as RollLogEntryType);
     });
     console.info("HP Tracker - Finished setting up dddice");

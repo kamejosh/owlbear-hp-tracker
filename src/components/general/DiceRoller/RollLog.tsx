@@ -1,5 +1,5 @@
 import { DiceButton } from "./DiceButtonWrapper.tsx";
-import { RollLogEntryType, useRollLogContext } from "../../../context/RollLogContext.tsx";
+import { RollLogEntryType, rollLogStore, useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useInterval } from "../../../helper/hooks.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
@@ -13,6 +13,9 @@ type RollLogEntryProps = {
 
 export const RollLog = () => {
     const log = useRollLogContext((state) => state.log);
+    useInterval(() => {
+        rollLogStore.persist.rehydrate();
+    }, 1000);
 
     return (
         <ul className={"roll-log"}>
