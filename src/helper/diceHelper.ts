@@ -320,7 +320,8 @@ export const localRoll = async (
     diceEquation: string,
     label: string,
     addRoll: (entry: RollLogEntryType) => void,
-    hidden: boolean = false
+    hidden: boolean = false,
+    statblock?: string
 ) => {
     try {
         const roll = new DiceRoll(diceEquation);
@@ -331,11 +332,8 @@ export const localRoll = async (
             equation: diceEquation,
             label: label,
             total_value: roll.total.toString(),
-            username: name,
-            values: roll.output
-                .substring(roll.output.indexOf("[") + 1, roll.output.indexOf("]"))
-                .replace(" ", "")
-                .split(","),
+            username: statblock ?? name,
+            values: [roll.output.substring(roll.output.indexOf(":") + 1, roll.output.indexOf("=") - 1)],
             owlbear_user_id: OBR.player.id,
             participantUsername: name,
         };

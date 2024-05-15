@@ -211,7 +211,7 @@ export const dddiceRollToRollLog = async (
     roll: IRoll,
     options?: { participant?: IRoomParticipant; owlbear_user_id?: string }
 ): Promise<RollLogEntryType> => {
-    let username = roll.user.username;
+    let username = roll.external_id ?? roll.user.username;
     let participantName = "";
     if (options && options.participant && options.participant.username) {
         participantName = options.participant.username;
@@ -222,7 +222,7 @@ export const dddiceRollToRollLog = async (
         }
     }
 
-    if (roll.user.name === "Guest User") {
+    if (roll.user.name === "Guest User" && !roll.external_id) {
         username = participantName;
     }
 

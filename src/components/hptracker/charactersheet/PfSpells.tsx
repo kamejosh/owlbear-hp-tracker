@@ -11,7 +11,7 @@ export type PfSpellCategory = components["schemas"]["SpellCategoryOut"];
 export type PfSpellList = components["schemas"]["SpelllistOut"];
 export type PfSpellOut = components["schemas"]["SpellOut"];
 
-const Spell = (props: { spell: PfSpellOut }) => {
+const Spell = (props: { spell: PfSpellOut; statblock: string }) => {
     const room = useMetadataContext((state) => state.room);
     const [open, setOpen] = useState<boolean>(false);
 
@@ -30,7 +30,7 @@ const Spell = (props: { spell: PfSpellOut }) => {
                     </div>
                     {damage ? (
                         <span className={"spell-damage"}>
-                            Damage: {DiceButtonWrapper(damage, `${capitalize(spell?.name)} Damage`)}
+                            Damage: {DiceButtonWrapper(damage, `${capitalize(spell?.name)} Damage`, props.statblock)}
                         </span>
                     ) : null}
                     {spell?.cast ? (
@@ -114,7 +114,11 @@ const Spell = (props: { spell: PfSpellOut }) => {
                     </div>
                     <div className={"spell-description"}>
                         <b>Description</b>:{" "}
-                        {DiceButtonWrapper(spell?.description?.text || "", `${capitalize(spell?.name)}`)}
+                        {DiceButtonWrapper(
+                            spell?.description?.text || "",
+                            `${capitalize(spell?.name)}`,
+                            props.statblock
+                        )}
                         {spell?.description?.details && spell.description.details.length > 0 ? (
                             <ul>
                                 {spell?.description.details.map((details, index) => {
@@ -123,7 +127,8 @@ const Spell = (props: { spell: PfSpellOut }) => {
                                             <b>{details.title}</b>:{" "}
                                             {DiceButtonWrapper(
                                                 details.text,
-                                                `${capitalize(spell.name)} ${details.title}`
+                                                `${capitalize(spell.name)} ${details.title}`,
+                                                props.statblock
                                             )}
                                         </li>
                                     );
@@ -141,13 +146,15 @@ const Spell = (props: { spell: PfSpellOut }) => {
                                             <div className={"modifier"}>
                                                 {DiceButtonWrapper(
                                                     heightened.modifier,
-                                                    `${capitalize(spell.name)}: Heightened`
+                                                    `${capitalize(spell.name)}: Heightened`,
+                                                    props.statblock
                                                 )}
                                             </div>
                                             <div className={"description"}>
                                                 {DiceButtonWrapper(
                                                     heightened.description,
-                                                    `${capitalize(spell.name)}: Heightened`
+                                                    `${capitalize(spell.name)}: Heightened`,
+                                                    props.statblock
                                                 )}
                                             </div>
                                         </div>
@@ -162,7 +169,7 @@ const Spell = (props: { spell: PfSpellOut }) => {
     );
 };
 
-const PfSpellListComponent = (props: { list: PfSpellList }) => {
+const PfSpellListComponent = (props: { list: PfSpellList; statblock: string }) => {
     return (
         <div className={"spell-list"}>
             <h4 className={"spell-list-title"}>
@@ -172,7 +179,7 @@ const PfSpellListComponent = (props: { list: PfSpellList }) => {
             <ul className={"spells"}>
                 {!!props.list.spells
                     ? props.list.spells.map((spell) => {
-                          return <Spell spell={spell} key={spell.slug} />;
+                          return <Spell spell={spell} key={spell.slug} statblock={props.statblock} />;
                       })
                     : null}
             </ul>
@@ -180,7 +187,7 @@ const PfSpellListComponent = (props: { list: PfSpellList }) => {
     );
 };
 
-const PfSpellCategory = (props: { spellCategory: PfSpellCategory }) => {
+const PfSpellCategory = (props: { spellCategory: PfSpellCategory; statblock: string }) => {
     const [spellFilter, setSpellFilter] = useState<Array<number>>([]);
     const [open, setOpen] = useState<boolean>(false);
 
@@ -231,6 +238,7 @@ const PfSpellCategory = (props: { spellCategory: PfSpellCategory }) => {
                                     dice={`d20+${props.spellCategory.attack}`}
                                     text={`+${props.spellCategory.attack}`}
                                     context={`${capitalize(props.spellCategory.name)}: Attack`}
+                                    statblock={props.statblock}
                                 />
                             </span>
                         ) : null}
@@ -273,7 +281,13 @@ const PfSpellCategory = (props: { spellCategory: PfSpellCategory }) => {
                                   }
                               })
                               .map((list) => {
-                                  return <PfSpellListComponent key={list.type + list.level} list={list} />;
+                                  return (
+                                      <PfSpellListComponent
+                                          key={list.type + list.level}
+                                          list={list}
+                                          statblock={props.statblock}
+                                      />
+                                  );
                               })
                         : null}
                 </div>
@@ -282,13 +296,17 @@ const PfSpellCategory = (props: { spellCategory: PfSpellCategory }) => {
     );
 };
 
-export const PfSpells = (props: { spells: Array<PfSpellCategory> }) => {
+export const PfSpells = (props: { spells: Array<PfSpellCategory>; statblock: string }) => {
     return (
         <div className={"spells"}>
             <h3 className={"section-title"}>Spells</h3>
             {props.spells.map((spellCategory) => {
                 return !!spellCategory ? (
-                    <PfSpellCategory key={spellCategory.name} spellCategory={spellCategory} />
+                    <PfSpellCategory
+                        key={spellCategory.name}
+                        spellCategory={spellCategory}
+                        statblock={props.statblock}
+                    />
                 ) : null;
             })}
         </div>

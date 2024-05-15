@@ -122,6 +122,7 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
                 dice={props.entry.equation}
                 text={props.entry.equation}
                 context={props.entry.label || "re-roll"}
+                statblock={props.entry.username}
             />
             <div className={"roll-equation"}>{props.entry.equation}</div>
             <div ref={detailsRef} className={"detailed-result"}>

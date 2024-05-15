@@ -1,6 +1,6 @@
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { useDiceButtonsContext } from "../../../context/DiceButtonContext.tsx";
-import React, { ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { IAvailableDie, IDiceRoll, IDieType, Operator, parseRollEquation } from "dddice-js";
 import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { AddSvg } from "../../svgs/AddSvg.tsx";
@@ -72,7 +72,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
     }, [props.dice]);
 
     const getDicePreview = () => {
-        if (props.dice && theme) {
+        if (props.dice && theme && !room?.disableDiceRoller) {
             try {
                 const parsed = parseRollEquation(props.dice, theme.id);
                 return (
@@ -144,7 +144,8 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                 });
             }
         } else if (props.dice) {
-            await localRoll(props.dice, "Roll: Custom", addRoll);
+            const roll = await localRoll(props.dice, "Roll: Custom", addRoll);
+            console.log(roll);
         }
         button.classList.remove("rolling");
         button.blur();
@@ -262,6 +263,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
 
 const QuickButtons = ({ open }: { open: boolean }) => {
     const { theme, rollerApi } = useDiceRoller();
+    const addRoll = useRollLogContext((state) => state.addRoll);
     const { room } = useMetadataContext();
     const { component } = useComponentContext();
     const [validCustom, setValidCustom] = useState<boolean>(true);
@@ -279,7 +281,7 @@ const QuickButtons = ({ open }: { open: boolean }) => {
 
     const roll = async (element: HTMLElement, dice: string, hide: boolean = false) => {
         element.classList.add("rolling");
-        if (theme && dice) {
+        if (theme && dice && !room?.disableDiceRoller) {
             let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined = diceToRoll(dice, theme.id);
             if (parsed && rollerApi) {
                 await rollWrapper(rollerApi, parsed.dice, {
@@ -289,6 +291,8 @@ const QuickButtons = ({ open }: { open: boolean }) => {
                     whisper: hide ? await getUserUuid() : undefined,
                 });
             }
+        } else {
+            await localRoll(dice, "Roll: Custom", addRoll, hide);
         }
         element.classList.remove("rolling");
         element.blur();
@@ -324,7 +328,7 @@ const QuickButtons = ({ open }: { open: boolean }) => {
             );
         };
 
-        if (theme) {
+        if (theme && !room?.disableDiceRoller) {
             return theme.available_dice.map((die, index) => {
                 let preview = "";
                 let name = "";

@@ -40,6 +40,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                             dice={statblock.hp.hit_dice}
                             text={statblock.hp.hit_dice}
                             context={statblock.name + ": Hit Dice"}
+                            statblock={statblock.name}
                         />
                     ) : null}
                 </span>
@@ -71,6 +72,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                                         Math.floor((value - 10) / 2)
                                     )}
                                     context={`${capitalize(stat)}: Check`}
+                                    statblock={statblock.name}
                                 />
                             </div>
                         </div>
@@ -83,7 +85,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                         <b>Saving Throws</b>{" "}
                         {Object.entries(statblock.saving_throws)
                             .map(([key, value]) => {
-                                if (isNull(value)) {
+                                if (!isNull(value)) {
                                     return (
                                         <span className={"saving-throw"} key={key}>
                                             {key.substring(0, 3)}:{" "}
@@ -91,6 +93,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                                                 dice={`d20+${value}`}
                                                 text={`+${value}`}
                                                 context={`${capitalize(key.substring(0, 3))}: Save`}
+                                                statblock={statblock.name}
                                             />
                                         </span>
                                     );
@@ -117,7 +120,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                     <h3>Skills</h3>
                     <ul className={"skill-list"}>
                         {Object.entries(statblock.skills).map(([key, value], index) => {
-                            if (value) {
+                            if (!isNull(value)) {
                                 return (
                                     <li className={"skill"} key={index}>
                                         <b>{key}</b>:{" "}
@@ -129,6 +132,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                                                 Math.floor(value)
                                             )}
                                             context={`${capitalize(key)}: Check`}
+                                            statblock={statblock.name}
                                         />
                                     </li>
                                 );
@@ -169,7 +173,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                     <h3>Special Abilities</h3>
                     <ul className={"ability-list"}>
                         {statblock.special_abilities?.map((ability, index) => (
-                            <E5Ability ability={ability} key={ability.name + index} />
+                            <E5Ability ability={ability} key={ability.name + index} statblock={statblock.name} />
                         ))}
                     </ul>
                 </div>
@@ -179,7 +183,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                     <h3>Actions</h3>
                     <ul className={"ability-list"}>
                         {statblock.actions.map((action, index) => (
-                            <E5Ability ability={action} key={action.name + index} />
+                            <E5Ability ability={action} key={action.name + index} statblock={statblock.name} />
                         ))}
                     </ul>
                 </div>
@@ -189,7 +193,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                     <h3>Reactions</h3>
                     <ul className={"ability-list"}>
                         {statblock.reactions?.map((reaction, index) => (
-                            <E5Ability ability={reaction} key={reaction.name + index} />
+                            <E5Ability ability={reaction} key={reaction.name + index} statblock={statblock.name} />
                         ))}
                     </ul>
                 </div>
@@ -199,7 +203,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                     <h3>Bonus Actions</h3>
                     <ul className={"ability-list"}>
                         {statblock.bonus_actions.map((action, index) => (
-                            <E5Ability ability={action} key={action.name + index} />
+                            <E5Ability ability={action} key={action.name + index} statblock={statblock.name} />
                         ))}
                     </ul>
                 </div>
@@ -209,7 +213,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                     <h3>Lair Actions</h3>
                     <ul className={"ability-list"}>
                         {statblock.lair_actions.map((action, index) => (
-                            <E5Ability ability={action} key={action.name + index} />
+                            <E5Ability ability={action} key={action.name + index} statblock={statblock.name} />
                         ))}
                     </ul>
                 </div>
@@ -219,7 +223,7 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                     <h3>Mythic Actions</h3>
                     <ul className={"ability-list"}>
                         {statblock.mythic_actions.map((action, index) => (
-                            <E5Ability ability={action} key={action.name + index} />
+                            <E5Ability ability={action} key={action.name + index} statblock={statblock.name} />
                         ))}
                     </ul>
                 </div>
@@ -230,12 +234,18 @@ const E5StatBlock = ({ slug }: { slug: string }) => {
                     {statblock.legendary_desc}
                     <ul className={"ability-list"}>
                         {statblock.legendary_actions?.map((legendary_action, index) => (
-                            <E5Ability ability={legendary_action} key={legendary_action.name + index} />
+                            <E5Ability
+                                ability={legendary_action}
+                                key={legendary_action.name + index}
+                                statblock={statblock.name}
+                            />
                         ))}
                     </ul>
                 </div>
             ) : null}
-            {statblock.spells && statblock.spells.length > 0 ? <E5Spells spells={statblock.spells} /> : null}
+            {statblock.spells && statblock.spells.length > 0 ? (
+                <E5Spells spells={statblock.spells} statblock={statblock.name} />
+            ) : null}
         </div>
     ) : null;
 };
@@ -286,6 +296,7 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                             dice={`d20${statblock.perception}`}
                             text={statblock.perception}
                             context={`Perception: Check`}
+                            statblock={statblock.name}
                         />
                     </span>
                 ) : null}
@@ -304,6 +315,7 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                                         Math.floor(value)
                                     )}
                                     context={`${capitalize(stat)}: Check`}
+                                    statblock={statblock.name}
                                 />
                             </div>
                         </div>
@@ -325,6 +337,7 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                                                     dice={`d20+${value}`}
                                                     text={`+${value}`}
                                                     context={`${capitalize(key)}: Save`}
+                                                    statblock={statblock.name}
                                                 />
                                             </li>
                                         );
@@ -373,6 +386,7 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                                             dice={`d20+${value}`}
                                             text={value}
                                             context={`${capitalize(skill.name)}: Check`}
+                                            statblock={statblock.name}
                                         />
                                     </div>
                                 </div>
@@ -406,7 +420,7 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                 <h3>Actions</h3>
                 <ul className={"ability-list"}>
                     {statblock.actions.map((action, index) => {
-                        return <PfAbility key={index} ability={action} />;
+                        return <PfAbility key={index} ability={action} statblock={statblock.name} />;
                     })}
                 </ul>
             </div>
@@ -415,7 +429,7 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                     <h3>Reactions</h3>
                     <ul className={"ability-list"}>
                         {statblock.reactions?.map((reaction, index) => {
-                            return <PfAbility key={index} ability={reaction} />;
+                            return <PfAbility key={index} ability={reaction} statblock={statblock.name} />;
                         })}
                     </ul>
                 </div>
@@ -425,12 +439,14 @@ const PfStatBlock = ({ slug }: { slug: string }) => {
                     <h3>Special Abilities</h3>
                     <ul className={"ability-list"}>
                         {statblock.special_abilities?.map((ability, index) => {
-                            return <PfAbility key={index} ability={ability} />;
+                            return <PfAbility key={index} ability={ability} statblock={statblock.name} />;
                         })}
                     </ul>
                 </div>
             ) : null}
-            {statblock.spells && statblock.spells.length > 0 ? <PfSpells spells={statblock.spells} /> : null}
+            {statblock.spells && statblock.spells.length > 0 ? (
+                <PfSpells spells={statblock.spells} statblock={statblock.name} />
+            ) : null}
         </div>
     ) : null;
 };
