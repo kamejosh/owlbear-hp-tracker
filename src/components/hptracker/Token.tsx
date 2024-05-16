@@ -9,7 +9,6 @@ import { evalString, getBgColor, getRoomDiceUser } from "../../helper/helpers.ts
 import { updateAc } from "../../helper/acHelper.ts";
 import _ from "lodash";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
-import { useComponentContext } from "../../context/ComponentContext.tsx";
 import { useDiceRoller } from "../../context/DDDiceContext.tsx";
 import { IDiceRoll, IRoll, Operator } from "dddice-js";
 import { diceToRoll, rollWrapper } from "../../helper/diceHelper.ts";
@@ -28,7 +27,6 @@ export const Token = (props: TokenProps) => {
     const [editName, setEditName] = useState<boolean>(false);
     const room = useMetadataContext((state) => state.room);
     const setId = useCharSheet((state) => state.setId);
-    const component = useComponentContext((state) => state.component);
     const [rollerApi, initialized, theme] = useDiceRoller((state) => [state.rollerApi, state.initialized, state.theme]);
     const hpRef = useRef<HTMLInputElement>(null);
     const maxHpRef = useRef<HTMLInputElement>(null);
@@ -275,7 +273,7 @@ export const Token = (props: TokenProps) => {
             if (parsed) {
                 const rollData = await rollWrapper(rollerApi, parsed.dice, {
                     operator: parsed.operator,
-                    external_id: component,
+                    external_id: data.name,
                     label: "Initiative: Roll",
                 });
                 if (rollData) {

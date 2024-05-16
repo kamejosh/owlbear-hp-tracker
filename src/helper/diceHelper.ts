@@ -370,3 +370,17 @@ export const rollWrapper = async (
         }
     }
 };
+
+export const getUserUuid = async (room?: RoomMetadata, rollerApi?: ThreeDDiceAPI) => {
+    if (room?.diceRoom?.slug) {
+        const diceRoom = (await rollerApi?.room.get(room?.diceRoom.slug))?.data;
+        const user = (await rollerApi?.user.get())?.data;
+        if (user && diceRoom) {
+            const participant = diceRoom.participants.find((p) => p.user.uuid === user.uuid);
+            if (participant) {
+                return [participant.id];
+            }
+        }
+    }
+    return undefined;
+};

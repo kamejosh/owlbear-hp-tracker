@@ -4,7 +4,6 @@ import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { DiceRoom } from "./DiceRoom.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { dddiceApiLogin, updateRoomMetadataDiceUser, validateTheme } from "../../../helper/diceHelper.ts";
-import { useComponentContext } from "../../../context/ComponentContext.tsx";
 import { ITheme, ThreeDDiceAPI } from "dddice-js";
 import { DiceUser } from "../../../helper/types.ts";
 import { getRoomDiceUser } from "../../../helper/helpers.ts";
@@ -25,7 +24,6 @@ export const DiceTray = (props: DiceTrayProps) => {
     ]);
     const playerContext = usePlayerContext();
     const room = useMetadataContext((state) => state.room);
-    const component = useComponentContext((state) => state.component);
     const [diceUser, setDiceUser] = useState<DiceUser>();
     const [apiKey, setApiKey] = useState<string>();
 
@@ -69,7 +67,7 @@ export const DiceTray = (props: DiceTrayProps) => {
             setInitialized(true);
         };
 
-        if ((diceUser && diceUser.apiKey !== undefined) || (!diceUser && component === "modal")) {
+        if ((diceUser && diceUser.apiKey !== undefined) || !diceUser) {
             if (!room?.disableDiceRoller && diceUser?.apiKey) {
                 initDice();
             }

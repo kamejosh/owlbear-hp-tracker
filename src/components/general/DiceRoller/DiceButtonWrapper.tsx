@@ -1,9 +1,8 @@
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
-import { useComponentContext } from "../../../context/ComponentContext.tsx";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { diceToRoll, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
+import { diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
 import tippy, { Instance } from "tippy.js";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 
@@ -17,7 +16,6 @@ export const DiceButton = (props: DiceButtonProps) => {
     const room = useMetadataContext((state) => state.room);
     const addRoll = useRollLogContext((state) => state.addRoll);
     const [rollerApi, initialized, theme] = useDiceRoller((state) => [state.rollerApi, state.initialized, state.theme]);
-    const component = useComponentContext((state) => state.component);
     const [context, setContext] = useState<boolean>(false);
     const [tooltip, setTooltip] = useState<Instance>();
     const rollButton = useRef<HTMLButtonElement>(null);
@@ -49,20 +47,6 @@ export const DiceButton = (props: DiceButtonProps) => {
             }
         }
     }, [initialized, room?.disableDiceRoller]);
-
-    const getUserUuid = async () => {
-        if (room?.diceRoom?.slug) {
-            const diceRoom = (await rollerApi?.room.get(room?.diceRoom.slug))?.data;
-            const user = (await rollerApi?.user.get())?.data;
-            if (user && diceRoom) {
-                const participant = diceRoom.participants.find((p) => p.user.uuid === user.uuid);
-                if (participant) {
-                    return [participant.id];
-                }
-            }
-        }
-        return undefined;
-    };
 
     const addModifier = (originalDie: string, baseDie: string) => {
         if (originalDie.includes("+")) {
@@ -96,7 +80,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                             whisper: modifier === "SELF" ? await getUserUuid() : undefined,
                         });
                     } catch {
-                        console.warn("error in dice roll", parsed.dice, parsed.operator, component);
+                        console.warn("error in dice roll", parsed.dice, parsed.operator);
                     }
                 }
             } else {

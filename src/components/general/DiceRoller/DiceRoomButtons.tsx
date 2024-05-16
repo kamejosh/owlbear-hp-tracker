@@ -5,7 +5,6 @@ import { IAvailableDie, IDiceRoll, IDieType, Operator, parseRollEquation } from 
 import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { AddSvg } from "../../svgs/AddSvg.tsx";
 import { diceToRoll, getDiceParticipant, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
-import { useComponentContext } from "../../../context/ComponentContext.tsx";
 import tippy, { Instance } from "tippy.js";
 import { RollLogSvg } from "../../svgs/RollLogSvg.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
@@ -49,7 +48,6 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
     const addRoll = useRollLogContext((state) => state.addRoll);
     const { buttons, setButtons } = useDiceButtonsContext();
     const room = useMetadataContext((state) => state.room);
-    const component = useComponentContext((state) => state.component);
     const [hover, setHover] = useState<boolean>(false);
     const [addCustom, setAddCustom] = useState<boolean>(false);
     const [validCustom, setValidCustom] = useState<boolean>(false);
@@ -139,7 +137,6 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
             if (parsed) {
                 await rollWrapper(rollerApi, parsed.dice, {
                     operator: parsed.operator,
-                    external_id: component,
                     label: "Roll: Custom",
                 });
             }
@@ -265,7 +262,6 @@ const QuickButtons = ({ open }: { open: boolean }) => {
     const { theme, rollerApi } = useDiceRoller();
     const addRoll = useRollLogContext((state) => state.addRoll);
     const { room } = useMetadataContext();
-    const { component } = useComponentContext();
     const [validCustom, setValidCustom] = useState<boolean>(true);
 
     const getUserUuid = async () => {
@@ -286,7 +282,6 @@ const QuickButtons = ({ open }: { open: boolean }) => {
             if (parsed && rollerApi) {
                 await rollWrapper(rollerApi, parsed.dice, {
                     operator: parsed.operator,
-                    external_id: component,
                     label: "Roll: Custom",
                     whisper: hide ? await getUserUuid() : undefined,
                 });
