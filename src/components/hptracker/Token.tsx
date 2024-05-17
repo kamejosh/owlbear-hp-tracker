@@ -10,7 +10,6 @@ import { updateAc } from "../../helper/acHelper.ts";
 import _ from "lodash";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { useDiceRoller } from "../../context/DDDiceContext.tsx";
-import { IDiceRoll, IRoll, Operator } from "dddice-js";
 import { diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../helper/diceHelper.ts";
 import { useRollLogContext } from "../../context/RollLogContext.tsx";
 
