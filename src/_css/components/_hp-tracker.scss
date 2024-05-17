@@ -103,9 +103,28 @@
                 grid-area: settings;
             }
 
-            .initiative-button {
+            .init-wrapper {
+                display: flex;
+                position: relative;
                 grid-area: init;
+                align-items: center;
                 justify-self: center;
+                height: 18px;
+
+                .self {
+                    position: absolute;
+                    top: 50%;
+                    right: 0;
+                    translate: 100% -50%;
+
+                    &.hidden {
+                        display: none;
+                    }
+
+                    &.visible {
+                        display: block;
+                    }
+                }
             }
 
             .hide-group {

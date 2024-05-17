@@ -141,8 +141,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                 });
             }
         } else if (props.dice) {
-            const roll = await localRoll(props.dice, "Roll: Custom", addRoll);
-            console.log(roll);
+            await localRoll(props.dice, "Roll: Custom", addRoll);
         }
         button.classList.remove("rolling");
         button.blur();
