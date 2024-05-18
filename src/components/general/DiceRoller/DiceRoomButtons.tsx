@@ -55,8 +55,6 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
     const buttonRef = useRef<HTMLButtonElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    console.log("CustomDiceButton rerender");
-
     useEffect(() => {
         if (buttonRef.current) {
             if (!tippyInstance) {
@@ -265,8 +263,6 @@ const QuickButtons = ({ open }: { open: boolean }) => {
     const { room } = useMetadataContext();
     const [validCustom, setValidCustom] = useState<boolean>(true);
 
-    console.log("QuickButtons rerender");
-
     const getUserUuid = async () => {
         if (room?.diceRoom?.slug && rollerApi) {
             const participant = await getDiceParticipant(rollerApi, room.diceRoom.slug);
@@ -297,9 +293,7 @@ const QuickButtons = ({ open }: { open: boolean }) => {
     };
 
     const getDiceList = () => {
-        console.log("getDiceList");
         const DiceListEntry = ({ preview, name }: { preview: ReactNode; name: string }) => {
-            console.log("DiceListEntry rerender");
             return (
                 <li
                     className={"quick-roll"}
@@ -413,7 +407,6 @@ export const DiceRoomButtons = (props: DiceRoomButtonsProps) => {
     const { buttons } = useDiceButtonsContext();
     const [quick, setQuick] = useState<boolean>(false);
 
-    console.log("DiceRoomButtons rerender");
     return (
         <div className={"dice-room-buttons"}>
             {Object.values(buttons).map((value, index) => {

@@ -40,8 +40,6 @@ export const DiceRoom = ({ className }: { className?: string }) => {
         }
     }, [open]);
 
-    console.log("DiceRoom rerender");
-
     return (
         <div className={`dice-room ${className} ${open ? "open" : "closed"}`}>
             <DiceRoomButtons open={open} setOpen={setOpen} />
