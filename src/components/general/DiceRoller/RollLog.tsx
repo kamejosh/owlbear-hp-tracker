@@ -13,6 +13,7 @@ type RollLogEntryProps = {
 
 export const RollLog = () => {
     const log = useRollLogContext((state) => state.log);
+
     useInterval(() => {
         rollLogStore.persist.rehydrate();
     }, 1000);
@@ -23,6 +24,7 @@ export const RollLog = () => {
                 .sort((a, b) => {
                     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
                 })
+                .slice(0, 20)
                 .map((entry, index) => {
                     return <RollLogEntry entry={entry} key={entry.uuid} classes={index > 4 ? "old-roll" : ""} />;
                 })}
@@ -64,7 +66,7 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
     useInterval(() => {
         const nowTime = new Date();
         setRollTimeText(getRollTimeText(nowTime.getTime() - rollTime.getTime()));
-    }, 10000);
+    }, 60000);
 
     useEffect(() => {
         if (detailsRef.current) {

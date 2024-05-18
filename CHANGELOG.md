@@ -1,3 +1,12 @@
+# 2.2.0
+
++ Add alternative dice roller
+  + When deactivating dddice (Settings->Use calculated rolls) you can now use the built in dice roller
+  + There is no 3D dice rendering
+  + Results are calculate locally
+  + Faster results but not so good looking
++ Added "about"-field to statblocks 
+
 # 2.1.1
 
 + Reset dddice themes that are not available
