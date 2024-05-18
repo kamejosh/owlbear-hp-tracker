@@ -181,6 +181,8 @@ export const DiceButtonWrapper = (text: string, context: string, statblock?: str
                     const text = die;
                     if (die.startsWith("DC")) {
                         die = `1d20>${parseInt(die.substring(3))}`;
+                    } else if (die.startsWith("+") || die.startsWith("-")) {
+                        die = `1d20${die}`;
                     }
                     diceField = <DiceButton dice={die} text={text} context={context} statblock={statblock} />;
                 }

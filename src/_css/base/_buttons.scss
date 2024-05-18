@@ -183,9 +183,11 @@ button,
 
     .self {
         position: absolute;
-        top: 50%;
-        right: 0;
-        translate: 100% -50%;
+        bottom: 0;
+        left: 50%;
+        translate: -50% 100%;
+        z-index: 1;
+        transition: all 0.25s ease;
 
         &.hidden {
             display: none;
@@ -193,6 +195,11 @@ button,
 
         &.visible {
             display: block;
+        }
+
+        &:hover {
+            background-color: lightgrey;
+            color: var(--bg-color);
         }
     }
 }

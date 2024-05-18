@@ -65,7 +65,8 @@ export const PfAbility = ({
                         <div className={`ability-description ${isAction(ability) ? "action" : "ability"}`}>
                             {DiceButtonWrapper(
                                 (ability as Action).description!,
-                                `${capitalize(ability.name)} (${statblock})`
+                                `${capitalize(ability.name)}`,
+                                statblock
                             )}
                         </div>
                     ) : null}
@@ -84,7 +85,8 @@ export const PfAbility = ({
                                     <b>{key}</b>:{" "}
                                     {DiceButtonWrapper(
                                         value,
-                                        `${capitalize(ability.name)} ${capitalize(key)} (${statblock})`
+                                        `${capitalize(ability.name)} ${capitalize(key)}`,
+                                        statblock
                                     )}
                                 </li>
                             );

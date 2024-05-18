@@ -196,6 +196,10 @@
         justify-content: flex-end;
     }
 
+    .about {
+        grid-column: span 2;
+    }
+
     .stats {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -298,6 +302,7 @@
         "values"
         "abilities"
         "tidbits"
+        "about"
         "skills"
         "resistances"
         "specials"
@@ -326,6 +331,7 @@
         grid-template-areas:
             "what values"
             "abilities tidbits"
+            "about about"
             "skills skills"
             "resistances resistances"
             "specials specials"
@@ -374,6 +380,7 @@
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         grid-area: abilities;
+        align-content: center;
         justify-content: space-between;
         gap: 10px;
 
@@ -412,6 +419,10 @@
                 gap: 2px;
             }
         }
+    }
+
+    .about {
+        grid-area: about;
     }
 
     .skills {

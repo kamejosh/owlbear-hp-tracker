@@ -11,17 +11,6 @@ export const E5Ability = ({ ability, statblock }: { ability: Ability; statblock:
                 <b>{ability.name}.</b> {DiceButtonWrapper(ability.desc, `${capitalize(ability.name)}`, statblock)}
             </span>
             <span className={"ability-extra-info"}>
-                {ability.damage_dice ? (
-                    <span>
-                        <i>Damage</i>:{" "}
-                        <DiceButton
-                            dice={ability.damage_dice}
-                            text={ability.damage_dice}
-                            context={`${capitalize(ability.name)}: Damage`}
-                            statblock={statblock}
-                        />
-                    </span>
-                ) : null}
                 {ability.attack_bonus ? (
                     <span>
                         <i>Attack bonus</i>:
@@ -29,6 +18,17 @@ export const E5Ability = ({ ability, statblock }: { ability: Ability; statblock:
                             dice={`d20+${ability.attack_bonus}`}
                             text={`+${ability.attack_bonus}`}
                             context={`${capitalize(ability.name)}: To Hit`}
+                            statblock={statblock}
+                        />
+                    </span>
+                ) : null}
+                {ability.damage_dice ? (
+                    <span>
+                        <i>Damage</i>:{" "}
+                        <DiceButton
+                            dice={ability.damage_dice}
+                            text={ability.damage_dice}
+                            context={`${capitalize(ability.name)}: Damage`}
                             statblock={statblock}
                         />
                     </span>
