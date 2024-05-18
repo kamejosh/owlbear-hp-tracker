@@ -5,7 +5,15 @@
   + There is no 3D dice rendering
   + Results are calculate locally
   + Faster results but not so good looking
++ Initiative rolls are now rolled with bonus which makes the log display the entered value
 + Added "about"-field to statblocks 
++ 10x-20x performance improvement during idle
++ improved roll-log
+  + default only the last 20 entries are shown
+  + click more to load additional entries
+  + older entries now display details on hover
+  + The roll log now displays the Token name rather then the players name
++ Saving Throws and Skills that have a bonus of 0 are now displayed with +0 instead of not displayed at all (when bonus is empty they are still not displayed).
 
 # 2.1.1
 
