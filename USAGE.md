@@ -426,3 +426,5 @@ Using dddice you can roll dice in your DnD Beyond Character Sheets and see those
 ## Simple Dice-Calculator
 
 When in the [Settings](#room-settings) the option "Use calculated rolls" is activated, dddice is disabled. HP Tracker will then use a local script to calculate the result of the chosen dice-roll and use the OBR broadcast API to notify all connected players of the result.
+
+The simple dice-calculator uses the [rpg-dice-roller](https://dice-roller.github.io/documentation/) package under the hood. Available dice notations for custom dice buttons and the quickroll function can be found [here](https://dice-roller.github.io/documentation/guide/notation/).
