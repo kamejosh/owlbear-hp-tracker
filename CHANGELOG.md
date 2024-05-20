@@ -14,6 +14,7 @@
   + older entries now display details on hover
   + The roll log now displays the Token name rather then the players name
 + Saving Throws and Skills that have a bonus of 0 are now displayed with +0 instead of not displayed at all (when bonus is empty they are still not displayed).
++ Fix HP Bar width has wrong calculation after scaling the token
 
 # 2.1.1
 

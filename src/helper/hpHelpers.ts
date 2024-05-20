@@ -217,6 +217,8 @@ export const updateBarChanges = async (changes: Map<string, BarItemChanges>) => 
                         if (change) {
                             if (change.width !== undefined) {
                                 shape.width = change.width;
+                                // when scaling a token, the bar scale also changes which messes with the actual width, so we need to reset it
+                                shape.scale = { x: 1, y: shape.scale.y };
                             }
                             if (change.visible !== undefined) {
                                 shape.visible = change.visible;
