@@ -6,6 +6,7 @@
 
 ## Feature Ideas
 
++ Allow statblocks to be hidden from statblock popover
 + Allow dddice user to switch rooms
 + Add customization to HP Bar settings
 + Pagination for statblocks

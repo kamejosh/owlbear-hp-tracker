@@ -7,7 +7,13 @@ type Action = components["schemas"]["ActionOut"];
 type Reaction = components["schemas"]["Reaction"];
 type SpecialAbility = components["schemas"]["SpecialAbility"];
 
-export const PfAbility = ({ ability }: { ability: Action | Reaction | SpecialAbility }) => {
+export const PfAbility = ({
+    ability,
+    statblock,
+}: {
+    ability: Action | Reaction | SpecialAbility;
+    statblock: string;
+}) => {
     const [open, setOpen] = useState<boolean>(false);
 
     const entries = Object.entries(ability);
@@ -57,7 +63,11 @@ export const PfAbility = ({ ability }: { ability: Action | Reaction | SpecialAbi
                     <b className={"ability-name"}>{ability.name}</b> {actionTypeConvert(ability)}
                     {Object.keys(ability).includes("description") && (ability as Action).description !== "" ? (
                         <div className={`ability-description ${isAction(ability) ? "action" : "ability"}`}>
-                            {DiceButtonWrapper((ability as Action).description!, capitalize(ability.name))}
+                            {DiceButtonWrapper(
+                                (ability as Action).description!,
+                                `${capitalize(ability.name)}`,
+                                statblock
+                            )}
                         </div>
                     ) : null}
                 </div>
@@ -73,7 +83,11 @@ export const PfAbility = ({ ability }: { ability: Action | Reaction | SpecialAbi
                             return (
                                 <li key={index}>
                                     <b>{key}</b>:{" "}
-                                    {DiceButtonWrapper(value, `${capitalize(ability.name)} ${capitalize(key)}`)}
+                                    {DiceButtonWrapper(
+                                        value,
+                                        `${capitalize(ability.name)} ${capitalize(key)}`,
+                                        statblock
+                                    )}
                                 </li>
                             );
                         }

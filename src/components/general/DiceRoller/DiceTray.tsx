@@ -4,7 +4,6 @@ import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { DiceRoom } from "./DiceRoom.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { dddiceApiLogin, updateRoomMetadataDiceUser, validateTheme } from "../../../helper/diceHelper.ts";
-import { useComponentContext } from "../../../context/ComponentContext.tsx";
 import { ITheme, ThreeDDiceAPI } from "dddice-js";
 import { DiceUser } from "../../../helper/types.ts";
 import { getRoomDiceUser } from "../../../helper/helpers.ts";
@@ -25,7 +24,6 @@ export const DiceTray = (props: DiceTrayProps) => {
     ]);
     const playerContext = usePlayerContext();
     const room = useMetadataContext((state) => state.room);
-    const component = useComponentContext((state) => state.component);
     const [diceUser, setDiceUser] = useState<DiceUser>();
     const [apiKey, setApiKey] = useState<string>();
 
@@ -55,7 +53,21 @@ export const DiceTray = (props: DiceTrayProps) => {
     }, [room]);
 
     useEffect(() => {
-        if ((diceUser && diceUser.apiKey !== undefined) || (!diceUser && component === "modal")) {
+        const initDice = async () => {
+            let api: ThreeDDiceAPI | undefined;
+            setInitialized(false);
+            if (diceUser?.apiKey !== apiKey && diceUser?.apiKey !== undefined) {
+                setApiKey(diceUser?.apiKey);
+                api = await dddiceApiLogin(room);
+                if (api) {
+                    setRollerApi(api);
+                }
+            }
+
+            setInitialized(true);
+        };
+
+        if ((diceUser && diceUser.apiKey !== undefined) || !diceUser) {
             if (!room?.disableDiceRoller && diceUser?.apiKey) {
                 initDice();
             }
@@ -79,7 +91,7 @@ export const DiceTray = (props: DiceTrayProps) => {
                 }
             }
         };
-        const initTheme = async () => {
+        const initUserTheme = async () => {
             if (!theme) {
                 const themeId = room?.diceUser?.find((user) => user.playerId === playerContext.id)?.diceTheme;
                 if (themeId && diceThemes.map((t) => t.id).includes(themeId)) {
@@ -97,22 +109,10 @@ export const DiceTray = (props: DiceTrayProps) => {
             }
         };
 
-        initTheme();
+        if (rollerApi) {
+            initUserTheme();
+        }
     }, [rollerApi, diceThemeQuery.isSuccess, diceUser?.diceTheme]);
 
-    const initDice = async () => {
-        let api: ThreeDDiceAPI | undefined;
-        setInitialized(false);
-        if (diceUser?.apiKey !== apiKey && diceUser?.apiKey !== undefined) {
-            setApiKey(diceUser?.apiKey);
-            api = await dddiceApiLogin(room);
-            if (api) {
-                setRollerApi(api);
-            }
-        }
-
-        setInitialized(true);
-    };
-
-    return room?.disableDiceRoller ? null : <DiceRoom className={props.classes} />;
+    return <DiceRoom className={props.classes} />;
 };

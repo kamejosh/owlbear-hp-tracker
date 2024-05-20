@@ -1,7 +1,7 @@
 import { useStore } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { ID } from "../helper/variables.ts";
-import { IRollValue, IRollValueImage } from "dddice-js";
+import { IRollValueImage } from "dddice-js";
 import { withStorageDOMEvents } from "../helper/hooks.ts";
 import { createStore } from "zustand/vanilla";
 
@@ -14,7 +14,7 @@ export type RollLogEntryType = {
     username: string;
     owlbear_user_id?: string;
     participantUsername?: string;
-    values: Array<IRollValue>;
+    values: Array<string>;
 };
 
 export type RollLogContextType = {

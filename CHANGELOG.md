@@ -1,3 +1,21 @@
+# 2.2.0
+
++ Add alternative dice roller
+  + When deactivating dddice (Settings->Use calculated rolls) you can now use the built in dice roller
+  + There is no 3D dice rendering
+  + Results are calculate locally
+  + Faster results but not so good looking
++ Initiative rolls are now rolled with bonus which makes the log display the entered value
++ Added "about"-field to statblocks 
++ 10x-20x performance improvement during idle
++ improved roll-log
+  + default only the last 20 entries are shown
+  + click more to load additional entries
+  + older entries now display details on hover
+  + The roll log now displays the Token name rather then the players name
++ Saving Throws and Skills that have a bonus of 0 are now displayed with +0 instead of not displayed at all (when bonus is empty they are still not displayed).
++ Fix HP Bar width has wrong calculation after scaling the token
+
 # 2.1.1
 
 + Reset dddice themes that are not available

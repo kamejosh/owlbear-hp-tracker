@@ -16,8 +16,8 @@
         .draggable-token-list-wrapper {
             display: grid;
             grid-template-rows: 1fr;
+            opacity: 1;
             transition: all 0.25s ease-in-out;
-            overflow: hidden;
 
             .draggable-token-list-wrapper {
                 min-height: 0;
@@ -38,6 +38,8 @@
         &.hidden {
             .draggable-token-list-wrapper {
                 grid-template-rows: 0fr;
+                opacity: 0;
+                overflow: hidden;
             }
 
             .group-title {
@@ -103,9 +105,13 @@
                 grid-area: settings;
             }
 
-            .initiative-button {
+            .init-wrapper {
+                display: flex;
+                position: relative;
                 grid-area: init;
+                align-items: center;
                 justify-self: center;
+                height: 18px;
             }
 
             .hide-group {

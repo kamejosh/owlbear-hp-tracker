@@ -1,14 +1,21 @@
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { useDiceButtonsContext } from "../../../context/DiceButtonContext.tsx";
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { IAvailableDie, IDiceRoll, IDieType, Operator, parseRollEquation } from "dddice-js";
 import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { AddSvg } from "../../svgs/AddSvg.tsx";
-import { diceToRoll, getDiceParticipant, rollWrapper } from "../../../helper/diceHelper.ts";
-import { useComponentContext } from "../../../context/ComponentContext.tsx";
+import { diceToRoll, getDiceParticipant, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
 import tippy, { Instance } from "tippy.js";
 import { RollLogSvg } from "../../svgs/RollLogSvg.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
+import { useRollLogContext } from "../../../context/RollLogContext.tsx";
+import { DiceRoll } from "@dice-roller/rpg-dice-roller";
+import { D4 } from "../../svgs/dice/D4.tsx";
+import { D6 } from "../../svgs/dice/D6.tsx";
+import { D8 } from "../../svgs/dice/D8.tsx";
+import { D10 } from "../../svgs/dice/D10.tsx";
+import { D12 } from "../../svgs/dice/D12.tsx";
+import { D20 } from "../../svgs/dice/D20.tsx";
 
 type DiceRoomButtonsProps = {
     open: boolean;
@@ -20,10 +27,27 @@ type CustomDiceButtonProps = {
     dice: string | null;
 };
 
+export const getSvgForDiceType = (diceType: string) => {
+    if (diceType === "d4") {
+        return <D4 />;
+    } else if (diceType === "d6") {
+        return <D6 />;
+    } else if (diceType === "d8") {
+        return <D8 />;
+    } else if (diceType === "d10" || diceType === "d10x") {
+        return <D10 />;
+    } else if (diceType === "d12") {
+        return <D12 />;
+    } else {
+        return <D20 />;
+    }
+};
+
 const CustomDiceButton = (props: CustomDiceButtonProps) => {
     const [rollerApi, theme, initialized] = useDiceRoller((state) => [state.rollerApi, state.theme, state.initialized]);
+    const addRoll = useRollLogContext((state) => state.addRoll);
     const { buttons, setButtons } = useDiceButtonsContext();
-    const component = useComponentContext((state) => state.component);
+    const room = useMetadataContext((state) => state.room);
     const [hover, setHover] = useState<boolean>(false);
     const [addCustom, setAddCustom] = useState<boolean>(false);
     const [validCustom, setValidCustom] = useState<boolean>(false);
@@ -45,8 +69,8 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
         }
     }, [props.dice]);
 
-    const getDicePreview = () => {
-        if (props.dice && theme) {
+    const getDicePreview = useCallback(() => {
+        if (props.dice && theme && !room?.disableDiceRoller) {
             try {
                 const parsed = parseRollEquation(props.dice, theme.id);
                 return (
@@ -76,28 +100,56 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
             } catch {
                 return <DiceSvg />;
             }
+        } else if (props.dice) {
+            const parsed = parseRollEquation(props.dice, "dddice-bees");
+            return (
+                <div className={"custom-dice-preview-wrapper"}>
+                    {parsed.dice.map((die, index) => {
+                        if (die.type !== "mod") {
+                            return (
+                                <div key={index} className={"preview-image"}>
+                                    {getSvgForDiceType(die.type)}
+                                </div>
+                            );
+                        } else {
+                            if (die.value) {
+                                return (
+                                    <span key={index} className={"modifier"}>
+                                        {Intl.NumberFormat("en-US", { signDisplay: "always" }).format(die.value)}
+                                    </span>
+                                );
+                            }
+                        }
+                    })}
+                </div>
+            );
         }
         return <DiceSvg />;
-    };
+    }, [theme, props.dice, room?.disableDiceRoller]);
 
     const roll = async (button: HTMLButtonElement) => {
         button.classList.add("rolling");
-        if (theme && props.dice) {
+        if (!room?.disableDiceRoller && rollerApi && theme && props.dice) {
             let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined = diceToRoll(
                 props.dice,
                 theme.id
             );
-            if (parsed && rollerApi) {
+            if (parsed) {
                 await rollWrapper(rollerApi, parsed.dice, {
                     operator: parsed.operator,
-                    external_id: component,
                     label: "Roll: Custom",
                 });
             }
+        } else if (props.dice) {
+            await localRoll(props.dice, "Roll: Custom", addRoll);
         }
         button.classList.remove("rolling");
         button.blur();
     };
+
+    const isEnabled = useCallback(() => {
+        return (initialized && !room?.disableDiceRoller) || room?.disableDiceRoller;
+    }, [initialized, room?.disableDiceRoller]);
 
     return (
         <div
@@ -107,7 +159,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
         >
             <button
                 ref={buttonRef}
-                className={`button custom-dice dice-${props.button} ${initialized ? "enabled" : "disabled"} `}
+                className={`button custom-dice dice-${props.button} ${isEnabled() ? "enabled" : "disabled"} `}
                 onClick={async (e) => {
                     if (!props.dice && buttons.hasOwnProperty(props.button.toString())) {
                         setAddCustom(true);
@@ -121,7 +173,6 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
             {addCustom ? (
                 <div className={"add-custom-dice"}>
                     <input
-                        disabled={!theme}
                         ref={inputRef}
                         type={"text"}
                         onChange={(e) => {
@@ -130,6 +181,13 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                                 if (theme) {
                                     const parsed = parseRollEquation(value, theme);
                                     if (parsed) {
+                                        setValidCustom(true);
+                                        inputRef.current?.classList.remove("error");
+                                        inputRef.current?.classList.add("success");
+                                    }
+                                } else {
+                                    const roll = new DiceRoll(value);
+                                    if (roll) {
                                         setValidCustom(true);
                                         inputRef.current?.classList.remove("error");
                                         inputRef.current?.classList.add("success");
@@ -201,8 +259,8 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
 
 const QuickButtons = ({ open }: { open: boolean }) => {
     const { theme, rollerApi } = useDiceRoller();
+    const addRoll = useRollLogContext((state) => state.addRoll);
     const { room } = useMetadataContext();
-    const { component } = useComponentContext();
     const [validCustom, setValidCustom] = useState<boolean>(true);
 
     const getUserUuid = async () => {
@@ -218,107 +276,129 @@ const QuickButtons = ({ open }: { open: boolean }) => {
 
     const roll = async (element: HTMLElement, dice: string, hide: boolean = false) => {
         element.classList.add("rolling");
-        if (theme && dice) {
+        if (theme && dice && !room?.disableDiceRoller) {
             let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined = diceToRoll(dice, theme.id);
             if (parsed && rollerApi) {
                 await rollWrapper(rollerApi, parsed.dice, {
                     operator: parsed.operator,
-                    external_id: component,
                     label: "Roll: Custom",
                     whisper: hide ? await getUserUuid() : undefined,
                 });
             }
+        } else {
+            await localRoll(dice, "Roll: Custom", addRoll, hide);
         }
         element.classList.remove("rolling");
         element.blur();
     };
 
+    const getDiceList = () => {
+        const DiceListEntry = ({ preview, name }: { preview: ReactNode; name: string }) => {
+            return (
+                <li
+                    className={"quick-roll"}
+                    onClick={async (e) => {
+                        await roll(e.currentTarget, name);
+                    }}
+                    ref={(e) => {
+                        if (e) {
+                            tippy(e, { content: name });
+                        }
+                    }}
+                >
+                    <div className={"quick-preview"}>{preview}</div>
+                    <button
+                        className={"self"}
+                        onClick={async (e) => {
+                            e.stopPropagation();
+                            if (e.currentTarget.parentElement) {
+                                await roll(e.currentTarget.parentElement, name, true);
+                            }
+                        }}
+                    >
+                        SELF
+                    </button>
+                </li>
+            );
+        };
+
+        if (theme && !room?.disableDiceRoller) {
+            return theme.available_dice.map((die, index) => {
+                let preview = "";
+                let name = "";
+                try {
+                    if (die.hasOwnProperty("type")) {
+                        const notation = (die as IAvailableDie).notation;
+                        if (notation && theme.preview.hasOwnProperty(notation)) {
+                            preview = theme.preview[notation];
+                        } else {
+                            preview = theme.preview[(die as IAvailableDie).type];
+                        }
+                        name = (die as IAvailableDie).notation ?? (die as IAvailableDie).id;
+                    } else {
+                        preview = theme.preview[die as IDieType];
+                        name = die.toString();
+                    }
+                    if (preview && name) {
+                        name = name === "d10x" ? "d100" : name;
+                        return <DiceListEntry key={index} preview={<img src={preview} alt={name} />} name={name} />;
+                    }
+                } catch {
+                    return null;
+                }
+            });
+        } else {
+            const quickRollDice = ["d4", "d6", "d8", "d10", "d10x", "d12", "d20"];
+            return quickRollDice.map((d, index) => {
+                const name = d === "d10x" ? "d100" : d;
+
+                return <DiceListEntry key={index} preview={getSvgForDiceType(d)} name={name} />;
+            });
+        }
+    };
+
     return (
         <>
-            {theme ? (
-                <ul className={`quick-button-list ${open ? "open" : ""}`}>
-                    {theme.available_dice.map((die, index) => {
-                        let preview = "";
-                        let name = "";
-                        try {
-                            if (die.hasOwnProperty("type")) {
-                                const notation = (die as IAvailableDie).notation;
-                                if (notation && theme.preview.hasOwnProperty(notation)) {
-                                    preview = theme.preview[notation];
-                                } else {
-                                    preview = theme.preview[(die as IAvailableDie).type];
-                                }
-                                name = (die as IAvailableDie).notation ?? (die as IAvailableDie).id;
-                            } else {
-                                preview = theme.preview[die as IDieType];
-                                name = die.toString();
+            <ul className={`quick-button-list ${open ? "open" : ""}`}>
+                {getDiceList()}
+                <li className={"quick-custom-roll"}>
+                    <DiceSvg />
+                    <input
+                        className={`quick-custom-input ${validCustom ? "valid" : "invalid"}`}
+                        type={"text"}
+                        size={2}
+                        onChange={(e) => {
+                            e.currentTarget.style.width = `${e.currentTarget.value.length}ch`;
+                            if (e.currentTarget.value === "") {
+                                setValidCustom(true);
+                                return;
                             }
-                            if (preview && name) {
-                                name = name === "d10x" ? "d100" : name;
-                                return (
-                                    <li
-                                        key={index}
-                                        className={"quick-roll"}
-                                        onClick={async (e) => {
-                                            await roll(e.currentTarget, name);
-                                        }}
-                                        ref={(e) => {
-                                            if (e) {
-                                                tippy(e, { content: name });
-                                            }
-                                        }}
-                                    >
-                                        <img src={preview} alt={name} />
-                                        <button
-                                            className={"self"}
-                                            onClick={async (e) => {
-                                                e.stopPropagation();
-                                                if (e.currentTarget.parentElement) {
-                                                    await roll(e.currentTarget.parentElement, name, true);
-                                                }
-                                            }}
-                                        >
-                                            SELF
-                                        </button>
-                                    </li>
-                                );
-                            }
-                        } catch {
-                            return null;
-                        }
-                    })}
-                    <li className={"quick-custom-roll"}>
-                        <DiceSvg />
-                        <input
-                            className={`quick-custom-input ${validCustom ? "valid" : "invalid"}`}
-                            type={"text"}
-                            size={2}
-                            onChange={(e) => {
-                                e.currentTarget.style.width = `${e.currentTarget.value.length}ch`;
-                                if (e.currentTarget.value === "") {
-                                    setValidCustom(true);
-                                    return;
-                                }
-                                try {
+                            try {
+                                if (theme) {
                                     const parsed = parseRollEquation(e.currentTarget.value, theme.id);
                                     if (parsed) {
                                         setValidCustom(true);
                                     } else {
                                         setValidCustom(false);
                                     }
-                                } catch {
-                                    setValidCustom(false);
+                                } else {
+                                    const roll = new DiceRoll(e.currentTarget.value);
+                                    if (roll) {
+                                        setValidCustom(true);
+                                    }
                                 }
-                            }}
-                            onKeyDown={async (e) => {
-                                if (e.key === "Enter" && validCustom && e.currentTarget.value) {
-                                    await roll(e.currentTarget, e.currentTarget.value);
-                                }
-                            }}
-                        />
-                    </li>
-                </ul>
-            ) : null}
+                            } catch {
+                                setValidCustom(false);
+                            }
+                        }}
+                        onKeyDown={async (e) => {
+                            if (e.key === "Enter" && validCustom && e.currentTarget.value) {
+                                await roll(e.currentTarget, e.currentTarget.value);
+                            }
+                        }}
+                    />
+                </li>
+            </ul>
         </>
     );
 };

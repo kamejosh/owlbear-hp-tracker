@@ -1,11 +1,11 @@
 import OBR, { Metadata } from "@owlbear-rodeo/sdk";
-import { diceTrayModal, diceTrayModalId, metadataKey } from "../helper/variables.ts";
+import { diceTrayModal, diceTrayModalId, metadataKey, rollMessageChannel } from "../helper/variables.ts";
 import { DiceUser, RoomMetadata } from "../helper/types.ts";
 import { getRoomDiceUser } from "../helper/helpers.ts";
 import { AsyncLock } from "../helper/AsyncLock.ts";
 import { ThreeDDiceAPI } from "dddice-js";
-import { addRollerApiCallbacks, dddiceApiLogin } from "../helper/diceHelper.ts";
-import { rollLogStore } from "../context/RollLogContext.tsx";
+import { addRollerApiCallbacks, dddiceApiLogin, handleNewRoll } from "../helper/diceHelper.ts";
+import { RollLogEntryType, rollLogStore } from "../context/RollLogContext.tsx";
 
 const lock = new AsyncLock();
 const diceRollerState: { diceUser: DiceUser | null; disableDiceRoller: boolean } = {
@@ -86,5 +86,8 @@ export const setupDddice = async () => {
     await roomCallback(metadata, true);
 
     OBR.room.onMetadataChange((metadata) => roomCallback(metadata, false));
+    OBR.broadcast.onMessage(rollMessageChannel, (event) => {
+        handleNewRoll(rollLogStore.getState().addRoll, event.data as RollLogEntryType);
+    });
     console.info("HP Tracker - Finished setting up dddice");
 };

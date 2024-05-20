@@ -4,24 +4,13 @@ import { capitalize } from "lodash";
 
 type Ability = components["schemas"]["Action-Output"];
 
-export const E5Ability = (props: { ability: Ability }) => {
-    const ability = props.ability;
+export const E5Ability = ({ ability, statblock }: { ability: Ability; statblock: string }) => {
     return (
         <li key={ability.name} className={"e5-ability"}>
             <span className={"ability-info"}>
-                <b>{ability.name}.</b> {DiceButtonWrapper(ability.desc, `${capitalize(ability.name)}`)}
+                <b>{ability.name}.</b> {DiceButtonWrapper(ability.desc, `${capitalize(ability.name)}`, statblock)}
             </span>
             <span className={"ability-extra-info"}>
-                {ability.damage_dice ? (
-                    <span>
-                        <i>Damage</i>:{" "}
-                        <DiceButton
-                            dice={ability.damage_dice}
-                            text={ability.damage_dice}
-                            context={`${capitalize(ability.name)}: Damage`}
-                        />
-                    </span>
-                ) : null}
                 {ability.attack_bonus ? (
                     <span>
                         <i>Attack bonus</i>:
@@ -29,6 +18,18 @@ export const E5Ability = (props: { ability: Ability }) => {
                             dice={`d20+${ability.attack_bonus}`}
                             text={`+${ability.attack_bonus}`}
                             context={`${capitalize(ability.name)}: To Hit`}
+                            statblock={statblock}
+                        />
+                    </span>
+                ) : null}
+                {ability.damage_dice ? (
+                    <span>
+                        <i>Damage</i>:{" "}
+                        <DiceButton
+                            dice={ability.damage_dice}
+                            text={ability.damage_dice}
+                            context={`${capitalize(ability.name)}: Damage`}
+                            statblock={statblock}
                         />
                     </span>
                 ) : null}

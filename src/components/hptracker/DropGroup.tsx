@@ -15,11 +15,12 @@ import {
 } from "../../helper/multiTokenHelper.ts";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { useDiceRoller } from "../../context/DDDiceContext.tsx";
-import { IDiceRoll, IRoll, Operator } from "dddice-js";
-import { diceToRoll } from "../../helper/diceHelper.ts";
+import { IDiceRoll, Operator } from "dddice-js";
+import { diceToRoll, getUserUuid, localRoll } from "../../helper/diceHelper.ts";
 import { getRoomDiceUser } from "../../helper/helpers.ts";
-import { useComponentContext } from "../../context/ComponentContext.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
+import { useRollLogContext } from "../../context/RollLogContext.tsx";
+import { useRef, useState } from "react";
 
 type DropGroupProps = {
     title: string;
@@ -30,9 +31,12 @@ type DropGroupProps = {
 
 export const DropGroup = (props: DropGroupProps) => {
     const [room, scene] = useMetadataContext((state) => [state.room, state.scene]);
-    const component = useComponentContext((state) => state.component);
     const [rollerApi, initialized, theme] = useDiceRoller((state) => [state.rollerApi, state.initialized, state.theme]);
+    const addRoll = useRollLogContext((state) => state.addRoll);
     const playerContext = usePlayerContext();
+    const initButtonRef = useRef<HTMLButtonElement>(null);
+
+    const [initHover, setInitHover] = useState<boolean>(false);
 
     const setOpenGroupSetting = async (name: string) => {
         const metadata: Metadata = await OBR.scene.getMetadata();
@@ -47,40 +51,63 @@ export const DropGroup = (props: DropGroupProps) => {
         await OBR.scene.setMetadata(ownMetadata);
     };
 
-    const roll = async (button: HTMLButtonElement, dice: string) => {
-        button.classList.add("rolling");
-        if (theme) {
+    const roll = async (dice: string, statblock: string, hidden: boolean, id: string) => {
+        if (room && theme) {
             let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined = diceToRoll(dice, theme.id);
             if (parsed) {
-                await rollerApi?.roll.create(parsed.dice, {
+                const r = await rollerApi?.roll.create(parsed.dice, {
                     operator: parsed.operator,
-                    external_id: component,
+                    external_id: statblock,
                     label: "Initiative: Roll",
+                    whisper: hidden ? await getUserUuid(room, rollerApi) : undefined,
                 });
+                return {
+                    value: Number(r?.data.total_value),
+                    id: id,
+                };
             }
         }
-        button.classList.remove("rolling");
-        button.blur();
     };
 
-    const setInitiative = async (button: HTMLButtonElement) => {
-        let rollData: IRoll | undefined;
-        const id = OBR.player.id;
-        if (getRoomDiceUser(room, id)?.diceRendering && !room?.disableDiceRoller) {
-            await roll(button, `${props.list.length}d${room?.initiativeDice ?? 20}`);
+    const diceLessRoll = async (dice: string, statblock: string, hidden: boolean, id: string) => {
+        const result = await localRoll(dice, "Initiative: Roll", addRoll, hidden, statblock);
+        if (result) {
+            return { value: result.total, id: id };
         }
+    };
+
+    const setInitiative = async (hidden: boolean) => {
+        initButtonRef.current?.classList.add("rolling");
+        const newInitiativeValues: Map<string, number> = new Map();
+        const promises: Array<Promise<{ value: number; id: string } | undefined>> = [];
+
+        for (const item of props.list) {
+            const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+            const dice = `1d${room?.initiativeDice ?? 20}+${data.stats.initiativeBonus}`;
+            if (getRoomDiceUser(room, OBR.player.id)?.diceRendering && !room?.disableDiceRoller) {
+                promises.push(roll(dice, data.name, hidden, item.id));
+            } else {
+                promises.push(diceLessRoll(dice, data.name, hidden, item.id));
+            }
+        }
+
+        const results = await Promise.all(promises);
+        results.forEach((result) => {
+            if (result) {
+                newInitiativeValues.set(result.id, result.value);
+            }
+        });
+
         await OBR.scene.items.updateItems(props.list, (items) => {
-            items.forEach((item, index) => {
-                let value = 0;
-                let bonus = (item.metadata[itemMetadataKey] as HpTrackerMetadata).stats.initiativeBonus;
-                if (rollData && rollData.values.length >= items.length) {
-                    value = rollData.values[index].value + bonus;
-                } else {
-                    value = Math.floor(Math.random() * (room?.initiativeDice ?? 20)) + 1 + bonus;
-                }
-                (item.metadata[itemMetadataKey] as HpTrackerMetadata).initiative = value;
+            items.forEach((item) => {
+                const bonus = (item.metadata[itemMetadataKey] as HpTrackerMetadata).stats.initiativeBonus;
+                (item.metadata[itemMetadataKey] as HpTrackerMetadata).initiative =
+                    newInitiativeValues.get(item.id) ??
+                    Math.floor(Math.random() * (room?.initiativeDice ?? 20)) + 1 + bonus;
             });
         });
+        initButtonRef.current?.classList.remove("rolling");
+        initButtonRef.current?.blur();
     };
 
     return (
@@ -123,18 +150,40 @@ export const DropGroup = (props: DropGroupProps) => {
                         }}
                     />
                 </div>
-                <button
-                    title={"Roll Initiative (including initiative modifier from statblock)"}
-                    className={`toggle-button initiative-button`}
-                    disabled={
-                        getRoomDiceUser(room, playerContext.id)?.diceRendering &&
-                        !initialized &&
-                        !room?.disableDiceRoller
-                    }
-                    onClick={async (e) => {
-                        await setInitiative(e.currentTarget);
+                <div
+                    className={"init-wrapper"}
+                    onMouseEnter={() => {
+                        setInitHover(true);
                     }}
-                />
+                    onMouseLeave={() => setInitHover(false)}
+                >
+                    <button
+                        ref={initButtonRef}
+                        title={"Roll Initiative (including initiative modifier from statblock)"}
+                        className={`toggle-button initiative-button`}
+                        disabled={
+                            getRoomDiceUser(room, playerContext.id)?.diceRendering &&
+                            !initialized &&
+                            !room?.disableDiceRoller
+                        }
+                        onClick={async () => {
+                            await setInitiative(false);
+                        }}
+                    />
+                    <button
+                        className={`self ${initHover ? "visible" : "hidden"}`}
+                        disabled={
+                            getRoomDiceUser(room, playerContext.id)?.diceRendering &&
+                            !initialized &&
+                            !room?.disableDiceRoller
+                        }
+                        onClick={async () => {
+                            await setInitiative(true);
+                        }}
+                    >
+                        SELF
+                    </button>
+                </div>
                 <button
                     className={"hide-group"}
                     onClick={async () => {

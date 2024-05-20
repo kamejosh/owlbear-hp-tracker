@@ -131,7 +131,7 @@ export const Settings = () => {
                         </div>
                     </div>
                     <div className={"dice-roller-enabled setting"}>
-                        Disable Dice Roller:
+                        Use calculated rolls (no 3D dice):
                         <input
                             type={"checkbox"}
                             checked={room?.disableDiceRoller || false}

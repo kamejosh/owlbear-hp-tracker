@@ -1,0 +1,22 @@
+.about {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    justify-content: space-between;
+    align-items: center;
+
+    .about-content-wrapper {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: all 0.25s ease;
+
+        &.open {
+            grid-template-rows: 1fr;
+        }
+
+        .about-content {
+            min-height: 0;
+            overflow: hidden;
+            white-space: pre-wrap;
+        }
+    }
+}

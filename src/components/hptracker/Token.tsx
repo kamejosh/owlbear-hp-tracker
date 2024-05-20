@@ -9,10 +9,9 @@ import { evalString, getBgColor, getRoomDiceUser } from "../../helper/helpers.ts
 import { updateAc } from "../../helper/acHelper.ts";
 import _ from "lodash";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
-import { useComponentContext } from "../../context/ComponentContext.tsx";
 import { useDiceRoller } from "../../context/DDDiceContext.tsx";
-import { IDiceRoll, IRoll, Operator } from "dddice-js";
-import { diceToRoll } from "../../helper/diceHelper.ts";
+import { diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../helper/diceHelper.ts";
+import { useRollLogContext } from "../../context/RollLogContext.tsx";
 
 type TokenProps = {
     item: Item;
@@ -28,11 +27,13 @@ export const Token = (props: TokenProps) => {
     const [editName, setEditName] = useState<boolean>(false);
     const room = useMetadataContext((state) => state.room);
     const setId = useCharSheet((state) => state.setId);
-    const component = useComponentContext((state) => state.component);
     const [rollerApi, initialized, theme] = useDiceRoller((state) => [state.rollerApi, state.initialized, state.theme]);
+    const addRoll = useRollLogContext((state) => state.addRoll);
+    const [initHover, setInitHover] = useState<boolean>(false);
     const hpRef = useRef<HTMLInputElement>(null);
     const maxHpRef = useRef<HTMLInputElement>(null);
     const tempHpRef = useRef<HTMLInputElement>(null);
+    const initButtonRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
         setData(props.data);
@@ -263,25 +264,32 @@ export const Token = (props: TokenProps) => {
         return room?.allowNegativeNumbers ? hp : Math.max(hp, 0);
     };
 
-    const roll = async (button: HTMLButtonElement, dice: string) => {
-        button.classList.add("rolling");
-        if (theme) {
-            let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined = diceToRoll(dice, theme.id);
+    const rollInitiative = async (hidden: boolean) => {
+        initButtonRef.current?.classList.add("rolling");
+        let initiativeValue = 0;
+        const dice = `1d${room?.initiativeDice ?? 20}+${data.stats.initiativeBonus}`;
+        if (room && !room?.disableDiceRoller && theme && rollerApi) {
+            const parsed = diceToRoll(dice, theme.id);
             if (parsed) {
-                const roll = await rollerApi?.roll.create(parsed.dice, {
+                const rollData = await rollWrapper(rollerApi, parsed.dice, {
                     operator: parsed.operator,
-                    external_id: component,
+                    external_id: data.name,
                     label: "Initiative: Roll",
+                    whisper: hidden ? await getUserUuid(room, rollerApi) : undefined,
                 });
-                if (roll && roll.data) {
-                    const data = roll.data;
-                    button.classList.remove("rolling");
-                    return data;
+                if (rollData) {
+                    initiativeValue = Number(rollData.total_value);
                 }
             }
+        } else {
+            const result = await localRoll(dice, "Initiative: Roll", addRoll, hidden, data.name);
+            if (result) {
+                initiativeValue = result.total;
+            }
         }
-        button.classList.remove("rolling");
-        button.blur();
+        initButtonRef.current?.classList.remove("rolling");
+        initButtonRef.current?.blur();
+        return initiativeValue;
     };
 
     return display() ? (
@@ -488,31 +496,45 @@ export const Token = (props: TokenProps) => {
                     }}
                     className={"initiative"}
                 />
-                <button
-                    title={"Roll Initiative (including initiative modifier from statblock)"}
-                    className={`toggle-button initiative-button`}
-                    disabled={
-                        getRoomDiceUser(room, playerContext.id)?.diceRendering &&
-                        !initialized &&
-                        !room?.disableDiceRoller
-                    }
-                    onClick={async (e) => {
-                        let rollData: IRoll | undefined;
-                        if (getRoomDiceUser(room, playerContext.id)?.diceRendering && !room?.disableDiceRoller) {
-                            rollData = await roll(e.currentTarget, `1d${room?.initiativeDice ?? 20}`);
-                        }
-                        let value = 0;
-                        let bonus = data.stats.initiativeBonus;
-                        if (rollData && rollData.values.length >= 1) {
-                            value = rollData.values[0].value + bonus;
-                        } else {
-                            value = Math.floor(Math.random() * (room?.initiativeDice ?? 20)) + 1 + bonus;
-                        }
-                        const newData = { ...data, initiative: value };
-                        setData(newData);
-                        handleValueChange(newData);
+                <div
+                    className={"init-wrapper"}
+                    onMouseEnter={() => {
+                        setInitHover(true);
                     }}
-                />
+                    onMouseLeave={() => setInitHover(false)}
+                >
+                    <button
+                        title={"Roll Initiative (including initiative modifier from statblock)"}
+                        className={`toggle-button initiative-button`}
+                        disabled={
+                            getRoomDiceUser(room, playerContext.id)?.diceRendering &&
+                            !initialized &&
+                            !room?.disableDiceRoller
+                        }
+                        onClick={async () => {
+                            const value = await rollInitiative(false);
+                            const newData = { ...data, initiative: value };
+                            setData(newData);
+                            handleValueChange(newData);
+                        }}
+                    />
+                    <button
+                        className={`self ${initHover ? "visible" : "hidden"}`}
+                        disabled={
+                            getRoomDiceUser(room, playerContext.id)?.diceRendering &&
+                            !initialized &&
+                            !room?.disableDiceRoller
+                        }
+                        onClick={async () => {
+                            const value = await rollInitiative(true);
+                            const newData = { ...data, initiative: value };
+                            setData(newData);
+                            handleValueChange(newData);
+                        }}
+                    >
+                        SELF
+                    </button>
+                </div>
             </div>
             {props.popover ? null : (
                 <div className={"info-button-wrapper"}>

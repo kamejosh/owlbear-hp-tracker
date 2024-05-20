@@ -1,7 +1,7 @@
 {
     "name": "hp-tracker",
     "private": true,
-    "version": "2.1.1",
+    "version": "2.2.0",
     "type": "module",
     "scripts": {
         "dev": "vite",
@@ -35,6 +35,7 @@
         "vite-plugin-mkcert": "^1.17.5"
     },
     "dependencies": {
+        "@dice-roller/rpg-dice-roller": "^5.5.0",
         "@owlbear-rodeo/sdk": "^2.4.0",
         "@tanstack/react-query": "^5.32.0",
         "add": "^2.0.6",

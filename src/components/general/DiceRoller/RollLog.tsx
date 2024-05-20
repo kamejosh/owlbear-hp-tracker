@@ -1,9 +1,10 @@
 import { DiceButton } from "./DiceButtonWrapper.tsx";
-import { RollLogEntryType, useRollLogContext } from "../../../context/RollLogContext.tsx";
+import { RollLogEntryType, rollLogStore, useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useInterval } from "../../../helper/hooks.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import tippy from "tippy.js";
+import { isObject } from "lodash";
 
 type RollLogEntryProps = {
     entry: RollLogEntryType;
@@ -12,6 +13,11 @@ type RollLogEntryProps = {
 
 export const RollLog = () => {
     const log = useRollLogContext((state) => state.log);
+    const [numberOfEntries, setNumberOfEntries] = useState<number>(20);
+
+    useInterval(() => {
+        rollLogStore.persist.rehydrate();
+    }, 1000);
 
     return (
         <ul className={"roll-log"}>
@@ -19,9 +25,20 @@ export const RollLog = () => {
                 .sort((a, b) => {
                     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
                 })
+                .slice(0, numberOfEntries)
                 .map((entry, index) => {
                     return <RollLogEntry entry={entry} key={entry.uuid} classes={index > 4 ? "old-roll" : ""} />;
                 })}
+            {numberOfEntries < log.length ? (
+                <button
+                    className={"more"}
+                    onClick={() => {
+                        setNumberOfEntries(Math.min(numberOfEntries + 10, log.length));
+                    }}
+                >
+                    more
+                </button>
+            ) : null}
         </ul>
     );
 };
@@ -60,7 +77,7 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
     useInterval(() => {
         const nowTime = new Date();
         setRollTimeText(getRollTimeText(nowTime.getTime() - rollTime.getTime()));
-    }, 10000);
+    }, 60000);
 
     useEffect(() => {
         if (detailsRef.current) {
@@ -69,14 +86,17 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
     }, [detailsRef]);
 
     const getDetailedResult = useCallback(() => {
-        let result = "";
-        props.entry.values.forEach((value) => {
-            result += Intl.NumberFormat("en-US", { signDisplay: "always" }).format(Math.floor(value.value));
-        });
-        if (result.length > 0) {
-            result = result.substring(1, result.length);
+        if (
+            props.entry.values.length > 0 &&
+            isObject(props.entry.values[0]) &&
+            // @ts-ignore before the switch values had the property "value"
+            props.entry.values[0].hasOwnProperty("value")
+        ) {
+            // @ts-ignore before the switch values had the property "value"
+            return props.entry.values.map((v) => v.value).join(", ");
+        } else {
+            return props.entry.values.join(", ");
         }
-        return result;
     }, [props.entry.values]);
 
     const formatLabel = useCallback(() => {
@@ -115,6 +135,7 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
                 dice={props.entry.equation}
                 text={props.entry.equation}
                 context={props.entry.label || "re-roll"}
+                statblock={props.entry.username}
             />
             <div className={"roll-equation"}>{props.entry.equation}</div>
             <div ref={detailsRef} className={"detailed-result"}>

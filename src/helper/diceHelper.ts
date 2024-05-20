@@ -16,7 +16,9 @@ import {
     ThreeDDiceRollEvent,
 } from "dddice-js";
 import { RollLogEntryType } from "../context/RollLogContext.tsx";
-import { rollLogPopover, rollLogPopoverId } from "./variables.ts";
+import { rollLogPopover, rollLogPopoverId, rollMessageChannel } from "./variables.ts";
+import { DiceRoll } from "@dice-roller/rpg-dice-roller";
+import { v4 } from "uuid";
 
 let rollLogTimeOut: number;
 
@@ -94,6 +96,7 @@ export const getDiceParticipant = async (rollerApi: ThreeDDiceAPI, roomSlug: str
 export const getApiKey = async (room: RoomMetadata | null) => {
     const roomMetadata = await OBR.room.getMetadata();
     const playerId = await OBR.player.getId();
+    //TODO: we currently use the playerId but this changes a lot. player names would probably be better.
     let apiKey: string | undefined = room?.diceUser?.find((user) => user.playerId === playerId)?.apiKey;
     let updateKey: boolean = false;
 
@@ -165,11 +168,7 @@ export const prepareRoomUser = async (diceRoom: IRoom, rollerApi: ThreeDDiceAPI)
     }
 };
 
-const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => void) => {
-    const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
-
-    const rollLogEntry = await dddiceRollToRollLog(e, { participant: participant });
-
+export const handleNewRoll = async (addRoll: (entry: RollLogEntryType) => void, rollLogEntry: RollLogEntryType) => {
     addRoll(rollLogEntry);
 
     await OBR.popover.open(rollLogPopover);
@@ -181,6 +180,14 @@ const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => vo
     rollLogTimeOut = setTimeout(async () => {
         await OBR.popover.close(rollLogPopoverId);
     }, 10000);
+};
+
+const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => void) => {
+    const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
+
+    const rollLogEntry = await dddiceRollToRollLog(e, { participant: participant });
+
+    await handleNewRoll(addRoll, rollLogEntry);
 };
 
 export const addRollerApiCallbacks = async (roller: ThreeDDiceAPI, addRoll: (entry: RollLogEntryType) => void) => {
@@ -309,17 +316,71 @@ export const validateTheme = (t: ITheme) => {
     );
 };
 
-export const rollWrapper = async (api: ThreeDDiceAPI, dice: Array<IDiceRoll>, options?: Partial<IDiceRollOptions>) => {
+export const localRoll = async (
+    diceEquation: string,
+    label: string,
+    addRoll: (entry: RollLogEntryType) => void,
+    hidden: boolean = false,
+    statblock?: string
+) => {
     try {
-        const roll = await api.roll.create(dice, options);
-        if (roll && roll.data) {
-            return roll.data;
+        const roll = new DiceRoll(diceEquation);
+        const name = await OBR.player.getName();
+        const logEntry = {
+            uuid: v4(),
+            created_at: new Date().toISOString(),
+            equation: diceEquation,
+            label: label,
+            total_value: roll.total.toString(),
+            username: statblock ?? name,
+            values: [roll.output.substring(roll.output.indexOf(":") + 1, roll.output.indexOf("=") - 1)],
+            owlbear_user_id: OBR.player.id,
+            participantUsername: name,
+        };
+
+        if (!hidden) {
+            await OBR.broadcast.sendMessage(rollMessageChannel, logEntry, { destination: "REMOTE" });
         }
+
+        await handleNewRoll(addRoll, logEntry);
+
+        return roll;
     } catch {
-        await OBR.notification.show(
-            "Error while rolling dice - check if the selected dice theme is available",
-            "WARNING"
-        );
-        return null;
+        return false;
     }
+};
+
+export const rollWrapper = async (
+    api: ThreeDDiceAPI | null,
+    dice: Array<IDiceRoll>,
+    options?: Partial<IDiceRollOptions>
+) => {
+    if (api) {
+        try {
+            const roll = await api.roll.create(dice, options);
+            if (roll && roll.data) {
+                return roll.data;
+            }
+        } catch {
+            await OBR.notification.show(
+                "Error while rolling dice - check if the selected dice theme is available",
+                "WARNING"
+            );
+            return null;
+        }
+    }
+};
+
+export const getUserUuid = async (room?: RoomMetadata, rollerApi?: ThreeDDiceAPI) => {
+    if (room?.diceRoom?.slug) {
+        const diceRoom = (await rollerApi?.room.get(room?.diceRoom.slug))?.data;
+        const user = (await rollerApi?.user.get())?.data;
+        if (user && diceRoom) {
+            const participant = diceRoom.participants.find((p) => p.user.uuid === user.uuid);
+            if (participant) {
+                return [participant.id];
+            }
+        }
+    }
+    return undefined;
 };

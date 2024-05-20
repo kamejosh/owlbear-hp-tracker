@@ -56,7 +56,6 @@
 
             .custom-dice {
                 translate: 0 1px;
-                animation: gradient 15s ease infinite;
                 transition: all 0.25s ease, --bg3 0.25s ease, --bg4 0.25s ease;
                 border-bottom: none;
                 border-bottom-right-radius: 0;
@@ -113,11 +112,24 @@
 
                     .preview-image {
                         max-width: 20px;
+                        max-height: 20px;
                         overflow: hidden;
                         object-fit: contain;
 
                         &:only-child {
                             max-width: 40px;
+                            max-height: 40px;
+
+                            svg {
+                                max-width: 35px;
+                                max-height: 35px;
+                            }
+                        }
+
+                        svg {
+                            max-width: 20px;
+                            max-height: 20px;
+                            fill: white;
                         }
                     }
 
@@ -299,6 +311,12 @@
 
                     img {
                         max-width: 40px;
+                    }
+
+                    svg {
+                        fill: white;
+                        max-width: 40px;
+                        max-height: 40px;
                     }
 
                     .self {
@@ -584,6 +602,10 @@
         }
     }
 
+    .more {
+        align-self: flex-end;
+    }
+
     .roll-log-entry {
         display: grid;
         grid-template-columns: 70px auto auto 80px;
@@ -594,6 +616,7 @@
             "reroll reroll divider total";
         column-gap: 1ch;
         align-content: flex-start;
+        transition: all 0.25s ease;
         border: 1px solid dimgrey;
         border-radius: 5px;
         background-color: var(--bg-color);
@@ -607,31 +630,32 @@
             align-self: flex-end;
         }
 
-        &.old-roll {
-            grid-template-columns: 70px auto auto 50px;
-            grid-template-areas:
-                "context context divider total"
-                "user user divider total";
-            padding-block: 2px;
-            min-width: 200px;
+        &:not(:hover) {
+            &.old-roll {
+                grid-template-columns: 70px auto auto 50px;
+                grid-template-areas:
+                    "context context divider total"
+                    "user user divider total";
+                padding-block: 2px;
+                min-width: 200px;
 
-            .detailed-result {
-                display: none;
-            }
+                .detailed-result {
+                    display: none;
+                }
 
-            .button-wrapper {
-                display: none;
-            }
+                .button-wrapper {
+                    display: none;
+                }
 
-            .total {
-                font-size: 1.5rem;
-            }
+                .total {
+                    font-size: 1.5rem;
+                }
 
-            .roll-context {
-                align-self: flex-end;
+                .roll-context {
+                    align-self: flex-end;
+                }
             }
         }
-
         .roll-time {
             grid-row: 1;
             grid-column: 4/5;

@@ -1,27 +1,25 @@
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
-import { IDiceRoll, Operator } from "dddice-js";
 import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
-import { useComponentContext } from "../../../context/ComponentContext.tsx";
-import { useEffect, useRef, useState } from "react";
-import { usePlayerContext } from "../../../context/PlayerContext.ts";
-import { diceToRoll, rollWrapper } from "../../../helper/diceHelper.ts";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
 import tippy, { Instance } from "tippy.js";
+import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 
 type DiceButtonProps = {
     dice: string;
     text: string;
     context: string;
+    statblock?: string;
 };
 export const DiceButton = (props: DiceButtonProps) => {
     const room = useMetadataContext((state) => state.room);
-    const [rollerApi, initialized] = useDiceRoller((state) => [state.rollerApi, state.initialized]);
-    const component = useComponentContext((state) => state.component);
+    const addRoll = useRollLogContext((state) => state.addRoll);
+    const [rollerApi, initialized, theme] = useDiceRoller((state) => [state.rollerApi, state.initialized, state.theme]);
     const [context, setContext] = useState<boolean>(false);
     const [tooltip, setTooltip] = useState<Instance>();
     const rollButton = useRef<HTMLButtonElement>(null);
     const buttonWrapper = useRef<HTMLDivElement>(null);
-    const playerContext = usePlayerContext();
 
     useEffect(() => {
         if (buttonWrapper.current) {
@@ -30,7 +28,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                     setTooltip(
                         tippy(buttonWrapper.current, {
                             content: !!room?.disableDiceRoller
-                                ? "Dice Roller is disabled, enable it in the settings"
+                                ? "dddice is disabled, no 3d dice are rendered"
                                 : "Dice Roller is not initialized",
                         })
                     );
@@ -40,7 +38,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                     tooltip.enable();
                     tooltip.setContent(
                         !!room?.disableDiceRoller
-                            ? "Dice Roller is disabled, enable it in the settings"
+                            ? "dddice is disabled, no 3d dice are rendered"
                             : "Dice Roller is not initialized"
                     );
                 } else {
@@ -49,20 +47,6 @@ export const DiceButton = (props: DiceButtonProps) => {
             }
         }
     }, [initialized, room?.disableDiceRoller]);
-
-    const getUserUuid = async () => {
-        if (room?.diceRoom?.slug) {
-            const diceRoom = (await rollerApi?.room.get(room?.diceRoom.slug))?.data;
-            const user = (await rollerApi?.user.get())?.data;
-            if (user && diceRoom) {
-                const participant = diceRoom.participants.find((p) => p.user.uuid === user.uuid);
-                if (participant) {
-                    return [participant.id];
-                }
-            }
-        }
-        return undefined;
-    };
 
     const addModifier = (originalDie: string, baseDie: string) => {
         if (originalDie.includes("+")) {
@@ -76,37 +60,44 @@ export const DiceButton = (props: DiceButtonProps) => {
 
     const roll = async (modifier?: "ADV" | "DIS" | "SELF") => {
         const button = rollButton.current;
-        const theme = room?.diceUser?.find((user) => user.playerId === playerContext.id)?.diceTheme;
-        if (button && theme) {
+        if (button) {
             button.classList.add("rolling");
-            let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined;
+            let modifiedDice = props.dice;
             if (modifier && modifier === "ADV") {
-                parsed = diceToRoll(addModifier(props.dice, "2d20kh1"), theme);
+                modifiedDice = addModifier(props.dice, "2d20kh1");
             } else if (modifier && modifier === "DIS") {
-                parsed = diceToRoll(addModifier(props.dice, "2d20dh1"), theme);
-            } else {
-                parsed = diceToRoll(props.dice, theme);
+                modifiedDice = addModifier(props.dice, "2d20dh1");
             }
-            if (parsed && rollerApi) {
-                try {
-                    await rollWrapper(rollerApi, parsed.dice, {
-                        label: props.context,
-                        operator: parsed.operator,
-                        external_id: component,
-                        whisper: modifier === "SELF" ? await getUserUuid() : undefined,
-                    });
-                } catch {
-                    console.warn("error in dice roll", parsed.dice, parsed.operator, component);
+
+            if (theme && !room?.disableDiceRoller) {
+                const parsed = diceToRoll(modifiedDice, theme.id);
+                if (parsed && rollerApi) {
+                    try {
+                        await rollWrapper(rollerApi, parsed.dice, {
+                            label: props.context,
+                            operator: parsed.operator,
+                            external_id: props.statblock,
+                            whisper: modifier === "SELF" ? await getUserUuid() : undefined,
+                        });
+                    } catch {
+                        console.warn("error in dice roll", parsed.dice, parsed.operator);
+                    }
                 }
+            } else {
+                await localRoll(modifiedDice, props.context, addRoll, modifier === "SELF", props.statblock);
             }
             button.classList.remove("rolling");
             button.blur();
         }
     };
 
+    const isEnabled = useCallback(() => {
+        return (initialized && !room?.disableDiceRoller) || room?.disableDiceRoller;
+    }, [initialized, room?.disableDiceRoller]);
+
     return (
         <div
-            className={`button-wrapper ${initialized && !room?.disableDiceRoller ? "enabled" : "disabled"}`}
+            className={`button-wrapper ${isEnabled() ? "enabled" : "disabled"}`}
             onMouseEnter={() => {
                 setContext(true);
             }}
@@ -115,7 +106,7 @@ export const DiceButton = (props: DiceButtonProps) => {
         >
             <button
                 ref={rollButton}
-                disabled={!initialized && room?.disableDiceRoller}
+                disabled={!isEnabled()}
                 className={"dice-button button"}
                 onClick={async () => {
                     await roll();
@@ -125,7 +116,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                 {props.text.replace(/\s/g, "")}
             </button>
             <div
-                className={`dice-context-button ${context && initialized ? "visible" : ""} ${
+                className={`dice-context-button ${context && isEnabled() ? "visible" : ""} ${
                     props.dice.startsWith("1d20") ||
                     props.dice.startsWith("d20") ||
                     props.dice.startsWith("+") ||
@@ -141,7 +132,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                     <>
                         <button
                             className={"advantage"}
-                            disabled={!initialized}
+                            disabled={!isEnabled()}
                             onClick={async () => {
                                 await roll("ADV");
                             }}
@@ -150,7 +141,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                         </button>
                         <button
                             className={"disadvantage"}
-                            disabled={!initialized}
+                            disabled={!isEnabled()}
                             onClick={async () => {
                                 await roll("DIS");
                             }}
@@ -161,7 +152,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                 ) : null}
                 <button
                     className={"self"}
-                    disabled={!initialized}
+                    disabled={!isEnabled()}
                     onClick={async () => {
                         await roll("SELF");
                     }}
@@ -173,8 +164,8 @@ export const DiceButton = (props: DiceButtonProps) => {
     );
 };
 
-export const DiceButtonWrapper = (text: string, context: string) => {
-    const regex = /((\d+?d\d+)( ?[\+\-] ?\d+)?)|([\+\-]\d+)/gi;
+export const DiceButtonWrapper = (text: string, context: string, statblock?: string) => {
+    const regex = /((\d*?d\d+)( ?[\+\-] ?\d+)?)|([\+\-]\d+)/gi;
     const dice = text.match(regex);
     dice?.forEach((die) => {
         text = text.split(die).join("|||");
@@ -190,8 +181,10 @@ export const DiceButtonWrapper = (text: string, context: string) => {
                     const text = die;
                     if (die.startsWith("DC")) {
                         die = `1d20>${parseInt(die.substring(3))}`;
+                    } else if (die.startsWith("+") || die.startsWith("-")) {
+                        die = `1d20${die}`;
                     }
-                    diceField = <DiceButton dice={die} text={text} context={context} />;
+                    diceField = <DiceButton dice={die} text={text} context={context} statblock={statblock} />;
                 }
                 return (
                     <span key={index}>

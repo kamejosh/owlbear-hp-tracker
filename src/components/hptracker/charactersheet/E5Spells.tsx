@@ -7,10 +7,8 @@ import { capitalize } from "lodash";
 
 type Spell = components["schemas"]["src__types__e5__Spell"];
 
-const Spell = (props: { spell: Spell }) => {
+const Spell = ({ spell, statblock }: { spell: Spell; statblock: string }) => {
     const [open, setOpen] = useState<boolean>(false);
-
-    const spell = props.spell;
 
     const getSpellLevel = () => {
         if (spell.level === 0) {
@@ -39,7 +37,12 @@ const Spell = (props: { spell: Spell }) => {
                     {damage ? (
                         <span className={"spell-damage"}>
                             Damage:{" "}
-                            <DiceButton dice={damage} text={damage} context={`${capitalize(spell.name)}: Damage`} />
+                            <DiceButton
+                                dice={damage}
+                                text={damage}
+                                context={`${capitalize(spell.name)}: Damage`}
+                                statblock={statblock}
+                            />
                         </span>
                     ) : null}
                     <div className={"spell-components"}>
@@ -95,12 +98,16 @@ const Spell = (props: { spell: Spell }) => {
                         </span>
                     </div>
                     <div className={"spell-description"}>
-                        <b>Description</b>: {DiceButtonWrapper(spell.desc, `${capitalize(spell.name)}`)}
+                        <b>Description</b>: {DiceButtonWrapper(spell.desc, `${capitalize(spell.name)}`, statblock)}
                     </div>
                     {!!spell.higher_level ? (
                         <div className={"spell-higher-level"}>
                             <b>Higher Levels</b>:{" "}
-                            {DiceButtonWrapper(spell.higher_level, `${capitalize(spell.name)}: Higher Level`)}
+                            {DiceButtonWrapper(
+                                spell.higher_level,
+                                `${capitalize(spell.name)}: Higher Level`,
+                                statblock
+                            )}
                         </div>
                     ) : null}
                 </div>
@@ -109,7 +116,7 @@ const Spell = (props: { spell: Spell }) => {
     );
 };
 
-export const E5Spells = (props: { spells: Array<Spell> }) => {
+export const E5Spells = (props: { spells: Array<Spell>; statblock: string }) => {
     const [spellFilter, setSpellFilter] = useState<Array<number>>([]);
 
     const filters = ["All"]
@@ -154,7 +161,7 @@ export const E5Spells = (props: { spells: Array<Spell> }) => {
                     .sort((a, b) => a.level - b.level)
                     .filter((spell) => spellFilter.indexOf(spell.level) >= 0 || spellFilter.length === 0)
                     .map((spell, index) => {
-                        return <Spell spell={spell} key={`${spell.name}${index}`} />;
+                        return <Spell spell={spell} key={`${spell.name}${index}`} statblock={props.statblock} />;
                     })}
             </ul>
         </div>
