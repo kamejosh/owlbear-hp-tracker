@@ -278,14 +278,7 @@ export const diceToRoll = (diceString: string, theme: string) => {
 
 export const validateTheme = (t: ITheme) => {
     for (const d of t.available_dice) {
-        if (d.hasOwnProperty("type")) {
-            const die = d as IAvailableDie;
-            if (die.notation === "d10x" && (die.notation !== die.id || die.type !== "d10")) {
-                return false;
-            } else if (die.notation !== "d10x" && (die.notation !== die.id || die.id !== die.type)) {
-                return false;
-            }
-        } else {
+        if (!d.hasOwnProperty("type")) {
             const dice = t.available_dice as Array<IDieType>;
             if (
                 dice.includes(IDieType.D4) &&

@@ -15,6 +15,7 @@
   + The roll log now displays the Token name rather then the players name
 + Saving Throws and Skills that have a bonus of 0 are now displayed with +0 instead of not displayed at all (when bonus is empty they are still not displayed).
 + Fix HP Bar width has wrong calculation after scaling the token
++ All dddice themes with the standard 5e dice are now selectable
 
 # 2.1.1
 

@@ -76,6 +76,26 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                 return (
                     <div className={"custom-dice-preview-wrapper"}>
                         {parsed.dice.map((die, index) => {
+                            if (die.type !== "mod") {
+                                const themeDie = theme.available_dice.find(
+                                    (d) => d.hasOwnProperty("type") && (d as IAvailableDie).type === die.type
+                                );
+                                if (themeDie) {
+                                    let preview = "";
+                                    const notation = (themeDie as IAvailableDie).notation;
+                                    const id = (themeDie as IAvailableDie).id;
+                                    if (theme.preview.hasOwnProperty(id)) {
+                                        preview = theme.preview[id];
+                                    } else if (notation && theme.preview.hasOwnProperty(notation)) {
+                                        preview = theme.preview[notation];
+                                    }
+                                    if (preview) {
+                                        return (
+                                            <img key={index} className={"preview-image"} src={preview} alt={die.type} />
+                                        );
+                                    }
+                                }
+                            }
                             if (die.type !== "mod" && theme.preview.hasOwnProperty(die.type)) {
                                 return (
                                     <img
@@ -84,6 +104,12 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                                         src={theme.preview[die.type]}
                                         alt={die.type}
                                     />
+                                );
+                            } else if (!theme.preview.hasOwnProperty(die.type)) {
+                                return (
+                                    <div key={index} className={"preview-image"}>
+                                        {getSvgForDiceType(die.type)}
+                                    </div>
                                 );
                             } else {
                                 if (die.value) {
@@ -329,7 +355,10 @@ const QuickButtons = ({ open }: { open: boolean }) => {
                 try {
                     if (die.hasOwnProperty("type")) {
                         const notation = (die as IAvailableDie).notation;
-                        if (notation && theme.preview.hasOwnProperty(notation)) {
+                        const id = (die as IAvailableDie).id;
+                        if (theme.preview.hasOwnProperty(id)) {
+                            preview = theme.preview[id];
+                        } else if (notation && theme.preview.hasOwnProperty(notation)) {
                             preview = theme.preview[notation];
                         } else {
                             preview = theme.preview[(die as IAvailableDie).type];
@@ -339,9 +368,15 @@ const QuickButtons = ({ open }: { open: boolean }) => {
                         preview = theme.preview[die as IDieType];
                         name = die.toString();
                     }
-                    if (preview && name) {
+                    if (name) {
                         name = name === "d10x" ? "d100" : name;
-                        return <DiceListEntry key={index} preview={<img src={preview} alt={name} />} name={name} />;
+                        return (
+                            <DiceListEntry
+                                key={index}
+                                preview={preview ? <img src={preview} alt={name} /> : getSvgForDiceType(name)}
+                                name={name}
+                            />
+                        );
                     }
                 } catch {
                     return null;

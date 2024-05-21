@@ -298,13 +298,15 @@
                     min-width: 40px;
 
                     &:hover {
-                        img {
+                        img,
+                        svg {
                             animation: shaking 0.2s alternate linear infinite;
                         }
                     }
 
                     &.rolling {
-                        img {
+                        img,
+                        svg {
                             animation: rotating 0.5s linear infinite;
                         }
                     }
@@ -465,7 +467,9 @@
                     grid-template-areas: "all";
 
                     img {
+                        width: 35px;
                         height: 35px;
+                        object-fit: cover;
                     }
 
                     &.open {
@@ -553,6 +557,8 @@
                                 display: flex;
                                 flex-direction: column;
                                 gap: 2px;
+                                max-height: 240px;
+                                overflow-y: auto;
 
                                 .select-option {
                                     display: flex;
