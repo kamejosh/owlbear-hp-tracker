@@ -63,11 +63,11 @@ export const PfAbility = ({
                     <b className={"ability-name"}>{ability.name}</b> {actionTypeConvert(ability)}
                     {Object.keys(ability).includes("description") && (ability as Action).description !== "" ? (
                         <div className={`ability-description ${isAction(ability) ? "action" : "ability"}`}>
-                            {DiceButtonWrapper(
-                                (ability as Action).description!,
-                                `${capitalize(ability.name)}`,
-                                statblock
-                            )}
+                            <DiceButtonWrapper
+                                text={(ability as Action).description!}
+                                context={`${capitalize(ability.name)}`}
+                                statblock={statblock}
+                            />
                         </div>
                     ) : null}
                 </div>
@@ -83,11 +83,11 @@ export const PfAbility = ({
                             return (
                                 <li key={index}>
                                     <b>{key}</b>:{" "}
-                                    {DiceButtonWrapper(
-                                        value,
-                                        `${capitalize(ability.name)} ${capitalize(key)}`,
-                                        statblock
-                                    )}
+                                    <DiceButtonWrapper
+                                        text={value}
+                                        context={`${capitalize(ability.name)} ${capitalize(key)}`}
+                                        statblock={statblock}
+                                    />
                                 </li>
                             );
                         }

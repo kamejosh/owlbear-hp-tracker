@@ -30,7 +30,12 @@ const Spell = (props: { spell: PfSpellOut; statblock: string }) => {
                     </div>
                     {damage ? (
                         <span className={"spell-damage"}>
-                            Damage: {DiceButtonWrapper(damage, `${capitalize(spell?.name)} Damage`, props.statblock)}
+                            Damage:{" "}
+                            <DiceButtonWrapper
+                                text={damage}
+                                context={`${capitalize(spell?.name)} Damage`}
+                                statblock={props.statblock}
+                            />
                         </span>
                     ) : null}
                     {spell?.cast ? (
@@ -114,22 +119,22 @@ const Spell = (props: { spell: PfSpellOut; statblock: string }) => {
                     </div>
                     <div className={"spell-description"}>
                         <b>Description</b>:{" "}
-                        {DiceButtonWrapper(
-                            spell?.description?.text || "",
-                            `${capitalize(spell?.name)}`,
-                            props.statblock
-                        )}
+                        <DiceButtonWrapper
+                            text={spell?.description?.text || ""}
+                            context={`${capitalize(spell?.name)}`}
+                            statblock={props.statblock}
+                        />
                         {spell?.description?.details && spell.description.details.length > 0 ? (
                             <ul>
                                 {spell?.description.details.map((details, index) => {
                                     return (
                                         <li key={index}>
                                             <b>{details.title}</b>:{" "}
-                                            {DiceButtonWrapper(
-                                                details.text,
-                                                `${capitalize(spell.name)} ${details.title}`,
-                                                props.statblock
-                                            )}
+                                            <DiceButtonWrapper
+                                                text={details.text}
+                                                context={`${capitalize(spell.name)} ${details.title}`}
+                                                statblock={props.statblock}
+                                            />
                                         </li>
                                     );
                                 })}
@@ -144,18 +149,18 @@ const Spell = (props: { spell: PfSpellOut; statblock: string }) => {
                                     return (
                                         <div key={index}>
                                             <div className={"modifier"}>
-                                                {DiceButtonWrapper(
-                                                    heightened.modifier,
-                                                    `${capitalize(spell.name)}: Heightened`,
-                                                    props.statblock
-                                                )}
+                                                <DiceButtonWrapper
+                                                    text={heightened.modifier}
+                                                    context={`${capitalize(spell.name)}: Heightened`}
+                                                    statblock={props.statblock}
+                                                />
                                             </div>
                                             <div className={"description"}>
-                                                {DiceButtonWrapper(
-                                                    heightened.description,
-                                                    `${capitalize(spell.name)}: Heightened`,
-                                                    props.statblock
-                                                )}
+                                                <DiceButtonWrapper
+                                                    text={heightened.description}
+                                                    context={`${capitalize(spell.name)}: Heightened`}
+                                                    statblock={props.statblock}
+                                                />
                                             </div>
                                         </div>
                                     );

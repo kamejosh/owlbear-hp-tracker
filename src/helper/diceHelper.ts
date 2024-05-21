@@ -15,7 +15,7 @@ import {
     ThreeDDiceAPI,
     ThreeDDiceRollEvent,
 } from "dddice-js";
-import { RollLogEntryType } from "../context/RollLogContext.tsx";
+import { RollLogEntryType, rollLogStore } from "../context/RollLogContext.tsx";
 import { rollLogPopover, rollLogPopoverId, rollMessageChannel } from "./variables.ts";
 import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 import { v4 } from "uuid";
@@ -336,6 +336,7 @@ export const localRoll = async (
         }
 
         await handleNewRoll(addRoll, logEntry);
+        rollLogStore.persist.rehydrate();
 
         return roll;
     } catch {

@@ -8,7 +8,8 @@ export const E5Ability = ({ ability, statblock }: { ability: Ability; statblock:
     return (
         <li key={ability.name} className={"e5-ability"}>
             <span className={"ability-info"}>
-                <b>{ability.name}.</b> {DiceButtonWrapper(ability.desc, `${capitalize(ability.name)}`, statblock)}
+                <b>{ability.name}.</b>{" "}
+                <DiceButtonWrapper text={ability.desc} context={`${capitalize(ability.name)}`} statblock={statblock} />
             </span>
             <span className={"ability-extra-info"}>
                 {ability.attack_bonus ? (

@@ -10,12 +10,7 @@ import { RollLogSvg } from "../../svgs/RollLogSvg.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { DiceRoll } from "@dice-roller/rpg-dice-roller";
-import { D4 } from "../../svgs/dice/D4.tsx";
-import { D6 } from "../../svgs/dice/D6.tsx";
-import { D8 } from "../../svgs/dice/D8.tsx";
-import { D10 } from "../../svgs/dice/D10.tsx";
-import { D12 } from "../../svgs/dice/D12.tsx";
-import { D20 } from "../../svgs/dice/D20.tsx";
+import { getDiceImage, getSvgForDiceType } from "../../../helper/previewHelpers.tsx";
 
 type DiceRoomButtonsProps = {
     open: boolean;
@@ -27,21 +22,7 @@ type CustomDiceButtonProps = {
     dice: string | null;
 };
 
-export const getSvgForDiceType = (diceType: string) => {
-    if (diceType === "d4") {
-        return <D4 />;
-    } else if (diceType === "d6") {
-        return <D6 />;
-    } else if (diceType === "d8") {
-        return <D8 />;
-    } else if (diceType === "d10" || diceType === "d10x") {
-        return <D10 />;
-    } else if (diceType === "d12") {
-        return <D12 />;
-    } else {
-        return <D20 />;
-    }
-};
+// this is here and not in diceHelper.ts because it needs to be in a .tsx file
 
 const CustomDiceButton = (props: CustomDiceButtonProps) => {
     const [rollerApi, theme, initialized] = useDiceRoller((state) => [state.rollerApi, state.theme, state.initialized]);
@@ -77,23 +58,9 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                     <div className={"custom-dice-preview-wrapper"}>
                         {parsed.dice.map((die, index) => {
                             if (die.type !== "mod") {
-                                const themeDie = theme.available_dice.find(
-                                    (d) => d.hasOwnProperty("type") && (d as IAvailableDie).type === die.type
-                                );
-                                if (themeDie) {
-                                    let preview = "";
-                                    const notation = (themeDie as IAvailableDie).notation;
-                                    const id = (themeDie as IAvailableDie).id;
-                                    if (theme.preview.hasOwnProperty(id)) {
-                                        preview = theme.preview[id];
-                                    } else if (notation && theme.preview.hasOwnProperty(notation)) {
-                                        preview = theme.preview[notation];
-                                    }
-                                    if (preview) {
-                                        return (
-                                            <img key={index} className={"preview-image"} src={preview} alt={die.type} />
-                                        );
-                                    }
+                                const preview = getDiceImage(theme, die, index);
+                                if (preview) {
+                                    return preview;
                                 }
                             }
                             if (die.type !== "mod" && theme.preview.hasOwnProperty(die.type)) {

@@ -98,16 +98,21 @@ const Spell = ({ spell, statblock }: { spell: Spell; statblock: string }) => {
                         </span>
                     </div>
                     <div className={"spell-description"}>
-                        <b>Description</b>: {DiceButtonWrapper(spell.desc, `${capitalize(spell.name)}`, statblock)}
+                        <b>Description</b>:{" "}
+                        <DiceButtonWrapper
+                            text={spell.desc}
+                            context={`${capitalize(spell.name)}`}
+                            statblock={statblock}
+                        />
                     </div>
                     {!!spell.higher_level ? (
                         <div className={"spell-higher-level"}>
                             <b>Higher Levels</b>:{" "}
-                            {DiceButtonWrapper(
-                                spell.higher_level,
-                                `${capitalize(spell.name)}: Higher Level`,
-                                statblock
-                            )}
+                            <DiceButtonWrapper
+                                text={spell.higher_level}
+                                context={`${capitalize(spell.name)}: Higher Level`}
+                                statblock={statblock}
+                            />
                         </div>
                     ) : null}
                 </div>

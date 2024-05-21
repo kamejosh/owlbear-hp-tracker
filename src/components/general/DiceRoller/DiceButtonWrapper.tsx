@@ -5,6 +5,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
 import tippy, { Instance } from "tippy.js";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
+import { parseRollEquation } from "dddice-js";
+import { getDiceImage, getSvgForDiceType } from "../../../helper/previewHelpers.tsx";
 
 type DiceButtonProps = {
     dice: string;
@@ -24,23 +26,17 @@ export const DiceButton = (props: DiceButtonProps) => {
     useEffect(() => {
         if (buttonWrapper.current) {
             if (!tooltip) {
-                if (!initialized || !!room?.disableDiceRoller) {
+                if (!initialized && !room?.disableDiceRoller) {
                     setTooltip(
                         tippy(buttonWrapper.current, {
-                            content: !!room?.disableDiceRoller
-                                ? "dddice is disabled, no 3d dice are rendered"
-                                : "Dice Roller is not initialized",
+                            content: "Dice Roller is not initialized",
                         })
                     );
                 }
             } else {
-                if (!initialized || !!room?.disableDiceRoller) {
+                if (!initialized && !room?.disableDiceRoller) {
                     tooltip.enable();
-                    tooltip.setContent(
-                        !!room?.disableDiceRoller
-                            ? "dddice is disabled, no 3d dice are rendered"
-                            : "Dice Roller is not initialized"
-                    );
+                    tooltip.setContent("Dice Roller is not initialized");
                 } else {
                     tooltip.disable();
                 }
@@ -91,13 +87,38 @@ export const DiceButton = (props: DiceButtonProps) => {
         }
     };
 
+    const getDicePreview = () => {
+        try {
+            const parsed = parseRollEquation(props.dice, "dddice-bees");
+            const die = parsed.dice.find((d) => d.type !== "mod");
+            if (die) {
+                if (room?.disableDiceRoller) {
+                    return getSvgForDiceType(die.type);
+                } else {
+                    if (theme) {
+                        const image = getDiceImage(theme, die, 0);
+                        return image ?? <DiceSvg />;
+                    } else {
+                        return <DiceSvg />;
+                    }
+                }
+            } else {
+                return <DiceSvg />;
+            }
+        } catch {
+            return <DiceSvg />;
+        }
+    };
+
     const isEnabled = useCallback(() => {
         return (initialized && !room?.disableDiceRoller) || room?.disableDiceRoller;
     }, [initialized, room?.disableDiceRoller]);
 
     return (
         <div
-            className={`button-wrapper ${isEnabled() ? "enabled" : "disabled"}`}
+            className={`button-wrapper ${isEnabled() ? "enabled" : "disabled"} ${
+                room?.disableDiceRoller ? "calculated" : "three-d-dice"
+            }`}
             onMouseEnter={() => {
                 setContext(true);
             }}
@@ -112,7 +133,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                     await roll();
                 }}
             >
-                <DiceSvg />
+                <div className={"dice-preview"}>{getDicePreview()}</div>
                 {props.text.replace(/\s/g, "")}
             </button>
             <div
@@ -164,7 +185,15 @@ export const DiceButton = (props: DiceButtonProps) => {
     );
 };
 
-export const DiceButtonWrapper = (text: string, context: string, statblock?: string) => {
+export const DiceButtonWrapper = ({
+    text,
+    context,
+    statblock,
+}: {
+    text: string;
+    context: string;
+    statblock?: string;
+}) => {
     const regex = /((\d*?d\d+)( ?[\+\-] ?\d+)?)|([\+\-]\d+)/gi;
     const dice = text.match(regex);
     dice?.forEach((die) => {
