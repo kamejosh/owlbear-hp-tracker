@@ -52,7 +52,7 @@ export const Select = ({ options, current, setTheme }: SelectProps) => {
                                         }}
                                     >
                                         {option.icon || null}
-                                        {option.name}{" "}
+                                        <span className={"name"}>{option.name} </span>
                                     </div>
                                 );
                             })}
