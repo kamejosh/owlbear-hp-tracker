@@ -307,7 +307,11 @@ export const getInitialValues = async (items: Array<Item>) => {
                     statblocks.data.forEach((statblock: E5Statblock) => {
                         const d = diff.diff_main(statblock.name, item.name);
                         const dist = diff.diff_levenshtein(d);
-                        if (bestMatch === undefined || dist < bestMatch.distance) {
+                        if (
+                            bestMatch === undefined ||
+                            dist < bestMatch.distance ||
+                            (dist === bestMatch.distance && statblock.source === "wotc-srd")
+                        ) {
                             bestMatch = {
                                 distance: dist,
                                 statblock: {
