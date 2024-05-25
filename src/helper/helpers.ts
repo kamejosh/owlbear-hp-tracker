@@ -298,7 +298,7 @@ export const getInitialValues = async (items: Array<Item>) => {
                         headers: headers,
                         params: {
                             name: item.name,
-                            take: 10,
+                            take: 20,
                             skip: 0,
                         },
                     });

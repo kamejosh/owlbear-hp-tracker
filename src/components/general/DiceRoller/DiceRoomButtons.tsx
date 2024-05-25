@@ -72,7 +72,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                                         alt={die.type}
                                     />
                                 );
-                            } else if (!theme.preview.hasOwnProperty(die.type)) {
+                            } else if (die.type !== "mod" && !theme.preview.hasOwnProperty(die.type)) {
                                 return (
                                     <div key={index} className={"preview-image"}>
                                         {getSvgForDiceType(die.type)}
