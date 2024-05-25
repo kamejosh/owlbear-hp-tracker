@@ -4,7 +4,7 @@ import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { IAvailableDie, IDiceRoll, IDieType, Operator, parseRollEquation } from "dddice-js";
 import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { AddSvg } from "../../svgs/AddSvg.tsx";
-import { diceToRoll, getDiceParticipant, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
+import { diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
 import tippy, { Instance } from "tippy.js";
 import { RollLogSvg } from "../../svgs/RollLogSvg.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
@@ -256,17 +256,6 @@ const QuickButtons = ({ open }: { open: boolean }) => {
     const { room } = useMetadataContext();
     const [validCustom, setValidCustom] = useState<boolean>(true);
 
-    const getUserUuid = async () => {
-        if (room?.diceRoom?.slug && rollerApi) {
-            const participant = await getDiceParticipant(rollerApi, room.diceRoom.slug);
-
-            if (participant) {
-                return [participant.id];
-            }
-        }
-        return undefined;
-    };
-
     const roll = async (element: HTMLElement, dice: string, hide: boolean = false) => {
         element.classList.add("rolling");
         if (theme && dice && !room?.disableDiceRoller) {
@@ -275,7 +264,7 @@ const QuickButtons = ({ open }: { open: boolean }) => {
                 await rollWrapper(rollerApi, parsed.dice, {
                     operator: parsed.operator,
                     label: "Roll: Custom",
-                    whisper: hide ? await getUserUuid() : undefined,
+                    whisper: hide ? await getUserUuid(room, rollerApi) : undefined,
                 });
             }
         } else {

@@ -73,7 +73,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                             label: props.context,
                             operator: parsed.operator,
                             external_id: props.statblock,
-                            whisper: modifier === "SELF" ? await getUserUuid() : undefined,
+                            whisper: modifier === "SELF" ? await getUserUuid(room, rollerApi) : undefined,
                         });
                     } catch {
                         console.warn("error in dice roll", parsed.dice, parsed.operator);
