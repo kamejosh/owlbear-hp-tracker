@@ -19,6 +19,7 @@ import { RollLogEntryType, rollLogStore } from "../context/RollLogContext.tsx";
 import { rollLogPopover, rollLogPopoverId, rollMessageChannel } from "./variables.ts";
 import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 import { v4 } from "uuid";
+import { diceRollerStore } from "../context/DDDiceContext.tsx";
 
 let rollLogTimeOut: number;
 
@@ -179,19 +180,26 @@ export const handleNewRoll = async (addRoll: (entry: RollLogEntryType) => void, 
 
     rollLogTimeOut = setTimeout(async () => {
         await OBR.popover.close(rollLogPopoverId);
-    }, 10000);
+    }, 7500);
 };
 
-const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => void) => {
-    const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
+export const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => void, show: boolean = false) => {
+    // we only handle new rolls dddice extension is not loaded or the function is called directly from the dddice callback (show = true)
+    if (!diceRollerStore.getState().dddiceExtensionLoaded || show) {
+        const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
 
-    const rollLogEntry = await dddiceRollToRollLog(e, { participant: participant });
+        const rollLogEntry = await dddiceRollToRollLog(e, { participant: participant });
 
-    await handleNewRoll(addRoll, rollLogEntry);
+        await handleNewRoll(addRoll, rollLogEntry);
+    }
 };
 
 export const addRollerApiCallbacks = async (roller: ThreeDDiceAPI, addRoll: (entry: RollLogEntryType) => void) => {
     roller.listen(ThreeDDiceRollEvent.RollCreated, (e) => rollerCallback(e, addRoll));
+};
+
+export const removeRollerApiCallbacks = async () => {
+    // TODO: dddice sdk does not provide this function yet
 };
 
 export const dddiceApiLogin = async (room: RoomMetadata | null) => {
@@ -374,4 +382,10 @@ export const getUserUuid = async (room: RoomMetadata | null, rollerApi?: ThreeDD
         }
     }
     return undefined;
+};
+
+export const blastMessage = (message: object) => {
+    for (let i = 0; i < window.parent.frames.length; i++) {
+        window.parent.frames[i].postMessage(message, "*");
+    }
 };

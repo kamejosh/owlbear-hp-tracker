@@ -1,3 +1,19 @@
+# 2.2.1
+
++ Improve dddice integration
+  + When both HP Tracker and dddice extension are installed only one of those extension renders dice
+  + HP Trackers roll log only appears after the dice are finished rolling
++ Fix dddice themes are not showing up
+  + Now every dice theme that contains the basic DnD Dice can be selected
++ API Key field is now obfuscated by default
++ Dice Buttons now indicate if 3D dice are rolled or not
+  + Button has a 3D effect and shows the selected dddice theme: dddice is used
+  + Button has no 3D effect and shows vector drawing: calculated dice are used
++ Fix styling issue when having dddice themes with very long names in dicebox
++ Fix issue that Tokens are assigned the wrong statblock because search result contains too many results
++ Equal names now prefer wotc-srd statblocks
++ Fix hidden dice rolls are now also hidden when rolled from within the statblock
+
 # 2.2.0
 
 + Add alternative dice roller

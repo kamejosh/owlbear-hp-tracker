@@ -10,6 +10,8 @@ export type DiceRoller = {
     setInitialized: (initialized: boolean) => void;
     theme: ITheme | null;
     setTheme: (theme: ITheme | null) => void;
+    dddiceExtensionLoaded: boolean;
+    setDddiceExtensionLoaded: (dddiceExtensionLoaded: boolean) => void;
 };
 
 export const diceRollerStore = createStore<DiceRoller>()((set) => ({
@@ -28,6 +30,8 @@ export const diceRollerStore = createStore<DiceRoller>()((set) => ({
             }
             return state;
         }),
+    dddiceExtensionLoaded: false,
+    setDddiceExtensionLoaded: (dddiceExtensionLoaded) => set(() => ({ dddiceExtensionLoaded: dddiceExtensionLoaded })),
 }));
 
 export function useDiceRoller(): DiceRoller;

@@ -4,8 +4,16 @@ import { DiceUser, RoomMetadata } from "../helper/types.ts";
 import { getRoomDiceUser } from "../helper/helpers.ts";
 import { AsyncLock } from "../helper/AsyncLock.ts";
 import { ThreeDDiceAPI } from "dddice-js";
-import { addRollerApiCallbacks, dddiceApiLogin, handleNewRoll } from "../helper/diceHelper.ts";
+import {
+    addRollerApiCallbacks,
+    blastMessage,
+    dddiceApiLogin,
+    handleNewRoll,
+    removeRollerApiCallbacks,
+    rollerCallback,
+} from "../helper/diceHelper.ts";
 import { RollLogEntryType, rollLogStore } from "../context/RollLogContext.tsx";
+import { diceRollerStore } from "../context/DDDiceContext.tsx";
 
 const lock = new AsyncLock();
 const diceRollerState: { diceUser: DiceUser | null; disableDiceRoller: boolean } = {
@@ -14,22 +22,31 @@ const diceRollerState: { diceUser: DiceUser | null; disableDiceRoller: boolean }
 };
 
 const initDice = async (room: RoomMetadata, updateApi: boolean) => {
-    let api: ThreeDDiceAPI | undefined = undefined;
+    let api: ThreeDDiceAPI | undefined | null = undefined;
 
     if (updateApi) {
         api = await dddiceApiLogin(room);
         if (api) {
-            await addRollerApiCallbacks(api, rollLogStore.getState().addRoll);
+            diceRollerStore.getState().setRollerApi(api);
         } else {
             throw Error("Error connecting to dddice");
         }
+    } else {
+        api = diceRollerStore.getState().rollerApi;
     }
-    if (diceRollerState.diceUser?.diceRendering) {
+
+    if (diceRollerState.diceUser?.diceRendering && !diceRollerStore.getState().dddiceExtensionLoaded) {
         await OBR.modal.open({
             ...diceTrayModal,
             url: `https://dddice.com/room/${room.diceRoom!.slug}/stream?key=${diceRollerState.diceUser.apiKey}`,
         });
+        if (api) {
+            await removeRollerApiCallbacks();
+        }
     } else {
+        if (api && !diceRollerStore.getState().dddiceExtensionLoaded) {
+            await addRollerApiCallbacks(api, rollLogStore.getState().addRoll);
+        }
         await OBR.modal.close(diceTrayModalId);
     }
 };
@@ -86,8 +103,24 @@ export const setupDddice = async () => {
     await roomCallback(metadata, true);
 
     OBR.room.onMetadataChange((metadata) => roomCallback(metadata, false));
+    // get dice rolls from integrated dice roller
     OBR.broadcast.onMessage(rollMessageChannel, (event) => {
         handleNewRoll(rollLogStore.getState().addRoll, event.data as RollLogEntryType);
     });
+    // handle dice rolls from dddice
+    window.addEventListener("message", async (event) => {
+        try {
+            if (event.type === "message") {
+                if (event.data.type === "roll:finished") {
+                    await rollerCallback(event.data.roll, rollLogStore.getState().addRoll, true);
+                }
+                if (event.data.type === "dddice.loaded") {
+                    diceRollerStore.getState().setDddiceExtensionLoaded(true);
+                    await roomCallback(await OBR.room.getMetadata(), false);
+                }
+            }
+        } catch {}
+    });
+    blastMessage({ type: "dddice.isLoaded" });
     console.info("HP Tracker - Finished setting up dddice");
 };
