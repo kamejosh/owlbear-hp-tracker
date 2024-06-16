@@ -109,7 +109,7 @@ The Action Window can be opened by clicking the HP Tracker Action Icon in the Ow
 At the top of the action window the current version of the extension is displayed as well as the link to the Tabletop Alamanac (to create custom statblocks), three system buttons, the statblock popover button, a link to the HP Tracker Patreon page, and a link to the HP Tracker/Tabletop Alamanac Discord. 
 
 The system buttons open a new modal (changelog and help are opened in fullscreen mode):
-+ The [⛭] buttons opens the [global settings](#settings).
++ The [⛭] buttons opens the [lobal settings](#settings).
 + The [i] button opens the changelog so you can see recent changes
 + The [?] button opens the help menu which displays the same help information you are currently reading
 
@@ -156,7 +156,7 @@ The Token List consists of the column headings, groups and tokens associated wit
 
 When clicking the button next to INIT in the header all Tokens will be ordered by there initiative value. This is done per group so Tokens in different groups will not be changing positions. Once clicked the button changes direction and now orders the tokens from smallest to biggest value.
 
-Tokens can be moved between groups or reordered inside a group by dragging and dropping. By default this has no effect on the [Player Action Window](#player-action-window) but when the [setting](#global-settings) "Sort in Player View" is active, the Tokens in the Player Action Window are **sorted by their initiative value regardless of group**.
+Tokens can be moved between groups or reordered inside a group by dragging and dropping. By default this has no effect on the [Player Action Window](#player-action-window) but when the [setting](#settings) "Sort in Player View" is active, the Tokens in the Player Action Window are **sorted by their initiative value regardless of group**.
 
 When a selected Token is moved all selected Tokens in the same group are moved as well.
 
@@ -221,9 +221,9 @@ Values can be changed in a few different ways:
 + Arrow Keys: when focus is on HP, maxHP, tempHP or AC you can increase or decrease the values by 1 by pressing up or down arrow key respectively
 + Entering a number: when focused on any field, you can delete its content and enter a new value. 
   + Note that changing the maxHP or tempHP field influences the HP field.
-+ Rolling Initiative: When clicking the Initiative Button a random number between 1 and the chosen [Initiative Dice](#global-settings) (default: 20) is rolled and the dexterity modifier (5e) or perception (pf2e) from the [Statblock](#statblock) (if selected) is added and entered as the final initiative value. You can also change the initiative bonus to any number, once a statblock is assigned. By default a 3D dice is rolled to determine the random value.
++ Rolling Initiative: When clicking the Initiative Button a random number between 1 and the chosen [Initiative Dice](#settings) (default: 20) is rolled and the dexterity modifier (5e) or perception (pf2e) from the [Statblock](#statblock) (if selected) is added and entered as the final initiative value. You can also change the initiative bonus to any number, once a statblock is assigned. By default a 3D dice is rolled to determine the random value.
 
-**Note: The HP value can never exceed the maxHP value ([except when maxHP is 0](#initializing-token)). It can also not be a negative number if the [Global Setting](#global-settings) for "Allow negative numbers" is not selected. All symbols except numbers will be removed to maintain a compatible value.**
+**Note: The HP value can never exceed the maxHP value ([except when maxHP is 0](#initializing-token)). It can also not be a negative number if the [Setting](#settings) for "Allow negative numbers" is not selected. All symbols except numbers will be removed to maintain a compatible value.**
 
 ##### Temporary Hitpoints
 
@@ -238,7 +238,7 @@ To initialize a Token there are two approaches:
 
 **TTRPG-API Statblocks**
 
-If you are using a creature that is available on ttrpg-api.bitperfect-software.com you can use the [statblock feature](#statblock). The statblocks from the TTRPG API include most of the statblocks that use the OGL. This includes DnD 5e and Pathfinder 2E statblocks. For switching between rulesets see [global settings](#global-settings).
+If you are using a creature that is available on ttrpg-api.bitperfect-software.com you can use the [statblock feature](#statblock). The statblocks from the TTRPG API include most of the statblocks that use the OGL. This includes DnD 5e and Pathfinder 2E statblocks. For switching between rulesets see [Settings](#settings).
 
 **Manual Initialization**
 
@@ -268,7 +268,7 @@ The Player Action Window has reduced functionality compared to the GM Action Win
 
 For tokens that have the Player Visibility set, their name change option, values, and statblock are shown. Otherwise just the dynamic-color background is there to indicate the current status of the creature.
 
-Tokens don't follow the drag and drop order in the [GM Action Window](#hp-tracker-action-window). But when activated in the [Settings](#global-settings) Tokens will be ordered by their initiative value, disregarding which group they belong to.
+Tokens don't follow the drag and drop order in the [GM Action Window](#hp-tracker-action-window). But when activated in the [Settings](#settings) Tokens will be ordered by their initiative value, disregarding which group they belong to.
 
 ### HP Tracker Context Menu
 
