@@ -109,7 +109,7 @@ The Action Window can be opened by clicking the HP Tracker Action Icon in the Ow
 At the top of the action window the current version of the extension is displayed as well as the link to the Tabletop Alamanac (to create custom statblocks), three system buttons, the statblock popover button, a link to the HP Tracker Patreon page, and a link to the HP Tracker/Tabletop Alamanac Discord. 
 
 The system buttons open a new modal (changelog and help are opened in fullscreen mode):
-+ The [⛭] buttons opens the [lobal settings](#settings).
++ The [⛭] buttons opens the [Settings](#settings).
 + The [i] button opens the changelog so you can see recent changes
 + The [?] button opens the help menu which displays the same help information you are currently reading
 
