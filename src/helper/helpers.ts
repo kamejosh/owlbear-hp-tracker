@@ -1,6 +1,13 @@
 import OBR, { Image, Item, Metadata } from "@owlbear-rodeo/sdk";
 import { infoMetadataKey, itemMetadataKey, metadataKey } from "./variables.ts";
-import { AttachmentMetadata, HpTrackerMetadata, InitialStatblockData, RoomMetadata, SceneMetadata } from "./types.ts";
+import {
+    AttachmentMetadata,
+    HpTrackerMetadata,
+    InitialStatblockData,
+    Limit,
+    RoomMetadata,
+    SceneMetadata,
+} from "./types.ts";
 import { isObject } from "lodash";
 import { IRoll, IRoomParticipant } from "dddice-js";
 import { RollLogEntryType } from "../context/RollLogContext.tsx";
@@ -10,6 +17,7 @@ import diff_match_patch from "./diff/diff_match_patch.ts";
 import { E5Statblock } from "../api/e5/useE5Api.ts";
 import { PfStatblock } from "../api/pf/usePfApi.ts";
 import axiosRetry from "axios-retry";
+import { Ability } from "../components/hptracker/charactersheet/E5Ability.tsx";
 
 export const getYOffset = async (height: number) => {
     const metadata = (await OBR.room.getMetadata()) as Metadata;
@@ -243,28 +251,79 @@ export const getRoomDiceUser = (room: RoomMetadata | null, id: string | null) =>
     return room?.diceUser?.find((user) => user.playerId === id);
 };
 
-export const updateTokenSheet = (
-    slug: string,
-    bonus: number,
-    hp: number,
-    ac: number,
-    characterId: string,
-    ruleset: "e5" | "pf"
-) => {
+const getLimitsE5 = (statblock: E5Statblock) => {
+    const limits: Array<Limit> = [];
+
+    const getActionTypeLimits = (actionType?: Array<Ability>) => {
+        actionType?.forEach((action) => {
+            if (action.limit) {
+                limits.push({
+                    id: action.limit.name,
+                    max: action.limit.uses,
+                    used: 0,
+                    resets: action.limit.resets ?? [],
+                });
+            }
+        });
+    };
+
+    getActionTypeLimits(statblock.actions);
+    getActionTypeLimits(statblock.reactions);
+    getActionTypeLimits(statblock.bonus_actions);
+    getActionTypeLimits(statblock.special_abilities);
+    getActionTypeLimits(statblock.lair_actions);
+    getActionTypeLimits(statblock.mythic_actions);
+    getActionTypeLimits(statblock.legendary_actions);
+
+    statblock.spell_slots?.forEach((spellSlot) => {
+        limits.push({
+            id: spellSlot.limit.name,
+            max: spellSlot.limit.uses,
+            used: 0,
+            resets: spellSlot.limit.resets ?? [],
+        });
+    });
+
+    statblock.limits?.forEach((limit) => {
+        limits.push({
+            id: limit.name,
+            max: limit.uses,
+            used: 0,
+            resets: limit.resets ?? [],
+        });
+    });
+
+    return limits;
+};
+
+const getLimitsPf = (statblock: PfStatblock) => {};
+
+export const updateTokenSheet = (statblock: E5Statblock | PfStatblock, characterId: string, ruleset: "e5" | "pf") => {
     OBR.scene.items.updateItems([characterId], (items) => {
         items.forEach((item) => {
             const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
             const newValues =
-                (data.stats.initial && data.sheet !== slug) ||
+                (data.stats.initial && data.sheet !== statblock.slug) ||
                 (data.hp === 0 && data.maxHp === 0 && data.armorClass === 0);
             item.metadata[itemMetadataKey] = {
                 ...data,
-                sheet: slug,
+                sheet: statblock.slug,
                 ruleset: ruleset,
-                maxHp: newValues ? hp : data.hp,
-                armorClass: newValues ? ac : data.armorClass,
-                hp: newValues ? hp : data.hp,
-                stats: { ...data.stats, initiativeBonus: bonus, initial: false },
+                maxHp: newValues ? statblock.hp.value : data.hp,
+                armorClass: newValues ? statblock.armor_class.value : data.armorClass,
+                hp: newValues ? statblock.hp.value : data.hp,
+                stats: {
+                    ...data.stats,
+                    initiativeBonus:
+                        ruleset === "e5"
+                            ? Math.floor((statblock.stats.dexterity - 10) / 2)
+                            : parseInt(statblock.perception?.toString() ?? "0"),
+                    initial: false,
+                    limits:
+                        ruleset === "e5"
+                            ? getLimitsE5(statblock as E5Statblock)
+                            : getLimitsPf(statblock as PfStatblock),
+                },
             };
         });
     });

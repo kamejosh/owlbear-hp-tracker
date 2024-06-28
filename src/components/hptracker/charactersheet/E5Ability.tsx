@@ -1,16 +1,38 @@
 import { components } from "../../../api/schema";
 import { DiceButton, DiceButtonWrapper } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { capitalize } from "lodash";
+import { LimitComponent } from "./LimitComponent.tsx";
+import { HpTrackerMetadata } from "../../../helper/types.ts";
 
-type Ability = components["schemas"]["Action-Output"];
+export type Ability = components["schemas"]["Action-Output"];
 
-export const E5Ability = ({ ability, statblock }: { ability: Ability; statblock: string }) => {
+export const E5Ability = ({
+    ability,
+    statblock,
+    tokenData,
+    itemId,
+}: {
+    ability: Ability;
+    statblock: string;
+    tokenData: HpTrackerMetadata;
+    itemId: string;
+}) => {
     return (
         <li key={ability.name} className={"e5-ability"}>
             <span className={"ability-info"}>
                 <b>{ability.name}.</b>{" "}
-                <DiceButtonWrapper text={ability.desc} context={`${capitalize(ability.name)}`} statblock={statblock} />
+                {ability.limit && tokenData.stats.limits ? (
+                    <LimitComponent
+                        limit={ability.limit}
+                        showTitle={false}
+                        limitValues={tokenData.stats.limits.find((l) => l.id === ability.limit!.name)!}
+                        itemId={itemId}
+                    />
+                ) : null}
             </span>
+            <div>
+                <DiceButtonWrapper text={ability.desc} context={`${capitalize(ability.name)}`} statblock={statblock} />
+            </div>
             <span className={"ability-extra-info"}>
                 {ability.attack_bonus ? (
                     <span>

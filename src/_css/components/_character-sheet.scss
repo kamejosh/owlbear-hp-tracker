@@ -578,3 +578,35 @@
 b {
     font-weight: 800;
 }
+
+.limit {
+    .limit-heading {
+        display: flex;
+        align-items: center;
+        gap: 1ch;
+
+        .limit-uses {
+            display: flex;
+            gap: 5px;
+
+            .limit-use {
+                transition: outline 0.25s ease;
+                cursor: pointer;
+                outline: 1px solid transparent;
+                border: 2px solid red;
+                border-radius: 100%;
+                background: transparent;
+                width: 15px;
+                height: 15px;
+
+                &:hover {
+                    outline-color: red;
+                }
+
+                &.used {
+                    background: red;
+                }
+            }
+        }
+    }
+}

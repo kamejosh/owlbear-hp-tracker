@@ -13,7 +13,7 @@ import { DiceButton } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { capitalize, isNull } from "lodash";
 import { About } from "./About.tsx";
 
-const E5StatBlock = ({ slug, name }: { slug: string; name: string }) => {
+const E5StatBlock = ({ slug, tokenData, itemId }: { slug: string; tokenData: HpTrackerMetadata; itemId: string }) => {
     const room = useMetadataContext((state) => state.room);
     const statblockQuery = useE5GetStatblock(slug, room?.tabletopAlmanacAPIKey);
     const statblock = statblockQuery.isSuccess && statblockQuery.data ? statblockQuery.data : null;
@@ -39,8 +39,8 @@ const E5StatBlock = ({ slug, name }: { slug: string; name: string }) => {
                         <DiceButton
                             dice={statblock.hp.hit_dice}
                             text={statblock.hp.hit_dice}
-                            context={name + ": Hit Dice"}
-                            statblock={name}
+                            context={tokenData.name + ": Hit Dice"}
+                            statblock={tokenData.name}
                         />
                     ) : null}
                 </span>
@@ -72,7 +72,7 @@ const E5StatBlock = ({ slug, name }: { slug: string; name: string }) => {
                                         Math.floor((value - 10) / 2)
                                     )}
                                     context={`${capitalize(stat)}: Check`}
-                                    statblock={name}
+                                    statblock={tokenData.name}
                                 />
                             </div>
                         </div>
@@ -93,7 +93,7 @@ const E5StatBlock = ({ slug, name }: { slug: string; name: string }) => {
                                                 dice={`d20+${value}`}
                                                 text={`+${value}`}
                                                 context={`${capitalize(key.substring(0, 3))}: Save`}
-                                                statblock={name}
+                                                statblock={tokenData.name}
                                             />
                                         </span>
                                     );
@@ -133,7 +133,7 @@ const E5StatBlock = ({ slug, name }: { slug: string; name: string }) => {
                                                 Math.floor(value)
                                             )}
                                             context={`${capitalize(key)}: Check`}
-                                            statblock={name}
+                                            statblock={tokenData.name}
                                         />
                                     </li>
                                 );
@@ -174,7 +174,13 @@ const E5StatBlock = ({ slug, name }: { slug: string; name: string }) => {
                     <h3>Special Abilities</h3>
                     <ul className={"ability-list"}>
                         {statblock.special_abilities?.map((ability, index) => (
-                            <E5Ability ability={ability} key={ability.name + index} statblock={name} />
+                            <E5Ability
+                                ability={ability}
+                                key={ability.name + index}
+                                statblock={tokenData.name}
+                                tokenData={tokenData}
+                                itemId={itemId}
+                            />
                         ))}
                     </ul>
                 </div>
@@ -184,7 +190,13 @@ const E5StatBlock = ({ slug, name }: { slug: string; name: string }) => {
                     <h3>Actions</h3>
                     <ul className={"ability-list"}>
                         {statblock.actions.map((action, index) => (
-                            <E5Ability ability={action} key={action.name + index} statblock={name} />
+                            <E5Ability
+                                ability={action}
+                                key={action.name + index}
+                                statblock={tokenData.name}
+                                tokenData={tokenData}
+                                itemId={itemId}
+                            />
                         ))}
                     </ul>
                 </div>
@@ -194,7 +206,13 @@ const E5StatBlock = ({ slug, name }: { slug: string; name: string }) => {
                     <h3>Reactions</h3>
                     <ul className={"ability-list"}>
                         {statblock.reactions?.map((reaction, index) => (
-                            <E5Ability ability={reaction} key={reaction.name + index} statblock={name} />
+                            <E5Ability
+                                ability={reaction}
+                                key={reaction.name + index}
+                                statblock={tokenData.name}
+                                tokenData={tokenData}
+                                itemId={itemId}
+                            />
                         ))}
                     </ul>
                 </div>
@@ -204,7 +222,13 @@ const E5StatBlock = ({ slug, name }: { slug: string; name: string }) => {
                     <h3>Bonus Actions</h3>
                     <ul className={"ability-list"}>
                         {statblock.bonus_actions.map((action, index) => (
-                            <E5Ability ability={action} key={action.name + index} statblock={name} />
+                            <E5Ability
+                                ability={action}
+                                key={action.name + index}
+                                statblock={tokenData.name}
+                                tokenData={tokenData}
+                                itemId={itemId}
+                            />
                         ))}
                     </ul>
                 </div>
@@ -214,7 +238,13 @@ const E5StatBlock = ({ slug, name }: { slug: string; name: string }) => {
                     <h3>Lair Actions</h3>
                     <ul className={"ability-list"}>
                         {statblock.lair_actions.map((action, index) => (
-                            <E5Ability ability={action} key={action.name + index} statblock={name} />
+                            <E5Ability
+                                ability={action}
+                                key={action.name + index}
+                                statblock={tokenData.name}
+                                tokenData={tokenData}
+                                itemId={itemId}
+                            />
                         ))}
                     </ul>
                 </div>
@@ -224,7 +254,13 @@ const E5StatBlock = ({ slug, name }: { slug: string; name: string }) => {
                     <h3>Mythic Actions</h3>
                     <ul className={"ability-list"}>
                         {statblock.mythic_actions.map((action, index) => (
-                            <E5Ability ability={action} key={action.name + index} statblock={name} />
+                            <E5Ability
+                                ability={action}
+                                key={action.name + index}
+                                statblock={tokenData.name}
+                                tokenData={tokenData}
+                                itemId={itemId}
+                            />
                         ))}
                     </ul>
                 </div>
@@ -238,14 +274,16 @@ const E5StatBlock = ({ slug, name }: { slug: string; name: string }) => {
                             <E5Ability
                                 ability={legendary_action}
                                 key={legendary_action.name + index}
-                                statblock={name}
+                                statblock={tokenData.name}
+                                tokenData={tokenData}
+                                itemId={itemId}
                             />
                         ))}
                     </ul>
                 </div>
             ) : null}
             {statblock.spells && statblock.spells.length > 0 ? (
-                <E5Spells spells={statblock.spells} statblock={name} />
+                <E5Spells spells={statblock.spells} statblock={tokenData.name} />
             ) : null}
         </div>
     ) : null;
@@ -488,7 +526,7 @@ export const Statblock = (props: { data: HpTrackerMetadata; itemId: string }) =>
                 />
             </div>
             {room && room.ruleset === "e5" ? (
-                <E5StatBlock slug={props.data.sheet} name={data.name} />
+                <E5StatBlock slug={props.data.sheet} tokenData={data} itemId={props.itemId} />
             ) : (
                 <PfStatBlock slug={props.data.sheet} name={data.name} />
             )}

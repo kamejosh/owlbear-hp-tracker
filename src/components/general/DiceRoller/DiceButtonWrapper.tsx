@@ -13,6 +13,7 @@ type DiceButtonProps = {
     text: string;
     context: string;
     statblock?: string;
+    onRoll?: () => void;
 };
 export const DiceButton = (props: DiceButtonProps) => {
     const room = useMetadataContext((state) => state.room);

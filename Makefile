@@ -13,4 +13,4 @@ clean:
 	rm -rf node_modules
 
 api:
-	openapi-typescript https://api.tabletop-almanac.com/openapi.json -o src/ttrpgapi/schema.d.ts
+	openapi-typescript https://api.tabletop-almanac.com/openapi.json -o src/api/schema.d.ts

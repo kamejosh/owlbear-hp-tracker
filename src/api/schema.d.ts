@@ -51,6 +51,10 @@ export interface paths {
     /** List Statblocks */
     get: operations["list_statblocks_api_v1_users_me_statblocks_get"];
   };
+  "/api/v1/users/me/spells": {
+    /** List Statblocks */
+    get: operations["list_statblocks_api_v1_users_me_spells_get"];
+  };
   "/api/v1/users/change-password": {
     /** Change Password */
     post: operations["change_password_api_v1_users_change_password_post"];
@@ -87,9 +91,17 @@ export interface paths {
     /** Create Spell */
     post: operations["create_spell_api_v1_pf_spell__post"];
   };
+  "/api/v1/pf/spell/search": {
+    /** Search Pf Spell */
+    get: operations["search_pf_spell_api_v1_pf_spell_search_get"];
+  };
   "/api/v1/pf/spell/{slug}": {
     /** Get Pf Spells Slug */
     get: operations["get_pf_spells_slug_api_v1_pf_spell__slug__get"];
+    /** Update Pf Spell */
+    put: operations["update_pf_spell_api_v1_pf_spell__slug__put"];
+    /** Delete Pf Spell */
+    delete: operations["delete_pf_spell_api_v1_pf_spell__slug__delete"];
   };
   "/api/v1/e5/statblock/": {
     /** List E5 Statblocks */
@@ -123,9 +135,17 @@ export interface paths {
     /** Create Spell */
     post: operations["create_spell_api_v1_e5_spell__post"];
   };
+  "/api/v1/e5/spell/search": {
+    /** Search E5 Spell */
+    get: operations["search_e5_spell_api_v1_e5_spell_search_get"];
+  };
   "/api/v1/e5/spell/{slug}": {
     /** Get E5 Spells Slug */
     get: operations["get_e5_spells_slug_api_v1_e5_spell__slug__get"];
+    /** Update E5 Spell */
+    put: operations["update_e5_spell_api_v1_e5_spell__slug__put"];
+    /** Delete E5 Spell */
+    delete: operations["delete_e5_spell_api_v1_e5_spell__slug__delete"];
   };
   "/legal/": {
     /** Get Legal */
@@ -147,6 +167,7 @@ export interface components {
       attack_bonus?: number | null;
       /** Damage Dice */
       damage_dice?: string | null;
+      limit?: components["schemas"]["LimitedUse"] | null;
     };
     /** ActionOut */
     ActionOut: {
@@ -175,6 +196,7 @@ export interface components {
       critical_failure?: string | null;
       /** Constant */
       constant?: string | null;
+      limit?: components["schemas"]["LimitedUse"] | null;
     };
     /**
      * ActionTypeEnum
@@ -348,10 +370,20 @@ export interface components {
        */
       special_abilities?: components["schemas"]["src__types__e5__Action"][];
       /**
+       * Spell Slots
+       * @default []
+       */
+      spell_slots?: components["schemas"]["SpellSlots"][] | null;
+      /**
        * Spells
        * @default []
        */
       spells?: string[];
+      /**
+       * Limits
+       * @default []
+       */
+      limits?: components["schemas"]["LimitedUse"][] | null;
       /** Source */
       source?: string | null;
     };
@@ -447,10 +479,20 @@ export interface components {
        */
       special_abilities?: components["schemas"]["Action-Output"][];
       /**
+       * Spell Slots
+       * @default []
+       */
+      spell_slots?: components["schemas"]["SpellSlots"][] | null;
+      /**
        * Spells
        * @default []
        */
       spells?: components["schemas"]["src__types__e5__Spell"][];
+      /**
+       * Limits
+       * @default []
+       */
+      limits?: components["schemas"]["LimitedUse"][] | null;
       /** Source */
       source?: string | null;
       /** Slug */
@@ -482,10 +524,27 @@ export interface components {
     };
     /** Info */
     Info: {
-      /** Type */
-      type: string;
+      /**
+       * Type
+       * @enum {string}
+       */
+      type: "Cantrip" | "Focus" | "Spell";
       /** Level */
       level: number;
+    };
+    /** LimitedUse */
+    LimitedUse: {
+      /** Name */
+      name: string;
+      /** Description */
+      description?: string | null;
+      /** Uses */
+      uses: number;
+      /**
+       * Resets
+       * @default []
+       */
+      resets?: string[];
     };
     /** Mystery */
     Mystery: {
@@ -554,6 +613,11 @@ export interface components {
       /** About */
       about?: string | null;
       /**
+       * Limits
+       * @default []
+       */
+      limits?: components["schemas"]["LimitedUse"][] | null;
+      /**
        * Special Abilities
        * @default []
        */
@@ -618,6 +682,11 @@ export interface components {
       /** About */
       about?: string | null;
       /**
+       * Limits
+       * @default []
+       */
+      limits?: components["schemas"]["LimitedUse"][] | null;
+      /**
        * Special Abilities
        * @default []
        */
@@ -658,6 +727,7 @@ export interface components {
       failure?: string | null;
       /** Critical Failure */
       critical_failure?: string | null;
+      limit?: components["schemas"]["LimitedUse"] | null;
     };
     /** Skill */
     Skill: {
@@ -711,6 +781,7 @@ export interface components {
       name: string;
       /** Description */
       description: string;
+      limit?: components["schemas"]["LimitedUse"] | null;
     };
     /** Speed */
     Speed: {
@@ -785,13 +856,21 @@ export interface components {
       name: string;
       /** Slug */
       slug: string;
+      /** Active */
+      active: boolean;
       /** License */
-      license: string;
+      license?: string | null;
     };
     /** SpellSchool */
     SpellSchool: {
       /** Name */
       name: string;
+    };
+    /** SpellSlots */
+    SpellSlots: {
+      /** Level */
+      level: number;
+      limit: components["schemas"]["LimitedUse"];
     };
     /** SpellTrait */
     SpellTrait: {
@@ -806,6 +885,7 @@ export interface components {
       level: string;
       /** Spells */
       spells: components["schemas"]["SpellInfo"][];
+      limit?: components["schemas"]["LimitedUse"] | null;
     };
     /** SpelllistOut */
     SpelllistOut: {
@@ -818,6 +898,7 @@ export interface components {
        * @default []
        */
       spells?: components["schemas"]["SpellOut"][] | null;
+      limit?: components["schemas"]["LimitedUse"] | null;
     };
     /** Stats */
     "Stats-Input": {
@@ -874,6 +955,13 @@ export interface components {
       /** Username */
       username: string;
     };
+    /** UserSpells */
+    UserSpells: {
+      /** E5 */
+      e5: components["schemas"]["src__types__e5__Spell"][];
+      /** Pf */
+      pf: components["schemas"]["SpellOut"][];
+    };
     /** UserStatblocks */
     UserStatblocks: {
       /** E5 */
@@ -918,6 +1006,7 @@ export interface components {
       attack_bonus?: number | null;
       /** Damage Dice */
       damage_dice?: string | null;
+      limit?: components["schemas"]["LimitedUse"] | null;
     };
     /** Hitpoints */
     src__types__e5__Hitpoints: {
@@ -945,8 +1034,11 @@ export interface components {
     src__types__e5__Spell: {
       /** Name */
       name: string;
-      /** Desc */
-      desc: string;
+      /**
+       * Desc
+       * @default
+       */
+      desc?: string | null;
       /** Higher Level */
       higher_level: string;
       /** Range */
@@ -987,13 +1079,20 @@ export interface components {
       circles?: components["schemas"]["SpellCircle"][] | null;
       /** Slug */
       slug: string;
+      /** Active */
+      active: boolean;
+      /** Source */
+      source?: string | null;
     };
     /** SpellIn */
     src__types__e5__SpellIn: {
       /** Name */
       name: string;
-      /** Desc */
-      desc: string;
+      /**
+       * Desc
+       * @default
+       */
+      desc?: string | null;
       /** Higher Level */
       higher_level: string;
       /** Range */
@@ -1016,22 +1115,23 @@ export interface components {
       casting_time: string;
       /** Level */
       level: number;
-      school: components["schemas"]["SpellSchool"];
+      /** School */
+      school: string;
       /**
        * Classes
        * @default []
        */
-      classes?: components["schemas"]["SpellClass"][] | null;
+      classes?: string[] | null;
       /**
        * Archetypes
        * @default []
        */
-      archetypes?: components["schemas"]["SpellArchetype"][] | null;
+      archetypes?: string[] | null;
       /**
        * Circles
        * @default []
        */
-      circles?: components["schemas"]["SpellCircle"][] | null;
+      circles?: string[] | null;
     };
     /** Stats */
     src__types__e5__Stats: {
@@ -1075,6 +1175,7 @@ export interface components {
       critical_failure?: string | null;
       /** Constant */
       constant?: string | null;
+      limit?: components["schemas"]["LimitedUse"] | null;
     };
     /** Hitpoints */
     src__types__pf__Hitpoints: {
@@ -1148,7 +1249,11 @@ export interface components {
       /** Slug */
       slug: string;
       /** License */
-      license: string;
+      license?: string | null;
+      /** Active */
+      active: boolean;
+      /** Source */
+      source?: string | null;
     };
     /** SpellIn */
     src__types__pf__SpellIn: {
@@ -1159,32 +1264,32 @@ export interface components {
        * Traits
        * @default []
        */
-      traits?: components["schemas"]["SpellTrait"][];
+      traits?: string[];
       /**
        * Traditions
        * @default []
        */
-      traditions?: components["schemas"]["Tradition"][];
+      traditions?: string[];
       /**
        * Bloodlines
        * @default []
        */
-      bloodlines?: components["schemas"]["Bloodline"][];
+      bloodlines?: string[];
       /**
        * Deities
        * @default []
        */
-      deities?: components["schemas"]["Deity"][];
+      deities?: string[];
       /**
        * Domains
        * @default []
        */
-      domains?: components["schemas"]["Domain"][];
+      domains?: string[];
       /**
        * Mysteries
        * @default []
        */
-      mysteries?: components["schemas"]["Mystery"][];
+      mysteries?: string[];
       /** Range */
       range?: string | null;
       /** Area */
@@ -1223,6 +1328,8 @@ export interface components {
       users: number;
       /** Statblocks */
       statblocks: number;
+      /** Spells */
+      spells: number;
       /** Patreon */
       patreon?: number | null;
     };
@@ -1461,6 +1568,17 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["UserStatblocks"];
+        };
+      };
+    };
+  };
+  /** List Statblocks */
+  list_statblocks_api_v1_users_me_spells_get: {
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["UserSpells"];
         };
       };
     };
@@ -1709,6 +1827,30 @@ export interface operations {
       };
     };
   };
+  /** Search Pf Spell */
+  search_pf_spell_api_v1_pf_spell_search_get: {
+    parameters: {
+      query?: {
+        name?: string;
+        take?: number;
+        skip?: number;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["src__types__pf__Spell"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
   /** Get Pf Spells Slug */
   get_pf_spells_slug_api_v1_pf_spell__slug__get: {
     parameters: {
@@ -1721,6 +1863,55 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["src__types__pf__Spell"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Update Pf Spell */
+  update_pf_spell_api_v1_pf_spell__slug__put: {
+    parameters: {
+      path: {
+        slug: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["src__types__pf__SpellIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Delete Pf Spell */
+  delete_pf_spell_api_v1_pf_spell__slug__delete: {
+    parameters: {
+      path: {
+        slug: string;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": unknown;
         };
       };
       /** @description Validation Error */
@@ -1965,6 +2156,30 @@ export interface operations {
       };
     };
   };
+  /** Search E5 Spell */
+  search_e5_spell_api_v1_e5_spell_search_get: {
+    parameters: {
+      query?: {
+        name?: string;
+        take?: number;
+        skip?: number;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["src__types__e5__Spell"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
   /** Get E5 Spells Slug */
   get_e5_spells_slug_api_v1_e5_spell__slug__get: {
     parameters: {
@@ -1977,6 +2192,55 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["src__types__e5__Spell"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Update E5 Spell */
+  update_e5_spell_api_v1_e5_spell__slug__put: {
+    parameters: {
+      path: {
+        slug: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["src__types__e5__SpellIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Delete E5 Spell */
+  delete_e5_spell_api_v1_e5_spell__slug__delete: {
+    parameters: {
+      path: {
+        slug: string;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": unknown;
         };
       };
       /** @description Validation Error */
