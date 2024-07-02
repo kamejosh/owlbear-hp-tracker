@@ -9,11 +9,13 @@ export const LimitComponent = ({
     showTitle,
     limitValues,
     itemId,
+    hideReset,
 }: {
     limit: LimitType;
     showTitle: boolean;
     limitValues: Limit;
     itemId: string;
+    hideReset?: boolean;
 }) => {
     return (
         <div className={"limit"}>
@@ -29,20 +31,14 @@ export const LimitComponent = ({
                                     key={i}
                                     className={`limit-use ${used ? "used" : ""}`}
                                     onClick={() => {
-                                        console.log("hier");
                                         OBR.scene.items.updateItems([itemId], (items) => {
-                                            console.log("hier");
                                             items.forEach((item) => {
-                                                console.log("hier");
                                                 if (item) {
-                                                    console.log("hier");
                                                     const metadata = item.metadata[
                                                         itemMetadataKey
                                                     ] as HpTrackerMetadata;
                                                     if (metadata) {
-                                                        console.log("hier");
                                                         const index = metadata.stats.limits?.findIndex((l) => {
-                                                            console.log(l.id, limitValues.id, l.id === limitValues.id);
                                                             return l.id === limitValues.id;
                                                         });
                                                         if (index !== undefined) {
@@ -62,7 +58,7 @@ export const LimitComponent = ({
                 </div>
             </div>
             {limit.description ? <div>{limit.description}</div> : null}
-            {limit.resets ? (
+            {limit.resets && !hideReset ? (
                 <div>
                     <b>Resets after:</b> {limit.resets.join(", ")}
                 </div>

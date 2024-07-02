@@ -83,6 +83,9 @@ export const DiceButton = (props: DiceButtonProps) => {
             } else {
                 await localRoll(modifiedDice, props.context, addRoll, modifier === "SELF", props.statblock);
             }
+            if (props.onRoll) {
+                props.onRoll();
+            }
             button.classList.remove("rolling");
             button.blur();
         }

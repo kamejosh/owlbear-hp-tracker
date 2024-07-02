@@ -305,6 +305,8 @@
         "about"
         "skills"
         "resistances"
+        "limits"
+        "limits"
         "specials"
         "specials"
         "actions"
@@ -319,6 +321,8 @@
         "reactions"
         "legendary"
         "legendary"
+        "spell-slots"
+        "spell-slots"
         "spells"
         "spells"
         "license";
@@ -334,6 +338,7 @@
             "about about"
             "skills skills"
             "resistances resistances"
+            "limits limits"
             "specials specials"
             "actions actions"
             "bonus-actions bonus-actions"
@@ -341,6 +346,7 @@
             "mythic-actions mythic-actions"
             "reactions reactions"
             "legendary legendary"
+            "spell-slots spell-slots"
             "spells spells"
             "license license";
     }
@@ -464,6 +470,14 @@
         }
     }
 
+    .limits {
+        grid-area: limits;
+    }
+
+    .spell-slots {
+        grid-area: spell-slots;
+    }
+
     .actions {
         grid-area: actions;
 
@@ -579,32 +593,61 @@ b {
     font-weight: 800;
 }
 
+.limits {
+    .limit {
+        margin-bottom: 5px;
+        border-left: 1px solid white;
+        padding-left: 1ch;
+    }
+}
+
 .limit {
     .limit-heading {
         display: flex;
         align-items: center;
         gap: 1ch;
 
+        h4 {
+            margin: 0;
+        }
+
         .limit-uses {
             display: flex;
             gap: 5px;
 
             .limit-use {
-                transition: outline 0.25s ease;
+                position: relative;
+                transition: all 0.25s ease;
                 cursor: pointer;
                 outline: 1px solid transparent;
-                border: 2px solid red;
-                border-radius: 100%;
+                box-shadow: 1px 2px 2px #8a3838;
+                border: 2px solid #8a3838ff;
+                border-radius: 30%;
                 background: transparent;
                 width: 15px;
                 height: 15px;
 
                 &:hover {
-                    outline-color: red;
+                    outline-color: #8a3838ff;
                 }
 
                 &.used {
-                    background: red;
+                    &::after,
+                    &::before {
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        translate: -50% -50%;
+                        rotate: 40deg;
+                        background-color: #aaa;
+                        width: 3px;
+                        height: 150%;
+                        content: "";
+                    }
+
+                    &::before {
+                        rotate: -40deg;
+                    }
                 }
             }
         }

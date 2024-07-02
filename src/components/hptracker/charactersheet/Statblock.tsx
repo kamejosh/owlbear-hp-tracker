@@ -12,6 +12,7 @@ import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { DiceButton } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { capitalize, isNull } from "lodash";
 import { About } from "./About.tsx";
+import { LimitComponent } from "./LimitComponent.tsx";
 
 const E5StatBlock = ({ slug, tokenData, itemId }: { slug: string; tokenData: HpTrackerMetadata; itemId: string }) => {
     const room = useMetadataContext((state) => state.room);
@@ -169,6 +170,21 @@ const E5StatBlock = ({ slug, tokenData, itemId }: { slug: string; tokenData: HpT
                     ) : null}
                 </div>
             ) : null}
+            {statblock.limits && statblock.limits.length > 0 ? (
+                <div className={"limits"}>
+                    {statblock.limits.map((limit, i) => {
+                        return (
+                            <LimitComponent
+                                key={i}
+                                limit={limit}
+                                showTitle={true}
+                                limitValues={tokenData.stats.limits?.find((l) => l.id === limit!.name)!}
+                                itemId={itemId}
+                            />
+                        );
+                    })}
+                </div>
+            ) : null}
             {statblock.special_abilities && statblock.special_abilities.length > 0 ? (
                 <div className={"special-abilities"}>
                     <h3>Special Abilities</h3>
@@ -280,6 +296,22 @@ const E5StatBlock = ({ slug, tokenData, itemId }: { slug: string; tokenData: HpT
                             />
                         ))}
                     </ul>
+                </div>
+            ) : null}
+            {statblock.spell_slots && statblock.spell_slots.length > 0 ? (
+                <div className={"spell-slots"}>
+                    {statblock.spell_slots.map((spellSlot, i) => {
+                        return (
+                            <LimitComponent
+                                key={i}
+                                limit={spellSlot.limit}
+                                showTitle={true}
+                                hideReset={true}
+                                limitValues={tokenData.stats.limits?.find((l) => l.id === spellSlot.limit!.name)!}
+                                itemId={itemId}
+                            />
+                        );
+                    })}
                 </div>
             ) : null}
             {statblock.spells && statblock.spells.length > 0 ? (
