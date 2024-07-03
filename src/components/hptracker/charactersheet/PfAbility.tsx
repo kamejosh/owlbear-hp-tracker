@@ -1,7 +1,7 @@
 import { components } from "../../../api/schema";
 import { useState } from "react";
 import { DiceButtonWrapper } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
-import { capitalize } from "lodash";
+import { capitalize, isString } from "lodash";
 
 type Action = components["schemas"]["ActionOut"];
 type Reaction = components["schemas"]["Reaction"];
@@ -79,7 +79,12 @@ export const PfAbility = ({
             <div className={`action-details-wrapper  ${open ? "open" : null}`}>
                 <ul className={`action-details`}>
                     {Object.entries(ability).map(([key, value], index) => {
-                        if (value !== null && value !== "" && !["name", "type", "description", "value"].includes(key)) {
+                        if (
+                            value !== null &&
+                            value !== "" &&
+                            isString(value) &&
+                            !["name", "type", "description", "value", "limit"].includes(key)
+                        ) {
                             return (
                                 <li key={index}>
                                     <b>{key}</b>:{" "}
