@@ -4,6 +4,7 @@ import { components } from "../schema";
 import { TTRPG_URL } from "../../config.ts";
 
 export type E5Statblock = components["schemas"]["E5StatblockOut"];
+export type E5SpellSlot = components["schemas"]["SpellSlots"];
 
 const fetchE5Search = (
     search_string: string,

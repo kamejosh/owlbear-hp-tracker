@@ -16,12 +16,12 @@ type SearchResultProps = {
 export const SearchResult5e = (props: SearchResultProps) => {
     const characterId = useCharSheet((state) => state.characterId);
     const room = useMetadataContext((state) => state.room);
-    const setSheet = (slug: string, bonus: number, hp: number, ac: number) => {
+    const setSheet = (statblock: E5Statblock) => {
         if (characterId) {
-            if (slug === props.current) {
+            if (statblock.slug === props.current) {
                 props.setForceSearch(false);
             }
-            updateTokenSheet(slug, bonus, hp, ac, characterId, "e5");
+            updateTokenSheet(statblock, characterId, "e5");
         }
     };
 
@@ -67,14 +67,7 @@ export const SearchResult5e = (props: SearchResultProps) => {
                                         : ""
                                 }`}
                                 key={entry.slug}
-                                onClick={() =>
-                                    setSheet(
-                                        entry.slug,
-                                        Math.floor((entry.stats.dexterity - 10) / 2),
-                                        entry.hp.value,
-                                        entry.armor_class.value
-                                    )
-                                }
+                                onClick={() => setSheet(entry)}
                             >
                                 <span>
                                     {entry.name}
@@ -98,12 +91,12 @@ export const SearchResult5e = (props: SearchResultProps) => {
 export const SearchResultPf = (props: SearchResultProps) => {
     const room = useMetadataContext((state) => state.room);
     const characterId = useCharSheet((state) => state.characterId);
-    const setSheet = (slug: string, bonus: number, hp: number, ac: number) => {
+    const setSheet = (statblock: PfStatblock) => {
         if (characterId) {
-            if (slug === props.current) {
+            if (statblock.slug === props.current) {
                 props.setForceSearch(false);
             }
-            updateTokenSheet(slug, bonus, hp, ac, characterId, "pf");
+            updateTokenSheet(statblock, characterId, "pf");
         }
     };
 
@@ -143,14 +136,7 @@ export const SearchResultPf = (props: SearchResultProps) => {
                                     entry.source ? "custom" : ""
                                 }`}
                                 key={entry.slug}
-                                onClick={() =>
-                                    setSheet(
-                                        entry.slug,
-                                        entry.perception ? parseInt(entry.perception) : 0,
-                                        entry.hp.value,
-                                        entry.armor_class.value
-                                    )
-                                }
+                                onClick={() => setSheet(entry)}
                             >
                                 <span>
                                     {entry.name}

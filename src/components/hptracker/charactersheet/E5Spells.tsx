@@ -1,14 +1,32 @@
 import { components } from "../../../api/schema";
 import { useState } from "react";
 import { DiceButton, DiceButtonWrapper } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
-import { getDamage } from "../../../helper/helpers.ts";
+import { getDamage, updateLimit } from "../../../helper/helpers.ts";
 import { SpellFilter } from "./SpellFilter.tsx";
 import { capitalize } from "lodash";
+import { E5SpellSlot } from "../../../api/e5/useE5Api.ts";
+import { HpTrackerMetadata } from "../../../helper/types.ts";
+import { useMetadataContext } from "../../../context/MetadataContext.ts";
+import tippy, { Instance } from "tippy.js";
 
 type Spell = components["schemas"]["src__types__e5__Spell"];
 
-const Spell = ({ spell, statblock }: { spell: Spell; statblock: string }) => {
+const Spell = ({
+    spell,
+    statblock,
+    spellSlots,
+    tokenData,
+    itemId,
+}: {
+    spell: Spell;
+    statblock: string;
+    spellSlots?: Array<E5SpellSlot> | null;
+    tokenData?: HpTrackerMetadata;
+    itemId?: string;
+}) => {
     const [open, setOpen] = useState<boolean>(false);
+    const [tooltip, setTooltip] = useState<Instance>();
+    const room = useMetadataContext((state) => state.room);
 
     const getSpellLevel = () => {
         if (spell.level === 0) {
@@ -24,7 +42,13 @@ const Spell = ({ spell, statblock }: { spell: Spell; statblock: string }) => {
         }
     };
 
-    const damage = getDamage(spell.desc);
+    const damage = spell.desc ? getDamage(spell.desc) : null;
+    const spellLevelLimit = spellSlots?.find((s) => s.level === spell.level)?.limit;
+
+    const limitValues = tokenData?.stats.limits?.find((l) => l.id === spellLevelLimit?.name);
+    const limitReached =
+        (limitValues && limitValues.max === limitValues.used) ||
+        (spellSlots && spellSlots.length > 0 && !spellLevelLimit);
 
     return (
         <li className={`spell`}>
@@ -33,6 +57,42 @@ const Spell = ({ spell, statblock }: { spell: Spell; statblock: string }) => {
                     <div className={"spell-header"}>
                         <h4 className={"spell-name"}>{spell.name}</h4>
                         <span className={"spell-level"}>({getSpellLevel()})</span>
+                        {spellSlots && spellSlots.length > 0 ? (
+                            <div
+                                ref={(e) => {
+                                    if (e) {
+                                        if (tooltip) {
+                                            if (limitReached) {
+                                                tooltip.enable();
+                                                tooltip.setContent("No more spellslots");
+                                            } else {
+                                                tooltip.disable();
+                                            }
+                                        } else {
+                                            if (limitReached) {
+                                                setTooltip(tippy(e, { content: "No more spellslots" }));
+                                            }
+                                        }
+                                    }
+                                }}
+                                className={`button-wrapper enabled ${
+                                    room?.disableDiceRoller ? "calculated" : "three-d-dice"
+                                }`}
+                            >
+                                <button
+                                    className={`dice-button button ${limitReached ? "limit" : ""}`}
+                                    onClick={async () => {
+                                        if (itemId && limitValues) {
+                                            await updateLimit(itemId, limitValues);
+                                        }
+                                    }}
+                                >
+                                    <div className={"dice-preview"}></div>
+                                    cast
+                                    <div className={"dice-preview"}></div>
+                                </button>
+                            </div>
+                        ) : null}
                     </div>
                     {damage ? (
                         <span className={"spell-damage"}>
@@ -42,6 +102,12 @@ const Spell = ({ spell, statblock }: { spell: Spell; statblock: string }) => {
                                 text={damage}
                                 context={`${capitalize(spell.name)}: Damage`}
                                 statblock={statblock}
+                                onRoll={async () => {
+                                    if (itemId && limitValues) {
+                                        await updateLimit(itemId, limitValues);
+                                    }
+                                }}
+                                limitReached={limitReached}
                             />
                         </span>
                     ) : null}
@@ -100,9 +166,15 @@ const Spell = ({ spell, statblock }: { spell: Spell; statblock: string }) => {
                     <div className={"spell-description"}>
                         <b>Description</b>:{" "}
                         <DiceButtonWrapper
-                            text={spell.desc}
+                            text={spell.desc || ""}
                             context={`${capitalize(spell.name)}`}
                             statblock={statblock}
+                            onRoll={async () => {
+                                if (itemId && limitValues) {
+                                    await updateLimit(itemId, limitValues);
+                                }
+                            }}
+                            limitReached={limitReached}
                         />
                     </div>
                     {!!spell.higher_level ? (
@@ -121,7 +193,13 @@ const Spell = ({ spell, statblock }: { spell: Spell; statblock: string }) => {
     );
 };
 
-export const E5Spells = (props: { spells: Array<Spell>; statblock: string }) => {
+export const E5Spells = (props: {
+    spells: Array<Spell>;
+    statblock: string;
+    spellSlots?: Array<E5SpellSlot> | null;
+    tokenData?: HpTrackerMetadata;
+    itemId?: string;
+}) => {
     const [spellFilter, setSpellFilter] = useState<Array<number>>([]);
 
     const filters = ["All"]
@@ -166,7 +244,16 @@ export const E5Spells = (props: { spells: Array<Spell>; statblock: string }) => 
                     .sort((a, b) => a.level - b.level)
                     .filter((spell) => spellFilter.indexOf(spell.level) >= 0 || spellFilter.length === 0)
                     .map((spell, index) => {
-                        return <Spell spell={spell} key={`${spell.name}${index}`} statblock={props.statblock} />;
+                        return (
+                            <Spell
+                                spell={spell}
+                                key={`${spell.name}${index}`}
+                                statblock={props.statblock}
+                                spellSlots={props.spellSlots}
+                                tokenData={props.tokenData}
+                                itemId={props.itemId}
+                            />
+                        );
                     })}
             </ul>
         </div>

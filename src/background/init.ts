@@ -237,6 +237,7 @@ const setupContextMenu = async () => {
                                 defaultMetadata.armorClass = itemStatblocks[item.id].ac;
                                 defaultMetadata.stats.initiativeBonus = itemStatblocks[item.id].bonus;
                                 defaultMetadata.stats.initial = true;
+                                defaultMetadata.stats.limits = itemStatblocks[item.id].limits;
                             }
                             item.metadata[itemMetadataKey] = defaultMetadata;
                         }

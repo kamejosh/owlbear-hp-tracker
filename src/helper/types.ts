@@ -1,3 +1,10 @@
+export type Limit = {
+    id: string;
+    max: number;
+    used: number;
+    resets: Array<string>;
+};
+
 export type HpTrackerMetadata = {
     name: string;
     hp: number;
@@ -14,6 +21,7 @@ export type HpTrackerMetadata = {
         initiativeBonus: number;
         tempHp?: number;
         initial?: boolean;
+        limits?: Array<Limit>;
     };
     ruleset?: Ruleset;
     index?: number;
@@ -104,4 +112,5 @@ export type InitialStatblockData = {
     bonus: number;
     slug: string;
     ruleset: Ruleset;
+    limits: Array<Limit>;
 };

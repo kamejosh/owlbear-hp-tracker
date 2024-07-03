@@ -229,6 +229,7 @@ button,
 
         .dice-button {
             transition: all 0.25s ease;
+
             &:hover,
             &:focus-visible {
                 translate: 0 2px;
@@ -245,11 +246,12 @@ button,
 
         .dice-preview {
             display: flex;
+            height: 15px;
 
             img,
             svg {
                 width: 15px;
-                height: 15px;
+                object-fit: contain;
             }
 
             svg {
@@ -272,6 +274,10 @@ button,
             svg {
                 animation: rotating 0.5s linear infinite;
             }
+        }
+
+        &.limit {
+            background-color: var(--limit-color);
         }
     }
 
