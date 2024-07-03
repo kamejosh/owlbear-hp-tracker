@@ -173,15 +173,16 @@ const E5StatBlock = ({ slug, tokenData, itemId }: { slug: string; tokenData: HpT
             {statblock.limits && statblock.limits.length > 0 ? (
                 <div className={"limits"}>
                     {statblock.limits.map((limit, i) => {
-                        return (
+                        const limitValues = tokenData.stats.limits?.find((l) => l.id === limit!.name);
+                        return limitValues ? (
                             <LimitComponent
                                 key={i}
                                 limit={limit}
-                                showTitle={true}
+                                title={"name"}
                                 limitValues={tokenData.stats.limits?.find((l) => l.id === limit!.name)!}
                                 itemId={itemId}
                             />
-                        );
+                        ) : null;
                     })}
                 </div>
             ) : null}
@@ -300,22 +301,37 @@ const E5StatBlock = ({ slug, tokenData, itemId }: { slug: string; tokenData: HpT
             ) : null}
             {statblock.spell_slots && statblock.spell_slots.length > 0 ? (
                 <div className={"spell-slots"}>
-                    {statblock.spell_slots.map((spellSlot, i) => {
-                        return (
-                            <LimitComponent
-                                key={i}
-                                limit={spellSlot.limit}
-                                showTitle={true}
-                                hideReset={true}
-                                limitValues={tokenData.stats.limits?.find((l) => l.id === spellSlot.limit!.name)!}
-                                itemId={itemId}
-                            />
-                        );
-                    })}
+                    <h3>Spell Slots</h3>
+                    <div className={"spell-slot-limits"}>
+                        {statblock.spell_slots
+                            .sort((a, b) => a.level - b.level)
+                            .map((spellSlot, i) => {
+                                const limitValues = tokenData.stats.limits?.find((l) => l.id === spellSlot.limit!.name);
+                                return limitValues ? (
+                                    <div className={"spell-slot-entry"}>
+                                        <div className={"spell-slot-level"}>Level: {spellSlot.level}</div>
+                                        <LimitComponent
+                                            key={i}
+                                            limit={spellSlot.limit}
+                                            title={"none"}
+                                            hideReset={true}
+                                            limitValues={limitValues}
+                                            itemId={itemId}
+                                        />
+                                    </div>
+                                ) : null;
+                            })}
+                    </div>
                 </div>
             ) : null}
             {statblock.spells && statblock.spells.length > 0 ? (
-                <E5Spells spells={statblock.spells} statblock={tokenData.name} />
+                <E5Spells
+                    spells={statblock.spells}
+                    statblock={tokenData.name}
+                    spellSlots={statblock.spell_slots}
+                    tokenData={tokenData}
+                    itemId={itemId}
+                />
             ) : null}
         </div>
     ) : null;

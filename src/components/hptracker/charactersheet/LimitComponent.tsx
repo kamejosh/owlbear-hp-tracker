@@ -6,21 +6,30 @@ import { itemMetadataKey } from "../../../helper/variables.ts";
 export type LimitType = components["schemas"]["LimitedUse"];
 export const LimitComponent = ({
     limit,
-    showTitle,
+    title,
     limitValues,
     itemId,
     hideReset,
 }: {
     limit: LimitType;
-    showTitle: boolean;
+    title: "name" | "uses" | "none";
     limitValues: Limit;
     itemId: string;
     hideReset?: boolean;
 }) => {
+    const getTitle = () => {
+        if (title === "name") {
+            return <h4>{limit.name}</h4>;
+        } else if (title === "uses") {
+            return <b>uses</b>;
+        } else {
+            return null;
+        }
+    };
     return (
         <div className={"limit"}>
             <div className={"limit-heading"}>
-                {showTitle ? <h4>{limit.name}</h4> : <b>uses</b>}
+                {getTitle()}
                 <div className={"limit-uses"}>
                     {Array(limit.uses)
                         .fill(0)

@@ -3,8 +3,7 @@ import { DiceButton, DiceButtonWrapper } from "../../general/DiceRoller/DiceButt
 import { capitalize } from "lodash";
 import { LimitComponent } from "./LimitComponent.tsx";
 import { HpTrackerMetadata } from "../../../helper/types.ts";
-import OBR from "@owlbear-rodeo/sdk";
-import { itemMetadataKey } from "../../../helper/variables.ts";
+import { updateLimit } from "../../../helper/helpers.ts";
 
 export type Ability = components["schemas"]["Action-Output"];
 
@@ -21,39 +20,30 @@ export const E5Ability = ({
 }) => {
     const limitValues = tokenData.stats.limits?.find((l) => l.id === ability.limit?.name)!;
 
-    const updateLimit = () => {
-        OBR.scene.items.updateItems([itemId], (items) => {
-            items.forEach((item) => {
-                if (item) {
-                    const metadata = item.metadata[itemMetadataKey] as HpTrackerMetadata;
-                    if (metadata) {
-                        const index = metadata.stats.limits?.findIndex((l) => {
-                            return l.id === limitValues.id;
-                        });
-                        if (index !== undefined) {
-                            console.log(limitValues);
-                            // @ts-ignore
-                            item.metadata[itemMetadataKey]["stats"]["limits"][index]["used"] = Math.min(
-                                limitValues.used + 1,
-                                limitValues.max
-                            );
-                        }
-                    }
-                }
-            });
-        });
-    };
+    const limitReached = limitValues && limitValues.max === limitValues.used;
 
     return (
         <li key={ability.name} className={"e5-ability"}>
             <span className={"ability-info"}>
                 <b className={"ability-name"}>{ability.name}.</b>
-                {ability.limit && tokenData.stats.limits ? (
-                    <LimitComponent limit={ability.limit} showTitle={false} limitValues={limitValues} itemId={itemId} />
+                {ability.limit && tokenData.stats.limits && limitValues ? (
+                    <LimitComponent limit={ability.limit} title={"uses"} limitValues={limitValues} itemId={itemId} />
                 ) : null}
             </span>
             <div>
-                <DiceButtonWrapper text={ability.desc} context={`${capitalize(ability.name)}`} statblock={statblock} />
+                <DiceButtonWrapper
+                    text={ability.desc}
+                    context={`${capitalize(ability.name)}`}
+                    statblock={statblock}
+                    onRoll={
+                        !ability.attack_bonus
+                            ? async () => {
+                                  await updateLimit(itemId, limitValues);
+                              }
+                            : undefined
+                    }
+                    limitReached={!ability.attack_bonus ? limitReached : undefined}
+                />
             </div>
             <span className={"ability-extra-info"}>
                 {ability.attack_bonus ? (
@@ -64,9 +54,10 @@ export const E5Ability = ({
                             text={`+${ability.attack_bonus}`}
                             context={`${capitalize(ability.name)}: To Hit`}
                             statblock={statblock}
-                            onRoll={() => {
-                                updateLimit();
+                            onRoll={async () => {
+                                await updateLimit(itemId, limitValues);
                             }}
+                            limitReached={limitReached}
                         />
                     </span>
                 ) : null}
@@ -80,11 +71,12 @@ export const E5Ability = ({
                             statblock={statblock}
                             onRoll={
                                 !ability.attack_bonus
-                                    ? () => {
-                                          updateLimit();
+                                    ? async () => {
+                                          await updateLimit(itemId, limitValues);
                                       }
                                     : undefined
                             }
+                            limitReached={!ability.attack_bonus ? limitReached : undefined}
                         />
                     </span>
                 ) : null}

@@ -296,7 +296,10 @@ const getLimitsE5 = (statblock: E5Statblock) => {
     return limits;
 };
 
-const getLimitsPf = (statblock: PfStatblock) => {};
+const getLimitsPf = (statblock: PfStatblock) => {
+    console.log(statblock);
+    return [];
+};
 
 export const updateTokenSheet = (statblock: E5Statblock | PfStatblock, characterId: string, ruleset: "e5" | "pf") => {
     OBR.scene.items.updateItems([characterId], (items) => {
@@ -379,6 +382,7 @@ export const getInitialValues = async (items: Array<Item>) => {
                                     bonus: Math.floor((statblock.stats.dexterity - 10) / 2),
                                     slug: statblock.slug,
                                     ruleset: "e5",
+                                    limits: getLimitsE5(statblock),
                                 },
                             };
                         }
@@ -416,6 +420,7 @@ export const getInitialValues = async (items: Array<Item>) => {
                                         : 0,
                                     slug: statblock.slug,
                                     ruleset: "pf",
+                                    limits: getLimitsPf(statblock),
                                 },
                             };
                         }
@@ -430,4 +435,26 @@ export const getInitialValues = async (items: Array<Item>) => {
     }
 
     return itemInitValues;
+};
+
+export const updateLimit = async (itemId: string, limitValues: Limit) => {
+    await OBR.scene.items.updateItems([itemId], (items) => {
+        items.forEach((item) => {
+            if (item) {
+                const metadata = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+                if (metadata) {
+                    const index = metadata.stats.limits?.findIndex((l) => {
+                        return l.id === limitValues.id;
+                    });
+                    if (index !== undefined) {
+                        // @ts-ignore
+                        item.metadata[itemMetadataKey]["stats"]["limits"][index]["used"] = Math.min(
+                            limitValues.used + 1,
+                            limitValues.max
+                        );
+                    }
+                }
+            }
+        });
+    });
 };

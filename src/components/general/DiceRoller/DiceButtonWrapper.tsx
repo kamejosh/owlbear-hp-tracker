@@ -14,6 +14,7 @@ type DiceButtonProps = {
     context: string;
     statblock?: string;
     onRoll?: () => void;
+    limitReached?: boolean | null;
 };
 export const DiceButton = (props: DiceButtonProps) => {
     const room = useMetadataContext((state) => state.room);
@@ -33,17 +34,26 @@ export const DiceButton = (props: DiceButtonProps) => {
                             content: "Dice Roller is not initialized",
                         })
                     );
+                } else if (props.limitReached) {
+                    setTooltip(
+                        tippy(buttonWrapper.current, {
+                            content: "You have reached your limits for this ability",
+                        })
+                    );
                 }
             } else {
                 if (!initialized && !room?.disableDiceRoller) {
                     tooltip.enable();
                     tooltip.setContent("Dice Roller is not initialized");
+                } else if (props.limitReached) {
+                    tooltip.enable();
+                    tooltip.setContent("You have reached your limits for this ability");
                 } else {
                     tooltip.disable();
                 }
             }
         }
-    }, [initialized, room?.disableDiceRoller]);
+    }, [initialized, room?.disableDiceRoller, props.limitReached]);
 
     const addModifier = (originalDie: string, baseDie: string) => {
         if (originalDie.includes("+")) {
@@ -132,7 +142,7 @@ export const DiceButton = (props: DiceButtonProps) => {
             <button
                 ref={rollButton}
                 disabled={!isEnabled()}
-                className={"dice-button button"}
+                className={`dice-button button ${props.limitReached ? "limit" : ""}`}
                 onClick={async () => {
                     await roll();
                 }}
@@ -193,10 +203,14 @@ export const DiceButtonWrapper = ({
     text,
     context,
     statblock,
+    onRoll,
+    limitReached,
 }: {
     text: string;
     context: string;
     statblock?: string;
+    onRoll?: () => void;
+    limitReached?: boolean | null;
 }) => {
     const regex = /((\d*?d\d+)( ?[\+\-] ?\d+)?)|([\+\-]\d+)/gi;
     const dice = text.match(regex);
@@ -217,7 +231,16 @@ export const DiceButtonWrapper = ({
                     } else if (die.startsWith("+") || die.startsWith("-")) {
                         die = `1d20${die}`;
                     }
-                    diceField = <DiceButton dice={die} text={text} context={context} statblock={statblock} />;
+                    diceField = (
+                        <DiceButton
+                            dice={die}
+                            text={text}
+                            context={context}
+                            statblock={statblock}
+                            onRoll={onRoll}
+                            limitReached={limitReached}
+                        />
+                    );
                 }
                 return (
                     <span key={index}>

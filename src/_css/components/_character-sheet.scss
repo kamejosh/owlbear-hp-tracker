@@ -620,15 +620,14 @@ b {
                 transition: all 0.25s ease;
                 cursor: pointer;
                 outline: 1px solid transparent;
-                box-shadow: 1px 2px 2px #8a3838;
-                border: 2px solid #8a3838ff;
+                border: 2px solid var(--limit-color);
                 border-radius: 30%;
                 background: transparent;
                 width: 15px;
                 height: 15px;
 
                 &:hover {
-                    outline-color: #8a3838ff;
+                    outline-color: var(--limit-color);
                 }
 
                 &.used {
@@ -650,6 +649,23 @@ b {
                     }
                 }
             }
+        }
+    }
+}
+
+.spell-slots {
+    .spell-slot-limits {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+
+        .spell-slot-entry {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid lightslategray;
+            border-radius: 8px;
+            padding: 4px;
         }
     }
 }

@@ -112,4 +112,5 @@ export type InitialStatblockData = {
     bonus: number;
     slug: string;
     ruleset: Ruleset;
+    limits: Array<Limit>;
 };

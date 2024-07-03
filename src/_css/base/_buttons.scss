@@ -273,6 +273,10 @@ button,
                 animation: rotating 0.5s linear infinite;
             }
         }
+
+        &.limit {
+            background-color: var(--limit-color);
+        }
     }
 
     .dice-context-button {
