@@ -6,6 +6,8 @@ import { SpellFilter } from "./SpellFilter.tsx";
 import { capitalize } from "lodash";
 import { E5SpellSlot } from "../../../api/e5/useE5Api.ts";
 import { HpTrackerMetadata } from "../../../helper/types.ts";
+import { useMetadataContext } from "../../../context/MetadataContext.ts";
+import tippy, { Instance } from "tippy.js";
 
 type Spell = components["schemas"]["src__types__e5__Spell"];
 
@@ -23,6 +25,8 @@ const Spell = ({
     itemId?: string;
 }) => {
     const [open, setOpen] = useState<boolean>(false);
+    const [tooltip, setTooltip] = useState<Instance>();
+    const room = useMetadataContext((state) => state.room);
 
     const getSpellLevel = () => {
         if (spell.level === 0) {
@@ -42,7 +46,9 @@ const Spell = ({
     const spellLevelLimit = spellSlots?.find((s) => s.level === spell.level)?.limit;
 
     const limitValues = tokenData?.stats.limits?.find((l) => l.id === spellLevelLimit?.name);
-    const limitReached = limitValues && limitValues.max === limitValues.used;
+    const limitReached =
+        (limitValues && limitValues.max === limitValues.used) ||
+        (spellSlots && spellSlots.length > 0 && !spellLevelLimit);
 
     return (
         <li className={`spell`}>
@@ -51,6 +57,42 @@ const Spell = ({
                     <div className={"spell-header"}>
                         <h4 className={"spell-name"}>{spell.name}</h4>
                         <span className={"spell-level"}>({getSpellLevel()})</span>
+                        {spellSlots && spellSlots.length > 0 ? (
+                            <div
+                                ref={(e) => {
+                                    if (e) {
+                                        if (tooltip) {
+                                            if (limitReached) {
+                                                tooltip.enable();
+                                                tooltip.setContent("No more spellslots");
+                                            } else {
+                                                tooltip.disable();
+                                            }
+                                        } else {
+                                            if (limitReached) {
+                                                setTooltip(tippy(e, { content: "No more spellslots" }));
+                                            }
+                                        }
+                                    }
+                                }}
+                                className={`button-wrapper enabled ${
+                                    room?.disableDiceRoller ? "calculated" : "three-d-dice"
+                                }`}
+                            >
+                                <button
+                                    className={`dice-button button ${limitReached ? "limit" : ""}`}
+                                    onClick={async () => {
+                                        if (itemId && limitValues) {
+                                            await updateLimit(itemId, limitValues);
+                                        }
+                                    }}
+                                >
+                                    <div className={"dice-preview"}></div>
+                                    cast
+                                    <div className={"dice-preview"}></div>
+                                </button>
+                            </div>
+                        ) : null}
                     </div>
                     {damage ? (
                         <span className={"spell-damage"}>
