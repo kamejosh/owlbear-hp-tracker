@@ -1,3 +1,7 @@
+# 2.3.0
+
++ Add limited abilities to custom statblocks: [video](https://www.youtube.com/watch?v=injiQlxv5Fc)
+
 # 2.2.1
 
 + Improve dddice integration

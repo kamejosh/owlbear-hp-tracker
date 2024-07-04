@@ -40,14 +40,12 @@ export const Markdown = ({ text }: { text: string }) => {
                 ),
                 a: ({ node, ...props }) => {
                     if (props.href?.startsWith("#")) {
-                        console.log(typeof props.children === "string" ? props.children : props.children[0]);
                         return (
                             <a href={props.href}>
                                 {typeof props.children === "string" ? props.children : props.children[0]}
                             </a>
                         );
                     } else {
-                        console.log(typeof props.children === "string" ? props.children : props.children[0]);
                         return (
                             <a href={props.href} target={"_blank"}>
                                 {typeof props.children === "string" ? props.children : props.children[0]}

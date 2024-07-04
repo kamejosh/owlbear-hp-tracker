@@ -14,6 +14,7 @@
       * [Temporary Hitpoints](#temporary-hitpoints)
       * [Initializing Token](#initializing-token)
     - [Statblock](#statblock)
+      - [Limited Abilities](#limited-abilities)
     - [Player Action Window](#player-action-window)
   + [Hp Tracker Context Menu](#hp-tracker-context-menu)
     - [Single Selection](#single-selection)
@@ -259,6 +260,24 @@ By clicking on one of the options this statblock is selected for the Token. If t
 ![Statblock Selected](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/statblock_selected.png)
 
 The statblock shows all the creature information including available spells and detailed spell information.
+
+##### Limited Abilities
+
+[Custom Statblocks](#custom-statblocks) can define limited abilities (see [this video](https://www.youtube.com/watch?v=injiQlxv5Fc) tutorial). These limited abilities allows to track how many uses are left and when those limits are refilled. This can be used for Death Saves, Spellslots, Actions, Abilities, Hitdice and whatever you can think of.
+
+There are a few automations in place to make tracking easier. 
+
++ If an ability has a "to hit" button this button will automatically mark off one use after clicking. 
++ If no "to hit" button is available any other dice button will mark off one use after clicking.
++ All spells include a "cast" button (if spellslots are defined) that mark of one use after clicking (but the to rules above are still true).
+
+In future versions there will be buttons to allow automatically refill all uses with the matching reset rule.
+
+Buttons that trigger uses being consumed will indicate that no uses are left by being highlighted. The buttons will still work while being highlighted.
+
+To create custom statblocks go to [Tabletop Almanac](https://tabletop-almanac.com?ref=hp-doc) and create a free account.
+
+![Statblock Limits](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/statblock_limits.png)
 
 #### Player Action Window
 
