@@ -234,6 +234,8 @@ export const dddiceRollToRollLog = async (
         username = participantName;
     }
 
+    console.log(roll);
+
     return {
         uuid: roll.uuid,
         created_at: roll.created_at,

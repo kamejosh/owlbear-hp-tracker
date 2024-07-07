@@ -297,58 +297,12 @@
 .open5e-sheet {
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-areas:
-        "what"
-        "values"
-        "abilities"
-        "tidbits"
-        "about"
-        "skills"
-        "resistances"
-        "limits"
-        "limits"
-        "specials"
-        "specials"
-        "actions"
-        "actions"
-        "bonus-actions"
-        "bonus-actions"
-        "lair-actions"
-        "lair-actions"
-        "mythic-actions"
-        "mythic-actions"
-        "reactions"
-        "reactions"
-        "legendary"
-        "legendary"
-        "spell-slots"
-        "spell-slots"
-        "spells"
-        "spells"
-        "license";
     gap: 10px 30px;
     margin-top: 20px;
     text-align: left;
 
     @include breakpoint.laptop {
         grid-template-columns: repeat(2, 1fr);
-        grid-template-areas:
-            "what values"
-            "abilities tidbits"
-            "about about"
-            "skills skills"
-            "resistances resistances"
-            "limits limits"
-            "specials specials"
-            "actions actions"
-            "bonus-actions bonus-actions"
-            "lair-actions lair-actions"
-            "mythic-actions mythic-actions"
-            "reactions reactions"
-            "legendary legendary"
-            "spell-slots spell-slots"
-            "spells spells"
-            "license license";
     }
 
     > * {
@@ -365,7 +319,7 @@
     }
 
     .what {
-        grid-area: what;
+        grid-column: span 1;
 
         h3 {
             margin: 0 0 5px;
@@ -378,14 +332,14 @@
 
     .values {
         display: flex;
-        grid-area: values;
+        grid-column: span 1;
         flex-direction: column;
     }
 
     .stats {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        grid-area: abilities;
+        grid-column: span 1;
         align-content: center;
         justify-content: space-between;
         gap: 10px;
@@ -410,29 +364,39 @@
     }
 
     .tidbits {
-        grid-area: tidbits;
+        grid-column: span 1;
 
         .saving-throws {
-            display: flex;
-            column-gap: 1ch;
-            flex-wrap: wrap;
-            align-items: center;
-            text-transform: capitalize;
-
-            .saving-throw {
+            .saving-throw-list {
                 display: flex;
+                column-gap: 1ch;
+                flex-wrap: wrap;
                 align-items: center;
-                gap: 2px;
+                text-transform: capitalize;
+
+                .saving-throw {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                }
             }
         }
     }
 
     .about {
-        grid-area: about;
+        grid-column: span 1;
+
+        @include breakpoint.laptop {
+            grid-column: span 2;
+        }
     }
 
     .skills {
-        grid-area: skills;
+        grid-column: span 1;
+
+        @include breakpoint.laptop {
+            grid-column: span 2;
+        }
 
         h3 {
             margin-bottom: 5px;
@@ -463,7 +427,11 @@
     }
 
     .resistances {
-        grid-area: resistances;
+        grid-column: span 1;
+
+        @include breakpoint.laptop {
+            grid-column: span 2;
+        }
 
         h3 {
             margin-bottom: 5px;
@@ -471,15 +439,27 @@
     }
 
     .limits {
-        grid-area: limits;
+        grid-column: span 1;
+
+        @include breakpoint.laptop {
+            grid-column: span 2;
+        }
     }
 
     .spell-slots {
-        grid-area: spell-slots;
+        grid-column: span 1;
+
+        @include breakpoint.laptop {
+            grid-column: span 2;
+        }
     }
 
     .actions {
-        grid-area: actions;
+        grid-column: span 1;
+
+        @include breakpoint.laptop {
+            grid-column: span 2;
+        }
 
         h3 {
             border-bottom: 1px solid white;
@@ -488,7 +468,11 @@
     }
 
     .bonus-actions {
-        grid-area: bonus-actions;
+        grid-column: span 1;
+
+        @include breakpoint.laptop {
+            grid-column: span 2;
+        }
 
         h3 {
             border-bottom: 1px solid white;
@@ -497,7 +481,11 @@
     }
 
     .lair-actions {
-        grid-area: lair-actions;
+        grid-column: span 1;
+
+        @include breakpoint.laptop {
+            grid-column: span 2;
+        }
 
         h3 {
             border-bottom: 1px solid white;
@@ -506,7 +494,11 @@
     }
 
     .mythic-actions {
-        grid-area: mythic-actions;
+        grid-column: span 1;
+
+        @include breakpoint.laptop {
+            grid-column: span 2;
+        }
 
         h3 {
             border-bottom: 1px solid white;
@@ -515,7 +507,11 @@
     }
 
     .reactions {
-        grid-area: reactions;
+        grid-column: span 1;
+
+        @include breakpoint.laptop {
+            grid-column: span 2;
+        }
 
         h3 {
             border-bottom: 1px solid white;
@@ -524,7 +520,11 @@
     }
 
     .special-abilities {
-        grid-area: specials;
+        grid-column: span 1;
+
+        @include breakpoint.laptop {
+            grid-column: span 2;
+        }
 
         h3 {
             border-bottom: 1px solid white;
@@ -533,7 +533,11 @@
     }
 
     .legendary-actions {
-        grid-area: legendary;
+        grid-column: span 1;
+
+        @include breakpoint.laptop {
+            grid-column: span 2;
+        }
 
         h3 {
             border-bottom: 1px solid white;
@@ -542,11 +546,29 @@
     }
 
     .spells {
-        grid-area: spells;
+        grid-column: span 1;
 
-        h3 {
+        @include breakpoint.laptop {
+            grid-column: span 2;
+        }
+
+        .top {
+            display: flex;
+            align-items: flex-end;
+            gap: 1ch;
+            margin-bottom: 1rem;
             border-bottom: 1px solid white;
             width: 100%;
+
+            h3 {
+                margin-bottom: 0;
+                line-height: 25px;
+            }
+
+            span {
+                font-size: 14px;
+                line-height: 22px;
+            }
         }
 
         .spell-list {
@@ -557,7 +579,11 @@
     }
 
     .license {
-        grid-area: license;
+        grid-column: span 1;
+
+        @include breakpoint.laptop {
+            grid-column: span 2;
+        }
     }
 }
 
@@ -613,6 +639,7 @@ b {
 
         .limit-uses {
             display: flex;
+            flex-wrap: wrap;
             gap: 5px;
 
             .limit-use {

@@ -17,12 +17,16 @@ const Spell = ({
     spellSlots,
     tokenData,
     itemId,
+    dc,
+    attack,
 }: {
     spell: Spell;
     statblock: string;
     spellSlots?: Array<E5SpellSlot> | null;
     tokenData?: HpTrackerMetadata;
     itemId?: string;
+    dc?: string | null;
+    attack?: string | null;
 }) => {
     const [open, setOpen] = useState<boolean>(false);
     const [tooltip, setTooltip] = useState<Instance>();
@@ -47,8 +51,10 @@ const Spell = ({
 
     const limitValues = tokenData?.stats.limits?.find((l) => l.id === spellLevelLimit?.name);
     const limitReached =
-        (limitValues && limitValues.max === limitValues.used) ||
-        (spellSlots && spellSlots.length > 0 && !spellLevelLimit);
+        spell.level === 0
+            ? false
+            : (limitValues && limitValues.max === limitValues.used) ||
+              (spellSlots && spellSlots.length > 0 && !spellLevelLimit);
 
     return (
         <li className={`spell`}>
@@ -79,21 +85,44 @@ const Spell = ({
                                     room?.disableDiceRoller ? "calculated" : "three-d-dice"
                                 }`}
                             >
-                                <button
-                                    className={`dice-button button ${limitReached ? "limit" : ""}`}
-                                    onClick={async () => {
-                                        if (itemId && limitValues) {
-                                            await updateLimit(itemId, limitValues);
-                                        }
-                                    }}
-                                >
-                                    <div className={"dice-preview"}></div>
-                                    cast
-                                    <div className={"dice-preview"}></div>
-                                </button>
+                                {spell.is_attack && attack ? (
+                                    <>
+                                        <DiceButton
+                                            dice={`1d20+${attack}`}
+                                            text={`+${attack}(attack)`}
+                                            context={`${capitalize(spell.name)}: Attack`}
+                                            statblock={statblock}
+                                            onRoll={async () => {
+                                                if (itemId && limitValues) {
+                                                    await updateLimit(itemId, limitValues);
+                                                }
+                                            }}
+                                            limitReached={limitReached}
+                                        />
+                                    </>
+                                ) : (
+                                    <button
+                                        className={`dice-button button ${limitReached ? "limit" : ""}`}
+                                        onClick={async () => {
+                                            if (itemId && limitValues) {
+                                                await updateLimit(itemId, limitValues);
+                                            }
+                                        }}
+                                    >
+                                        <div className={"dice-preview"}></div>
+                                        cast
+                                        <div className={"dice-preview"}></div>
+                                    </button>
+                                )}
                             </div>
                         ) : null}
                     </div>
+                    {spell.dc ? (
+                        <span className={"spell-damage"}>
+                            DC: {spell.dc}
+                            <DiceButton dice={"1d20"} text={`DC ${dc}`} context={`${capitalize(spell.name)}: Attack`} />
+                        </span>
+                    ) : null}
                     {damage ? (
                         <span className={"spell-damage"}>
                             Damage:{" "}
@@ -103,7 +132,7 @@ const Spell = ({
                                 context={`${capitalize(spell.name)}: Damage`}
                                 statblock={statblock}
                                 onRoll={async () => {
-                                    if (itemId && limitValues) {
+                                    if (itemId && limitValues && !spell.is_attack) {
                                         await updateLimit(itemId, limitValues);
                                     }
                                 }}
@@ -199,6 +228,8 @@ export const E5Spells = (props: {
     spellSlots?: Array<E5SpellSlot> | null;
     tokenData?: HpTrackerMetadata;
     itemId?: string;
+    dc?: string | null;
+    attack?: string | null;
 }) => {
     const [spellFilter, setSpellFilter] = useState<Array<number>>([]);
 
@@ -237,7 +268,11 @@ export const E5Spells = (props: {
 
     return (
         <div className={"spells"}>
-            <h3>Spells</h3>
+            <div className={"top"}>
+                <h3>Spells</h3>
+                {props.dc ? <span>DC {props.dc}</span> : null}
+                {props.attack ? <span>Attack +{props.attack}</span> : null}
+            </div>
             <SpellFilter filters={filters} spellFilter={spellFilter} setSpellFilter={setSpellFilter} />
             <ul className={"spell-list"}>
                 {props.spells
@@ -252,6 +287,8 @@ export const E5Spells = (props: {
                                 spellSlots={props.spellSlots}
                                 tokenData={props.tokenData}
                                 itemId={props.itemId}
+                                dc={props.dc}
+                                attack={props.attack}
                             />
                         );
                     })}

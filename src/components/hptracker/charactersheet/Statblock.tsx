@@ -83,24 +83,26 @@ const E5StatBlock = ({ slug, tokenData, itemId }: { slug: string; tokenData: HpT
             <div className={"tidbits"}>
                 {Object.entries(statblock.saving_throws).filter((st) => !!st[1]).length > 0 ? (
                     <div className={"tidbit saving-throws"}>
-                        <b>Saving Throws</b>{" "}
-                        {Object.entries(statblock.saving_throws)
-                            .map(([key, value]) => {
-                                if (!isNull(value)) {
-                                    return (
-                                        <span className={"saving-throw"} key={key}>
-                                            {key.substring(0, 3)}:{" "}
-                                            <DiceButton
-                                                dice={`d20+${value}`}
-                                                text={`+${value}`}
-                                                context={`${capitalize(key.substring(0, 3))}: Save`}
-                                                statblock={tokenData.name}
-                                            />
-                                        </span>
-                                    );
-                                }
-                            })
-                            .filter((v) => !!v)}
+                        <div className={"bold"}>Saving Throws</div>
+                        <div className={"saving-throw-list"}>
+                            {Object.entries(statblock.saving_throws)
+                                .map(([key, value]) => {
+                                    if (!isNull(value)) {
+                                        return (
+                                            <span className={"saving-throw"} key={key}>
+                                                {key.substring(0, 3)}:{" "}
+                                                <DiceButton
+                                                    dice={`d20+${value}`}
+                                                    text={`+${value}`}
+                                                    context={`${capitalize(key.substring(0, 3))}: Save`}
+                                                    statblock={tokenData.name}
+                                                />
+                                            </span>
+                                        );
+                                    }
+                                })
+                                .filter((v) => !!v)}
+                        </div>
                     </div>
                 ) : null}
                 <div className={"tidbit"}>
@@ -331,6 +333,8 @@ const E5StatBlock = ({ slug, tokenData, itemId }: { slug: string; tokenData: HpT
                     spellSlots={statblock.spell_slots}
                     tokenData={tokenData}
                     itemId={itemId}
+                    dc={statblock.spell_dc}
+                    attack={statblock.spell_attack}
                 />
             ) : null}
         </div>
@@ -437,7 +441,6 @@ const PfStatBlock = ({ slug, name }: { slug: string; name: string }) => {
                     </>
                 ) : null}
             </div>
-            <About about={statblock.about} slug={slug} />
             {statblock.traits && statblock.traits.length > 0 ? (
                 <div className={"skills"}>
                     <h3>Traits</h3>
@@ -483,6 +486,7 @@ const PfStatBlock = ({ slug, name }: { slug: string; name: string }) => {
                     </div>
                 </div>
             ) : null}
+            <About about={statblock.about} slug={slug} />
             {statblock.items?.length && statblock.items.length > 0 ? (
                 <div className={"items"}>
                     <b>Items</b>: {statblock.items.join(", ")}

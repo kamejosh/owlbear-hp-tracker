@@ -379,6 +379,10 @@ export interface components {
        * @default []
        */
       spells?: string[];
+      /** Spell Dc */
+      spell_dc?: string | null;
+      /** Spell Attack */
+      spell_attack?: string | null;
       /**
        * Limits
        * @default []
@@ -488,6 +492,10 @@ export interface components {
        * @default []
        */
       spells?: components["schemas"]["src__types__e5__Spell"][];
+      /** Spell Dc */
+      spell_dc?: string | null;
+      /** Spell Attack */
+      spell_attack?: string | null;
       /**
        * Limits
        * @default []
@@ -1039,8 +1047,11 @@ export interface components {
        * @default
        */
       desc?: string | null;
-      /** Higher Level */
-      higher_level: string;
+      /**
+       * Higher Level
+       * @default
+       */
+      higher_level?: string | null;
       /** Range */
       range: string;
       /** Verbal */
@@ -1061,6 +1072,10 @@ export interface components {
       casting_time: string;
       /** Level */
       level: number;
+      /** Is Attack */
+      is_attack?: boolean | null;
+      /** Dc */
+      dc?: string | null;
       school: components["schemas"]["SpellSchool"];
       /**
        * Classes
@@ -1093,8 +1108,11 @@ export interface components {
        * @default
        */
       desc?: string | null;
-      /** Higher Level */
-      higher_level: string;
+      /**
+       * Higher Level
+       * @default
+       */
+      higher_level?: string | null;
       /** Range */
       range: string;
       /** Verbal */
@@ -1115,6 +1133,10 @@ export interface components {
       casting_time: string;
       /** Level */
       level: number;
+      /** Is Attack */
+      is_attack?: boolean | null;
+      /** Dc */
+      dc?: string | null;
       /** School */
       school: string;
       /**
