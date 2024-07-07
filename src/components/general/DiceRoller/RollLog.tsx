@@ -88,10 +88,15 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
             // @ts-ignore before the switch values had the property "value"
             props.entry.values[0].hasOwnProperty("value")
         ) {
-            // @ts-ignore before the switch values had the property "value"
-            return props.entry.values.map((v) => v.value).join(", ");
+            return (
+                props.entry.values
+                    // @ts-ignore before the switch values had the property "value"
+                    .map((v) => v.value)
+                    .join(", ")
+                    .replace(", +", " + ")
+            );
         } else {
-            return props.entry.values.join(", ");
+            return props.entry.values.join(", ").replaceAll(", +", " + ");
         }
     }, [props.entry.values]);
 

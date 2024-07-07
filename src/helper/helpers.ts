@@ -234,8 +234,6 @@ export const dddiceRollToRollLog = async (
         username = participantName;
     }
 
-    console.log(roll);
-
     return {
         uuid: roll.uuid,
         created_at: roll.created_at,
@@ -243,7 +241,13 @@ export const dddiceRollToRollLog = async (
         label: roll.label,
         total_value: roll.total_value,
         username: username,
-        values: roll.values.map((v) => v.value.toString()),
+        values: roll.values.map((v) => {
+            if (v.is_user_value) {
+                return `+${v.value.toString()}`;
+            } else {
+                return v.value.toString();
+            }
+        }),
         owlbear_user_id: options?.owlbear_user_id,
         participantUsername: participantName,
     };
@@ -299,7 +303,8 @@ const getLimitsE5 = (statblock: E5Statblock) => {
 };
 
 const getLimitsPf = (statblock: PfStatblock) => {
-    console.log(statblock);
+    if (!statblock) {
+    }
     return [];
 };
 

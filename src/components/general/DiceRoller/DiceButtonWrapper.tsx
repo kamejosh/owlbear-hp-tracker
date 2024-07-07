@@ -148,7 +148,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                 }}
             >
                 <div className={"dice-preview"}>{getDicePreview()}</div>
-                {props.text.replace(/\s/g, "")}
+                {props.text.replace(/\s/g, "").replace("&nbsp", " ")}
             </button>
             <div
                 className={`dice-context-button ${context && isEnabled() ? "visible" : ""} ${

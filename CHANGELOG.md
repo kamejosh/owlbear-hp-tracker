@@ -1,6 +1,8 @@
 # 2.3.0
 
 + Add limited abilities to custom statblocks: [video](https://www.youtube.com/watch?v=injiQlxv5Fc)
++ Add new Spell and Statblock Fields from TA to HP Tracker
++ Fix some bugs
 
 # 2.2.1
 

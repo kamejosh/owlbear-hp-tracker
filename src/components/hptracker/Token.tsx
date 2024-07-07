@@ -311,6 +311,11 @@ export const Token = (props: TokenProps) => {
                                 setData(newData);
                                 handleValueChange(newData);
                             }}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    setEditName(false);
+                                }
+                            }}
                         />
                     ) : (
                         <div

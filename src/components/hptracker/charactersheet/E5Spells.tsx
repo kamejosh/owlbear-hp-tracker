@@ -89,7 +89,7 @@ const Spell = ({
                                     <>
                                         <DiceButton
                                             dice={`1d20+${attack}`}
-                                            text={`+${attack}(attack)`}
+                                            text={`+${attack}&nbspattack`}
                                             context={`${capitalize(spell.name)}: Attack`}
                                             statblock={statblock}
                                             onRoll={async () => {
