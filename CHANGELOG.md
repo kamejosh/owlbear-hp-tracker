@@ -3,6 +3,7 @@
 + Add limited abilities to custom statblocks: [video](https://www.youtube.com/watch?v=injiQlxv5Fc)
 + Add new Spell and Statblock Fields from TA to HP Tracker
 + Fix some bugs
++ Token Owners are always able to access statblock an change stats
 
 # 2.2.1
 

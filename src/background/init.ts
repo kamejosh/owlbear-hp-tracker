@@ -158,6 +158,7 @@ const setupContextMenu = async () => {
                             value: true,
                             coordinator: "&&",
                         },
+                        { key: ["createdUserId"], value: OBR.player.id, coordinator: "||" },
                     ],
                     roles: ["PLAYER"],
                 },

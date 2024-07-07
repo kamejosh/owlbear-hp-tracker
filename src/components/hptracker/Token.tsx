@@ -232,7 +232,8 @@ export const Token = (props: TokenProps) => {
         return (
             props.data.hpTrackerActive &&
             (playerContext.role === "GM" ||
-                (playerContext.role === "PLAYER" && props.data.canPlayersSee && props.item.visible))
+                (playerContext.role === "PLAYER" && props.data.canPlayersSee && props.item.visible) ||
+                props.item.createdUserId === playerContext.id)
         );
     };
 

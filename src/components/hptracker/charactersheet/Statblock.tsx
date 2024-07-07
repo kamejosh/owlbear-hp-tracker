@@ -310,10 +310,9 @@ const E5StatBlock = ({ slug, tokenData, itemId }: { slug: string; tokenData: HpT
                             .map((spellSlot, i) => {
                                 const limitValues = tokenData.stats.limits?.find((l) => l.id === spellSlot.limit!.name);
                                 return limitValues ? (
-                                    <div className={"spell-slot-entry"}>
+                                    <div className={"spell-slot-entry"} key={i}>
                                         <div className={"spell-slot-level"}>Level: {spellSlot.level}</div>
                                         <LimitComponent
-                                            key={i}
                                             limit={spellSlot.limit}
                                             title={"none"}
                                             hideReset={true}
