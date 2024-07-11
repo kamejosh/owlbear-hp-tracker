@@ -134,16 +134,21 @@ const StatblockWrapper = (props: StatblockWrapperProps) => {
 
 export const CharacterSheet = (props: { itemId: string }) => {
     const { characterId, setId } = useCharSheet();
+    const playerContext = usePlayerContext();
     const room = useMetadataContext((state) => state.room);
     const [token, setToken] = useState<Item | null>(null);
     const [data, setData] = useState<HpTrackerMetadata | null>(null);
     const [search, setSearch] = useState<string>("");
     const [forceSearch, setForceSearch] = useState<boolean>(false);
     const [emptySearch, setEmptySearch] = useState<boolean>(false);
+    const [backgroundColor, setBackgroundColor] = useState<string>();
 
-    const initData = (items: Item[]) => {
+    const initData = async (items: Item[]) => {
         if (items.length > 0) {
             const item = items[0];
+            if (playerContext.role !== "GM" && item.createdUserId === OBR.player.id) {
+                setBackgroundColor(await OBR.player.getColor());
+            }
             if (itemMetadataKey in item.metadata) {
                 const d = item.metadata[itemMetadataKey] as HpTrackerMetadata;
                 setData(d);
@@ -183,7 +188,10 @@ export const CharacterSheet = (props: { itemId: string }) => {
     }, [data?.sheet]);
 
     return (
-        <div className={"character-sheet"}>
+        <div className={`character-sheet`}>
+            {backgroundColor ? (
+                <div className={"background"} style={{ outline: `10px solid ${backgroundColor}` }}></div>
+            ) : null}
             <button className={"back-button"} onClick={() => setId(null)}>
                 Back
             </button>

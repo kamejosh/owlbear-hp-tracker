@@ -84,7 +84,7 @@ export const StatblockPopover = () => {
 
     return (
         <ContextWrapper component={"statblock_popover"}>
-            <div className={"statblock-popover"}>
+            <div className={`statblock-popover ${minimized ? "minimized" : ""}`}>
                 <div className={"help-buttons statblock"}>
                     <button
                         className={"top-button"}
@@ -116,7 +116,7 @@ export const StatblockPopover = () => {
                     data={data}
                 />
             </div>
-            <DiceTray classes={"statblock-dice-tray"} />
+            {!minimized ? <DiceTray classes={"statblock-dice-tray"} /> : null}
         </ContextWrapper>
     );
 };

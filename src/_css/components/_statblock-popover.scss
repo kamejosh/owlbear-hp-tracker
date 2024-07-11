@@ -6,6 +6,12 @@ body:has(.statblock-app) {
     .statblock-popover {
         position: relative;
 
+        &.minimized {
+            &::before {
+                height: calc(26px + 1rem);
+            }
+        }
+
         &::before {
             display: block;
             position: fixed;

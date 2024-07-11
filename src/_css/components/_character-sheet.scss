@@ -3,6 +3,17 @@
 .character-sheet {
     margin-bottom: 25px;
 
+    .background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        outline-offset: -10px;
+        border-radius: 16px 16px 0 0;
+        width: calc(100vw - 10px);
+        height: calc(100vh + 10px);
+        overflow: hidden;
+    }
+
     .back-button {
         display: flex;
         position: fixed;
