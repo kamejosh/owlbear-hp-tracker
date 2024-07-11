@@ -190,7 +190,7 @@ export const CharacterSheet = (props: { itemId: string }) => {
     return (
         <div className={`character-sheet`}>
             {backgroundColor ? (
-                <div className={"background"} style={{ outline: `10px solid ${backgroundColor}` }}></div>
+                <div className={"background"} style={{ outline: `5px solid ${backgroundColor}` }}></div>
             ) : null}
             <button className={"back-button"} onClick={() => setId(null)}>
                 Back
@@ -198,7 +198,7 @@ export const CharacterSheet = (props: { itemId: string }) => {
             <Helpbuttons />
             {token && data ? (
                 <div className={"content"}>
-                    <h2>
+                    <h2 className={"statblock-name"}>
                         {data.name} <span className={"note"}>(using {room?.ruleset} Filter)</span>
                     </h2>
                     {room?.ruleset === "e5" || room?.ruleset === "pf" ? (

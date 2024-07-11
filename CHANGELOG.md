@@ -4,6 +4,9 @@
 + Add new Spell and Statblock Fields from TA to HP Tracker
 + Fix some bugs
 + Token Owners are always able to access statblock an change stats
++ Fix issue when minimizing statblock popover
++ Give statblocks of owned tokens a border in the player color
++ make statblock name sticky
 
 # 2.2.1
 

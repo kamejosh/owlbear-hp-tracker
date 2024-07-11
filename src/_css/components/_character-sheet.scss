@@ -1,13 +1,13 @@
 @use "../utilities/breakpoint";
 
 .character-sheet {
-    margin-bottom: 25px;
+    margin-bottom: 45px;
 
     .background {
         position: fixed;
         top: 0;
         left: 0;
-        outline-offset: -10px;
+        outline-offset: -5px;
         border-radius: 16px 16px 0 0;
         width: calc(100vw - 10px);
         height: calc(100vh + 10px);
@@ -62,9 +62,14 @@
         margin-top: 30px;
         width: 100%;
 
-        h2 {
-            margin-bottom: 8px;
-            text-align: left;
+        .statblock-name {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            margin: 0;
+            background: linear-gradient(to bottom, var(--bg-color) 90%, transparent);
+            padding-block: 0.8em 8px;
+            text-align: center;
 
             .note {
                 font-size: 12px;
