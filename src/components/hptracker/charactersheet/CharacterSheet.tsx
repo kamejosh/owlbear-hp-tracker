@@ -190,7 +190,7 @@ export const CharacterSheet = (props: { itemId: string }) => {
     return (
         <div className={`character-sheet`}>
             {backgroundColor ? (
-                <div className={"background"} style={{ outline: `5px solid ${backgroundColor}` }}></div>
+                <div className={"background"} style={{ borderLeft: `5px solid ${backgroundColor}` }}></div>
             ) : null}
             <button className={"back-button"} onClick={() => setId(null)}>
                 Back
