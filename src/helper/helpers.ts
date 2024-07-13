@@ -239,6 +239,7 @@ export const dddiceRollToRollLog = async (
         created_at: roll.created_at,
         equation: roll.equation,
         label: roll.label,
+        is_hidden: roll.values.some((v) => v.is_hidden),
         total_value: roll.total_value,
         username: username,
         values: roll.values.map((v) => {

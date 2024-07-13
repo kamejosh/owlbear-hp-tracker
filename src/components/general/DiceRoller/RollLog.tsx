@@ -44,7 +44,10 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
     const rollTime = new Date(props.entry.created_at);
     const now = new Date();
     const detailsRef = useRef<HTMLDivElement>(null);
+    const [hidden, setHidden] = useState<boolean>(props.entry.is_hidden);
 
+    const ownRoll =
+        props.entry.owlbear_user_id === playerContext.id || props.entry.participantUsername === playerContext.name;
     const deltaTime = now.getTime() - rollTime.getTime();
 
     const getRollTimeText = (delta: number) => {
@@ -91,14 +94,17 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
             return (
                 props.entry.values
                     // @ts-ignore before the switch values had the property "value"
-                    .map((v) => v.value)
+                    .map((v) => (hidden ? "?" : v.value))
                     .join(", ")
                     .replace(", +", " + ")
             );
         } else {
-            return props.entry.values.join(", ").replaceAll(", +", " + ");
+            return props.entry.values
+                .map((v) => (hidden ? "?" : v))
+                .join(", ")
+                .replaceAll(", +", " + ");
         }
-    }, [props.entry.values]);
+    }, [props.entry.values, hidden]);
 
     const formatLabel = useCallback(() => {
         if (props.entry.label) {
@@ -121,14 +127,7 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
     }, [props.entry.label]);
 
     return (
-        <li
-            className={`roll-log-entry ${props.classes} ${
-                props.entry.owlbear_user_id === playerContext.id ||
-                props.entry.participantUsername === playerContext.name
-                    ? "self"
-                    : ""
-            }`}
-        >
+        <li className={`roll-log-entry ${props.classes} ${ownRoll ? "self" : ""}`}>
             <div className={"roll-time"}>{rollTimeText}</div>
             <div className={"roll-context"}>{formatLabel()}</div>
             <div className={"username"}>{props.entry.username}</div>
@@ -143,7 +142,17 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
                 {getDetailedResult()}
             </div>
             <div className={"divider"}>=</div>
-            <div className={"total"}>{props.entry.total_value.toString()}</div>
+            <div className={"total"}>{hidden ? "?" : props.entry.total_value.toString()}</div>
+            {props.entry.is_hidden && ownRoll ? (
+                <button
+                    className={"hide-toggle"}
+                    onClick={() => {
+                        setHidden(!hidden);
+                    }}
+                >
+                    {hidden ? "unhide" : "hide"}
+                </button>
+            ) : null}
         </li>
     );
 };

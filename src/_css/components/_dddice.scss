@@ -681,6 +681,15 @@
             font-size: 0.8rem;
         }
 
+        .hide-toggle {
+            grid-row: 1;
+            grid-column: 1;
+            justify-self: flex-start;
+            padding: 0 2px;
+            width: min-content;
+            height: min-content;
+        }
+
         .roll-context {
             grid-area: context;
             max-width: 250px;

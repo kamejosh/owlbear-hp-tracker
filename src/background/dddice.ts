@@ -112,7 +112,7 @@ export const setupDddice = async () => {
         try {
             if (event.type === "message") {
                 if (event.data.type === "roll:finished") {
-                    await rollerCallback(event.data.roll, rollLogStore.getState().addRoll, true);
+                    await rollerCallback(event.data.roll, rollLogStore.getState().addRoll);
                 }
                 if (event.data.type === "dddice.loaded") {
                     diceRollerStore.getState().setDddiceExtensionLoaded(true);

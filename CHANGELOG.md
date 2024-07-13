@@ -7,6 +7,7 @@
 + Fix issue when minimizing statblock popover
 + Give statblocks of owned tokens a border in the player color
 + make statblock name sticky
++ Fix HP Tracker showing hidden rolls from dddice
 
 # 2.2.1
 

@@ -183,14 +183,16 @@ export const handleNewRoll = async (addRoll: (entry: RollLogEntryType) => void, 
     }, 7500);
 };
 
-export const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => void, show: boolean = false) => {
-    // we only handle new rolls dddice extension is not loaded or the function is called directly from the dddice callback (show = true)
-    if (!diceRollerStore.getState().dddiceExtensionLoaded || show) {
-        const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
+export const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => void) => {
+    const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
 
-        const rollLogEntry = await dddiceRollToRollLog(e, { participant: participant });
+    const rollLogEntry = await dddiceRollToRollLog(e, { participant: participant });
 
+    // we only handle new rolls dddice extension is not loaded
+    if (!diceRollerStore.getState().dddiceExtensionLoaded) {
         await handleNewRoll(addRoll, rollLogEntry);
+    } else {
+        addRoll(rollLogEntry);
     }
 };
 
@@ -332,6 +334,7 @@ export const localRoll = async (
             created_at: new Date().toISOString(),
             equation: diceEquation,
             label: label,
+            is_hidden: false,
             total_value: roll.total.toString(),
             username: statblock ?? name,
             values: [roll.output.substring(roll.output.indexOf(":") + 1, roll.output.indexOf("=") - 1)],

@@ -10,6 +10,7 @@ export type RollLogEntryType = {
     created_at: string;
     equation: string;
     label?: string;
+    is_hidden: boolean;
     total_value: string | Array<string | IRollValueImage>;
     username: string;
     owlbear_user_id?: string;
