@@ -7,22 +7,21 @@ import { updateRoomMetadataDiceUser, validateTheme } from "../../../helper/diceH
 import OBR from "@owlbear-rodeo/sdk";
 import { getRoomDiceUser } from "../../../helper/helpers.ts";
 import { diceTrayModal } from "../../../helper/variables.ts";
-import { useListThemes } from "../../../api/dddiceApi.ts";
 import { Select } from "../Select.tsx";
 
 export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean) => void }) => {
     const room = useMetadataContext((state) => state.room);
-    const { rollerApi, initialized, theme, setTheme } = useDiceRoller();
+    const [rollerApi, initialized, theme, setTheme, themes] = useDiceRoller((state) => [
+        state.rollerApi,
+        state.initialized,
+        state.theme,
+        state.setTheme,
+        state.themes,
+    ]);
     const playerContext = usePlayerContext();
     const [validTheme, setValidTheme] = useState<boolean>(true);
     const [searching, setSearching] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-
-    const themesQuery = useListThemes(getRoomDiceUser(room, playerContext.id)?.apiKey ?? "");
-
-    const themes: Array<ITheme> = themesQuery.isSuccess
-        ? themesQuery.data.data.filter((t: ITheme) => validateTheme(t))
-        : [];
 
     const findAndSetTheme = async (searchTheme: string, input?: HTMLInputElement) => {
         try {

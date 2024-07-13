@@ -6,7 +6,19 @@ import { D10 } from "../components/svgs/dice/D10.tsx";
 import { D12 } from "../components/svgs/dice/D12.tsx";
 import { D20 } from "../components/svgs/dice/D20.tsx";
 
-export const getDiceImage = (theme: ITheme, die: IDiceRoll, index: number) => {
+export const getDiceImage = (
+    theme: ITheme,
+    die: IDiceRoll,
+    index: number,
+    customTheme?: string,
+    themes?: Array<ITheme>
+) => {
+    if (customTheme && themes) {
+        const t = themes.find((th) => th.id === customTheme);
+        if (t) {
+            theme = t;
+        }
+    }
     const themeDie = theme.available_dice.find(
         (d) => d.hasOwnProperty("type") && (d as IAvailableDie).type === die.type
     );

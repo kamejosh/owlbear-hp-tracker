@@ -1,12 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
 
 const dddiceUrl = "https://dddice.com/api/1.0";
 
-const listThemes = async (apikey: string) => {
+const listThemes = async (apikey: string, url?: string) => {
     return axios
         .request({
-            url: `${dddiceUrl}/dice-box`,
+            url: url ?? `${dddiceUrl}/dice-box`,
             headers: {
                 Authorization: `Bearer ${apikey}`,
                 "Content-Type": "application/json",
@@ -22,10 +22,14 @@ const listThemes = async (apikey: string) => {
 };
 
 export const useListThemes = (apikey: string) => {
-    return useQuery({
+    return useInfiniteQuery({
         queryKey: ["themes"],
-        queryFn: async () => {
-            return await listThemes(apikey);
+        queryFn: async ({ pageParam }) => {
+            return await listThemes(apikey, pageParam);
+        },
+        initialPageParam: `${dddiceUrl}/dice-box`,
+        getNextPageParam: (lastPage) => {
+            return lastPage.links.next;
         },
         enabled: apikey !== "",
     });

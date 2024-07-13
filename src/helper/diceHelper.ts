@@ -8,6 +8,7 @@ import {
     IDieType,
     IRoll,
     IRoom,
+    IRoomParticipant,
     ITheme,
     IUser,
     Operator,
@@ -20,6 +21,7 @@ import { rollLogPopover, rollLogPopoverId, rollMessageChannel } from "./variable
 import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 import { v4 } from "uuid";
 import { diceRollerStore } from "../context/DDDiceContext.tsx";
+import { CustomDieNotation, diceButtonsStore } from "../context/DiceButtonContext.tsx";
 
 let rollLogTimeOut: number;
 
@@ -162,6 +164,10 @@ export const prepareRoomUser = async (diceRoom: IRoom, rollerApi: ThreeDDiceAPI)
     const participant = await getDiceParticipant(rollerApi, diceRoom.slug);
     const name = await OBR.player.getName();
 
+    if (participant) {
+        setCustomDiceButtons(participant);
+    }
+
     if (participant && participant.username !== name) {
         await rollerApi.room.updateParticipant(diceRoom.slug, participant.id, {
             username: name,
@@ -202,6 +208,26 @@ export const addRollerApiCallbacks = async (roller: ThreeDDiceAPI, addRoll: (ent
 
 export const removeRollerApiCallbacks = async () => {
     // TODO: dddice sdk does not provide this function yet
+};
+
+const setCustomDiceButtons = (participant: IRoomParticipant) => {
+    const validDice = ["d2", "d4", "d6", "d8", "d10", "d12", "d16", "d20"];
+    const diceButtons = diceButtonsStore.getState().buttons;
+    let count = 1;
+    participant.dice_tray.forEach((dice_array) => {
+        dice_array.forEach((d) => {
+            if (count <= 8) {
+                // @ts-ignore
+                const currentCustomDice: CustomDieNotation = diceButtons[count.toString()];
+                if (d && validDice.includes(d.dieType) && currentCustomDice === null) {
+                    // @ts-ignore
+                    diceButtons[count.toString()] = { dice: `1${d.dieType}`, theme: d.theme };
+                    count++;
+                }
+            }
+        });
+    });
+    diceButtonsStore.getState().setButtons(diceButtons);
 };
 
 export const dddiceApiLogin = async (room: RoomMetadata | null) => {
