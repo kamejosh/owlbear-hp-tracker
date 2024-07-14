@@ -1,5 +1,4 @@
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
-import { ITheme } from "dddice-js";
 import { useEffect, useState } from "react";
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
@@ -8,6 +7,7 @@ import OBR from "@owlbear-rodeo/sdk";
 import { getRoomDiceUser } from "../../../helper/helpers.ts";
 import { diceTrayModal } from "../../../helper/variables.ts";
 import { Select } from "../Select.tsx";
+import { getThemePreview } from "../../../helper/previewHelpers.tsx";
 
 export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean) => void }) => {
     const room = useMetadataContext((state) => state.room);
@@ -76,17 +76,6 @@ export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean)
             }, 5000);
         }
     }, [error]);
-
-    const getThemePreview = (t: ITheme) => {
-        if (t?.preview) {
-            if (Object.keys(t.preview).includes("d20")) {
-                return <img className={"theme-preview"} src={t.preview.d20} alt={"d20 theme preview"} />;
-            } else if (Object.keys(t.preview).length > 0) {
-                return <img className={"theme-preview"} src={Object.values(t.preview).pop()} alt={"theme preview"} />;
-            }
-        }
-        return <img className={"theme-preview"} src={""} alt={"no preview available"} />;
-    };
 
     return (
         <div className={"dice-settings"}>

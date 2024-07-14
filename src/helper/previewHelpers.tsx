@@ -54,3 +54,14 @@ export const getSvgForDiceType = (diceType: string) => {
         return <D20 />;
     }
 };
+
+export const getThemePreview = (t: ITheme) => {
+    if (t?.preview) {
+        if (Object.keys(t.preview).includes("d20")) {
+            return <img className={"theme-preview"} src={t.preview.d20} alt={"d20 theme preview"} />;
+        } else if (Object.keys(t.preview).length > 0) {
+            return <img className={"theme-preview"} src={Object.values(t.preview).pop()} alt={"theme preview"} />;
+        }
+    }
+    return <img className={"theme-preview"} src={""} alt={"no preview available"} />;
+};
