@@ -11,7 +11,7 @@ export const getDiceImage = (
     die: IDiceRoll,
     index: number,
     customTheme?: string,
-    themes?: Array<ITheme>
+    themes?: Array<ITheme> | null
 ) => {
     if (customTheme && themes) {
         const t = themes.find((th) => th.id === customTheme);

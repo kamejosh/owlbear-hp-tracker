@@ -12,6 +12,7 @@ import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 import { getDiceImage, getSvgForDiceType, getThemePreview } from "../../../helper/previewHelpers.tsx";
 import { Select } from "../Select.tsx";
+import { isNull } from "lodash";
 
 type DiceRoomButtonsProps = {
     open: boolean;
@@ -60,9 +61,11 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
     }, [theme]);
 
     const setCustomTheme = (themeId: string) => {
-        const tempT = themes.find((t) => t.id === themeId);
-        if (tempT) {
-            setCurrentCustomTheme(tempT);
+        if (!isNull(themes)) {
+            const tempT = themes.find((t) => t.id === themeId);
+            if (tempT) {
+                setCurrentCustomTheme(tempT);
+            }
         }
     };
 
@@ -185,9 +188,13 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                 <div className={"add-custom-dice"}>
                     <div className={`setting dice-theme valid searching`}>
                         <Select
-                            options={themes.map((t) => {
-                                return { value: t.id, name: t.name || t.id, icon: getThemePreview(t) };
-                            })}
+                            options={
+                                !isNull(themes)
+                                    ? themes.map((t) => {
+                                          return { value: t.id, name: t.name || t.id, icon: getThemePreview(t) };
+                                      })
+                                    : []
+                            }
                             current={{
                                 value: currentCustomTheme?.id || theme?.id || "",
                                 name: currentCustomTheme?.name || theme?.name || "",
