@@ -27,6 +27,7 @@
   + [Login into dddice](#login-into-dddice)
   + [Dice Settings](#dice-settings)
     - [Dice Theme](#dice-theme)
+    - [dddice Room](#dddice-room)
     - [3D Rendering](#3d-rendering)
   + [Using The Dice Roller](#using-the-dice-roller)
     - [Dice Buttons in Statblocks](#dice-buttons-in-statblocks)
@@ -366,6 +367,10 @@ There are currently two settings:
 
 Each Owlbear user can chose their own dice theme (and the other users will see them roll with this theme). When logged in the dropdown menu list all compatible dice themes (theme has d4, d6, d8, d10, d12 and d20 with matching labeling) will be shown. Users can switch between those themes. Guest users only have access to the default dddice theme (bees).
 
+### dddice Room
+
+You can change the dddice room you want to use directly in this settings menu. Just select the room you want and every player will automatically join this room as well.
+
 ### 3D Rendering
 
 You can choose to use the 3D rendering of dddice, this is the default option. Should you already use the dddice owlbear extension you might want to turn HP Trackers dice rendering off to not have multiple dice showing the same thing.
@@ -415,9 +420,9 @@ To get started click on a button with the "+" sign. A text input is opened where
 
 Custom Roll Buttons are automatically assigned with dddice Dice Box presets where one dice is assigned to a free custom dice button. All already prepared custom dice buttons get no value assigned.
 
-You can also chose a different theme than the main theme for your custom dice button by selecting the theme from the theme selector
+You can also choose a different theme than the main theme for your custom dice button by selecting the theme from the theme selector
 
-
+![Custom Roll Buttons](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/custom_roll_theme.png)
 
 Once the preset has been saved the button will show up to 4 parts of the dice equations to make it easier to identify which button does what. It will also display the full dice command when hovering over the button.
 
