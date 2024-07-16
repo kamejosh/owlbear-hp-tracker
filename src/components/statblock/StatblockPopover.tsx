@@ -116,7 +116,7 @@ export const StatblockPopover = () => {
                     data={data}
                 />
             </div>
-            {!minimized ? <DiceTray classes={"statblock-dice-tray"} /> : null}
+            <DiceTray classes={`statblock-dice-tray ${minimized ? "hidden" : ""}`} />
         </ContextWrapper>
     );
 };

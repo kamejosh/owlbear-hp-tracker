@@ -125,10 +125,10 @@ export const DiceTray = (props: DiceTrayProps) => {
             }
         };
 
-        if (rollerApi) {
+        if (rollerApi && themes.length > 0) {
             initUserTheme();
         }
-    }, [rollerApi, diceThemeQuery.isSuccess, diceUser?.diceTheme]);
+    }, [rollerApi, diceThemeQuery.isSuccess, diceUser?.diceTheme, themes]);
 
     return <DiceRoom className={props.classes} />;
 };

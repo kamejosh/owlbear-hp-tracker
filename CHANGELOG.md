@@ -1,3 +1,10 @@
+# 2.3.1
+
++ Improve dddice Integration
+  + dddice dice box is automatically assigned to custom dice buttons if custom dice buttons have no value assigned
+  + custom dice buttons can now be set to use a different dice theme than the main dice theme
+  + you can now switch dddice rooms directly from the Dice Settings
+
 # 2.3.0
 
 + Add limited abilities to custom statblocks: [video](https://www.youtube.com/watch?v=injiQlxv5Fc)
