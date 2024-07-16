@@ -10,7 +10,7 @@ export type DiceRoller = {
     setInitialized: (initialized: boolean) => void;
     theme: ITheme | null;
     setTheme: (theme: ITheme | null) => void;
-    themes: Array<ITheme>;
+    themes: Array<ITheme> | null;
     setThemes: (themes: Array<ITheme>) => void;
     rooms: Array<IRoom>;
     setRooms: (rooms: Array<IRoom>) => void;
@@ -39,7 +39,7 @@ export const diceRollerStore = createStore<DiceRoller>()((set) => ({
             }
             return state;
         }),
-    themes: [],
+    themes: null,
     setThemes: (themes) =>
         set(() => {
             return { themes: themes };

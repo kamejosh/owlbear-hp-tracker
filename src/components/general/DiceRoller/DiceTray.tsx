@@ -9,6 +9,7 @@ import { DiceUser } from "../../../helper/types.ts";
 import { getRoomDiceUser } from "../../../helper/helpers.ts";
 import { useListThemes } from "../../../api/dddiceApi.ts";
 import OBR from "@owlbear-rodeo/sdk";
+import { isNull } from "lodash";
 
 type DiceTrayProps = {
     classes: string;
@@ -92,7 +93,7 @@ export const DiceTray = (props: DiceTrayProps) => {
 
     useEffect(() => {
         const resetDiceTheme = async () => {
-            if (themes.length > 0) {
+            if (!isNull(themes) && themes.length > 0) {
                 setTheme(themes[0]);
                 if (room) {
                     await updateRoomMetadataDiceUser(room, OBR.player.id, { diceTheme: themes[0].id });
@@ -110,7 +111,7 @@ export const DiceTray = (props: DiceTrayProps) => {
         const initUserTheme = async () => {
             if (!theme) {
                 const themeId = room?.diceUser?.find((user) => user.playerId === playerContext.id)?.diceTheme;
-                if (themeId && themes.map((t) => t.id).includes(themeId)) {
+                if (themeId && !isNull(themes) && themes.map((t) => t.id).includes(themeId)) {
                     const newTheme = (await rollerApi?.theme.get(themeId))?.data;
                     if (newTheme) {
                         setTheme(newTheme);
@@ -119,13 +120,13 @@ export const DiceTray = (props: DiceTrayProps) => {
                     await resetDiceTheme();
                 }
             } else {
-                if (!themes.includes(theme)) {
+                if (!isNull(themes) && !themes.includes(theme)) {
                     await resetDiceTheme();
                 }
             }
         };
 
-        if (rollerApi && themes.length > 0) {
+        if (rollerApi && !isNull(themes)) {
             initUserTheme();
         }
     }, [rollerApi, diceThemeQuery.isSuccess, diceUser?.diceTheme, themes]);

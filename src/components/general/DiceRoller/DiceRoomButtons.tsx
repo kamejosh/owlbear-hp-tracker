@@ -55,6 +55,10 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
         }
     }, [props.customDice]);
 
+    useEffect(() => {
+        setCurrentCustomTheme(theme);
+    }, [theme]);
+
     const setCustomTheme = (themeId: string) => {
         const tempT = themes.find((t) => t.id === themeId);
         if (tempT) {

@@ -15,6 +15,7 @@ import { Select } from "../Select.tsx";
 import { getThemePreview } from "../../../helper/previewHelpers.tsx";
 import { IRoom } from "dddice-js";
 import { Loader } from "../Loader.tsx";
+import { isNull } from "lodash";
 
 export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean) => void }) => {
     const room = useMetadataContext((state) => state.room);
@@ -113,9 +114,13 @@ export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean)
                 <span className={"setting-name"}>dice theme:</span>
                 {theme ? (
                     <Select
-                        options={themes.map((t) => {
-                            return { value: t.id, name: t.name || t.id, icon: getThemePreview(t) };
-                        })}
+                        options={
+                            !isNull(themes)
+                                ? themes.map((t) => {
+                                      return { value: t.id, name: t.name || t.id, icon: getThemePreview(t) };
+                                  })
+                                : []
+                        }
                         current={{
                             value: theme.id,
                             name: theme.name!,
