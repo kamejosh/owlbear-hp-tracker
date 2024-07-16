@@ -9,29 +9,40 @@ import { DiceUser } from "../../../helper/types.ts";
 import { getRoomDiceUser } from "../../../helper/helpers.ts";
 import { useListThemes } from "../../../api/dddiceApi.ts";
 import OBR from "@owlbear-rodeo/sdk";
+import { isNull } from "lodash";
 
 type DiceTrayProps = {
     classes: string;
 };
 
 export const DiceTray = (props: DiceTrayProps) => {
-    const [rollerApi, setRollerApi, setInitialized, theme, setTheme] = useDiceRoller((state) => [
+    const [rollerApi, setRollerApi, setInitialized, theme, setTheme, themes, setThemes] = useDiceRoller((state) => [
         state.rollerApi,
         state.setRollerApi,
         state.setInitialized,
         state.theme,
         state.setTheme,
+        state.themes,
+        state.setThemes,
     ]);
     const playerContext = usePlayerContext();
     const room = useMetadataContext((state) => state.room);
     const [diceUser, setDiceUser] = useState<DiceUser>();
     const [apiKey, setApiKey] = useState<string>();
+    const [roomSlug, setRoomSlug] = useState<string>();
 
     const diceThemeQuery = useListThemes(diceUser?.apiKey || "");
 
-    const diceThemes: Array<ITheme> = diceThemeQuery.isSuccess
-        ? diceThemeQuery.data.data.filter((t: ITheme) => validateTheme(t))
-        : [];
+    useEffect(() => {
+        if (diceThemeQuery.hasNextPage) {
+            diceThemeQuery.fetchNextPage();
+        } else if (diceThemeQuery.isSuccess) {
+            const diceThemes: Array<ITheme> = diceThemeQuery.isSuccess
+                ? diceThemeQuery.data.pages.flatMap((theme) => theme.data).filter((t: ITheme) => validateTheme(t))
+                : [];
+            setThemes(diceThemes);
+        }
+    }, [diceThemeQuery.hasNextPage]);
 
     useEffect(() => {
         const newDiceUser = getRoomDiceUser(room, playerContext.id);
@@ -56,8 +67,9 @@ export const DiceTray = (props: DiceTrayProps) => {
         const initDice = async () => {
             let api: ThreeDDiceAPI | undefined;
             setInitialized(false);
-            if (diceUser?.apiKey !== apiKey && diceUser?.apiKey !== undefined) {
+            if ((diceUser?.apiKey !== apiKey && diceUser?.apiKey !== undefined) || room?.diceRoom?.slug !== roomSlug) {
                 setApiKey(diceUser?.apiKey);
+                setRoomSlug(room?.diceRoom?.slug);
                 api = await dddiceApiLogin(room);
                 if (api) {
                     setRollerApi(api);
@@ -67,19 +79,24 @@ export const DiceTray = (props: DiceTrayProps) => {
             setInitialized(true);
         };
 
-        if ((diceUser && diceUser.apiKey !== undefined) || !diceUser) {
+        if (
+            (diceUser && diceUser.apiKey !== undefined) ||
+            !diceUser ||
+            !roomSlug ||
+            (roomSlug && room?.diceRoom?.slug !== roomSlug)
+        ) {
             if (!room?.disableDiceRoller && diceUser?.apiKey) {
                 initDice();
             }
         }
-    }, [diceUser, room?.disableDiceRoller]);
+    }, [diceUser, room?.disableDiceRoller, room?.diceRoom?.slug]);
 
     useEffect(() => {
         const resetDiceTheme = async () => {
-            if (diceThemes.length > 0) {
-                setTheme(diceThemes[0]);
+            if (!isNull(themes) && themes.length > 0) {
+                setTheme(themes[0]);
                 if (room) {
-                    await updateRoomMetadataDiceUser(room, OBR.player.id, { diceTheme: diceThemes[0].id });
+                    await updateRoomMetadataDiceUser(room, OBR.player.id, { diceTheme: themes[0].id });
                 }
             } else {
                 const newTheme = (await rollerApi?.theme.get("dddice-bees"))?.data;
@@ -94,7 +111,7 @@ export const DiceTray = (props: DiceTrayProps) => {
         const initUserTheme = async () => {
             if (!theme) {
                 const themeId = room?.diceUser?.find((user) => user.playerId === playerContext.id)?.diceTheme;
-                if (themeId && diceThemes.map((t) => t.id).includes(themeId)) {
+                if (themeId && !isNull(themes) && themes.map((t) => t.id).includes(themeId)) {
                     const newTheme = (await rollerApi?.theme.get(themeId))?.data;
                     if (newTheme) {
                         setTheme(newTheme);
@@ -103,16 +120,16 @@ export const DiceTray = (props: DiceTrayProps) => {
                     await resetDiceTheme();
                 }
             } else {
-                if (!diceThemes.includes(theme)) {
+                if (!isNull(themes) && !themes.includes(theme)) {
                     await resetDiceTheme();
                 }
             }
         };
 
-        if (rollerApi) {
+        if (rollerApi && !isNull(themes)) {
             initUserTheme();
         }
-    }, [rollerApi, diceThemeQuery.isSuccess, diceUser?.diceTheme]);
+    }, [rollerApi, diceThemeQuery.isSuccess, diceUser?.diceTheme, themes]);
 
     return <DiceRoom className={props.classes} />;
 };

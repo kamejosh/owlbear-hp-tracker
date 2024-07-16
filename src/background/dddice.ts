@@ -16,7 +16,7 @@ import { RollLogEntryType, rollLogStore } from "../context/RollLogContext.tsx";
 import { diceRollerStore } from "../context/DDDiceContext.tsx";
 
 const lock = new AsyncLock();
-const diceRollerState: { diceUser: DiceUser | null; disableDiceRoller: boolean } = {
+const diceRollerState: { diceUser: DiceUser | null; disableDiceRoller: boolean; diceRoom?: string } = {
     diceUser: null,
     disableDiceRoller: false,
 };
@@ -36,6 +36,7 @@ const initDice = async (room: RoomMetadata, updateApi: boolean) => {
     }
 
     if (diceRollerState.diceUser?.diceRendering && !diceRollerStore.getState().dddiceExtensionLoaded) {
+        await OBR.modal.close(diceTrayModalId);
         await OBR.modal.open({
             ...diceTrayModal,
             url: `https://dddice.com/room/${room.diceRoom!.slug}/stream?key=${diceRollerState.diceUser.apiKey}`,
@@ -64,12 +65,13 @@ const roomCallback = async (metadata: Metadata, forceLogin: boolean) => {
     lock.enable();
     const roomData = metadataKey in metadata ? (metadata[metadataKey] as RoomMetadata) : null;
     let initialized: boolean = false;
-    let reInitialize: boolean = diceRollerState.disableDiceRoller !== roomData?.disableDiceRoller;
+    let reInitialize: boolean =
+        diceRollerState.disableDiceRoller !== roomData?.disableDiceRoller ||
+        diceRollerState.diceRoom !== roomData?.diceRoom?.slug;
     reInitialize =
         reInitialize ||
         diceRollerState.diceUser?.diceRendering !== getRoomDiceUser(roomData, OBR.player.id)?.diceRendering;
     diceRollerState.disableDiceRoller = roomData?.disableDiceRoller === undefined ? false : roomData.disableDiceRoller;
-
     if (roomData && (!roomData.disableDiceRoller || reInitialize)) {
         const newDiceUser = getRoomDiceUser(roomData, OBR.player.id);
         if (newDiceUser) {
@@ -92,8 +94,10 @@ const roomCallback = async (metadata: Metadata, forceLogin: boolean) => {
             }
         }
         if (reInitialize || !initialized) {
-            await initDiceRoller(roomData, forceLogin || false);
+            await initDiceRoller(roomData, forceLogin || diceRollerState.diceRoom !== roomData.diceRoom?.slug);
         }
+
+        diceRollerState.diceRoom = roomData.diceRoom?.slug;
     }
     lock.disable(null);
 };

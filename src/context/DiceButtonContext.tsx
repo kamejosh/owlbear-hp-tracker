@@ -1,17 +1,23 @@
-import { create, StateCreator } from "zustand";
+import { StateCreator, useStore } from "zustand";
 import { persist } from "zustand/middleware";
 import { ID } from "../helper/variables.ts";
 import { withStorageDOMEvents } from "../helper/hooks.ts";
+import { createStore } from "zustand/vanilla";
+
+export type CustomDieNotation = {
+    dice: string;
+    theme?: string;
+};
 
 export type DiceButtonsType = {
-    1: string | null;
-    2: string | null;
-    3: string | null;
-    4: string | null;
-    5: string | null;
-    6: string | null;
-    7: string | null;
-    8: string | null;
+    1: CustomDieNotation | null;
+    2: CustomDieNotation | null;
+    3: CustomDieNotation | null;
+    4: CustomDieNotation | null;
+    5: CustomDieNotation | null;
+    6: CustomDieNotation | null;
+    7: CustomDieNotation | null;
+    8: CustomDieNotation | null;
 };
 
 export type DiceButtonsContextType = {
@@ -26,10 +32,16 @@ const dicebuttonsSlice: StateCreator<DiceButtonsContextType, [["zustand/persist"
             return { buttons: { ...state.buttons, ...button } };
         }),
 });
-export const useDiceButtonsContext = create<DiceButtonsContextType>()(
+export const diceButtonsStore = createStore<DiceButtonsContextType>()(
     persist(dicebuttonsSlice, {
         name: `${ID}.dice-buttons`,
     })
 );
 
-withStorageDOMEvents(useDiceButtonsContext);
+export function useDiceButtonsContext(): DiceButtonsContextType;
+export function useDiceButtonsContext<T>(selector: (state: DiceButtonsContextType) => T): T;
+export function useDiceButtonsContext<T>(selector?: (state: DiceButtonsContextType) => T) {
+    return useStore(diceButtonsStore, selector!);
+}
+
+withStorageDOMEvents(diceButtonsStore);

@@ -1,5 +1,5 @@
 import { createStore } from "zustand/vanilla";
-import { ITheme, ThreeDDice, ThreeDDiceAPI } from "dddice-js";
+import { IRoom, ITheme, ThreeDDice, ThreeDDiceAPI } from "dddice-js";
 import { useStore } from "zustand";
 
 export type DiceRoller = {
@@ -10,6 +10,12 @@ export type DiceRoller = {
     setInitialized: (initialized: boolean) => void;
     theme: ITheme | null;
     setTheme: (theme: ITheme | null) => void;
+    themes: Array<ITheme> | null;
+    setThemes: (themes: Array<ITheme>) => void;
+    rooms: Array<IRoom>;
+    setRooms: (rooms: Array<IRoom>) => void;
+    room: IRoom | null;
+    setRoom: (room: IRoom) => void;
     dddiceExtensionLoaded: boolean;
     setDddiceExtensionLoaded: (dddiceExtensionLoaded: boolean) => void;
 };
@@ -17,7 +23,10 @@ export type DiceRoller = {
 export const diceRollerStore = createStore<DiceRoller>()((set) => ({
     roller: new ThreeDDice(),
     rollerApi: null,
-    setRollerApi: (api) => set(() => ({ rollerApi: api })),
+    setRollerApi: (api) =>
+        set(() => {
+            return { rollerApi: api };
+        }),
     initialized: false,
     setInitialized: (initialized: boolean) => set(() => ({ initialized: initialized })),
     theme: null,
@@ -29,6 +38,21 @@ export const diceRollerStore = createStore<DiceRoller>()((set) => ({
                 };
             }
             return state;
+        }),
+    themes: null,
+    setThemes: (themes) =>
+        set(() => {
+            return { themes: themes };
+        }),
+    rooms: [],
+    setRooms: (rooms) =>
+        set(() => {
+            return { rooms: rooms };
+        }),
+    room: null,
+    setRoom: (room) =>
+        set(() => {
+            return { room: room };
         }),
     dddiceExtensionLoaded: false,
     setDddiceExtensionLoaded: (dddiceExtensionLoaded) => set(() => ({ dddiceExtensionLoaded: dddiceExtensionLoaded })),

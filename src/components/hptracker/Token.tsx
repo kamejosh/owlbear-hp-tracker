@@ -538,7 +538,7 @@ export const Token = (props: TokenProps) => {
                             handleValueChange(newData);
                         }}
                     >
-                        SELF
+                        HIDE
                     </button>
                 </div>
             </div>

@@ -6,11 +6,16 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    z-index: 4;
     width: 100svw;
     max-height: calc(100vh - 5rem);
 
     &.statblock-dice-tray {
         max-height: calc(100vh - (70px + 1rem));
+    }
+
+    &.hidden {
+        display: none;
     }
 
     &.open {
@@ -44,9 +49,13 @@
                 order: 1;
             }
 
-            &:hover,
-            &:focus-visible {
-                height: 35px;
+            &:not(.has-dice) {
+                &:not(:has(.open)) {
+                    &:hover,
+                    &:focus-visible {
+                        height: 35px;
+                    }
+                }
             }
 
             &.has-dice {
@@ -147,22 +156,76 @@
                 position: absolute;
                 top: 0;
                 left: 50%;
+                flex-direction: column;
+                align-items: center;
+                gap: 2px;
                 translate: -50% -100%;
                 z-index: 100;
 
-                .success {
-                    border-color: var(--success-border);
-                    background-color: rgb(var(--success-bg));
+                .dice-equation {
+                    display: flex;
+
+                    .success {
+                        border-color: var(--success-border);
+                        background-color: rgb(var(--success-bg));
+                    }
+
+                    .error {
+                        border-color: var(--error-border);
+                        background-color: rgb(var(--error-bg));
+                    }
+
+                    .save-custom-dice {
+                        &:disabled {
+                            cursor: default;
+                        }
+                    }
                 }
 
-                .error {
-                    border-color: var(--error-border);
-                    background-color: rgb(var(--error-bg));
-                }
+                .dice-theme {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 1ch;
+                    max-width: 180px;
+                    white-space: nowrap;
 
-                .save-custom-dice {
-                    &:disabled {
-                        cursor: default;
+                    .select {
+                        width: 100%;
+                        overflow: hidden;
+
+                        .select-current {
+                            max-width: 178px;
+
+                            .current {
+                                width: 100%;
+                                overflow: hidden;
+
+                                span {
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                }
+                            }
+                        }
+
+                        .height-wrapper {
+                            width: 100%;
+
+                            .options-wrapper {
+                                max-width: 178px;
+                            }
+                        }
+
+                        .expand-wrapper {
+                            .expand {
+                                box-shadow: none;
+                                border: none;
+
+                                &::after {
+                                    width: 20px;
+                                    height: 20px;
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -262,8 +325,10 @@
                     flex-direction: column;
                     translate: -50% -100%;
                     visibility: visible;
+                    z-index: 2;
                     box-shadow: 0 0 20px var(--button-shadow);
-                    background-color: rgba(16, 16, 16, 0.3);
+                    border-radius: 5px;
+                    background-color: rgba(16, 16, 16, 0.8);
                 }
 
                 .quick-custom-roll {
@@ -335,6 +400,7 @@
     .dice-tray-wrapper {
         display: grid;
         grid-template-rows: 0fr;
+        z-index: 3;
         transition: all 0.25s ease-in-out;
         box-shadow: 0 -15px 25px #1b1b1b;
         background: linear-gradient(-45deg, var(--bg1), var(--bg2), var(--bg3), var(--bg4));
@@ -449,6 +515,30 @@
                 }
             }
 
+            &.dice-room-select {
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+
+                &:has(.room-loader) {
+                    justify-content: flex-start;
+                }
+
+                .select {
+                    width: 100%;
+                }
+
+                .room-loader {
+                    width: 20px;
+                    height: 20px;
+
+                    svg {
+                        width: 20px;
+                        height: 20px;
+                    }
+                }
+            }
+
             &.dice-theme {
                 align-items: flex-start;
 
@@ -465,131 +555,22 @@
                     }
                 }
 
-                .select {
-                    display: grid;
-                    grid-template-areas: "all";
+                .theme-loader {
+                    width: 20px;
+                    height: 20px;
 
-                    img {
-                        width: 35px;
-                        height: 35px;
-                        object-fit: cover;
+                    svg {
+                        width: 20px;
+                        height: 20px;
                     }
+                }
+            }
 
-                    &.open {
-                        .select-current {
-                            opacity: 0;
-                            z-index: -10;
-                        }
-                        .height-wrapper {
-                            grid-template-rows: 1fr;
-                            opacity: 1;
-                            z-index: 10;
-                        }
-                    }
-
-                    &.close {
-                        .select-current {
-                            opacity: 1;
-                            z-index: 10;
-                        }
-                        .height-wrapper {
-                            opacity: 0;
-                            z-index: -10;
-                        }
-                    }
-
-                    .expand-wrapper {
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        transition: all 0.25s ease;
-                        cursor: pointer;
-                        background-color: #ffffff22;
-                        width: 30px;
-
-                        &:hover {
-                            background-color: #ffffff55;
-                        }
-
-                        .expand {
-                            rotate: 90deg;
-                            border: none;
-                            background: transparent;
-                        }
-                    }
-
-                    .select-current {
-                        display: flex;
-                        grid-area: all;
-                        justify-content: space-between;
-                        gap: 1ch;
-                        transition: opacity 0.25s linear;
-                        border: 1px solid white;
-                        border-radius: 5px;
-                        background-color: #00000033;
-                        width: calc(100% - 2px);
-
-                        .current {
-                            display: flex;
-                            align-items: center;
-                            gap: 1ch;
-                            cursor: pointer;
-                            border-radius: 5px;
-                            padding: 2px 10px;
-                        }
-                    }
-
-                    .height-wrapper {
-                        display: grid;
-                        grid-template-rows: 0fr;
-                        grid-area: all;
-                        transition: all 0.25s linear;
-                        width: min-content;
-                        overflow: hidden;
-
-                        .options-wrapper {
-                            display: flex;
-                            justify-content: space-between;
-                            border: 1px solid white;
-                            border-radius: 5px;
-                            background-color: #00000033;
-                            width: min-content;
-                            min-height: 0;
-
-                            .select-options {
-                                display: flex;
-                                flex-direction: column;
-                                gap: 2px;
-                                max-height: 240px;
-                                overflow-x: hidden;
-                                overflow-y: auto;
-
-                                .select-option {
-                                    display: flex;
-                                    align-items: center;
-                                    gap: 1ch;
-                                    cursor: pointer;
-                                    border-radius: 5px;
-                                    padding: 2px 10px;
-                                    max-width: 200px;
-                                    min-height: 40px;
-
-                                    .name {
-                                        overflow: hidden;
-                                        text-overflow: ellipsis;
-                                    }
-
-                                    &.current {
-                                        background-color: #000000;
-                                    }
-                                }
-                            }
-
-                            .expand {
-                                rotate: -90deg;
-                            }
-                        }
-                    }
+            &.dice-room-select,
+            &.dice-theme {
+                .setting-name {
+                    flex-shrink: 0;
+                    width: 100px;
                 }
             }
         }
@@ -870,5 +851,132 @@
     .username,
     .roll-log-context {
         max-width: 175px;
+    }
+}
+
+.select {
+    display: grid;
+    grid-template-areas: "all";
+
+    img {
+        width: 35px;
+        height: 35px;
+        object-fit: cover;
+    }
+
+    &.open {
+        .select-current {
+            opacity: 0;
+            z-index: -10;
+        }
+        .height-wrapper {
+            grid-template-rows: 1fr;
+            opacity: 1;
+            z-index: 10;
+        }
+    }
+
+    &.close {
+        .select-current {
+            opacity: 1;
+            z-index: 10;
+        }
+        .height-wrapper {
+            opacity: 0;
+            z-index: -10;
+        }
+    }
+
+    .expand-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: all 0.25s ease;
+        cursor: pointer;
+        background-color: #ffffff22;
+        width: 30px;
+
+        &:hover {
+            background-color: #ffffff55;
+        }
+
+        .expand {
+            rotate: 90deg;
+            border: none;
+            background: transparent;
+        }
+    }
+
+    .select-current {
+        display: flex;
+        grid-area: all;
+        justify-content: space-between;
+        gap: 1ch;
+        transition: opacity 0.25s linear;
+        border: 1px solid white;
+        border-radius: 5px;
+        background-color: #00000033;
+        width: calc(100% - 2px);
+
+        .current {
+            display: flex;
+            align-items: center;
+            gap: 1ch;
+            cursor: pointer;
+            border-radius: 5px;
+            padding: 2px 10px;
+        }
+    }
+
+    .height-wrapper {
+        display: grid;
+        grid-template-rows: 0fr;
+        grid-area: all;
+        transition: all 0.25s linear;
+        width: min-content;
+        overflow: hidden;
+
+        .options-wrapper {
+            display: flex;
+            justify-content: space-between;
+            border: 1px solid white;
+            border-radius: 5px;
+            background-color: #00000033;
+            width: min-content;
+            min-height: 0;
+
+            .select-options {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+                max-height: 240px;
+                overflow-x: hidden;
+                overflow-y: auto;
+
+                .select-option {
+                    display: flex;
+                    align-items: center;
+                    gap: 1ch;
+                    cursor: pointer;
+                    border-radius: 5px;
+                    padding: 2px 10px;
+                    max-width: 200px;
+                    min-height: 40px;
+
+                    .name {
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+
+                    &.current {
+                        background-color: #000000;
+                    }
+                }
+            }
+
+            .expand {
+                rotate: -90deg;
+            }
+        }
     }
 }

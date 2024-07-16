@@ -181,7 +181,7 @@ export const DropGroup = (props: DropGroupProps) => {
                             await setInitiative(true);
                         }}
                     >
-                        SELF
+                        HIDE
                     </button>
                 </div>
                 <button
