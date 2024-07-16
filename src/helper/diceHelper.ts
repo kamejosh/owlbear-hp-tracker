@@ -1,6 +1,6 @@
 import { RoomMetadata } from "./types.ts";
 import { dddiceRollToRollLog, updateRoomMetadata } from "./helpers.ts";
-import OBR from "@owlbear-rodeo/sdk";
+import OBR, { Metadata } from "@owlbear-rodeo/sdk";
 import {
     IAvailableDie,
     IDiceRoll,
@@ -72,13 +72,19 @@ export const updateRoomMetadataDiceUser = async (
 };
 
 export const updateRoomMetadataDiceRoom = async (room: RoomMetadata, slug: string | undefined) => {
-    await updateRoomMetadata(room, {
-        diceRoom: {
-            slug: slug,
+    // to keep in sync with dddice I save the dddice metadata as well (Approved by CelesteBloodreign)
+    const dddiceMetadata: Metadata = {};
+    dddiceMetadata["com.dddice/roomSlug"] = slug;
+    await updateRoomMetadata(
+        room,
+        {
+            diceRoom: {
+                slug: slug,
+            },
         },
-    });
+        dddiceMetadata
+    );
 };
-
 export const getDiceUser = async (rollerApi: ThreeDDiceAPI) => {
     return (await rollerApi?.user.get())?.data;
 };
