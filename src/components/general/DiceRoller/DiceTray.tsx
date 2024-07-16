@@ -28,6 +28,7 @@ export const DiceTray = (props: DiceTrayProps) => {
     const room = useMetadataContext((state) => state.room);
     const [diceUser, setDiceUser] = useState<DiceUser>();
     const [apiKey, setApiKey] = useState<string>();
+    const [roomSlug, setRoomSlug] = useState<string>();
 
     const diceThemeQuery = useListThemes(diceUser?.apiKey || "");
 
@@ -65,8 +66,9 @@ export const DiceTray = (props: DiceTrayProps) => {
         const initDice = async () => {
             let api: ThreeDDiceAPI | undefined;
             setInitialized(false);
-            if (diceUser?.apiKey !== apiKey && diceUser?.apiKey !== undefined) {
+            if ((diceUser?.apiKey !== apiKey && diceUser?.apiKey !== undefined) || room?.diceRoom?.slug !== roomSlug) {
                 setApiKey(diceUser?.apiKey);
+                setRoomSlug(room?.diceRoom?.slug);
                 api = await dddiceApiLogin(room);
                 if (api) {
                     setRollerApi(api);
@@ -76,12 +78,17 @@ export const DiceTray = (props: DiceTrayProps) => {
             setInitialized(true);
         };
 
-        if ((diceUser && diceUser.apiKey !== undefined) || !diceUser) {
+        if (
+            (diceUser && diceUser.apiKey !== undefined) ||
+            !diceUser ||
+            !roomSlug ||
+            (roomSlug && room?.diceRoom?.slug !== roomSlug)
+        ) {
             if (!room?.disableDiceRoller && diceUser?.apiKey) {
                 initDice();
             }
         }
-    }, [diceUser, room?.disableDiceRoller]);
+    }, [diceUser, room?.disableDiceRoller, room?.diceRoom?.slug]);
 
     useEffect(() => {
         const resetDiceTheme = async () => {

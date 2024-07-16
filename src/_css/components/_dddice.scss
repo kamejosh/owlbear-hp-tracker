@@ -184,22 +184,41 @@
                     max-width: 180px;
                     white-space: nowrap;
 
-                    .height-wrapper {
+                    .select {
                         width: 100%;
+                        overflow: hidden;
 
-                        .options-wrapper {
+                        .select-current {
                             max-width: 178px;
+
+                            .current {
+                                width: 100%;
+                                overflow: hidden;
+
+                                span {
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                }
+                            }
                         }
-                    }
 
-                    .expand-wrapper {
-                        .expand {
-                            box-shadow: none;
-                            border: none;
+                        .height-wrapper {
+                            width: 100%;
 
-                            &::after {
-                                width: 20px;
-                                height: 20px;
+                            .options-wrapper {
+                                max-width: 178px;
+                            }
+                        }
+
+                        .expand-wrapper {
+                            .expand {
+                                box-shadow: none;
+                                border: none;
+
+                                &::after {
+                                    width: 20px;
+                                    height: 20px;
+                                }
                             }
                         }
                     }
@@ -488,6 +507,30 @@
                 }
             }
 
+            &.dice-room-select {
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+
+                &:has(.room-loader) {
+                    justify-content: flex-start;
+                }
+
+                .select {
+                    width: 100%;
+                }
+
+                .room-loader {
+                    width: 20px;
+                    height: 20px;
+
+                    svg {
+                        width: 20px;
+                        height: 20px;
+                    }
+                }
+            }
+
             &.dice-theme {
                 align-items: flex-start;
 
@@ -502,6 +545,14 @@
                     .theme-preview {
                         animation: rotating 0.3s linear infinite;
                     }
+                }
+            }
+
+            &.dice-room-select,
+            &.dice-theme {
+                .setting-name {
+                    flex-shrink: 0;
+                    width: 100px;
                 }
             }
         }

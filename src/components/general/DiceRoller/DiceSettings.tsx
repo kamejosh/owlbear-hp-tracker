@@ -2,12 +2,19 @@ import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useEffect, useState } from "react";
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
-import { updateRoomMetadataDiceUser, validateTheme } from "../../../helper/diceHelper.ts";
+import {
+    getDiceUser,
+    updateRoomMetadataDiceRoom,
+    updateRoomMetadataDiceUser,
+    validateTheme,
+} from "../../../helper/diceHelper.ts";
 import OBR from "@owlbear-rodeo/sdk";
 import { getRoomDiceUser } from "../../../helper/helpers.ts";
 import { diceTrayModal } from "../../../helper/variables.ts";
 import { Select } from "../Select.tsx";
 import { getThemePreview } from "../../../helper/previewHelpers.tsx";
+import { IRoom } from "dddice-js";
+import { Loader } from "../Loader.tsx";
 
 export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean) => void }) => {
     const room = useMetadataContext((state) => state.room);
@@ -22,6 +29,8 @@ export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean)
     const [validTheme, setValidTheme] = useState<boolean>(true);
     const [searching, setSearching] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const [rooms, setRooms] = useState<Array<IRoom>>([]);
+    const [currentRoom, setCurrentRoom] = useState<IRoom>();
 
     const findAndSetTheme = async (searchTheme: string, input?: HTMLInputElement) => {
         try {
@@ -49,7 +58,7 @@ export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean)
             if (input) {
                 input.value = theme?.id || "";
             }
-            setError("theme no found");
+            setError("theme not found");
             setValidTheme(false);
         } finally {
             setSearching(false);
@@ -64,8 +73,21 @@ export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean)
             }
         };
 
+        const initRooms = async () => {
+            const dddiceUser = await getDiceUser(rollerApi!);
+            if (dddiceUser) {
+                // @ts-ignore error in package, rooms are part of IUser
+                const rooms = dddiceUser.rooms;
+                setRooms(rooms);
+                setCurrentRoom(rooms.find((r: IRoom) => r.slug === room?.diceRoom?.slug));
+            }
+        };
+
         if (initialized) {
             initTheme();
+            if (playerContext.role === "GM") {
+                initRooms();
+            }
         }
     }, [initialized]);
 
@@ -88,20 +110,42 @@ export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean)
                 X
             </button>
             <div className={`setting dice-theme ${validTheme ? "valid" : "invalid"} ${searching ? "searching" : ""}`}>
-                dice theme:
+                <span className={"setting-name"}>dice theme:</span>
                 <Select
                     options={themes.map((t) => {
                         return { value: t.id, name: t.name || t.id, icon: getThemePreview(t) };
                     })}
                     current={{
-                        value: theme?.id || "",
-                        name: theme?.name || "",
+                        value: theme?.id || "dddice-beees",
+                        name: theme?.name || "bees",
                         icon: theme ? getThemePreview(theme) : undefined,
                     }}
                     setTheme={findAndSetTheme}
                 />
             </div>
             {error ? <span>{error}</span> : null}
+            <div className={`setting dice-room-select valid`}>
+                <span className={"setting-name"}>dice room:</span>
+                {rooms.length === 0 ? (
+                    <Loader className={"room-loader"} />
+                ) : (
+                    <Select
+                        options={rooms.map((r) => {
+                            return { value: r.slug, name: `${r.name} - ${r.slug}` };
+                        })}
+                        current={
+                            currentRoom
+                                ? { value: currentRoom.slug, name: `${currentRoom.name} - ${currentRoom.slug}` }
+                                : undefined
+                        }
+                        setTheme={async (t) => {
+                            if (room) {
+                                await updateRoomMetadataDiceRoom(room, t);
+                            }
+                        }}
+                    />
+                )}
+            </div>
             <div className={"setting dice-rendering"}>
                 <span className={"text"}>{"Render 3D Dice "}</span>
                 <input

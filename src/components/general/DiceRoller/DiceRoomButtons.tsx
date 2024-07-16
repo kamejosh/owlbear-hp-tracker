@@ -62,13 +62,6 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
         }
     };
 
-    const getCustomDiceImage = useCallback(
-        (theme: ITheme, die: IDiceRoll, index: number) => {
-            return getDiceImage(theme, die, index, props.customDice?.theme, themes);
-        },
-        [themes]
-    );
-
     const getDicePreview = useCallback(() => {
         if (props.customDice && theme && !room?.disableDiceRoller) {
             try {
@@ -77,7 +70,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                     <div className={"custom-dice-preview-wrapper"}>
                         {parsed.dice.map((die, index) => {
                             if (die.type !== "mod") {
-                                const preview = getCustomDiceImage(theme, die, index);
+                                const preview = getDiceImage(theme, die, index, props.customDice?.theme, themes);
                                 if (preview) {
                                     return preview;
                                 }
@@ -137,7 +130,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
             );
         }
         return <DiceSvg />;
-    }, [theme, props.customDice, room?.disableDiceRoller]);
+    }, [theme, props.customDice, room?.disableDiceRoller, themes, rollerApi]);
 
     const roll = async (button: HTMLButtonElement) => {
         button.classList.add("rolling");
