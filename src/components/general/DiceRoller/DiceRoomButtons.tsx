@@ -113,28 +113,32 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                 return <DiceSvg />;
             }
         } else if (props.customDice) {
-            const parsed = parseRollEquation(props.customDice.dice, props.customDice.theme ?? "dddice-bees");
-            return (
-                <div className={"custom-dice-preview-wrapper"}>
-                    {parsed.dice.map((die, index) => {
-                        if (die.type !== "mod") {
-                            return (
-                                <div key={index} className={"preview-image"}>
-                                    {getSvgForDiceType(die.type)}
-                                </div>
-                            );
-                        } else {
-                            if (die.value) {
+            try {
+                const parsed = parseRollEquation(props.customDice.dice, props.customDice.theme ?? "dddice-bees");
+                return (
+                    <div className={"custom-dice-preview-wrapper"}>
+                        {parsed.dice.map((die, index) => {
+                            if (die.type !== "mod") {
                                 return (
-                                    <span key={index} className={"modifier"}>
-                                        {Intl.NumberFormat("en-US", { signDisplay: "always" }).format(die.value)}
-                                    </span>
+                                    <div key={index} className={"preview-image"}>
+                                        {getSvgForDiceType(die.type)}
+                                    </div>
                                 );
+                            } else {
+                                if (die.value) {
+                                    return (
+                                        <span key={index} className={"modifier"}>
+                                            {Intl.NumberFormat("en-US", { signDisplay: "always" }).format(die.value)}
+                                        </span>
+                                    );
+                                }
                             }
-                        }
-                    })}
-                </div>
-            );
+                        })}
+                    </div>
+                );
+            } catch {
+                return <DiceSvg />;
+            }
         }
         return <DiceSvg />;
     }, [theme, props.customDice, room?.disableDiceRoller, themes, rollerApi]);
