@@ -11,7 +11,7 @@ import { IUser } from "dddice-js";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { updateRoomMetadata } from "../../../helper/helpers.ts";
 
-export const DiceRoom = ({ className, user }: { className?: string; user: IUser }) => {
+export const DiceRoom = ({ className, user }: { className?: string; user?: IUser }) => {
     const room = useMetadataContext((state) => state.room);
     const clear = useRollLogContext((state) => state.clear);
 
@@ -71,7 +71,7 @@ export const DiceRoom = ({ className, user }: { className?: string; user: IUser 
                                             });
                                         }}
                                     >
-                                        {user.name !== "Guest User" ? user.username : "Login"}
+                                        {user && user.name !== "Guest User" ? user.username : "Login"}
                                     </button>
                                     <div className={"room-link"}>
                                         <a href={`https://dddice.com/room/${room?.diceRoom?.slug}`} target={"_blank"}>

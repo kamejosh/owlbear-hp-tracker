@@ -161,5 +161,7 @@ export const DiceTray = (props: DiceTrayProps) => {
         }
     }, [rollerApi, diceThemeQuery.isSuccess, diceUser?.diceTheme, themes]);
 
-    return <>{dddiceUser ? <DiceRoom className={props.classes} user={dddiceUser} /> : null}</>;
+    return (
+        <>{dddiceUser || room?.disableDiceRoller ? <DiceRoom className={props.classes} user={dddiceUser} /> : null}</>
+    );
 };
