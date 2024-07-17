@@ -14,8 +14,6 @@ export type DiceRoller = {
     setThemes: (themes: Array<ITheme>) => void;
     rooms: Array<IRoom>;
     setRooms: (rooms: Array<IRoom>) => void;
-    room: IRoom | null;
-    setRoom: (room: IRoom) => void;
     dddiceExtensionLoaded: boolean;
     setDddiceExtensionLoaded: (dddiceExtensionLoaded: boolean) => void;
 };
@@ -48,11 +46,6 @@ export const diceRollerStore = createStore<DiceRoller>()((set) => ({
     setRooms: (rooms) =>
         set(() => {
             return { rooms: rooms };
-        }),
-    room: null,
-    setRoom: (room) =>
-        set(() => {
-            return { room: room };
         }),
     dddiceExtensionLoaded: false,
     setDddiceExtensionLoaded: (dddiceExtensionLoaded) => set(() => ({ dddiceExtensionLoaded: dddiceExtensionLoaded })),

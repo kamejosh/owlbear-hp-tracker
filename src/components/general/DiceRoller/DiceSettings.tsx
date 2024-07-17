@@ -2,36 +2,30 @@ import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useEffect, useState } from "react";
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
-import {
-    getDiceUser,
-    updateRoomMetadataDiceRoom,
-    updateRoomMetadataDiceUser,
-    validateTheme,
-} from "../../../helper/diceHelper.ts";
+import { updateRoomMetadataDiceRoom, updateRoomMetadataDiceUser, validateTheme } from "../../../helper/diceHelper.ts";
 import OBR from "@owlbear-rodeo/sdk";
 import { getRoomDiceUser } from "../../../helper/helpers.ts";
 import { diceTrayModal } from "../../../helper/variables.ts";
 import { Select } from "../Select.tsx";
 import { getThemePreview } from "../../../helper/previewHelpers.tsx";
-import { IRoom } from "dddice-js";
 import { Loader } from "../Loader.tsx";
 import { isNull } from "lodash";
 
 export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean) => void }) => {
     const room = useMetadataContext((state) => state.room);
-    const [rollerApi, initialized, theme, setTheme, themes] = useDiceRoller((state) => [
+    const [rollerApi, theme, setTheme, themes, rooms] = useDiceRoller((state) => [
         state.rollerApi,
-        state.initialized,
         state.theme,
         state.setTheme,
         state.themes,
+        state.rooms,
     ]);
     const playerContext = usePlayerContext();
     const [validTheme, setValidTheme] = useState<boolean>(true);
     const [searching, setSearching] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-    const [rooms, setRooms] = useState<Array<IRoom>>([]);
-    const [currentRoom, setCurrentRoom] = useState<IRoom>();
+
+    const currentRoom = rooms.find((r) => r.slug === room?.diceRoom?.slug);
 
     const findAndSetTheme = async (searchTheme: string, input?: HTMLInputElement) => {
         try {
@@ -65,32 +59,6 @@ export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean)
             setSearching(false);
         }
     };
-
-    useEffect(() => {
-        const initTheme = async () => {
-            const themeId = getRoomDiceUser(room, playerContext.id)?.diceTheme;
-            if (themeId) {
-                await findAndSetTheme(themeId);
-            }
-        };
-
-        const initRooms = async () => {
-            const dddiceUser = await getDiceUser(rollerApi!);
-            if (dddiceUser) {
-                // @ts-ignore error in package, rooms are part of IUser
-                const rooms = dddiceUser.rooms;
-                setRooms(rooms);
-                setCurrentRoom(rooms.find((r: IRoom) => r.slug === room?.diceRoom?.slug));
-            }
-        };
-
-        if (initialized) {
-            initTheme();
-            if (playerContext.role === "GM") {
-                initRooms();
-            }
-        }
-    }, [initialized]);
 
     useEffect(() => {
         if (error) {
@@ -136,7 +104,7 @@ export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean)
             {playerContext.role === "GM" ? (
                 <div className={`setting dice-room-select valid`}>
                     <span className={"setting-name"}>dice room:</span>
-                    {rooms.length === 0 ? (
+                    {rooms.length === 0 && !currentRoom ? (
                         <Loader className={"room-loader"} />
                     ) : (
                         <Select

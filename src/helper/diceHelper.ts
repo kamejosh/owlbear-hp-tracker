@@ -166,8 +166,8 @@ export const getDiceRoom = async (rollerApi: ThreeDDiceAPI, room: RoomMetadata |
     }
 };
 
-export const prepareRoomUser = async (diceRoom: IRoom, rollerApi: ThreeDDiceAPI) => {
-    const participant = await getDiceParticipant(rollerApi, diceRoom.slug);
+export const prepareRoomUser = async (diceRoom: IRoom, rollerApi: ThreeDDiceAPI, user: IUser) => {
+    const participant = await getDiceParticipant(rollerApi, diceRoom.slug, user);
     const name = await OBR.player.getName();
 
     if (participant) {
@@ -236,20 +236,27 @@ const setCustomDiceButtons = (participant: IRoomParticipant) => {
     diceButtonsStore.getState().setButtons(diceButtons);
 };
 
-export const dddiceApiLogin = async (room: RoomMetadata | null) => {
+export const dddiceApiLogin = async (room: RoomMetadata | null, user?: IUser) => {
     const rollerApi = new ThreeDDiceAPI(await getApiKey(room), "HP Tracker");
-    const diceRoom = await getDiceRoom(rollerApi, room);
+    return connectToDddiceRoom(rollerApi, room, user);
+};
+
+export const connectToDddiceRoom = async (api: ThreeDDiceAPI, room: RoomMetadata | null, user?: IUser) => {
+    const diceRoom = await getDiceRoom(api, room);
     if (diceRoom) {
-        const user = (await rollerApi.user.get())?.data;
-        if (user) {
-            const participant = diceRoom.participants.find((p) => p.user.uuid === user.uuid);
+        let diceUser: IUser | undefined = user;
+        if (!diceUser) {
+            diceUser = (await api.user.get())?.data;
+        }
+        if (diceUser) {
+            const participant = diceRoom.participants.find((p) => p.user.uuid === diceUser.uuid);
             if (participant) {
-                await prepareRoomUser(diceRoom, rollerApi);
+                await prepareRoomUser(diceRoom, api, diceUser);
             } else {
                 try {
-                    const userDiceRoom = (await rollerApi?.room.join(diceRoom.slug, diceRoom.passcode))?.data;
+                    const userDiceRoom = (await api?.room.join(diceRoom.slug, diceRoom.passcode))?.data;
                     if (userDiceRoom) {
-                        await prepareRoomUser(userDiceRoom, rollerApi);
+                        await prepareRoomUser(userDiceRoom, api, diceUser);
                     }
                 } catch (e) {
                     console.warn(e);
@@ -260,7 +267,7 @@ export const dddiceApiLogin = async (room: RoomMetadata | null) => {
                      */
                 }
             }
-            return rollerApi.connect(diceRoom.slug, diceRoom.passcode, user.uuid);
+            return api.connect(diceRoom.slug, diceRoom.passcode, diceUser.uuid);
         }
     }
 };

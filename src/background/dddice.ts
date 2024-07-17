@@ -7,6 +7,7 @@ import { ThreeDDiceAPI } from "dddice-js";
 import {
     addRollerApiCallbacks,
     blastMessage,
+    connectToDddiceRoom,
     dddiceApiLogin,
     handleNewRoll,
     removeRollerApiCallbacks,
@@ -65,13 +66,12 @@ const roomCallback = async (metadata: Metadata, forceLogin: boolean) => {
     lock.enable();
     const roomData = metadataKey in metadata ? (metadata[metadataKey] as RoomMetadata) : null;
     let initialized: boolean = false;
-    let reInitialize: boolean =
-        diceRollerState.disableDiceRoller !== roomData?.disableDiceRoller ||
-        diceRollerState.diceRoom !== roomData?.diceRoom?.slug;
+    let reInitialize: boolean = diceRollerState.disableDiceRoller !== roomData?.disableDiceRoller;
     reInitialize =
         reInitialize ||
         diceRollerState.diceUser?.diceRendering !== getRoomDiceUser(roomData, OBR.player.id)?.diceRendering;
     diceRollerState.disableDiceRoller = roomData?.disableDiceRoller === undefined ? false : roomData.disableDiceRoller;
+
     if (roomData && (!roomData.disableDiceRoller || reInitialize)) {
         const newDiceUser = getRoomDiceUser(roomData, OBR.player.id);
         if (newDiceUser) {
@@ -94,10 +94,16 @@ const roomCallback = async (metadata: Metadata, forceLogin: boolean) => {
             }
         }
         if (reInitialize || !initialized) {
-            await initDiceRoller(roomData, forceLogin || diceRollerState.diceRoom !== roomData.diceRoom?.slug);
+            await initDiceRoller(roomData, forceLogin);
         }
 
         diceRollerState.diceRoom = roomData.diceRoom?.slug;
+    } else if (diceRollerState.diceRoom !== roomData?.diceRoom?.slug) {
+        const api = diceRollerStore.getState().rollerApi;
+        if (api && roomData?.diceRoom?.slug) {
+            diceRollerState.diceRoom = roomData.diceRoom.slug;
+            await connectToDddiceRoom(api, roomData);
+        }
     }
     lock.disable(null);
 };
