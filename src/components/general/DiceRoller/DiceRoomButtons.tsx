@@ -179,7 +179,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                     addCustom ? "open" : ""
                 }`}
                 onClick={async (e) => {
-                    if (!props.customDice && buttons.hasOwnProperty(props.button.toString())) {
+                    if (!props.customDice && buttons.hasOwnProperty(String(props.button))) {
                         setAddCustom(true);
                     } else if (props.customDice) {
                         await roll(e.currentTarget);
@@ -297,7 +297,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                 <button
                     className={`remove-dice ${hover ? "hover" : ""}`}
                     onClick={() => {
-                        if (props.customDice && buttons.hasOwnProperty(props.button.toString())) {
+                        if (props.customDice && buttons.hasOwnProperty(String(props.button))) {
                             const newButton = {
                                 [props.button]: null,
                             };
@@ -384,7 +384,7 @@ const QuickButtons = ({ open }: { open: boolean }) => {
                         name = (die as IAvailableDie).notation ?? (die as IAvailableDie).id;
                     } else {
                         preview = theme.preview[die as IDieType];
-                        name = die.toString();
+                        name = String(die);
                     }
                     if (name) {
                         name = name === "d10x" ? "d100" : name;

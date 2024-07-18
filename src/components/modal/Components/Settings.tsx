@@ -90,16 +90,16 @@ export const Settings = () => {
                                 if (factor < 0 && nValue === 0) {
                                     e.currentTarget.value = "-";
                                 } else {
-                                    e.currentTarget.value = (nValue * factor).toString();
+                                    e.currentTarget.value = String(nValue * factor);
                                 }
                             }}
                             onKeyDown={(e) => {
                                 if (e.key === "ArrowUp") {
                                     handleOffsetChange((room?.hpBarOffset || 0) + 1);
-                                    e.currentTarget.value = ((room?.hpBarOffset || 0) + 1).toString();
+                                    e.currentTarget.value = String((room?.hpBarOffset || 0) + 1);
                                 } else if (e.key === "ArrowDown") {
                                     handleOffsetChange((room?.hpBarOffset || 0) - 1);
-                                    e.currentTarget.value = ((room?.hpBarOffset || 0) + 1).toString();
+                                    e.currentTarget.value = String((room?.hpBarOffset || 0) + 1);
                                 }
                             }}
                         />
@@ -193,7 +193,7 @@ export const Settings = () => {
                                         },
                                     });
 
-                                    e.currentTarget.value = Math.max(200, parseInt(e.currentTarget.value)).toString();
+                                    e.currentTarget.value = String(Math.max(200, parseInt(e.currentTarget.value)));
                                 }}
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter") {
@@ -203,10 +203,7 @@ export const Settings = () => {
                                                 width: Math.max(parseInt(e.currentTarget.value), 200),
                                             },
                                         });
-                                        e.currentTarget.value = Math.max(
-                                            200,
-                                            parseInt(e.currentTarget.value)
-                                        ).toString();
+                                        e.currentTarget.value = String(Math.max(200, parseInt(e.currentTarget.value)));
                                     }
                                 }}
                             />
@@ -223,7 +220,7 @@ export const Settings = () => {
                                             height: Math.max(parseInt(e.currentTarget.value), 200),
                                         },
                                     });
-                                    e.currentTarget.value = Math.max(200, parseInt(e.target.value)).toString();
+                                    e.currentTarget.value = String(Math.max(200, parseInt(e.target.value)));
                                 }}
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter") {
@@ -233,10 +230,7 @@ export const Settings = () => {
                                                 height: Math.max(parseInt(e.currentTarget.value), 200),
                                             },
                                         });
-                                        e.currentTarget.value = Math.max(
-                                            200,
-                                            parseInt(e.currentTarget.value)
-                                        ).toString();
+                                        e.currentTarget.value = String(Math.max(200, parseInt(e.currentTarget.value)));
                                     }
                                 }}
                             />

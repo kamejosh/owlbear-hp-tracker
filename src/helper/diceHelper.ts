@@ -235,10 +235,10 @@ const setCustomDiceButtons = (participant: IRoomParticipant) => {
         dice_array.forEach((d) => {
             if (count <= 8) {
                 // @ts-ignore
-                const currentCustomDice: CustomDieNotation = diceButtons[count.toString()];
+                const currentCustomDice: CustomDieNotation = diceButtons[String(count)];
                 if (d && validDice.includes(d.dieType) && currentCustomDice === null) {
                     // @ts-ignore
-                    diceButtons[count.toString()] = { dice: `1${d.dieType}`, theme: d.theme };
+                    diceButtons[String(count)] = { dice: `1${d.dieType}`, theme: d.theme };
                     count++;
                 }
             }
@@ -390,7 +390,7 @@ export const localRoll = async (
             equation: diceEquation,
             label: label,
             is_hidden: false,
-            total_value: roll.total.toString(),
+            total_value: String(roll.total),
             username: statblock ?? name,
             values: [roll.output.substring(roll.output.indexOf(":") + 1, roll.output.indexOf("=") - 1)],
             owlbear_user_id: OBR.player.id,

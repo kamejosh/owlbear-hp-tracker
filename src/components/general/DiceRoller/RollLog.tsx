@@ -142,7 +142,7 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
                 {getDetailedResult()}
             </div>
             <div className={"divider"}>=</div>
-            <div className={"total"}>{hidden ? "?" : props.entry.total_value.toString()}</div>
+            <div className={"total"}>{hidden ? "?" : String(props.entry.total_value)}</div>
             {props.entry.is_hidden && ownRoll ? (
                 <button
                     className={"hide-toggle"}

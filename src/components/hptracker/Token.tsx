@@ -41,13 +41,13 @@ export const Token = (props: TokenProps) => {
 
     useEffect(() => {
         if (hpRef && hpRef.current) {
-            hpRef.current.value = props.data.hp.toString();
+            hpRef.current.value = String(props.data.hp);
         }
     }, [props.data.hp]);
 
     useEffect(() => {
         if (maxHpRef && maxHpRef.current) {
-            maxHpRef.current.value = props.data.maxHp.toString();
+            maxHpRef.current.value = String(props.data.maxHp);
         }
     }, [props.data.maxHp]);
 
@@ -68,7 +68,7 @@ export const Token = (props: TokenProps) => {
         if (newHp < data.hp && data.stats.tempHp && data.stats.tempHp > 0) {
             newData.stats.tempHp = Math.max(data.stats.tempHp - (data.hp - newHp), 0);
             if (tempHpRef && tempHpRef.current) {
-                tempHpRef.current.value = newData.stats.tempHp.toString();
+                tempHpRef.current.value = String(newData.stats.tempHp);
             }
         }
         newData.hp = room?.allowNegativeNumbers ? newHp : Math.max(newHp, 0);
@@ -76,7 +76,7 @@ export const Token = (props: TokenProps) => {
         setData(newData);
         handleValueChange(newData);
         if (hpRef && hpRef.current) {
-            hpRef.current.value = newData.hp.toString();
+            hpRef.current.value = String(newData.hp);
         }
     };
 
@@ -94,7 +94,7 @@ export const Token = (props: TokenProps) => {
         setData(newData);
         handleValueChange(newData);
         if (maxHpRef && maxHpRef.current) {
-            maxHpRef.current.value = newMax.toString();
+            maxHpRef.current.value = String(newMax);
         }
     };
 
@@ -124,10 +124,10 @@ export const Token = (props: TokenProps) => {
         setData(newData);
         handleValueChange(newData);
         if (hpRef && hpRef.current) {
-            hpRef.current.value = newData.hp.toString();
+            hpRef.current.value = String(newData.hp);
         }
         if (tempHpRef && tempHpRef.current) {
-            tempHpRef.current.value = newData.stats.tempHp.toString();
+            tempHpRef.current.value = String(newData.stats.tempHp);
         }
     };
 
@@ -258,7 +258,7 @@ export const Token = (props: TokenProps) => {
             setData(newData);
             handleValueChange(newData);
             if (maxHpRef && maxHpRef.current) {
-                maxHpRef.current.value = newData.maxHp.toString();
+                maxHpRef.current.value = String(newData.maxHp);
             }
             return null;
         }
@@ -394,7 +394,7 @@ export const Token = (props: TokenProps) => {
                         const input = e.target.value;
                         const hp = getNewHpValue(input);
                         if (hp !== null) {
-                            e.target.value = hp.toString();
+                            e.target.value = String(hp);
                             changeHp(hp);
                         }
                     }}
@@ -405,19 +405,19 @@ export const Token = (props: TokenProps) => {
                                 data.stats.tempHp ? data.maxHp + data.stats.tempHp : data.maxHp
                             );
                             changeHp(hp);
-                            e.currentTarget.value = hp.toString();
+                            e.currentTarget.value = String(hp);
                         } else if (e.key === "ArrowDown") {
                             const hp = Math.min(
                                 data.hp - 1,
                                 data.stats.tempHp ? data.maxHp + data.stats.tempHp : data.maxHp
                             );
                             changeHp(hp);
-                            e.currentTarget.value = hp.toString();
+                            e.currentTarget.value = String(hp);
                         } else if (e.key === "Enter") {
                             const input = e.currentTarget.value;
                             const hp = getNewHpValue(input);
                             if (hp !== null) {
-                                e.currentTarget.value = hp.toString();
+                                e.currentTarget.value = String(hp);
                                 changeHp(hp);
                             }
                         }

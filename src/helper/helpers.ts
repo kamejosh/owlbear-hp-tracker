@@ -244,9 +244,9 @@ export const dddiceRollToRollLog = async (
         username: username,
         values: roll.values.map((v) => {
             if (v.is_user_value) {
-                return `+${v.value.toString()}`;
+                return `+${String(v.value)}`;
             } else {
-                return v.value.toString();
+                return String(v.value);
             }
         }),
         owlbear_user_id: options?.owlbear_user_id,

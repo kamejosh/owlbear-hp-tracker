@@ -43,7 +43,7 @@ export const createAC = async (ac: number, token: Image) => {
         .position({ x: position.x, y: position.y + height * 0.2 })
         .attachedTo(acShape.id)
         .locked(true)
-        .plainText(ac.toString())
+        .plainText(String(ac))
         .textAlign("CENTER")
         .fontSize(width / 2)
         .strokeColor("black")
@@ -162,9 +162,9 @@ export const saveOrChangeAC = async (
             texts.forEach((text) => {
                 if (text.type === "TEXT") {
                     const t = text as Text;
-                    if (t.text.plainText !== data.armorClass.toString()) {
+                    if (t.text.plainText !== String(data.armorClass)) {
                         const textChange = changeMap.get(t.id) ?? {};
-                        textChange.text = data.armorClass.toString();
+                        textChange.text = String(data.armorClass);
                         changeMap.set(t.id, textChange);
                     }
                 }
