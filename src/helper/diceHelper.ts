@@ -126,7 +126,11 @@ export const getApiKey = async (room: RoomMetadata | null) => {
     return apiKey;
 };
 
-export const getDiceRoom = async (rollerApi: ThreeDDiceAPI, room: RoomMetadata | null): Promise<IRoom | undefined> => {
+export const getDiceRoom = async (
+    rollerApi: ThreeDDiceAPI,
+    room: RoomMetadata | null,
+    diceRoom?: IRoom
+): Promise<IRoom | undefined> => {
     const roomMetadata = await OBR.room.getMetadata();
     let slug: string | undefined;
 
@@ -134,6 +138,10 @@ export const getDiceRoom = async (rollerApi: ThreeDDiceAPI, room: RoomMetadata |
         slug = roomMetadata["com.dddice/roomSlug"] as string;
     } else {
         slug = room?.diceRoom?.slug;
+    }
+
+    if (diceRoom && diceRoom.slug === slug) {
+        return diceRoom;
     }
 
     if (!slug) {
@@ -151,14 +159,17 @@ export const getDiceRoom = async (rollerApi: ThreeDDiceAPI, room: RoomMetadata |
                 await updateRoomMetadataDiceRoom(room, diceRoom.slug);
                 return diceRoom;
             }
-        } catch {
-            // it seems like a room with no logged in users is removed after some time, so in that case we need to create a new one
-            const newDiceRoom = (await rollerApi?.room.create())?.data;
-            if (room && newDiceRoom) {
-                await updateRoomMetadataDiceRoom(room, newDiceRoom.slug);
-                return newDiceRoom;
-            } else {
-                console.warn("HP Tracker - unable to connect to dddice room");
+        } catch (e) {
+            // @ts-ignore
+            if (e.response.status === 404) {
+                // it seems like a room with no logged in users is removed after some time, so in that case we need to create a new one
+                const newDiceRoom = (await rollerApi?.room.create())?.data;
+                if (room && newDiceRoom) {
+                    await updateRoomMetadataDiceRoom(room, newDiceRoom.slug);
+                    return newDiceRoom;
+                } else {
+                    console.warn("HP Tracker - unable to connect to dddice room");
+                }
             }
         }
 
@@ -241,8 +252,13 @@ export const dddiceApiLogin = async (room: RoomMetadata | null, user?: IUser) =>
     return connectToDddiceRoom(rollerApi, room, user);
 };
 
-export const connectToDddiceRoom = async (api: ThreeDDiceAPI, room: RoomMetadata | null, user?: IUser) => {
-    const diceRoom = await getDiceRoom(api, room);
+export const connectToDddiceRoom = async (
+    api: ThreeDDiceAPI,
+    room: RoomMetadata | null,
+    user?: IUser,
+    currentDiceRoom?: IRoom
+) => {
+    const diceRoom = await getDiceRoom(api, room, currentDiceRoom);
     if (diceRoom) {
         let diceUser: IUser | undefined = user;
         if (!diceUser) {
