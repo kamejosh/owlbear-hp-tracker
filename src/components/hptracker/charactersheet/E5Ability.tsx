@@ -77,6 +77,7 @@ export const E5Ability = ({
                                     : undefined
                             }
                             limitReached={!ability.attack_bonus ? limitReached : undefined}
+                            damageDie={true}
                         />
                     </span>
                 ) : null}

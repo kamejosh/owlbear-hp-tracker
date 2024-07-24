@@ -90,8 +90,9 @@ export const PfAbility = ({
                                     <b>{key}</b>:{" "}
                                     <DiceButtonWrapper
                                         text={value}
-                                        context={`${capitalize(ability.name)} ${capitalize(key)}`}
+                                        context={`${capitalize(ability.name)}: ${capitalize(key)}`}
                                         statblock={statblock}
+                                        damageDie={key === "damage"}
                                     />
                                 </li>
                             );

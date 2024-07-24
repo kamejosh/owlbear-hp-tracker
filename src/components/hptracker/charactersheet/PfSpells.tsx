@@ -35,6 +35,7 @@ const Spell = (props: { spell: PfSpellOut; statblock: string }) => {
                                 text={damage}
                                 context={`${capitalize(spell?.name)} Damage`}
                                 statblock={props.statblock}
+                                damageDie={true}
                             />
                         </span>
                     ) : null}

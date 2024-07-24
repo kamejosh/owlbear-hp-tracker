@@ -137,6 +137,7 @@ const Spell = ({
                                     }
                                 }}
                                 limitReached={limitReached}
+                                damageDie={true}
                             />
                         </span>
                     ) : null}

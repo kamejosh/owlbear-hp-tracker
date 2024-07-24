@@ -15,9 +15,10 @@ type DiceButtonProps = {
     statblock?: string;
     onRoll?: () => void;
     limitReached?: boolean | null;
+    damageDie?: boolean;
 };
 export const DiceButton = (props: DiceButtonProps) => {
-    const room = useMetadataContext((state) => state.room);
+    const [room, taSettings] = useMetadataContext((state) => [state.room, state.taSettings]);
     const addRoll = useRollLogContext((state) => state.addRoll);
     const [rollerApi, initialized, theme] = useDiceRoller((state) => [state.rollerApi, state.initialized, state.theme]);
     const [context, setContext] = useState<boolean>(false);
@@ -65,15 +66,62 @@ export const DiceButton = (props: DiceButtonProps) => {
         return baseDie;
     };
 
-    const roll = async (modifier?: "ADV" | "DIS" | "SELF") => {
+    const roll = async (modifier?: "ADV" | "DIS" | "SELF" | "CRIT") => {
         const button = rollButton.current;
         if (button) {
             button.classList.add("rolling");
+            let label = props.context;
             let modifiedDice = props.dice;
             if (modifier && modifier === "ADV") {
                 modifiedDice = addModifier(props.dice, "2d20kh1");
             } else if (modifier && modifier === "DIS") {
                 modifiedDice = addModifier(props.dice, "2d20dh1");
+            } else if (modifier && modifier === "CRIT") {
+                label = label.substring(0, label.indexOf(":")) + ": Critical Damage";
+                if (theme && !room?.disableDiceRoller) {
+                    const diceCountsRegx = /\d+(?=d\d)/gi;
+                    const dicesRegx = /(?<=\dd)(\d+)/gi;
+                    const modifierRegx = /(?<=d\d+( ?))([+-]{1}( ?)\d+)(?!d\d)/gi;
+                    const diceCounts = modifiedDice.match(diceCountsRegx);
+                    const dices = modifiedDice.match(dicesRegx);
+                    const modifiers = modifiedDice.match(modifierRegx);
+                    try {
+                        if (diceCounts && dices && diceCounts.length === dices.length) {
+                            if (taSettings.crit_rules === "double_dice") {
+                                const diceArray = diceCounts?.map((dc) => `${2 * Number(dc)}d`);
+                                modifiedDice = "";
+                                diceArray.forEach((dc, index) => {
+                                    if (index > 0) {
+                                        modifiedDice += "+";
+                                    }
+                                    modifiedDice += `${dc}${dices[index]}`;
+                                });
+                            } else if (taSettings.crit_rules === "double_role") {
+                                modifiedDice = "2*(";
+                                diceCounts.forEach((dc, index) => {
+                                    if (index > 0) {
+                                        modifiedDice += "+";
+                                    }
+                                    modifiedDice += `${dc}d${dices[index]}`;
+                                });
+                                modifiedDice += ")";
+                            } else if (taSettings.crit_rules === "max_roll") {
+                                modifiedDice = "";
+                                diceCounts.forEach((dc, index) => {
+                                    if (index > 0) {
+                                        modifiedDice += "+";
+                                    }
+                                    const maxRoll = Number(dc) * Number(dices[index]);
+                                    modifiedDice += `${dc}d${dices[index]} + ${maxRoll} `;
+                                });
+                            }
+
+                            if (modifiers) {
+                                modifiedDice += " " + modifiers.join(" ");
+                            }
+                        }
+                    } catch {}
+                }
             }
 
             if (theme && !room?.disableDiceRoller) {
@@ -81,7 +129,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                 if (parsed && rollerApi) {
                     try {
                         await rollWrapper(rollerApi, parsed.dice, {
-                            label: props.context,
+                            label: label,
                             operator: parsed.operator,
                             external_id: props.statblock,
                             whisper: modifier === "SELF" ? await getUserUuid(room, rollerApi) : undefined,
@@ -185,6 +233,17 @@ export const DiceButton = (props: DiceButtonProps) => {
                         </button>
                     </>
                 ) : null}
+                {props.damageDie && taSettings.crit_rules !== "none" ? (
+                    <button
+                        className={"crit"}
+                        disabled={!isEnabled()}
+                        onClick={async () => {
+                            await roll("CRIT");
+                        }}
+                    >
+                        CRIT
+                    </button>
+                ) : null}
                 <button
                     className={"self"}
                     disabled={!isEnabled()}
@@ -205,12 +264,14 @@ export const DiceButtonWrapper = ({
     statblock,
     onRoll,
     limitReached,
+    damageDie,
 }: {
     text: string;
     context: string;
     statblock?: string;
     onRoll?: () => void;
     limitReached?: boolean | null;
+    damageDie?: boolean;
 }) => {
     const regex = /((\d*?d\d+)( ?[\+\-] ?\d+)?)|([\+\-]\d+)/gi;
     const dice = text.match(regex);
@@ -239,6 +300,7 @@ export const DiceButtonWrapper = ({
                             statblock={statblock}
                             onRoll={onRoll}
                             limitReached={limitReached}
+                            damageDie={damageDie}
                         />
                     );
                 }

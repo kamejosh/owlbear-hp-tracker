@@ -11,9 +11,23 @@ import { objectsEqual } from "../helper/helpers.ts";
 import { SceneReadyContext } from "../context/SceneReadyContext.ts";
 import { useComponentContext } from "../context/ComponentContext.tsx";
 import "tippy.js/dist/tippy.css";
+import { useGetSettings } from "../api/tabletop-almanac/useUser.ts";
 
 type ContextWrapperProps = PropsWithChildren & {
     component: string;
+};
+
+const Content = (props: PropsWithChildren) => {
+    const [setTaSettings, room] = useMetadataContext((state) => [state.setTaSettings, state.room]);
+
+    const settingsQuery = useGetSettings(room?.tabletopAlmanacAPIKey);
+
+    useEffect(() => {
+        if (settingsQuery.isSuccess) {
+            setTaSettings(settingsQuery.data);
+        }
+    }, [settingsQuery.isSuccess]);
+    return <>{props.children}</>;
 };
 
 export const ContextWrapper = (props: ContextWrapperProps) => {
@@ -102,14 +116,16 @@ export const ContextWrapper = (props: ContextWrapperProps) => {
             <PluginGate>
                 <QueryClientProvider client={queryClient}>
                     <PlayerContext.Provider value={playerContext}>
-                        {component && room ? (
-                            props.children
-                        ) : (
-                            <div>
-                                HP Tracker - initializing...
-                                <Loader className={"initialization-loader"} />
-                            </div>
-                        )}
+                        <Content>
+                            {component && room ? (
+                                props.children
+                            ) : (
+                                <div>
+                                    HP Tracker - initializing...
+                                    <Loader className={"initialization-loader"} />
+                                </div>
+                            )}
+                        </Content>
                     </PlayerContext.Provider>
                 </QueryClientProvider>
             </PluginGate>

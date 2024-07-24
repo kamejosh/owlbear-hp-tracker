@@ -52,8 +52,8 @@ export interface paths {
     get: operations["list_statblocks_api_v1_users_me_statblocks_get"];
   };
   "/api/v1/users/me/spells": {
-    /** List Statblocks */
-    get: operations["list_statblocks_api_v1_users_me_spells_get"];
+    /** List Spells */
+    get: operations["list_spells_api_v1_users_me_spells_get"];
   };
   "/api/v1/users/change-password": {
     /** Change Password */
@@ -62,6 +62,12 @@ export interface paths {
   "/api/v1/users/activate": {
     /** Activate User */
     post: operations["activate_user_api_v1_users_activate_post"];
+  };
+  "/api/v1/users/me/settings": {
+    /** Get User Settings */
+    get: operations["get_user_settings_api_v1_users_me_settings_get"];
+    /** Put User Settings */
+    put: operations["put_user_settings_api_v1_users_me_settings_put"];
   };
   "/api/v1/pf/statblock/": {
     /** List Pf Statblocks */
@@ -736,6 +742,20 @@ export interface components {
       /** Critical Failure */
       critical_failure?: string | null;
       limit?: components["schemas"]["LimitedUse"] | null;
+    };
+    /** Settings */
+    Settings: {
+      /**
+       * Crit Rules
+       * @default none
+       * @enum {string}
+       */
+      crit_rules?: "none" | "double_dice" | "double_role" | "max_roll";
+      /**
+       * Death Saves
+       * @default false
+       */
+      death_saves?: boolean;
     };
     /** Skill */
     Skill: {
@@ -1594,8 +1614,8 @@ export interface operations {
       };
     };
   };
-  /** List Statblocks */
-  list_statblocks_api_v1_users_me_spells_get: {
+  /** List Spells */
+  list_spells_api_v1_users_me_spells_get: {
     responses: {
       /** @description Successful Response */
       200: {
@@ -1634,6 +1654,39 @@ export interface operations {
       200: {
         content: {
           "application/json": unknown;
+        };
+      };
+    };
+  };
+  /** Get User Settings */
+  get_user_settings_api_v1_users_me_settings_get: {
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": unknown;
+        };
+      };
+    };
+  };
+  /** Put User Settings */
+  put_user_settings_api_v1_users_me_settings_put: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["Settings"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
         };
       };
     };

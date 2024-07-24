@@ -285,17 +285,14 @@ button,
     .dice-context-button {
         display: none;
         position: absolute;
+        top: 50%;
         right: 0;
-        translate: 100% -120%;
+        translate: 100% -50%;
         z-index: 10;
         border: 1px solid lightgrey;
         border-radius: 4px;
         background-color: var(--bg-color);
         padding: 1px;
-
-        &.full {
-            translate: 100% -75%;
-        }
 
         &.visible {
             display: flex;
@@ -317,6 +314,10 @@ button,
 
             &.disadvantage {
                 --hover-color: rgba(255, 0, 0, 0.6);
+            }
+
+            &.crit {
+                --hover-color: rgba(150, 0, 255, 1);
             }
 
             &:hover,
