@@ -78,50 +78,48 @@ export const DiceButton = (props: DiceButtonProps) => {
                 modifiedDice = addModifier(props.dice, "2d20dh1");
             } else if (modifier && modifier === "CRIT") {
                 label = label.substring(0, label.indexOf(":")) + ": Critical Damage";
-                if (theme && !room?.disableDiceRoller) {
-                    const diceCountsRegx = /\d+(?=d\d)/gi;
-                    const dicesRegx = /(?<=\dd)(\d+)/gi;
-                    const modifierRegx = /(?<=d\d+( ?))([+-]{1}( ?)\d+)(?!d\d)/gi;
-                    const diceCounts = modifiedDice.match(diceCountsRegx);
-                    const dices = modifiedDice.match(dicesRegx);
-                    const modifiers = modifiedDice.match(modifierRegx);
-                    try {
-                        if (diceCounts && dices && diceCounts.length === dices.length) {
-                            if (taSettings.crit_rules === "double_dice") {
-                                const diceArray = diceCounts?.map((dc) => `${2 * Number(dc)}d`);
-                                modifiedDice = "";
-                                diceArray.forEach((dc, index) => {
-                                    if (index > 0) {
-                                        modifiedDice += "+";
-                                    }
-                                    modifiedDice += `${dc}${dices[index]}`;
-                                });
-                            } else if (taSettings.crit_rules === "double_role") {
-                                modifiedDice = "2*(";
-                                diceCounts.forEach((dc, index) => {
-                                    if (index > 0) {
-                                        modifiedDice += "+";
-                                    }
-                                    modifiedDice += `${dc}d${dices[index]}`;
-                                });
-                                modifiedDice += ")";
-                            } else if (taSettings.crit_rules === "max_roll") {
-                                modifiedDice = "";
-                                diceCounts.forEach((dc, index) => {
-                                    if (index > 0) {
-                                        modifiedDice += "+";
-                                    }
-                                    const maxRoll = Number(dc) * Number(dices[index]);
-                                    modifiedDice += `${dc}d${dices[index]} + ${maxRoll} `;
-                                });
-                            }
-
-                            if (modifiers) {
-                                modifiedDice += " " + modifiers.join(" ");
-                            }
+                const diceCountsRegx = /\d+(?=d\d)/gi;
+                const dicesRegx = /(?<=\dd)(\d+)/gi;
+                const modifierRegx = /(?<=d\d+( ?))([+-]{1}( ?)\d+)(?!d\d)/gi;
+                const diceCounts = modifiedDice.match(diceCountsRegx);
+                const dices = modifiedDice.match(dicesRegx);
+                const modifiers = modifiedDice.match(modifierRegx);
+                try {
+                    if (diceCounts && dices && diceCounts.length === dices.length) {
+                        if (taSettings.crit_rules === "double_dice") {
+                            const diceArray = diceCounts?.map((dc) => `${2 * Number(dc)}d`);
+                            modifiedDice = "";
+                            diceArray.forEach((dc, index) => {
+                                if (index > 0) {
+                                    modifiedDice += "+";
+                                }
+                                modifiedDice += `${dc}${dices[index]}`;
+                            });
+                        } else if (taSettings.crit_rules === "double_role") {
+                            modifiedDice = "2*(";
+                            diceCounts.forEach((dc, index) => {
+                                if (index > 0) {
+                                    modifiedDice += "+";
+                                }
+                                modifiedDice += `${dc}d${dices[index]}`;
+                            });
+                            modifiedDice += ")";
+                        } else if (taSettings.crit_rules === "max_roll") {
+                            modifiedDice = "";
+                            diceCounts.forEach((dc, index) => {
+                                if (index > 0) {
+                                    modifiedDice += "+";
+                                }
+                                const maxRoll = Number(dc) * Number(dices[index]);
+                                modifiedDice += `${dc}d${dices[index]} + ${maxRoll} `;
+                            });
                         }
-                    } catch {}
-                }
+
+                        if (modifiers) {
+                            modifiedDice += " " + modifiers.join(" ");
+                        }
+                    }
+                } catch {}
             }
 
             if (theme && !room?.disableDiceRoller) {
@@ -139,7 +137,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                     }
                 }
             } else {
-                await localRoll(modifiedDice, props.context, addRoll, modifier === "SELF", props.statblock);
+                await localRoll(modifiedDice, label, addRoll, modifier === "SELF", props.statblock);
             }
             if (props.onRoll) {
                 props.onRoll();
