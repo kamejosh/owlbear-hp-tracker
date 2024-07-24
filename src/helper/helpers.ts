@@ -446,23 +446,25 @@ export const getInitialValues = async (items: Array<Item>) => {
 };
 
 export const updateLimit = async (itemId: string, limitValues: Limit) => {
-    await OBR.scene.items.updateItems([itemId], (items) => {
-        items.forEach((item) => {
-            if (item) {
-                const metadata = item.metadata[itemMetadataKey] as HpTrackerMetadata;
-                if (metadata) {
-                    const index = metadata.stats.limits?.findIndex((l) => {
-                        return l.id === limitValues.id;
-                    });
-                    if (index !== undefined) {
-                        // @ts-ignore
-                        item.metadata[itemMetadataKey]["stats"]["limits"][index]["used"] = Math.min(
-                            limitValues.used + 1,
-                            limitValues.max
-                        );
+    if (limitValues) {
+        await OBR.scene.items.updateItems([itemId], (items) => {
+            items.forEach((item) => {
+                if (item) {
+                    const metadata = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+                    if (metadata) {
+                        const index = metadata.stats.limits?.findIndex((l) => {
+                            return l.id === limitValues.id;
+                        });
+                        if (index !== undefined) {
+                            // @ts-ignore
+                            item.metadata[itemMetadataKey]["stats"]["limits"][index]["used"] = Math.min(
+                                limitValues.used + 1,
+                                limitValues.max
+                            );
+                        }
                     }
                 }
-            }
+            });
         });
-    });
+    }
 };
