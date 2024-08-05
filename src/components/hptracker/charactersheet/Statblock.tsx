@@ -1,7 +1,6 @@
 import OBR from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "../../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../../helper/types.ts";
-import { useEffect, useState } from "react";
 import { PfAbility } from "./PfAbility.tsx";
 import { useE5GetStatblock } from "../../../api/e5/useE5Api.ts";
 import { usePfGetStatblock } from "../../../api/pf/usePfApi.ts";
@@ -13,11 +12,14 @@ import { DiceButton } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { capitalize, isNull } from "lodash";
 import { About } from "./About.tsx";
 import { LimitComponent } from "./LimitComponent.tsx";
+import { useTokenListContext } from "../../../context/TokenContext.tsx";
 
-const E5StatBlock = ({ slug, tokenData, itemId }: { slug: string; tokenData: HpTrackerMetadata; itemId: string }) => {
+const E5StatBlock = ({ slug, itemId }: { slug: string; itemId: string }) => {
     const room = useMetadataContext((state) => state.room);
     const statblockQuery = useE5GetStatblock(slug, room?.tabletopAlmanacAPIKey);
     const statblock = statblockQuery.isSuccess && statblockQuery.data ? statblockQuery.data : null;
+    const token = useTokenListContext((state) => state.tokens?.get(itemId));
+    const data = token?.data as HpTrackerMetadata;
 
     return statblock ? (
         <div className={"open5e-sheet"}>
@@ -40,8 +42,8 @@ const E5StatBlock = ({ slug, tokenData, itemId }: { slug: string; tokenData: HpT
                         <DiceButton
                             dice={statblock.hp.hit_dice}
                             text={statblock.hp.hit_dice}
-                            context={tokenData.name + ": Hit Dice"}
-                            statblock={tokenData.name}
+                            context={data.name + ": Hit Dice"}
+                            statblock={data.name}
                         />
                     ) : null}
                 </span>
@@ -73,7 +75,7 @@ const E5StatBlock = ({ slug, tokenData, itemId }: { slug: string; tokenData: HpT
                                         Math.floor((value - 10) / 2)
                                     )}
                                     context={`${capitalize(stat)}: Check`}
-                                    statblock={tokenData.name}
+                                    statblock={data.name}
                                 />
                             </div>
                         </div>
@@ -95,7 +97,7 @@ const E5StatBlock = ({ slug, tokenData, itemId }: { slug: string; tokenData: HpT
                                                     dice={`d20+${value}`}
                                                     text={`+${value}`}
                                                     context={`${capitalize(key.substring(0, 3))}: Save`}
-                                                    statblock={tokenData.name}
+                                                    statblock={data.name}
                                                 />
                                             </span>
                                         );
@@ -136,7 +138,7 @@ const E5StatBlock = ({ slug, tokenData, itemId }: { slug: string; tokenData: HpT
                                                 Math.floor(value)
                                             )}
                                             context={`${capitalize(key)}: Check`}
-                                            statblock={tokenData.name}
+                                            statblock={data.name}
                                         />
                                     </li>
                                 );
@@ -175,13 +177,13 @@ const E5StatBlock = ({ slug, tokenData, itemId }: { slug: string; tokenData: HpT
             {statblock.limits && statblock.limits.length > 0 ? (
                 <div className={"limits"}>
                     {statblock.limits.map((limit, i) => {
-                        const limitValues = tokenData.stats.limits?.find((l) => l.id === limit!.name);
+                        const limitValues = data.stats.limits?.find((l) => l.id === limit!.name);
                         return limitValues ? (
                             <LimitComponent
                                 key={i}
                                 limit={limit}
                                 title={"name"}
-                                limitValues={tokenData.stats.limits?.find((l) => l.id === limit!.name)!}
+                                limitValues={data.stats.limits?.find((l) => l.id === limit!.name)!}
                                 itemId={itemId}
                             />
                         ) : null;
@@ -196,8 +198,8 @@ const E5StatBlock = ({ slug, tokenData, itemId }: { slug: string; tokenData: HpT
                             <E5Ability
                                 ability={ability}
                                 key={ability.name + index}
-                                statblock={tokenData.name}
-                                tokenData={tokenData}
+                                statblock={data.name}
+                                tokenData={data}
                                 itemId={itemId}
                             />
                         ))}
@@ -212,8 +214,8 @@ const E5StatBlock = ({ slug, tokenData, itemId }: { slug: string; tokenData: HpT
                             <E5Ability
                                 ability={action}
                                 key={action.name + index}
-                                statblock={tokenData.name}
-                                tokenData={tokenData}
+                                statblock={data.name}
+                                tokenData={data}
                                 itemId={itemId}
                             />
                         ))}
@@ -228,8 +230,8 @@ const E5StatBlock = ({ slug, tokenData, itemId }: { slug: string; tokenData: HpT
                             <E5Ability
                                 ability={reaction}
                                 key={reaction.name + index}
-                                statblock={tokenData.name}
-                                tokenData={tokenData}
+                                statblock={data.name}
+                                tokenData={data}
                                 itemId={itemId}
                             />
                         ))}
@@ -244,8 +246,8 @@ const E5StatBlock = ({ slug, tokenData, itemId }: { slug: string; tokenData: HpT
                             <E5Ability
                                 ability={action}
                                 key={action.name + index}
-                                statblock={tokenData.name}
-                                tokenData={tokenData}
+                                statblock={data.name}
+                                tokenData={data}
                                 itemId={itemId}
                             />
                         ))}
@@ -260,8 +262,8 @@ const E5StatBlock = ({ slug, tokenData, itemId }: { slug: string; tokenData: HpT
                             <E5Ability
                                 ability={action}
                                 key={action.name + index}
-                                statblock={tokenData.name}
-                                tokenData={tokenData}
+                                statblock={data.name}
+                                tokenData={data}
                                 itemId={itemId}
                             />
                         ))}
@@ -276,8 +278,8 @@ const E5StatBlock = ({ slug, tokenData, itemId }: { slug: string; tokenData: HpT
                             <E5Ability
                                 ability={action}
                                 key={action.name + index}
-                                statblock={tokenData.name}
-                                tokenData={tokenData}
+                                statblock={data.name}
+                                tokenData={data}
                                 itemId={itemId}
                             />
                         ))}
@@ -293,8 +295,8 @@ const E5StatBlock = ({ slug, tokenData, itemId }: { slug: string; tokenData: HpT
                             <E5Ability
                                 ability={legendary_action}
                                 key={legendary_action.name + index}
-                                statblock={tokenData.name}
-                                tokenData={tokenData}
+                                statblock={data.name}
+                                tokenData={data}
                                 itemId={itemId}
                             />
                         ))}
@@ -308,7 +310,7 @@ const E5StatBlock = ({ slug, tokenData, itemId }: { slug: string; tokenData: HpT
                         {statblock.spell_slots
                             .sort((a, b) => a.level - b.level)
                             .map((spellSlot, i) => {
-                                const limitValues = tokenData.stats.limits?.find((l) => l.id === spellSlot.limit!.name);
+                                const limitValues = data.stats.limits?.find((l) => l.id === spellSlot.limit!.name);
                                 return limitValues ? (
                                     <div className={"spell-slot-entry"} key={i}>
                                         <div className={"spell-slot-level"}>Level: {spellSlot.level}</div>
@@ -328,9 +330,9 @@ const E5StatBlock = ({ slug, tokenData, itemId }: { slug: string; tokenData: HpT
             {statblock.spells && statblock.spells.length > 0 ? (
                 <E5Spells
                     spells={statblock.spells}
-                    statblock={tokenData.name}
+                    statblock={data.name}
                     spellSlots={statblock.spell_slots}
-                    tokenData={tokenData}
+                    tokenData={data}
                     itemId={itemId}
                     dc={statblock.spell_dc}
                     attack={statblock.spell_attack}
@@ -542,13 +544,10 @@ const PfStatBlock = ({ slug, name }: { slug: string; name: string }) => {
     ) : null;
 };
 
-export const Statblock = (props: { data: HpTrackerMetadata; itemId: string }) => {
+export const Statblock = ({ id }: { id: string }) => {
     const room = useMetadataContext((state) => state.room);
-    const [data, setData] = useState<HpTrackerMetadata>(props.data);
-
-    useEffect(() => {
-        setData(props.data);
-    }, [props.data]);
+    const token = useTokenListContext((state) => state.tokens?.get(id));
+    const data = token?.data as HpTrackerMetadata;
 
     return (
         <div className={"statblock-wrapper"}>
@@ -566,9 +565,7 @@ export const Statblock = (props: { data: HpTrackerMetadata; itemId: string }) =>
                             stats: { ...data.stats, initiativeBonus: factor * value },
                         };
 
-                        setData({ ...newData });
-
-                        await OBR.scene.items.updateItems([props.itemId], (items) => {
+                        await OBR.scene.items.updateItems([id], (items) => {
                             items.forEach((item) => {
                                 item.metadata[itemMetadataKey] = { ...newData };
                             });
@@ -577,9 +574,9 @@ export const Statblock = (props: { data: HpTrackerMetadata; itemId: string }) =>
                 />
             </div>
             {room && room.ruleset === "e5" ? (
-                <E5StatBlock slug={props.data.sheet} tokenData={data} itemId={props.itemId} />
+                <E5StatBlock slug={data.sheet} itemId={id} />
             ) : (
-                <PfStatBlock slug={props.data.sheet} name={data.name} />
+                <PfStatBlock slug={data.sheet} name={data.name} />
             )}
         </div>
     );

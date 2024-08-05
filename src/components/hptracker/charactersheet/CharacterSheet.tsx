@@ -1,7 +1,7 @@
 import { ReactElement, useEffect, useRef, useState } from "react";
 import { useCharSheet } from "../../../context/CharacterContext.ts";
-import OBR, { Item } from "@owlbear-rodeo/sdk";
-import { itemMetadataKey, settingsModal } from "../../../helper/variables.ts";
+import OBR, { Image } from "@owlbear-rodeo/sdk";
+import { settingsModal } from "../../../helper/variables.ts";
 import { HpTrackerMetadata, Ruleset } from "../../../helper/types.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { SearchResult5e, SearchResultPf } from "./SearchResult.tsx";
@@ -9,6 +9,7 @@ import { Statblock } from "./Statblock.tsx";
 import { Helpbuttons } from "../../general/Helpbuttons/Helpbuttons.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { updateRoomMetadata } from "../../../helper/helpers.ts";
+import { useTokenListContext } from "../../../context/TokenContext.tsx";
 
 type SearchWrapperProps = {
     data: HpTrackerMetadata;
@@ -122,7 +123,7 @@ const StatblockWrapper = (props: StatblockWrapperProps) => {
     return (
         <>
             {props.data.sheet && !props.forceSearch ? (
-                <Statblock data={props.data} itemId={props.itemId} />
+                <Statblock id={props.itemId} />
             ) : props.search !== "" ? (
                 ruleSetMap.get(room?.ruleset || "e5")
             ) : (
@@ -133,51 +134,28 @@ const StatblockWrapper = (props: StatblockWrapperProps) => {
 };
 
 export const CharacterSheet = (props: { itemId: string }) => {
-    const { characterId, setId } = useCharSheet();
+    const { setId } = useCharSheet();
     const playerContext = usePlayerContext();
     const room = useMetadataContext((state) => state.room);
-    const [token, setToken] = useState<Item | null>(null);
-    const [data, setData] = useState<HpTrackerMetadata | null>(null);
+    const token = useTokenListContext((state) => state.tokens?.get(props.itemId));
+    const item = token?.item as Image;
+    const data = token?.data as HpTrackerMetadata;
     const [search, setSearch] = useState<string>("");
     const [forceSearch, setForceSearch] = useState<boolean>(false);
     const [emptySearch, setEmptySearch] = useState<boolean>(false);
     const [backgroundColor, setBackgroundColor] = useState<string>();
 
-    const initData = async (items: Item[]) => {
-        if (items.length > 0) {
-            const item = items[0];
-            if (playerContext.role !== "GM" && item.createdUserId === OBR.player.id) {
-                setBackgroundColor(await OBR.player.getColor());
-            }
-            if (itemMetadataKey in item.metadata) {
-                const d = item.metadata[itemMetadataKey] as HpTrackerMetadata;
-                setData(d);
-                if (!d.sheet) {
-                    setSearch(getSearchString(d.name));
-                }
-                setToken(item);
-            }
+    const initData = async () => {
+        if (playerContext.role !== "GM" && item.createdUserId === OBR.player.id) {
+            setBackgroundColor(await OBR.player.getColor());
         }
     };
 
     useEffect(() => {
-        const getToken = async () => {
-            if (characterId) {
-                const items = await OBR.scene.items.getItems([characterId]);
-
-                initData(items);
-            }
-        };
-
-        getToken();
-    }, [characterId]);
-
-    useEffect(() => {
-        OBR.scene.items.onChange(async (items) => {
-            const filteredItems = items.filter((item) => item.id === characterId);
-            initData(filteredItems);
-        });
-    }, []);
+        if (item) {
+            initData();
+        }
+    }, [token]);
 
     useEffect(() => {
         if (data?.sheet && data?.ruleset === room?.ruleset) {
@@ -196,7 +174,7 @@ export const CharacterSheet = (props: { itemId: string }) => {
                 Back
             </button>
             <Helpbuttons />
-            {token && data ? (
+            {item && data ? (
                 <div className={"content"}>
                     <h2 className={"statblock-name"}>
                         {data.name} <span className={"note"}>(using {room?.ruleset} Filter)</span>

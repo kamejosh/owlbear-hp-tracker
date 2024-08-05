@@ -1,7 +1,7 @@
 import { HpTrackerMetadata } from "../../helper/types.ts";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import { useEffect, useRef, useState } from "react";
-import OBR, { Item } from "@owlbear-rodeo/sdk";
+import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "../../helper/variables.ts";
 import { useCharSheet } from "../../context/CharacterContext.ts";
 import { updateHp } from "../../helper/hpHelpers.ts";
@@ -12,10 +12,10 @@ import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { useDiceRoller } from "../../context/DDDiceContext.tsx";
 import { diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../helper/diceHelper.ts";
 import { useRollLogContext } from "../../context/RollLogContext.tsx";
+import { useTokenListContext } from "../../context/TokenContext.tsx";
 
 type TokenProps = {
-    item: Item;
-    data: HpTrackerMetadata;
+    id: string;
     popover: boolean;
     selected: boolean;
     tokenLists?: Map<string, Array<Item>>;
@@ -23,7 +23,6 @@ type TokenProps = {
 
 export const Token = (props: TokenProps) => {
     const playerContext = usePlayerContext();
-    const [data, setData] = useState<HpTrackerMetadata>(props.data);
     const [editName, setEditName] = useState<boolean>(false);
     const room = useMetadataContext((state) => state.room);
     const setId = useCharSheet((state) => state.setId);
@@ -34,22 +33,21 @@ export const Token = (props: TokenProps) => {
     const maxHpRef = useRef<HTMLInputElement>(null);
     const tempHpRef = useRef<HTMLInputElement>(null);
     const initButtonRef = useRef<HTMLButtonElement>(null);
-
-    useEffect(() => {
-        setData(props.data);
-    }, [props.data]);
+    const token = useTokenListContext((state) => state.tokens?.get(props.id));
+    const data = token?.data as HpTrackerMetadata;
+    const item = token?.item as Image;
 
     useEffect(() => {
         if (hpRef && hpRef.current) {
-            hpRef.current.value = String(props.data.hp);
+            hpRef.current.value = String(data?.hp);
         }
-    }, [props.data.hp]);
+    }, [data?.hp]);
 
     useEffect(() => {
         if (maxHpRef && maxHpRef.current) {
-            maxHpRef.current.value = String(props.data.maxHp);
+            maxHpRef.current.value = String(data?.maxHp);
         }
-    }, [props.data.maxHp]);
+    }, [data?.maxHp]);
 
     useEffect(() => {
         // could be undefined so we check for boolean
@@ -72,8 +70,7 @@ export const Token = (props: TokenProps) => {
             }
         }
         newData.hp = room?.allowNegativeNumbers ? newHp : Math.max(newHp, 0);
-        updateHp(props.item, newData);
-        setData(newData);
+        updateHp(item, newData);
         handleValueChange(newData);
         if (hpRef && hpRef.current) {
             hpRef.current.value = String(newData.hp);
@@ -90,8 +87,7 @@ export const Token = (props: TokenProps) => {
         if (maxHp < newData.hp) {
             newData.hp = maxHp;
         }
-        updateHp(props.item, newData);
-        setData(newData);
+        updateHp(item, newData);
         handleValueChange(newData);
         if (maxHpRef && maxHpRef.current) {
             maxHpRef.current.value = String(newMax);
@@ -103,8 +99,7 @@ export const Token = (props: TokenProps) => {
             newAc = Math.max(newAc, 0);
         }
         const newData = { ...data, armorClass: newAc };
-        updateAc(props.item, newData);
-        setData(newData);
+        updateAc(item, newData);
         handleValueChange(newData);
     };
 
@@ -120,8 +115,7 @@ export const Token = (props: TokenProps) => {
             }
         }
         newData.hp = Math.min(newData.hp, newData.maxHp + newData.stats.tempHp);
-        updateHp(props.item, newData);
-        setData(newData);
+        updateHp(item, newData);
         handleValueChange(newData);
         if (hpRef && hpRef.current) {
             hpRef.current.value = String(newData.hp);
@@ -132,7 +126,7 @@ export const Token = (props: TokenProps) => {
     };
 
     const handleValueChange = (newData: HpTrackerMetadata) => {
-        OBR.scene.items.updateItems([props.item], (items) => {
+        OBR.scene.items.updateItems([props.id], (items) => {
             items.forEach((item) => {
                 // just assigning currentData did not trigger onChange event. Spreading helps
                 item.metadata[itemMetadataKey] = { ...newData };
@@ -195,32 +189,32 @@ export const Token = (props: TokenProps) => {
         e.stopPropagation();
         const currentSelection = (await OBR.player.getSelection()) || [];
         if (currentSelection.length === 0) {
-            await OBR.player.select([props.item.id]);
+            await OBR.player.select([props.id]);
         } else {
-            if (currentSelection.includes(props.item.id)) {
-                currentSelection.splice(currentSelection.indexOf(props.item.id), 1);
+            if (currentSelection.includes(props.id)) {
+                currentSelection.splice(currentSelection.indexOf(props.id), 1);
                 await OBR.player.select(currentSelection);
             } else {
                 if (e.shiftKey) {
                     const toSelect = getGroupSelectRange(currentSelection);
                     if (toSelect) {
                         const extendedSelection = currentSelection.concat(toSelect);
-                        extendedSelection.push(props.item.id);
+                        extendedSelection.push(props.id);
                         await OBR.player.select(extendedSelection);
                     }
                 } else if (e.metaKey || e.ctrlKey) {
-                    currentSelection.push(props.item.id);
+                    currentSelection.push(props.id);
                     await OBR.player.select(currentSelection);
                 } else {
-                    await OBR.player.select([props.item.id]);
+                    await OBR.player.select([props.id]);
                 }
             }
         }
     };
 
     const handleOnPlayerDoubleClick = async () => {
-        const bounds = await OBR.scene.items.getItemBounds([props.item.id]);
-        await OBR.player.select([props.item.id]);
+        const bounds = await OBR.scene.items.getItemBounds([props.id]);
+        await OBR.player.select([props.id]);
         await OBR.viewport.animateToBounds({
             ...bounds,
             min: { x: bounds.min.x - 1000, y: bounds.min.y - 1000 },
@@ -230,10 +224,10 @@ export const Token = (props: TokenProps) => {
 
     const display = (): boolean => {
         return (
-            props.data.hpTrackerActive &&
+            data.hpTrackerActive &&
             (playerContext.role === "GM" ||
-                (playerContext.role === "PLAYER" && props.data.canPlayersSee && props.item.visible) ||
-                props.item.createdUserId === playerContext.id)
+                (playerContext.role === "PLAYER" && data.canPlayersSee && item.visible) ||
+                item.createdUserId === playerContext.id)
         );
     };
 
@@ -254,8 +248,7 @@ export const Token = (props: TokenProps) => {
         } else {
             hp = Number(value * factor);
             const newData = { ...data, hp: hp, maxHp: Math.max(value, 0) };
-            updateHp(props.item, newData);
-            setData(newData);
+            updateHp(item, newData);
             handleValueChange(newData);
             if (maxHpRef && maxHpRef.current) {
                 maxHpRef.current.value = String(newData.maxHp);
@@ -309,7 +302,6 @@ export const Token = (props: TokenProps) => {
                             value={data.name}
                             onChange={(e) => {
                                 const newData = { ...data, name: e.target.value };
-                                setData(newData);
                                 handleValueChange(newData);
                             }}
                             onKeyDown={(e) => {
@@ -329,7 +321,7 @@ export const Token = (props: TokenProps) => {
                                 handleOnPlayerDoubleClick();
                             }}
                         >
-                            {props.data.name}
+                            {data.name}
                         </div>
                     )}
                     <button
@@ -346,9 +338,8 @@ export const Token = (props: TokenProps) => {
                         className={`toggle-button hp ${data.hpBar ? "on" : "off"}`}
                         onClick={() => {
                             const newData = { ...data, hpBar: !data.hpBar };
-                            setData(newData);
                             handleValueChange(newData);
-                            updateHp(props.item, newData);
+                            updateHp(item, newData);
                         }}
                     />
                     <button
@@ -356,9 +347,8 @@ export const Token = (props: TokenProps) => {
                         className={`toggle-button map ${data.hpOnMap ? "on" : "off"}`}
                         onClick={() => {
                             const newData = { ...data, hpOnMap: !data.hpOnMap };
-                            setData(newData);
                             handleValueChange(newData);
-                            updateHp(props.item, newData);
+                            updateHp(item, newData);
                         }}
                     />
                     <button
@@ -366,9 +356,8 @@ export const Token = (props: TokenProps) => {
                         className={`toggle-button ac ${data.acOnMap ? "on" : "off"}`}
                         onClick={async () => {
                             const newData = { ...data, acOnMap: !data.acOnMap };
-                            setData(newData);
                             handleValueChange(newData);
-                            updateAc(props.item, newData);
+                            updateAc(item, newData);
                         }}
                     />
                     <button
@@ -376,10 +365,9 @@ export const Token = (props: TokenProps) => {
                         className={`toggle-button players ${data.canPlayersSee ? "on" : "off"}`}
                         onClick={() => {
                             const newData = { ...data, canPlayersSee: !data.canPlayersSee };
-                            setData(newData);
                             handleValueChange(newData);
-                            updateHp(props.item, newData);
-                            updateAc(props.item, newData);
+                            updateHp(item, newData);
+                            updateAc(item, newData);
                         }}
                     />{" "}
                 </div>
@@ -497,7 +485,6 @@ export const Token = (props: TokenProps) => {
                     onChange={(e) => {
                         const value = Number(e.target.value.replace(/[^0-9]/g, ""));
                         const newData = { ...data, initiative: value };
-                        setData(newData);
                         handleValueChange(newData);
                     }}
                     className={"initiative"}
@@ -520,7 +507,6 @@ export const Token = (props: TokenProps) => {
                         onClick={async () => {
                             const value = await rollInitiative(false);
                             const newData = { ...data, initiative: value };
-                            setData(newData);
                             handleValueChange(newData);
                         }}
                     />
@@ -534,7 +520,6 @@ export const Token = (props: TokenProps) => {
                         onClick={async () => {
                             const value = await rollInitiative(true);
                             const newData = { ...data, initiative: value };
-                            setData(newData);
                             handleValueChange(newData);
                         }}
                     >
@@ -547,12 +532,12 @@ export const Token = (props: TokenProps) => {
                     <button
                         title={"Show Statblock"}
                         className={"toggle-button info-button"}
-                        onClick={() => setId(props.item.id)}
+                        onClick={() => setId(item.id)}
                     />
                 </div>
             )}
         </div>
-    ) : props.data.hpBar && props.item.visible ? (
+    ) : data.hpBar && item.visible ? (
         <div
             className={"player-wrapper player"}
             style={{ background: `linear-gradient(to right, ${getBgColor(data)}, #242424 50%, #242424 )` }}
@@ -564,7 +549,7 @@ export const Token = (props: TokenProps) => {
                     onMouseUp={handleOnPlayerClick}
                     onMouseLeave={handleOnPlayerClick}
                 >
-                    {props.data.name}
+                    {data.name}
                 </div>
             </div>
         </div>

@@ -20,6 +20,8 @@ import {
     toggleHpOnMap,
 } from "../../helper/multiTokenHelper.ts";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
+import { useTokenListContext } from "../../context/TokenContext.tsx";
+import { TokenContextWrapper } from "../TokenContextWrapper.tsx";
 
 export const Popover = () => {
     const [ids, setIds] = useState<Array<string>>([]);
@@ -41,13 +43,15 @@ export const Popover = () => {
 
     return (
         <ContextWrapper component={"popover"}>
-            {ids.length === 1 ? (
-                <Content id={ids[0]} />
-            ) : ids.length > 1 ? (
-                <MultiContent ids={ids} />
-            ) : (
-                <Loader className={"popover-spinner"} />
-            )}
+            <TokenContextWrapper>
+                {ids.length === 1 ? (
+                    <Content id={ids[0]} />
+                ) : ids.length > 1 ? (
+                    <MultiContent ids={ids} />
+                ) : (
+                    <Loader className={"popover-spinner"} />
+                )}
+            </TokenContextWrapper>
         </ContextWrapper>
     );
 };
@@ -204,50 +208,13 @@ const MultiContent = ({ ids }: { ids: Array<string> }) => {
 
 const Content = (props: { id: string }) => {
     const id = props.id;
-    const [data, setData] = useState<HpTrackerMetadata | null>(null);
-    const [item, setItem] = useState<Item | null>(null);
-    const { isReady } = SceneReadyContext();
-
-    const getData = async () => {
-        if (id) {
-            const items = await OBR.scene.items.getItems([id]);
-            if (items.length > 0) {
-                const item = items[0];
-                if (itemMetadataKey in item.metadata) {
-                    setData(item.metadata[itemMetadataKey] as HpTrackerMetadata);
-                    setItem(item);
-                }
-            }
-        }
-
-        return null;
-    };
-
-    const initPopover = async () => {
-        await getData();
-    };
-
-    useEffect(() => {
-        OBR.scene.items.onChange(async (items) => {
-            const filteredItems = items.filter((item) => item.id === id);
-            if (filteredItems.length > 0) {
-                const item = filteredItems[0];
-                if (itemMetadataKey in item.metadata) {
-                    setData(item.metadata[itemMetadataKey] as HpTrackerMetadata);
-                }
-            }
-        });
-    }, []);
-
-    useEffect(() => {
-        if (isReady) {
-            initPopover();
-        }
-    }, [isReady]);
+    const token = useTokenListContext((state) => state.tokens?.get(props.id));
+    const data = token?.data as HpTrackerMetadata;
+    const item = token?.item as Image;
 
     return id && data && item ? (
         <div className={"popover"}>
-            <Token item={item} data={data} popover={true} selected={false} />
+            <Token id={id} popover={true} selected={false} />
         </div>
     ) : null;
 };

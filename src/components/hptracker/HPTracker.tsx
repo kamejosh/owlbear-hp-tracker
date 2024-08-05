@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
@@ -16,22 +16,25 @@ import { Helpbuttons } from "../general/Helpbuttons/Helpbuttons.tsx";
 import { DiceTray } from "../general/DiceRoller/DiceTray.tsx";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { uniq } from "lodash";
+import { TokenContextWrapper } from "../TokenContextWrapper.tsx";
+import { useTokenListContext } from "../../context/TokenContext.tsx";
 
 export const HPTracker = () => {
     return (
         <ContextWrapper component={"action_window"}>
-            <Content />
-            <DiceTray classes={"hp-tracker-dice-tray"} />
+            <TokenContextWrapper>
+                <Content />
+                <DiceTray classes={"hp-tracker-dice-tray"} />
+            </TokenContextWrapper>
         </ContextWrapper>
     );
 };
 
 const Content = () => {
     const playerContext = usePlayerContext();
-    const [tokens, setTokens] = useState<Item[] | undefined>(undefined);
-    const [playerTokens, setPlayerTokens] = useState<Array<Item>>([]);
+    const tokens = useTokenListContext((state) => state.tokens);
+    const items = tokens ? [...tokens].map((t) => t[1].item) : [];
     const [selectedTokens, setSelectedTokens] = useState<Array<string>>([]);
-    const [tokenLists, setTokenLists] = useState<Map<string, Array<Item>>>(new Map());
     const [ignoredChanges, setIgnoredChanges] = useState<boolean>(false);
     const [scene, room] = useMetadataContext((state) => [state.scene, state.room]);
     const [reverseInitiativeOrder, setReverseInitiativeOrder] = useState<boolean>(false);
@@ -39,13 +42,6 @@ const Content = () => {
     const characterId = useCharSheet((state) => state.characterId);
 
     const initHpTracker = async () => {
-        const initialItems = await OBR.scene.items.getItems(
-            (item) =>
-                itemMetadataKey in item.metadata &&
-                (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpTrackerActive
-        );
-        setTokens(initialItems);
-
         if (
             playerContext.role === "GM" &&
             !room?.ignoreUpdateNotification &&
@@ -68,29 +64,33 @@ const Content = () => {
     useEffect(() => {
         if (isReady) {
             initHpTracker();
-
-            return OBR.scene.items.onChange(async (items) => {
-                const filteredItems = items.filter(
-                    (item) =>
-                        itemMetadataKey in item.metadata &&
-                        (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpTrackerActive
-                );
-                setTokens(Array.from(filteredItems));
-            });
         }
     }, [isReady]);
 
     useEffect(() => {
-        OBR.player.onChange((player) => {
+        return OBR.player.onChange((player) => {
             setSelectedTokens(player.selection ?? []);
         });
     }, []);
 
-    useEffect(() => {
+    const reorderMetadataIndex = (list: Array<Item>, group?: string) => {
+        OBR.scene.items.updateItems(list, (items) => {
+            items.forEach((item, index) => {
+                const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+                data.index = index;
+                if (group) {
+                    data.group = group;
+                }
+                item.metadata[itemMetadataKey] = { ...data };
+            });
+        });
+    };
+
+    const tokenLists = useCallback(() => {
         const tokenMap = new Map<string, Array<Item>>();
 
         scene?.groups?.forEach((group) => {
-            const groupItems = tokens?.filter((item) => {
+            const groupItems = items?.filter((item) => {
                 const metadata = item.metadata[itemMetadataKey] as HpTrackerMetadata;
                 return (
                     (!metadata.group && group === "Default") ||
@@ -106,18 +106,10 @@ const Content = () => {
                 tokenMap.set(group, groupItems ?? []);
             }
         });
+        return tokenMap;
+    }, [scene?.groups, items])();
 
-        setTokenLists(tokenMap);
-    }, [scene?.groups, tokens]);
-
-    useEffect(() => {
-        if (room?.playerSort && tokens) {
-            const localTokens = [...tokens];
-            setPlayerTokens(localTokens.sort(sortItemsInitiative));
-        } else {
-            setPlayerTokens(tokens ?? []);
-        }
-    }, [room?.playerSort, tokens]);
+    const playerTokens = room?.playerSort && items ? [...items].sort(sortItemsInitiative) : items ?? [];
 
     const reorderMetadataIndexMulti = (destList: Array<Item>, group: string, sourceList: Array<Item>) => {
         const combinedList = destList.concat(sourceList);
@@ -134,19 +126,6 @@ const Content = () => {
                 } else {
                     data.index = sourceIndex;
                     sourceIndex += 1;
-                }
-                item.metadata[itemMetadataKey] = { ...data };
-            });
-        });
-    };
-
-    const reorderMetadataIndex = (list: Array<Item>, group?: string) => {
-        OBR.scene.items.updateItems(list, (items) => {
-            items.forEach((item, index) => {
-                const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
-                data.index = index;
-                if (group) {
-                    data.group = group;
                 }
                 item.metadata[itemMetadataKey] = { ...data };
             });
@@ -336,7 +315,7 @@ const Content = () => {
                         ) : (
                             <DropGroup
                                 title={"Default"}
-                                list={Array.from(tokens ?? []).sort(sortItems)}
+                                list={Array.from(items ?? []).sort(sortItems)}
                                 selected={selectedTokens}
                                 tokenLists={tokenLists}
                             />

@@ -45,8 +45,7 @@ export const DraggableTokenList = React.memo(function DraggableTokenList(props: 
                                                     {...provided.dragHandleProps}
                                                 >
                                                     <Token
-                                                        item={token}
-                                                        data={data}
+                                                        id={token.id}
                                                         popover={false}
                                                         selected={props.selected.includes(token.id)}
                                                         tokenLists={props.tokenLists}
@@ -78,9 +77,7 @@ export const PlayerTokenList = (props: TokenListProps) => {
                 if (data) {
                     return (
                         <Token
-                            key={token.id}
-                            item={token}
-                            data={data}
+                            id={token.id}
                             popover={false}
                             selected={props.selected.includes(token.id)}
                             tokenLists={props.tokenLists}
