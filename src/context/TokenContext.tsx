@@ -24,7 +24,6 @@ export const useTokenListContext = create<TokenListContextType>()((set) => ({
     changeList: [],
     setTokens: (list) =>
         set((state) => {
-            const start = new Date().getTime();
             const newTokens = new Map();
             const changes: Array<TokenChange> = [];
             list.forEach((item) => {
@@ -53,8 +52,6 @@ export const useTokenListContext = create<TokenListContextType>()((set) => ({
                         changes.push({ changeType: "delete", id: e[0], oldData: e[1].data, newData: null });
                     });
             }
-            const end = new Date().getTime();
-            console.log(`set took: ${end - start}ms`);
             return { changeList: changes, tokens: newTokens };
         }),
 }));

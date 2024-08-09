@@ -98,13 +98,9 @@ export const updateAc = async (token: Item, data: HpTrackerMetadata) => {
     if (!show) {
         await deleteAttachments(acAttachment);
     } else {
-        const characters = await OBR.scene.items.getItems([token.id]);
-        if (characters.length > 0) {
-            const character = characters[0];
-            const changes = new Map<string, ACItemChanges>();
-            await saveOrChangeAC(character, data, acAttachment, changes, visible);
-            await updateAcChanges(changes);
-        }
+        const changes = new Map<string, ACItemChanges>();
+        await saveOrChangeAC(token, data, acAttachment, changes, visible);
+        await updateAcChanges(changes);
     }
 };
 

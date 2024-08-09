@@ -77,6 +77,7 @@ export const PlayerTokenList = (props: TokenListProps) => {
                 if (data) {
                     return (
                         <Token
+                            key={token.id}
                             id={token.id}
                             popover={false}
                             selected={props.selected.includes(token.id)}

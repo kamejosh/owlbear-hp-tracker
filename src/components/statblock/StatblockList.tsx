@@ -1,50 +1,49 @@
 import { Statblock } from "../hptracker/charactersheet/Statblock.tsx";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { FreeMode } from "swiper/modules";
+import { FreeMode, Mousewheel } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/free-mode";
-import { Item } from "@owlbear-rodeo/sdk";
+import "swiper/css/mousewheel";
 import { useEffect, useState } from "react";
 import { itemMetadataKey } from "../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../helper/types.ts";
 import SwiperClass from "swiper/types/swiper-class";
+import { getBgColor, sortItems } from "../../helper/helpers.ts";
+import { useTokenListContext } from "../../context/TokenContext.tsx";
 
 type StatblockListProps = {
     minimized: boolean;
-    tokens: Array<Item>;
     pinned: boolean;
     setPinned: (pinned: boolean) => void;
-    data: HpTrackerMetadata | null;
+    selection?: string;
 };
 export const StatblockList = (props: StatblockListProps) => {
-    const [data, setData] = useState<HpTrackerMetadata | null>(null);
-    const [id, setId] = useState<string>();
+    const tokens = useTokenListContext((state) => state.tokens);
+    const items = tokens ? [...tokens].map((t) => t[1].item).sort(sortItems) : [];
+    const [id, setId] = useState<string | undefined>();
     const [swiper, setSwiper] = useState<SwiperClass>();
 
     useEffect(() => {
-        if (!props.pinned && props.data && props.data.sheet) {
-            setData(props.data);
-            const index = props.tokens.findIndex((item) => {
-                if (itemMetadataKey in item.metadata && props.data) {
-                    const metadata = item.metadata[itemMetadataKey] as HpTrackerMetadata;
-                    return metadata.index === props.data.index && metadata.sheet === props.data.sheet;
+        if (!id && items.length > 0) {
+            setId(items[0].id);
+        }
+    }, [items, id]);
+
+    useEffect(() => {
+        if (!props.pinned && props.selection) {
+            setId(props.selection);
+            const index = items.findIndex((item) => {
+                if (props.selection) {
+                    return item.id === props.selection;
                 }
                 return false;
             });
             if (index >= 0 && swiper) {
-                setId(props.tokens[index].id);
+                setId(items[index].id);
                 swiper.slideTo(index, 100, false);
             }
         }
-    }, [props.data]);
-
-    const matches = (currentData: HpTrackerMetadata | null, itemData: HpTrackerMetadata) => {
-        return (
-            currentData?.index === itemData.index &&
-            currentData?.sheet === itemData.sheet &&
-            currentData?.group === itemData.group
-        );
-    };
+    }, [props.selection]);
 
     return (
         <>
@@ -54,24 +53,33 @@ export const StatblockList = (props: StatblockListProps) => {
                 direction={`horizontal`}
                 slidesPerView={"auto"}
                 spaceBetween={0}
-                modules={[FreeMode]}
+                modules={[FreeMode, Mousewheel]}
                 freeMode={true}
+                mousewheel={{ enabled: true, releaseOnEdges: true }}
             >
                 <SwiperSlide className={"pre"}> </SwiperSlide>
-                {props.tokens.map((token) => {
-                    const tokenData = token.metadata[itemMetadataKey] as HpTrackerMetadata;
+                {items.map((item) => {
+                    const tokenData = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+
                     return (
                         <SwiperSlide
-                            className={`statblock-name ${matches(data, tokenData) ? "active" : ""}`}
+                            className={`statblock-name ${item.id === id ? "active" : ""}`}
                             onClick={() => {
-                                setData(tokenData);
-                                setId(token.id);
+                                setId(item.id);
                             }}
-                            key={token.id}
+                            key={item.id}
                             title={tokenData.name}
+                            style={{
+                                background: `linear-gradient(to right, ${getBgColor(
+                                    tokenData
+                                )}, #1C1B22 100%, #1C1B22 )`,
+                            }}
                         >
                             <span className={"name"}>{tokenData.name}</span>
-                            {matches(data, tokenData) ? (
+                            <span className={"hp"}>
+                                {tokenData.hp}/{tokenData.maxHp}
+                            </span>
+                            {item.id === id ? (
                                 <button
                                     className={`pin ${props.pinned ? "pinned" : ""}`}
                                     title={"pin statblock"}
@@ -95,9 +103,7 @@ export const StatblockList = (props: StatblockListProps) => {
                 })}
                 <SwiperSlide className={"post"}> </SwiperSlide>
             </Swiper>
-            {props.minimized ? null : (
-                <div className={"statblock-sheet"}>{data && id ? <Statblock data={data} itemId={id} /> : null}</div>
-            )}
+            {props.minimized ? null : <div className={"statblock-sheet"}>{id ? <Statblock id={id} /> : null}</div>}
         </>
     );
 };

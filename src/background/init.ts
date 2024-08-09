@@ -133,8 +133,24 @@ const setupContextMenu = async () => {
                 icon: "/iconPopover.svg",
                 label: "HP Tracker",
                 filter: {
-                    every: [{ key: ["metadata", `${itemMetadataKey}`, "hpTrackerActive"], value: true }],
+                    some: [{ key: ["metadata", `${itemMetadataKey}`, "hpTrackerActive"], value: true }],
                     roles: ["GM"],
+                },
+            },
+            {
+                icon: "/iconPopover.svg",
+                label: "HP Tracker",
+                filter: {
+                    every: [{ key: ["metadata", `${itemMetadataKey}`, "hpTrackerActive"], value: true }],
+                    some: [
+                        {
+                            key: ["metadata", `${itemMetadataKey}`, "canPlayersSee"],
+                            value: true,
+                            coordinator: "||",
+                        },
+                        { key: ["createdUserId"], value: OBR.player.id },
+                    ],
+                    roles: ["PLAYER"],
                 },
             },
         ],
@@ -145,42 +161,13 @@ const setupContextMenu = async () => {
     });
 
     await OBR.contextMenu.create({
-        id: `${ID}/popoverPlayer`,
-        icons: [
-            {
-                icon: "/iconPopover.svg",
-                label: "HP Tracker",
-                filter: {
-                    every: [
-                        { key: ["metadata", `${itemMetadataKey}`, "hpTrackerActive"], value: true },
-                        {
-                            key: ["metadata", `${itemMetadataKey}`, "canPlayersSee"],
-                            value: true,
-                            coordinator: "&&",
-                        },
-                        { key: ["createdUserId"], value: OBR.player.id, coordinator: "||" },
-                    ],
-                    roles: ["PLAYER"],
-                },
-            },
-        ],
-        embed: {
-            url: "/popover.html",
-            height: 90,
-        },
-    });
-
-    await OBR.contextMenu.create({
         id: `${ID}/tool`,
         icons: [
             {
                 icon: "/icon.svg",
                 label: "Activate HP Tracker",
                 filter: {
-                    every: [
-                        { key: "type", value: "IMAGE", coordinator: "||" },
-                        { key: "type", value: "SHAPE" },
-                    ],
+                    every: [{ key: "type", value: "IMAGE" }],
                     some: [
                         { key: ["metadata", `${itemMetadataKey}`], value: undefined, coordinator: "||" },
                         {
@@ -326,13 +313,13 @@ const initTokens = async () => {
 
 OBR.onReady(async () => {
     console.info(`HP Tracker - version ${version} initializing`);
-    if ((await OBR.player.getRole()) === "GM") {
-        try {
-            await setupContextMenu();
-        } catch (e) {
-            console.warn("HP Tracker - error while setting up context menu");
-        }
+    try {
+        await setupContextMenu();
+    } catch (e) {
+        console.warn("HP Tracker - error while setting up context menu");
+    }
 
+    if ((await OBR.player.getRole()) === "GM") {
         try {
             await initRoom();
         } catch (e) {

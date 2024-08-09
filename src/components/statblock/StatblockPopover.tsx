@@ -1,52 +1,38 @@
-import { itemMetadataKey, statblockPopoverId } from "../../helper/variables.ts";
-import OBR, { Item } from "@owlbear-rodeo/sdk";
+import { statblockPopoverId } from "../../helper/variables.ts";
+import OBR from "@owlbear-rodeo/sdk";
 import { useEffect, useState } from "react";
 import { StatblockList } from "./StatblockList.tsx";
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
-import { HpTrackerMetadata } from "../../helper/types.ts";
-import { sortItems } from "../../helper/helpers.ts";
 import { DiceTray } from "../general/DiceRoller/DiceTray.tsx";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
+import { TokenContextWrapper } from "../TokenContextWrapper.tsx";
 
 export const StatblockPopover = () => {
+    return (
+        <ContextWrapper component={"statblock-popover"}>
+            <TokenContextWrapper>
+                <Content />
+            </TokenContextWrapper>
+        </ContextWrapper>
+    );
+};
+
+const Content = () => {
     const [minimized, setMinimized] = useState<boolean>(false);
-    const [tokens, setTokens] = useState<Array<Item>>([]);
-    const [sortedTokens, setSortedTokens] = useState<Array<Item>>([]);
     const [pinned, setPinned] = useState<boolean>(false);
-    const [data, setData] = useState<HpTrackerMetadata | null>(null);
-    const [room, scene] = useMetadataContext((state) => [state.room, state.scene]);
+    const [selection, setSelection] = useState<string>();
+    const [room] = useMetadataContext((state) => [state.room, state.scene]);
     const { isReady } = SceneReadyContext();
 
     const initPopover = async () => {
-        const initialItems = await OBR.scene.items.getItems(
-            (item) =>
-                itemMetadataKey in item.metadata &&
-                (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpTrackerActive &&
-                (item.metadata[itemMetadataKey] as HpTrackerMetadata).sheet !== ""
-        );
-        setTokens(initialItems.sort(sortItems));
-
-        OBR.scene.items.onChange(async (items) => {
-            const filteredItems = items.filter(
-                (item) =>
-                    itemMetadataKey in item.metadata &&
-                    (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpTrackerActive &&
-                    (item.metadata[itemMetadataKey] as HpTrackerMetadata).sheet !== ""
-            );
-            setTokens(Array.from(filteredItems.sort(sortItems)));
-        });
-
         OBR.player.onChange(async (player) => {
             if (player.selection && player.selection.length === 1) {
-                const items = await OBR.scene.items.getItems(player.selection);
-                if (items.length > 0) {
-                    const metadata = items[0].metadata;
-                    if (itemMetadataKey in metadata) {
-                        const data = metadata[itemMetadataKey] as HpTrackerMetadata;
-                        setData(data);
-                    }
+                if (player.selection[0] !== selection) {
+                    setSelection(player.selection[0]);
                 }
+            } else {
+                setSelection(undefined);
             }
         });
     };
@@ -59,31 +45,13 @@ export const StatblockPopover = () => {
     }, [room, isReady]);
 
     useEffect(() => {
-        let tempList: Array<Item> = [];
-
-        scene?.groups?.forEach((group) => {
-            const groupItems = tokens?.filter((item) => {
-                const metadata = item.metadata[itemMetadataKey] as HpTrackerMetadata;
-                return (
-                    (!metadata.group && group === "Default") ||
-                    metadata.group === group ||
-                    (!scene?.groups?.includes(metadata.group ?? "") && group === "Default")
-                );
-            });
-            tempList = tempList.concat(groupItems ?? []);
-        });
-
-        setSortedTokens(tempList);
-    }, [scene?.groups, tokens]);
-
-    useEffect(() => {
         if (isReady) {
             initPopover();
         }
     }, [isReady]);
 
     return (
-        <ContextWrapper component={"statblock_popover"}>
+        <>
             <div className={`statblock-popover ${minimized ? "minimized" : ""}`}>
                 <div className={"help-buttons statblock"}>
                     <button
@@ -108,15 +76,9 @@ export const StatblockPopover = () => {
                         X
                     </button>
                 </div>
-                <StatblockList
-                    minimized={minimized}
-                    tokens={sortedTokens}
-                    pinned={pinned}
-                    setPinned={setPinned}
-                    data={data}
-                />
+                <StatblockList minimized={minimized} pinned={pinned} setPinned={setPinned} selection={selection} />
             </div>
             <DiceTray classes={`statblock-dice-tray ${minimized ? "hidden" : ""}`} />
-        </ContextWrapper>
+        </>
     );
 };

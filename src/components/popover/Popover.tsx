@@ -1,7 +1,7 @@
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import { useEffect, useRef, useState } from "react";
 import { Token } from "../hptracker/Token.tsx";
-import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
+import OBR, { Image } from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../helper/types.ts";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
@@ -29,10 +29,7 @@ export const Popover = () => {
 
     const initPopover = async () => {
         const selection = await OBR.player.getSelection();
-        if (selection) {
-            const items = await OBR.scene.items.getItems<Image>(selection);
-            setIds(items.map((item) => item.id));
-        }
+        setIds(selection ?? []);
     };
 
     useEffect(() => {
@@ -57,15 +54,11 @@ export const Popover = () => {
 };
 
 const MultiContent = ({ ids }: { ids: Array<string> }) => {
-    const [items, setItems] = useState<Array<Item>>([]);
+    const tokens = useTokenListContext((state) => state.tokens);
     const inputRef = useRef<HTMLInputElement>(null);
     const { room } = useMetadataContext();
-    const { isReady } = SceneReadyContext();
     const playerContext = usePlayerContext();
-
-    const initPopover = async () => {
-        setItems(await OBR.scene.items.getItems(ids));
-    };
+    const items = tokens ? [...tokens.values()].filter((v) => ids.includes(v.item.id)).map((v) => v.item) : [];
 
     const changeHP = async (value: number) => {
         await OBR.scene.items.updateItems(items, (uItems) => {
@@ -94,31 +87,6 @@ const MultiContent = ({ ids }: { ids: Array<string> }) => {
             });
         });
     };
-
-    useEffect(() => {
-        OBR.scene.items.onChange(async (cItems) => {
-            const filteredItems = cItems.filter((item) => ids.includes(item.id));
-            let localItems = Array.from(items);
-
-            if (filteredItems.length > 0) {
-                filteredItems.forEach((item) => {
-                    const index = localItems.findIndex((lItem) => lItem.id === item.id);
-                    if (index >= 0) {
-                        localItems.splice(index, 1, item);
-                    } else {
-                        localItems.push(item);
-                    }
-                });
-            }
-            setItems(localItems);
-        });
-    }, []);
-
-    useEffect(() => {
-        if (isReady) {
-            initPopover();
-        }
-    }, [isReady]);
 
     return (
         <div className={"popover multi-selection"}>
