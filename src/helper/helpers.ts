@@ -17,7 +17,7 @@ import diff_match_patch from "./diff/diff_match_patch.ts";
 import { E5Statblock } from "../api/e5/useE5Api.ts";
 import { PfStatblock } from "../api/pf/usePfApi.ts";
 import axiosRetry from "axios-retry";
-import { Ability } from "../components/hptracker/charactersheet/E5Ability.tsx";
+import { Ability } from "../components/hptracker/charactersheet/e5/E5Ability.tsx";
 
 export const getYOffset = async (height: number) => {
     const metadata = (await OBR.room.getMetadata()) as Metadata;
@@ -198,12 +198,7 @@ export const updateSceneMetadata = async (scene: SceneMetadata | null, data: Par
     ownMetadata[metadataKey] = { ...scene, ...data };
 
     if (!scene || !objectsEqual(ownMetadata, scene)) {
-        if (await OBR.scene.isReady()) {
-            console.log("scene was ready");
-            await OBR.scene.setMetadata({ ...ownMetadata });
-        } else {
-            console.log("scene wasn't ready");
-        }
+        await OBR.scene.setMetadata({ ...ownMetadata });
     }
 };
 

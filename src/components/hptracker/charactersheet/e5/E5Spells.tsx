@@ -1,12 +1,12 @@
-import { components } from "../../../api/schema";
+import { components } from "../../../../api/schema";
 import { useState } from "react";
-import { DiceButton, DiceButtonWrapper } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
-import { getDamage, updateLimit } from "../../../helper/helpers.ts";
-import { SpellFilter } from "./SpellFilter.tsx";
+import { DiceButton, DiceButtonWrapper } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { getDamage, updateLimit } from "../../../../helper/helpers.ts";
+import { SpellFilter } from "../SpellFilter.tsx";
 import { capitalize } from "lodash";
-import { E5SpellSlot } from "../../../api/e5/useE5Api.ts";
-import { HpTrackerMetadata } from "../../../helper/types.ts";
-import { useMetadataContext } from "../../../context/MetadataContext.ts";
+import { E5SpellSlot } from "../../../../api/e5/useE5Api.ts";
+import { HpTrackerMetadata } from "../../../../helper/types.ts";
+import { useMetadataContext } from "../../../../context/MetadataContext.ts";
 import tippy, { Instance } from "tippy.js";
 
 type Spell = components["schemas"]["src__types__e5__Spell"];

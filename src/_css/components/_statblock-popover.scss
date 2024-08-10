@@ -107,7 +107,8 @@ body:has(.statblock-app) {
                     width: 0;
                     height: 23px;
 
-                    &:hover {
+                    &:hover,
+                    &:focus-visible {
                         width: 100px;
                         .name,
                         .hp {

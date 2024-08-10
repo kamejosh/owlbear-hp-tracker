@@ -3,7 +3,7 @@ import OBR, { Item } from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../helper/types.ts";
 import { Draggable } from "react-beautiful-dnd";
-import { Token } from "./Token.tsx";
+import { Token } from "./Token/Token.tsx";
 
 type TokenListProps = {
     tokens: Item[];

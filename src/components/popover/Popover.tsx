@@ -1,6 +1,6 @@
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import { useEffect, useRef, useState } from "react";
-import { Token } from "../hptracker/Token.tsx";
+import { Token } from "../hptracker/Token/Token.tsx";
 import OBR, { Image } from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../helper/types.ts";

@@ -1,9 +1,9 @@
-import { components } from "../../../api/schema";
-import { DiceButton, DiceButtonWrapper } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { components } from "../../../../api/schema";
+import { DiceButton, DiceButtonWrapper } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { capitalize } from "lodash";
-import { LimitComponent } from "./LimitComponent.tsx";
-import { HpTrackerMetadata } from "../../../helper/types.ts";
-import { updateLimit } from "../../../helper/helpers.ts";
+import { LimitComponent } from "../LimitComponent.tsx";
+import { HpTrackerMetadata } from "../../../../helper/types.ts";
+import { updateLimit } from "../../../../helper/helpers.ts";
 
 export type Ability = components["schemas"]["Action-Output"];
 

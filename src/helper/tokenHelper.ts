@@ -1,0 +1,130 @@
+import { HpTrackerMetadata, RoomMetadata } from "./types.ts";
+import OBR, { Image } from "@owlbear-rodeo/sdk";
+import { itemMetadataKey } from "./variables.ts";
+import { evalString } from "./helpers.ts";
+import { updateHp } from "./hpHelpers.ts";
+import { RefObject } from "react";
+import { updateAc } from "./acHelper.ts";
+
+export const updateTokenMetadata = async (tokenData: HpTrackerMetadata, ids: Array<string>) => {
+    await OBR.scene.items.updateItems(ids, (items) => {
+        items.forEach((item) => {
+            item.metadata[itemMetadataKey] = { ...tokenData };
+        });
+    });
+};
+
+export const changeHp = async (
+    newHp: number,
+    data: HpTrackerMetadata,
+    item: Image,
+    hpRef?: RefObject<HTMLInputElement>,
+    tempHpRef?: RefObject<HTMLInputElement>,
+    room?: RoomMetadata | null
+) => {
+    const newData = { ...data };
+    if (newHp < data.hp && data.stats.tempHp && data.stats.tempHp > 0) {
+        newData.stats.tempHp = Math.max(data.stats.tempHp - (data.hp - newHp), 0);
+        if (tempHpRef && tempHpRef.current) {
+            tempHpRef.current.value = String(newData.stats.tempHp);
+        }
+    }
+    newData.hp = room?.allowNegativeNumbers ? newHp : Math.max(newHp, 0);
+    updateHp(item, newData);
+    updateTokenMetadata(newData, [item.id]);
+    if (hpRef && hpRef.current) {
+        hpRef.current.value = String(newData.hp);
+    }
+};
+
+export const getNewHpValue = (
+    input: string,
+    data: HpTrackerMetadata,
+    item: Image,
+    maxHpRef?: RefObject<HTMLInputElement>,
+    room?: RoomMetadata | null
+) => {
+    let value: number;
+    let factor = 1;
+    if (room?.allowNegativeNumbers) {
+        factor = input.startsWith("-") ? -1 : 1;
+    }
+    if (input.indexOf("+") > 0 || input.indexOf("-") > 0) {
+        value = Number(evalString(input));
+    } else {
+        value = Number(input.replace(/[^0-9]/g, ""));
+    }
+    let hp: number;
+    if (data.maxHp > 0) {
+        hp = Math.min(Number(value * factor), data.stats.tempHp ? data.maxHp + data.stats.tempHp : data.maxHp);
+    } else {
+        hp = Number(value * factor);
+        const newData = { ...data, hp: hp, maxHp: Math.max(value, 0) };
+        updateHp(item, newData);
+        updateTokenMetadata(newData, [item.id]);
+        if (maxHpRef && maxHpRef.current) {
+            maxHpRef.current.value = String(newData.maxHp);
+        }
+        return null;
+    }
+    return room?.allowNegativeNumbers ? hp : Math.max(hp, 0);
+};
+
+export const changeMaxHp = (
+    newMax: number,
+    data: HpTrackerMetadata,
+    item: Image,
+    maxHpRef?: RefObject<HTMLInputElement>
+) => {
+    const newData = { ...data };
+    newData.maxHp = Math.max(newMax, 0);
+    let maxHp = newData.maxHp;
+    if (newData.stats.tempHp) {
+        maxHp += newData.stats.tempHp;
+    }
+    if (maxHp < newData.hp) {
+        newData.hp = maxHp;
+    }
+    updateHp(item, newData);
+    updateTokenMetadata(newData, [item.id]);
+    if (maxHpRef && maxHpRef.current) {
+        maxHpRef.current.value = String(newMax);
+    }
+};
+
+export const changeTempHp = (
+    newTempHp: number,
+    data: HpTrackerMetadata,
+    item: Image,
+    hpRef?: RefObject<HTMLInputElement>,
+    tempHpRef?: RefObject<HTMLInputElement>
+) => {
+    // temporary hitpoints can't be negative
+    newTempHp = Math.max(newTempHp, 0);
+    const newData = { ...data, stats: { ...data.stats, tempHp: newTempHp } };
+    if (newTempHp > 0) {
+        if (!data.stats.tempHp) {
+            newData.hp += newTempHp;
+        } else {
+            newData.hp += newTempHp - data.stats.tempHp;
+        }
+    }
+    newData.hp = Math.min(newData.hp, newData.maxHp + newData.stats.tempHp);
+    updateHp(item, newData);
+    updateTokenMetadata(newData, [item.id]);
+    if (hpRef && hpRef.current) {
+        hpRef.current.value = String(newData.hp);
+    }
+    if (tempHpRef && tempHpRef.current) {
+        tempHpRef.current.value = String(newData.stats.tempHp);
+    }
+};
+
+export const changeArmorClass = (newAc: number, data: HpTrackerMetadata, item: Image, room?: RoomMetadata | null) => {
+    if (!room?.allowNegativeNumbers) {
+        newAc = Math.max(newAc, 0);
+    }
+    const newData = { ...data, armorClass: newAc };
+    updateAc(item, newData);
+    updateTokenMetadata(newData, [item.id]);
+};

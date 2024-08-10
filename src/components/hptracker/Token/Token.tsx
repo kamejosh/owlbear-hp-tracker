@@ -1,19 +1,22 @@
-import { HpTrackerMetadata } from "../../helper/types.ts";
-import { usePlayerContext } from "../../context/PlayerContext.ts";
+import { HpTrackerMetadata } from "../../../helper/types.ts";
+import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { useEffect, useRef, useState } from "react";
 import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
-import { itemMetadataKey } from "../../helper/variables.ts";
-import { useCharSheet } from "../../context/CharacterContext.ts";
-import { updateHp } from "../../helper/hpHelpers.ts";
-import { evalString, getBgColor, getRoomDiceUser } from "../../helper/helpers.ts";
-import { updateAc } from "../../helper/acHelper.ts";
+import { itemMetadataKey } from "../../../helper/variables.ts";
+import { useCharSheet } from "../../../context/CharacterContext.ts";
+import { updateHp } from "../../../helper/hpHelpers.ts";
+import { getBgColor, getRoomDiceUser } from "../../../helper/helpers.ts";
+import { updateAc } from "../../../helper/acHelper.ts";
 import _ from "lodash";
-import { useMetadataContext } from "../../context/MetadataContext.ts";
-import { useDiceRoller } from "../../context/DDDiceContext.tsx";
-import { diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../helper/diceHelper.ts";
-import { useRollLogContext } from "../../context/RollLogContext.tsx";
-import { useTokenListContext } from "../../context/TokenContext.tsx";
-import { useComponentContext } from "../../context/ComponentContext.tsx";
+import { useMetadataContext } from "../../../context/MetadataContext.ts";
+import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
+import { diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
+import { useRollLogContext } from "../../../context/RollLogContext.tsx";
+import { useTokenListContext } from "../../../context/TokenContext.tsx";
+import { useComponentContext } from "../../../context/ComponentContext.tsx";
+import { changeArmorClass, changeHp } from "../../../helper/tokenHelper.ts";
+import { HP } from "./HP.tsx";
+import { AC } from "./AC.tsx";
 
 type TokenProps = {
     id: string;
@@ -31,101 +34,22 @@ export const Token = (props: TokenProps) => {
     const component = useComponentContext((state) => state.component);
     const addRoll = useRollLogContext((state) => state.addRoll);
     const [initHover, setInitHover] = useState<boolean>(false);
-    const hpRef = useRef<HTMLInputElement>(null);
-    const maxHpRef = useRef<HTMLInputElement>(null);
-    const tempHpRef = useRef<HTMLInputElement>(null);
     const initButtonRef = useRef<HTMLButtonElement>(null);
     const token = useTokenListContext((state) => state.tokens?.get(props.id));
     const data = token?.data as HpTrackerMetadata;
     const item = token?.item as Image;
 
     useEffect(() => {
-        if (hpRef && hpRef.current) {
-            hpRef.current.value = String(data?.hp);
-        }
-    }, [data?.hp]);
-
-    useEffect(() => {
-        if (maxHpRef && maxHpRef.current) {
-            maxHpRef.current.value = String(data?.maxHp);
-        }
-    }, [data?.maxHp]);
-
-    useEffect(() => {
         // could be undefined so we check for boolean
         if (room && room.allowNegativeNumbers === false) {
             if (data.hp < 0) {
-                changeHp(0);
+                changeHp(0, data, item, undefined, undefined, room);
             }
             if (data.armorClass < 0) {
-                changeArmorClass(0);
+                changeArmorClass(0, data, item, room);
             }
         }
     }, [room?.allowNegativeNumbers]);
-
-    const changeHp = (newHp: number) => {
-        const newData = { ...data };
-        if (newHp < data.hp && data.stats.tempHp && data.stats.tempHp > 0) {
-            newData.stats.tempHp = Math.max(data.stats.tempHp - (data.hp - newHp), 0);
-            if (tempHpRef && tempHpRef.current) {
-                tempHpRef.current.value = String(newData.stats.tempHp);
-            }
-        }
-        newData.hp = room?.allowNegativeNumbers ? newHp : Math.max(newHp, 0);
-        updateHp(item, newData);
-        handleValueChange(newData);
-        if (hpRef && hpRef.current) {
-            hpRef.current.value = String(newData.hp);
-        }
-    };
-
-    const changeMaxHp = (newMax: number) => {
-        const newData = { ...data };
-        newData.maxHp = Math.max(newMax, 0);
-        let maxHp = newData.maxHp;
-        if (newData.stats.tempHp) {
-            maxHp += newData.stats.tempHp;
-        }
-        if (maxHp < newData.hp) {
-            newData.hp = maxHp;
-        }
-        updateHp(item, newData);
-        handleValueChange(newData);
-        if (maxHpRef && maxHpRef.current) {
-            maxHpRef.current.value = String(newMax);
-        }
-    };
-
-    const changeArmorClass = (newAc: number) => {
-        if (!room?.allowNegativeNumbers) {
-            newAc = Math.max(newAc, 0);
-        }
-        const newData = { ...data, armorClass: newAc };
-        updateAc(item, newData);
-        handleValueChange(newData);
-    };
-
-    const changeTempHp = (newTempHp: number) => {
-        // temporary hitpoints can't be negative
-        newTempHp = Math.max(newTempHp, 0);
-        const newData = { ...data, stats: { ...data.stats, tempHp: newTempHp } };
-        if (newTempHp > 0) {
-            if (!data.stats.tempHp) {
-                newData.hp += newTempHp;
-            } else {
-                newData.hp += newTempHp - data.stats.tempHp;
-            }
-        }
-        newData.hp = Math.min(newData.hp, newData.maxHp + newData.stats.tempHp);
-        updateHp(item, newData);
-        handleValueChange(newData);
-        if (hpRef && hpRef.current) {
-            hpRef.current.value = String(newData.hp);
-        }
-        if (tempHpRef && tempHpRef.current) {
-            tempHpRef.current.value = String(newData.stats.tempHp);
-        }
-    };
 
     const handleValueChange = (newData: HpTrackerMetadata) => {
         OBR.scene.items.updateItems([props.id], (items) => {
@@ -231,33 +155,6 @@ export const Token = (props: TokenProps) => {
                 (playerContext.role === "PLAYER" && data.canPlayersSee && item.visible) ||
                 item.createdUserId === playerContext.id)
         );
-    };
-
-    const getNewHpValue = (input: string) => {
-        let value: number;
-        let factor = 1;
-        if (room?.allowNegativeNumbers) {
-            factor = input.startsWith("-") ? -1 : 1;
-        }
-        if (input.indexOf("+") > 0 || input.indexOf("-") > 0) {
-            value = Number(evalString(input));
-        } else {
-            value = Number(input.replace(/[^0-9]/g, ""));
-        }
-        let hp: number;
-        if (data.maxHp > 0) {
-            hp = Math.min(Number(value * factor), data.stats.tempHp ? data.maxHp + data.stats.tempHp : data.maxHp);
-        } else {
-            hp = Number(value * factor);
-            const newData = { ...data, hp: hp, maxHp: Math.max(value, 0) };
-            updateHp(item, newData);
-            handleValueChange(newData);
-            if (maxHpRef && maxHpRef.current) {
-                maxHpRef.current.value = String(newData.maxHp);
-            }
-            return null;
-        }
-        return room?.allowNegativeNumbers ? hp : Math.max(hp, 0);
     };
 
     const rollInitiative = async (hidden: boolean) => {
@@ -374,111 +271,8 @@ export const Token = (props: TokenProps) => {
                     />{" "}
                 </div>
             ) : null}
-            <div className={"current-hp"}>
-                <input
-                    ref={hpRef}
-                    type={"text"}
-                    size={3}
-                    defaultValue={data.hp}
-                    onBlur={(e) => {
-                        const input = e.target.value;
-                        const hp = getNewHpValue(input);
-                        if (hp !== null) {
-                            e.target.value = String(hp);
-                            changeHp(hp);
-                        }
-                    }}
-                    onKeyDown={(e) => {
-                        if (e.key === "ArrowUp") {
-                            const hp = Math.min(
-                                data.hp + 1,
-                                data.stats.tempHp ? data.maxHp + data.stats.tempHp : data.maxHp
-                            );
-                            changeHp(hp);
-                            e.currentTarget.value = String(hp);
-                        } else if (e.key === "ArrowDown") {
-                            const hp = Math.min(
-                                data.hp - 1,
-                                data.stats.tempHp ? data.maxHp + data.stats.tempHp : data.maxHp
-                            );
-                            changeHp(hp);
-                            e.currentTarget.value = String(hp);
-                        } else if (e.key === "Enter") {
-                            const input = e.currentTarget.value;
-                            const hp = getNewHpValue(input);
-                            if (hp !== null) {
-                                e.currentTarget.value = String(hp);
-                                changeHp(hp);
-                            }
-                        }
-                    }}
-                />
-                <span>/</span>
-                <input
-                    type={"text"}
-                    size={3}
-                    ref={maxHpRef}
-                    defaultValue={data.maxHp}
-                    onKeyDown={(e) => {
-                        if (e.key === "ArrowUp") {
-                            changeMaxHp(data.maxHp + 1);
-                        } else if (e.key === "ArrowDown") {
-                            changeMaxHp(data.maxHp - 1);
-                        } else if (e.key === "Enter") {
-                            const value = Number(e.currentTarget.value.replace(/[^0-9]/g, ""));
-                            changeMaxHp(value);
-                        }
-                    }}
-                    onBlur={(e) => {
-                        const value = Number(e.target.value.replace(/[^0-9]/g, ""));
-                        changeMaxHp(value);
-                    }}
-                />
-            </div>
-            <div className={"temp-hp"}>
-                <input
-                    type={"text"}
-                    size={1}
-                    defaultValue={data.stats.tempHp}
-                    ref={tempHpRef}
-                    onKeyDown={(e) => {
-                        if (e.key === "ArrowUp") {
-                            changeTempHp((data.stats.tempHp || 0) + 1);
-                        } else if (e.key === "ArrowDown") {
-                            changeTempHp((data.stats.tempHp || 0) - 1);
-                        } else if (e.key === "Enter") {
-                            const value = Number(e.currentTarget.value.replace(/[^0-9]/g, ""));
-                            changeTempHp(value);
-                        }
-                    }}
-                    onBlur={(e) => {
-                        const value = Number(e.target.value.replace(/[^0-9]/g, ""));
-                        changeTempHp(value);
-                    }}
-                />
-            </div>
-            <div className={"armor-class"}>
-                <input
-                    type={"text"}
-                    size={1}
-                    value={data.armorClass}
-                    onChange={(e) => {
-                        let factor = 1;
-                        if (room?.allowNegativeNumbers) {
-                            factor = e.target.value.startsWith("-") ? -1 : 1;
-                        }
-                        const value = Number(e.target.value.replace(/[^0-9]/g, ""));
-                        changeArmorClass(value * factor);
-                    }}
-                    onKeyDown={(e) => {
-                        if (e.key === "ArrowUp") {
-                            changeArmorClass(data.armorClass + 1);
-                        } else if (e.key === "ArrowDown") {
-                            changeArmorClass(data.armorClass - 1);
-                        }
-                    }}
-                />
-            </div>
+            <HP id={props.id} />
+            <AC id={props.id} />
             <div className={"initiative-wrapper"}>
                 <input
                     type={"text"}
