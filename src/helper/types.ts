@@ -53,6 +53,7 @@ export type SceneMetadata = {
     id?: string;
     groups?: Array<string>;
     openGroups?: Array<string>;
+    collapsedStatblocks?: Array<string>;
 };
 
 export type DiceUser = {

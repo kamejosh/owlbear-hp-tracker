@@ -8,8 +8,10 @@ import { useEffect, useState } from "react";
 import { itemMetadataKey } from "../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../helper/types.ts";
 import SwiperClass from "swiper/types/swiper-class";
-import { getBgColor, sortItems } from "../../helper/helpers.ts";
+import { getBgColor, sortItems, updateSceneMetadata } from "../../helper/helpers.ts";
 import { useTokenListContext } from "../../context/TokenContext.tsx";
+import { useMetadataContext } from "../../context/MetadataContext.ts";
+import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 
 type StatblockListProps = {
     minimized: boolean;
@@ -19,9 +21,11 @@ type StatblockListProps = {
 };
 export const StatblockList = (props: StatblockListProps) => {
     const tokens = useTokenListContext((state) => state.tokens);
-    const items = tokens ? [...tokens].map((t) => t[1].item).sort(sortItems) : [];
+    const [scene, collapsedStatblocks] = useMetadataContext((state) => [state.scene, state.scene?.collapsedStatblocks]);
+    const { isReady } = SceneReadyContext();
     const [id, setId] = useState<string | undefined>();
     const [swiper, setSwiper] = useState<SwiperClass>();
+    const items = tokens ? [...tokens].map((t) => t[1].item).sort(sortItems) : [];
 
     useEffect(() => {
         if (!id && items.length > 0) {
@@ -31,10 +35,10 @@ export const StatblockList = (props: StatblockListProps) => {
 
     useEffect(() => {
         if (!props.pinned && props.selection) {
-            setId(props.selection);
             const index = items.findIndex((item) => {
                 if (props.selection) {
-                    return item.id === props.selection;
+                    const collapsed = collapsedStatblocks?.includes(item.id);
+                    return item.id === props.selection && !collapsed;
                 }
                 return false;
             });
@@ -45,7 +49,7 @@ export const StatblockList = (props: StatblockListProps) => {
         }
     }, [props.selection]);
 
-    return (
+    return isReady && scene ? (
         <>
             <Swiper
                 onSwiper={setSwiper}
@@ -60,12 +64,35 @@ export const StatblockList = (props: StatblockListProps) => {
                 <SwiperSlide className={"pre"}> </SwiperSlide>
                 {items.map((item) => {
                     const tokenData = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+                    const collapsed = collapsedStatblocks?.includes(item.id);
 
                     return (
                         <SwiperSlide
-                            className={`statblock-name ${item.id === id ? "active" : ""}`}
+                            className={`statblock-name ${item.id === id ? "active" : ""} ${
+                                collapsed && item.id !== id ? "collapsed" : ""
+                            }`}
                             onClick={() => {
                                 setId(item.id);
+                            }}
+                            onContextMenu={async (e) => {
+                                e.preventDefault();
+
+                                if (collapsedStatblocks) {
+                                    const newCollapse = [...collapsedStatblocks];
+                                    if (newCollapse.includes(item.id)) {
+                                        newCollapse.splice(
+                                            newCollapse.findIndex((c) => c === item.id),
+                                            1
+                                        );
+                                    } else {
+                                        newCollapse.push(item.id);
+                                    }
+                                    await updateSceneMetadata(scene, { collapsedStatblocks: newCollapse });
+                                } else {
+                                    await updateSceneMetadata(scene, {
+                                        collapsedStatblocks: [item.id],
+                                    });
+                                }
                             }}
                             key={item.id}
                             title={tokenData.name}
@@ -105,5 +132,7 @@ export const StatblockList = (props: StatblockListProps) => {
             </Swiper>
             {props.minimized ? null : <div className={"statblock-sheet"}>{id ? <Statblock id={id} /> : null}</div>}
         </>
+    ) : (
+        <></>
     );
 };

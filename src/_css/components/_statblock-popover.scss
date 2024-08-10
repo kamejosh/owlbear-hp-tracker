@@ -98,6 +98,29 @@ body:has(.statblock-app) {
                     }
                 }
 
+                &.collapsed {
+                    transition: all 0.25s ease;
+                    border-top: 1px solid white;
+                    border-right: 1px solid white;
+                    border-bottom: none;
+                    border-left: 1px solid white;
+                    width: 0;
+                    height: 23px;
+
+                    &:hover {
+                        width: 100px;
+                        .name,
+                        .hp {
+                            display: initial;
+                        }
+                    }
+
+                    .name,
+                    .hp {
+                        display: none;
+                    }
+                }
+
                 .name {
                     overflow: hidden;
                     text-overflow: ellipsis;
