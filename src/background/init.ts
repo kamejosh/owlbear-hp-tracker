@@ -29,6 +29,7 @@ import { attachmentFilter, getAttachedItems, getInitialValues } from "../helper/
 import { migrateTo160 } from "../migrations/v160.ts";
 import { migrateTo200 } from "../migrations/v200.ts";
 import { setupDddice } from "./dddice.ts";
+import { migrateTo300 } from "../migrations/v300.ts";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -103,6 +104,7 @@ const initScene = async () => {
             id: uuidv4(),
             groups: ["Default"],
             openGroups: ["Default"],
+            collapsedStatblocks: [],
         };
 
         ownMetadata[metadataKey] = sceneData;
@@ -118,6 +120,9 @@ const initScene = async () => {
         }
         if (sceneData.openGroups === undefined) {
             sceneData.openGroups = ["Default"];
+        }
+        if (!sceneData.collapsedStatblocks) {
+            sceneData.collapsedStatblocks = [];
         }
 
         ownMetadata[metadataKey] = sceneData;
@@ -274,6 +279,9 @@ const migrations = async () => {
             }
             if (compare(data.version, "2.0.0", "<")) {
                 await migrateTo200();
+            }
+            if (compare(data.version, "3.0.0", "<")) {
+                await migrateTo300();
             }
         }
     }
