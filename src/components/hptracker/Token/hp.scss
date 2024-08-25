@@ -1,0 +1,52 @@
+.hp {
+    display: grid;
+    position: relative;
+    grid-template-areas:
+        "title hp"
+        "temp-icon temp";
+    grid-area: hp;
+    align-content: center;
+    gap: 0 1px;
+    max-height: 46px;
+
+    .hp-icon {
+        grid-area: title;
+        height: 23px;
+    }
+
+    .temp-hp-icon {
+        grid-area: temp-icon;
+        align-self: center;
+        height: 15px;
+    }
+
+    .current-hp {
+        display: flex;
+        grid-area: hp;
+        align-items: center;
+        gap: 0.5ch;
+
+        .divider {
+            rotate: 15deg;
+            background-color: var(--text-color);
+            width: 1px;
+            height: 70%;
+        }
+    }
+
+    .bottom-row {
+        display: flex;
+        grid-area: temp;
+        justify-content: space-between;
+        justify-self: start;
+        width: 100%;
+
+        .temp-hp {
+            height: 20px;
+        }
+
+        .map-button {
+            padding-top: 2px;
+        }
+    }
+}

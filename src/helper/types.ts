@@ -26,6 +26,7 @@ export type HpTrackerMetadata = {
     ruleset?: Ruleset;
     index?: number;
     group?: string;
+    playerList?: boolean;
 };
 
 /**

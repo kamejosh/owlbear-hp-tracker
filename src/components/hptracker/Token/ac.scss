@@ -1,0 +1,23 @@
+.armor-class {
+    display: grid;
+    grid-template-areas:
+        "icon ac"
+        ". map";
+    grid-area: ac;
+    align-items: start;
+    gap: 0.2ch;
+
+    .ac-icon {
+        grid-area: icon;
+        fill: #808080;
+        height: 20px;
+    }
+
+    .ac-input {
+        grid-area: ac;
+    }
+
+    .map-button {
+        grid-area: map;
+    }
+}

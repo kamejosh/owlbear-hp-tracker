@@ -16,6 +16,7 @@
         .draggable-token-list-wrapper {
             display: grid;
             grid-template-rows: 1fr;
+            gap: 2px;
             opacity: 1;
             transition: all 0.25s ease-in-out;
 

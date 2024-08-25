@@ -1,5 +1,4 @@
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
-import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
@@ -7,6 +6,7 @@ import tippy, { Instance } from "tippy.js";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { parseRollEquation } from "dddice-js";
 import { getDiceImage, getSvgForDiceType } from "../../../helper/previewHelpers.tsx";
+import { D20 } from "../../svgs/dice/D20.tsx";
 
 type DiceButtonProps = {
     dice: string;
@@ -157,16 +157,16 @@ export const DiceButton = (props: DiceButtonProps) => {
                 } else {
                     if (theme) {
                         const image = getDiceImage(theme, die, 0);
-                        return image ?? <DiceSvg />;
+                        return image ?? <D20 />;
                     } else {
-                        return <DiceSvg />;
+                        return <D20 />;
                     }
                 }
             } else {
-                return <DiceSvg />;
+                return <D20 />;
             }
         } catch {
-            return <DiceSvg />;
+            return <D20 />;
         }
     };
 

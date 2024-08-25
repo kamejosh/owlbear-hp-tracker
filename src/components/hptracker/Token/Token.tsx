@@ -3,20 +3,17 @@ import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { useEffect, useRef, useState } from "react";
 import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "../../../helper/variables.ts";
-import { useCharSheet } from "../../../context/CharacterContext.ts";
 import { updateHp } from "../../../helper/hpHelpers.ts";
-import { getBgColor, getRoomDiceUser } from "../../../helper/helpers.ts";
+import { getBgColor } from "../../../helper/helpers.ts";
 import { updateAc } from "../../../helper/acHelper.ts";
 import _ from "lodash";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
-import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
-import { diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
-import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
-import { useComponentContext } from "../../../context/ComponentContext.tsx";
 import { changeArmorClass, changeHp } from "../../../helper/tokenHelper.ts";
 import { HP } from "./HP.tsx";
 import { AC } from "./AC.tsx";
+import { Initiative } from "./Initiative.tsx";
+import { Sheet } from "./Sheet.tsx";
 
 type TokenProps = {
     id: string;
@@ -29,12 +26,7 @@ export const Token = (props: TokenProps) => {
     const playerContext = usePlayerContext();
     const [editName, setEditName] = useState<boolean>(false);
     const room = useMetadataContext((state) => state.room);
-    const setId = useCharSheet((state) => state.setId);
-    const [rollerApi, initialized, theme] = useDiceRoller((state) => [state.rollerApi, state.initialized, state.theme]);
-    const component = useComponentContext((state) => state.component);
-    const addRoll = useRollLogContext((state) => state.addRoll);
-    const [initHover, setInitHover] = useState<boolean>(false);
-    const initButtonRef = useRef<HTMLButtonElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
     const token = useTokenListContext((state) => state.tokens?.get(props.id));
     const data = token?.data as HpTrackerMetadata;
     const item = token?.item as Image;
@@ -111,6 +103,10 @@ export const Token = (props: TokenProps) => {
     };
 
     const handleOnPlayerClick = async (e: React.MouseEvent<HTMLDivElement>) => {
+        if (e.target !== containerRef.current) {
+            // we prevent subcomponent clicking triggering this function
+            return;
+        }
         e.preventDefault();
         e.stopPropagation();
         const currentSelection = (await OBR.player.getSelection()) || [];
@@ -157,78 +153,59 @@ export const Token = (props: TokenProps) => {
         );
     };
 
-    const rollInitiative = async (hidden: boolean) => {
-        initButtonRef.current?.classList.add("rolling");
-        let initiativeValue = 0;
-        const dice = `1d${room?.initiativeDice ?? 20}+${data.stats.initiativeBonus}`;
-        if (room && !room?.disableDiceRoller && theme && rollerApi) {
-            const parsed = diceToRoll(dice, theme.id);
-            if (parsed) {
-                const rollData = await rollWrapper(rollerApi, parsed.dice, {
-                    operator: parsed.operator,
-                    external_id: data.name,
-                    label: "Initiative: Roll",
-                    whisper: hidden ? await getUserUuid(room, rollerApi) : undefined,
-                });
-                if (rollData) {
-                    initiativeValue = Number(rollData.total_value);
-                }
-            }
-        } else {
-            const result = await localRoll(dice, "Initiative: Roll", addRoll, hidden, data.name);
-            if (result) {
-                initiativeValue = result.total;
-            }
-        }
-        initButtonRef.current?.classList.remove("rolling");
-        initButtonRef.current?.blur();
-        return initiativeValue;
-    };
-
     return display() ? (
         <div
-            className={`player-wrapper ${playerContext.role === "PLAYER" ? "player" : ""} ${
-                props.selected ? "selected" : ""
-            }`}
-            style={{ background: `linear-gradient(to right, ${getBgColor(data)}, #1C1B22 50%, #1C1B22 )` }}
+            ref={containerRef}
+            className={` token ${playerContext.role === "PLAYER" ? "player" : ""} ${props.selected ? "selected" : ""}`}
+            style={{
+                background: `linear-gradient(to right, ${getBgColor(data)}, #1C1B22 50%, #1C1B22 )`,
+            }}
+            onClick={(e) => {
+                handleOnPlayerClick(e);
+            }}
+            onDoubleClick={(e) => {
+                e.preventDefault();
+                handleOnPlayerDoubleClick();
+            }}
         >
             {props.popover ? null : (
-                <div className={"player-name"}>
-                    {editName ? (
-                        <input
-                            className={"edit-name"}
-                            type={"text"}
-                            value={data.name}
-                            onChange={(e) => {
-                                const newData = { ...data, name: e.target.value };
-                                handleValueChange(newData);
-                            }}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                    setEditName(false);
-                                }
-                            }}
-                        />
-                    ) : (
-                        <div
-                            className={"name"}
-                            onClick={(e) => {
-                                handleOnPlayerClick(e);
-                            }}
-                            onDoubleClick={(e) => {
-                                e.preventDefault();
-                                handleOnPlayerDoubleClick();
-                            }}
-                        >
-                            {data.name}
-                        </div>
-                    )}
-                    <button
-                        title={"Change entry name"}
-                        className={`edit ${editName ? "on" : "off"}`}
-                        onClick={() => setEditName(!editName)}
-                    ></button>
-                </div>
+                <>
+                    <div className={"player-icon"}>
+                        <img src={item.image.url} alt={""} />
+                    </div>
+
+                    <div className={"player-name"}>
+                        {editName ? (
+                            <input
+                                className={"edit-name"}
+                                type={"text"}
+                                value={data.name}
+                                onChange={(e) => {
+                                    const newData = { ...data, name: e.target.value };
+                                    handleValueChange(newData);
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        setEditName(false);
+                                    }
+                                }}
+                            />
+                        ) : (
+                            <div
+                                className={"name"}
+                                onClick={(e) => {
+                                    handleOnPlayerClick(e);
+                                }}
+                                onDoubleClick={(e) => {
+                                    e.preventDefault();
+                                    handleOnPlayerDoubleClick();
+                                }}
+                            >
+                                {data.name}
+                            </div>
+                        )}
+                    </div>
+                </>
             )}
             {playerContext.role === "GM" ? (
                 <div className={"settings"}>
@@ -273,69 +250,12 @@ export const Token = (props: TokenProps) => {
             ) : null}
             <HP id={props.id} />
             <AC id={props.id} />
-            <div className={"initiative-wrapper"}>
-                <input
-                    type={"text"}
-                    size={1}
-                    value={data.initiative}
-                    onChange={(e) => {
-                        const value = Number(e.target.value.replace(/[^0-9]/g, ""));
-                        const newData = { ...data, initiative: value };
-                        handleValueChange(newData);
-                    }}
-                    className={"initiative"}
-                />
-                {component !== "popover" ? (
-                    <div
-                        className={"init-wrapper"}
-                        onMouseEnter={() => {
-                            setInitHover(true);
-                        }}
-                        onMouseLeave={() => setInitHover(false)}
-                    >
-                        <button
-                            title={"Roll Initiative (including initiative modifier from statblock)"}
-                            className={`toggle-button initiative-button`}
-                            disabled={
-                                getRoomDiceUser(room, playerContext.id)?.diceRendering &&
-                                !initialized &&
-                                !room?.disableDiceRoller
-                            }
-                            onClick={async () => {
-                                const value = await rollInitiative(false);
-                                const newData = { ...data, initiative: value };
-                                handleValueChange(newData);
-                            }}
-                        />
-                        <button
-                            className={`self ${initHover ? "visible" : "hidden"}`}
-                            disabled={
-                                getRoomDiceUser(room, playerContext.id)?.diceRendering &&
-                                !initialized &&
-                                !room?.disableDiceRoller
-                            }
-                            onClick={async () => {
-                                const value = await rollInitiative(true);
-                                const newData = { ...data, initiative: value };
-                                handleValueChange(newData);
-                            }}
-                        >
-                            HIDE
-                        </button>
-                    </div>
-                ) : null}
-            </div>
-            {props.popover ? null : (
-                <div className={"info-button-wrapper"}>
-                    <button
-                        title={"Show Statblock"}
-                        className={"toggle-button info-button"}
-                        onClick={() => setId(item.id)}
-                    />
-                </div>
-            )}
+            <Initiative id={props.id} />
+            {props.popover ? null : playerContext.role === "GM" || item.createdUserId === playerContext.id ? (
+                <Sheet id={props.id} />
+            ) : null}
         </div>
-    ) : data.hpBar && item.visible ? (
+    ) : data.playerList && item.visible ? (
         <div
             className={"player-wrapper player"}
             style={{ background: `linear-gradient(to right, ${getBgColor(data)}, #242424 50%, #242424 )` }}

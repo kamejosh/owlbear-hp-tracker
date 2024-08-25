@@ -1,0 +1,26 @@
+.map-button {
+    height: 20px;
+
+    &.active {
+        .map-default {
+            .map-icon {
+                fill: white;
+            }
+        }
+    }
+
+    .map-default {
+        border-color: grey;
+        width: 35px;
+        height: 20px;
+        overflow: hidden;
+
+        .map-icon {
+            fill: grey;
+            position: relative;
+            top: -3px;
+            left: -1px;
+            height: 23px;
+        }
+    }
+}
