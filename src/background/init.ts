@@ -151,14 +151,14 @@ const setupContextMenu = async () => {
                 icon: "/iconPopover.svg",
                 label: "HP Tracker",
                 filter: {
-                    every: [
-                        { key: ["metadata", `${itemMetadataKey}`, "hpTrackerActive"], value: true },
+                    every: [{ key: ["metadata", `${itemMetadataKey}`, "hpTrackerActive"], value: true }],
+                    some: [
                         {
                             key: ["metadata", `${itemMetadataKey}`, "canPlayersSee"],
                             value: true,
-                            coordinator: "&&",
+                            coordinator: "||",
                         },
-                        { key: ["createdUserId"], value: OBR.player.id, coordinator: "||" },
+                        { key: ["createdUserId"], value: OBR.player.id },
                     ],
                     roles: ["PLAYER"],
                 },
@@ -326,13 +326,14 @@ const initTokens = async () => {
 
 OBR.onReady(async () => {
     console.info(`HP Tracker - version ${version} initializing`);
-    if ((await OBR.player.getRole()) === "GM") {
-        try {
-            await setupContextMenu();
-        } catch (e) {
-            console.warn("HP Tracker - error while setting up context menu");
-        }
 
+    try {
+        await setupContextMenu();
+    } catch (e) {
+        console.warn("HP Tracker - error while setting up context menu");
+    }
+
+    if ((await OBR.player.getRole()) === "GM") {
         try {
             await initRoom();
         } catch (e) {
