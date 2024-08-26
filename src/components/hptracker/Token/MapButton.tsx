@@ -1,16 +1,19 @@
 import { MapSvg } from "../../svgs/MapSvg.tsx";
 import "./map-button.scss";
 import tippy from "tippy.js";
+import { PlayerSvg } from "../../svgs/PlayerSvg.tsx";
 
 export const MapButton = ({
     onClick,
     onContextMenu,
     active,
+    players,
     tooltip,
 }: {
     onClick: () => void;
     onContextMenu: () => void;
     active: boolean;
+    players: boolean;
     tooltip: string;
 }) => {
     return (
@@ -31,6 +34,7 @@ export const MapButton = ({
                 }}
             >
                 <MapSvg />
+                {players ? <PlayerSvg /> : null}
             </button>
         </div>
     );

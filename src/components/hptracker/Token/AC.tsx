@@ -63,7 +63,13 @@ export const AC = ({ id }: { id: string }) => {
                         updateTokenMetadata(newData, [id]);
                         updateAc(item, newData);
                     }}
+                    onContextMenu={() => {
+                        const newData = { ...data, playerMap: { ...data.playerMap, ac: !data.playerMap.ac } };
+                        updateTokenMetadata(newData, [id]);
+                        updateAc(item, newData);
+                    }}
                     active={data.acOnMap}
+                    players={data.playerMap.ac}
                     tooltip={"Show AC on map (right click for players)"}
                 />
             ) : null}

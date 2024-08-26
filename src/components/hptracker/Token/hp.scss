@@ -5,13 +5,13 @@
         "title hp"
         "temp-icon temp";
     grid-area: hp;
-    align-content: center;
-    gap: 0 1px;
-    max-height: 46px;
+    align-items: flex-start;
+    height: 46px;
 
     .hp-icon {
         grid-area: title;
-        height: 23px;
+        width: 20px;
+        height: 20px;
     }
 
     .temp-hp-icon {

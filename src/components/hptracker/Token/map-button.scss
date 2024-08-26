@@ -1,26 +1,44 @@
 .map-button {
+    opacity: 0.5;
     height: 20px;
 
     &.active {
+        opacity: 1;
         .map-default {
             .map-icon {
+                fill: white;
+            }
+
+            .player-icon {
                 fill: white;
             }
         }
     }
 
     .map-default {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         border-color: grey;
+        padding: 0;
+        padding-inline: 1px;
         width: 35px;
         height: 20px;
         overflow: hidden;
 
         .map-icon {
+            flex-shrink: 0;
             fill: grey;
-            position: relative;
-            top: -3px;
-            left: -1px;
-            height: 23px;
+            width: 19px;
+            height: 19px;
+        }
+
+        .player-icon {
+            flex-shrink: 0;
+            align-self: flex-end;
+            fill: grey;
+            width: 16px;
+            height: 16px;
         }
     }
 }

@@ -15,6 +15,10 @@
     padding-block: 2px;
     min-height: 46px;
 
+    &.selected {
+        outline: 1px solid #ffffff88;
+    }
+
     &::before {
         position: absolute;
         top: 0;
@@ -48,6 +52,7 @@
 
     .player-icon {
         display: initial;
+        position: relative;
         grid-area: icon;
         width: 46px;
         height: 46px;
@@ -58,6 +63,57 @@
             overflow: hidden;
             object-fit: contain;
             object-position: center;
+        }
+
+        .preview-hp {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            background-color: #00000088;
+            padding-top: 2px;
+            width: 100%;
+            height: calc(100% / 4.85);
+            font-weight: 600;
+            font-size: 0.5rem;
+            line-height: 1;
+
+            &::before {
+                display: block;
+                position: absolute;
+                top: 1px;
+                left: 1px;
+                background-color: #ff000088;
+                width: var(--width);
+                height: calc(100% - 2px);
+                content: "";
+            }
+        }
+
+        .preview-ac {
+            position: absolute;
+            right: 0;
+            bottom: 10px;
+            opacity: 0.8;
+            width: 20px;
+            height: 24px;
+
+            .shield-icon {
+                position: absolute;
+                top: 0;
+                left: 0;
+                fill: grey;
+                stroke: black;
+                stroke-width: 0.3;
+            }
+
+            .preview-value {
+                position: absolute;
+                top: 3px;
+                left: 2px;
+                font-weight: 600;
+                font-size: 0.8rem;
+                text-shadow: 0 0 1px black;
+            }
         }
     }
 

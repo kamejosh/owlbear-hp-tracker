@@ -58,7 +58,7 @@ const initItems = async () => {
             await saveOrChangeText(token, data, textAttachments, textChanges);
         }
         if (data.acOnMap) {
-            await saveOrChangeAC(token, data, acAttachments, acChanges, token.visible && data.canPlayersSee);
+            await saveOrChangeAC(token, data, acAttachments, acChanges, token.visible && data.playerMap.ac);
         }
     }
 
@@ -211,7 +211,6 @@ const setupContextMenu = async () => {
                                 maxHp: 0,
                                 armorClass: 0,
                                 hpTrackerActive: true,
-                                canPlayersSee: false,
                                 hpOnMap: false,
                                 acOnMap: false,
                                 hpBar: false,
@@ -220,6 +219,10 @@ const setupContextMenu = async () => {
                                 stats: {
                                     initiativeBonus: 0,
                                     initial: true,
+                                },
+                                playerMap: {
+                                    hp: false,
+                                    ac: false,
                                 },
                             };
                             if (item.id in itemStatblocks) {

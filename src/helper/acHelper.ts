@@ -94,7 +94,7 @@ export const updateAc = async (token: Item, data: HpTrackerMetadata) => {
     const acAttachment = (await getAttachedItems(token.id, ["CURVE"])).filter((a) => attachmentFilter(a, "AC"));
 
     const show = data.acOnMap && data.hpTrackerActive;
-    const visible = data.canPlayersSee && token.visible;
+    const visible = data.playerMap.ac && token.visible;
     if (!show) {
         await deleteAttachments(acAttachment);
     } else {

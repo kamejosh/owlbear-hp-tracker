@@ -1,6 +1,6 @@
 import { HpTrackerMetadata } from "../../../helper/types.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
-import { useEffect, useRef, useState } from "react";
+import { CSSProperties, useEffect, useRef, useState } from "react";
 import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "../../../helper/variables.ts";
 import { updateHp } from "../../../helper/hpHelpers.ts";
@@ -14,6 +14,7 @@ import { HP } from "./HP.tsx";
 import { AC } from "./AC.tsx";
 import { Initiative } from "./Initiative.tsx";
 import { Sheet } from "./Sheet.tsx";
+import { ShieldSvg } from "../../svgs/ShieldSvg.tsx";
 
 type TokenProps = {
     id: string;
@@ -148,7 +149,7 @@ export const Token = (props: TokenProps) => {
         return (
             data.hpTrackerActive &&
             (playerContext.role === "GM" ||
-                (playerContext.role === "PLAYER" && data.canPlayersSee && item.visible) ||
+                (playerContext.role === "PLAYER" && item.visible && data.playerMap.hp && data.playerMap.ac) ||
                 item.createdUserId === playerContext.id)
         );
     };
@@ -172,6 +173,31 @@ export const Token = (props: TokenProps) => {
                 <>
                     <div className={"player-icon"}>
                         <img src={item.image.url} alt={""} />
+                        {playerContext.role === "GM" ? (
+                            <>
+                                {data.playerMap.hp && data.hpOnMap ? (
+                                    <div
+                                        className={"preview-hp"}
+                                        style={
+                                            {
+                                                "--width": `${
+                                                    ((data.hp - (data.stats?.tempHp ?? 0)) / data.maxHp) * 100
+                                                }%`,
+                                            } as CSSProperties
+                                        }
+                                    >
+                                        {data.hp + (data.stats?.tempHp ?? 0)}/{data.maxHp}
+                                        {data.stats?.tempHp ? `(${data.stats.tempHp})` : null}
+                                    </div>
+                                ) : null}
+                                {data.playerMap.ac && data.acOnMap ? (
+                                    <div className={"preview-ac"}>
+                                        <ShieldSvg />
+                                        <span className={"preview-value"}>{data.armorClass}</span>
+                                    </div>
+                                ) : null}
+                            </>
+                        ) : null}
                     </div>
 
                     <div className={"player-name"}>

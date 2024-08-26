@@ -109,7 +109,11 @@ export const Sheet = ({ id }: { id: string }) => {
                     >
                         <option value={OBR.player.id}>GM</option>
                         {players.map((player) => {
-                            return <option value={player.id}>{player.name}</option>;
+                            return (
+                                <option key={player.id} value={player.id}>
+                                    {player.name}
+                                </option>
+                            );
                         })}
                     </select>
                 </>

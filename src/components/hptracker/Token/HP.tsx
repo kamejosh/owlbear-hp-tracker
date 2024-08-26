@@ -160,9 +160,12 @@ export const HP = ({ id }: { id: string }) => {
                             updateHp(item, newData);
                         }}
                         onContextMenu={() => {
-                            //TODO: enable playerview for HP
+                            const newData = { ...data, playerMap: { ...data.playerMap, hp: !data.playerMap.hp } };
+                            updateTokenMetadata(newData, [id]);
+                            updateHp(item, newData);
                         }}
                         active={data.hpOnMap}
+                        players={data.playerMap.hp}
                         tooltip={"Show HP on map (right click for players)"}
                     />
                 ) : null}

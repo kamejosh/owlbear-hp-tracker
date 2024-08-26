@@ -11,7 +11,7 @@ export type HpTrackerMetadata = {
     maxHp: number;
     armorClass: number;
     hpTrackerActive: boolean;
-    canPlayersSee: boolean;
+    canPlayersSee?: boolean;
     hpOnMap: boolean;
     acOnMap: boolean;
     hpBar: boolean;
@@ -22,6 +22,10 @@ export type HpTrackerMetadata = {
         tempHp?: number;
         initial?: boolean;
         limits?: Array<Limit>;
+    };
+    playerMap: {
+        hp: boolean;
+        ac: boolean;
     };
     ruleset?: Ruleset;
     index?: number;
