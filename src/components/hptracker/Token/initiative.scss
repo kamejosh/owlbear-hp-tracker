@@ -3,9 +3,20 @@
     grid-template-columns: auto repeat(2, 1fr);
     grid-area: init;
     gap: 0.5ch;
+    row-gap: 0.2ch;
+    height: 46px;
 
     .initiative-icon {
         fill: green;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+        padding-inline: 4px;
+        padding-block: 0;
+        width: 25px;
+        height: 18px;
+        text-align: right;
     }
 
     input[type="number"] {
@@ -32,7 +43,9 @@
         .dice-button {
             gap: 0;
             transition: all 0.25s ease;
+            width: 35px;
             height: 20px;
+            overflow: hidden;
 
             &:disabled {
                 filter: invert(1);
@@ -46,11 +59,11 @@
             }
 
             .dice-preview {
-                width: 15px;
+                width: 13px;
 
                 svg {
-                    width: 15px;
-                    height: 15px;
+                    width: 13px;
+                    height: 13px;
                     fill: white;
                 }
             }
@@ -58,9 +71,9 @@
 
         .self {
             position: absolute;
-            bottom: 0;
+            top: 0;
             left: 50%;
-            translate: -50% 100%;
+            translate: -50% -100%;
             z-index: 1;
             transition: all 0.25s ease;
 

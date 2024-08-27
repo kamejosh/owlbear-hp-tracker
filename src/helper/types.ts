@@ -23,7 +23,7 @@ export type HpTrackerMetadata = {
         initial?: boolean;
         limits?: Array<Limit>;
     };
-    playerMap: {
+    playerMap?: {
         hp: boolean;
         ac: boolean;
     };

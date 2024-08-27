@@ -345,9 +345,20 @@
     }
 
     .values {
-        display: flex;
+        display: grid;
+        grid-template-columns: repeat(2, auto);
         grid-column: span 1;
         flex-direction: column;
+        gap: 1ch;
+        width: min-content;
+
+        .ac {
+            white-space: nowrap;
+        }
+
+        .speed {
+            grid-column: span 2;
+        }
     }
 
     .stats {

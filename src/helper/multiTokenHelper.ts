@@ -4,27 +4,6 @@ import OBR, { Item } from "@owlbear-rodeo/sdk";
 import { updateHp } from "./hpHelpers.ts";
 import { updateAc } from "./acHelper.ts";
 
-export const getHpBar = (list: Array<Item>) => {
-    const hpBars = list.map((token) => {
-        const metadata = token.metadata[itemMetadataKey] as HpTrackerMetadata;
-        return metadata.hpBar;
-    });
-    return hpBars.some((bar) => bar);
-};
-
-export const toggleHpBar = async (list: Array<Item>) => {
-    const current = getHpBar(list);
-    await OBR.scene.items.updateItems(list, (items) => {
-        items.forEach((item) => {
-            (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpBar = !current;
-        });
-    });
-    for (const item of list) {
-        const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
-        await updateHp(item, { ...data, hpBar: !current });
-    }
-};
-
 export const getHpOnMap = (list: Array<Item>) => {
     const hpMap = list.map((token) => {
         const metadata = token.metadata[itemMetadataKey] as HpTrackerMetadata;
@@ -33,16 +12,67 @@ export const getHpOnMap = (list: Array<Item>) => {
     return hpMap.some((map) => map);
 };
 
+export const getHpForPlayers = (list: Array<Item>) => {
+    const hpPlayers = list.map((token) => {
+        const metadata = token.metadata[itemMetadataKey] as HpTrackerMetadata;
+        return metadata.playerMap?.hp || false;
+    });
+    return hpPlayers.some((map) => map);
+};
+
+export const getAcForPlayers = (list: Array<Item>) => {
+    const acPlayers = list.map((token) => {
+        const metadata = token.metadata[itemMetadataKey] as HpTrackerMetadata;
+        return metadata.playerMap?.ac ?? false;
+    });
+    return acPlayers.some((map) => map);
+};
+
 export const toggleHpOnMap = async (list: Array<Item>) => {
     const current = getHpOnMap(list);
     await OBR.scene.items.updateItems(list, (items) => {
         items.forEach((item) => {
             (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpOnMap = !current;
+            (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpBar = !current;
         });
     });
     for (const item of list) {
         const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
-        await updateHp(item, { ...data, hpOnMap: !current });
+        await updateHp(item, { ...data, hpOnMap: !current, hpBar: !current });
+    }
+};
+
+export const toggleHpForPlayers = async (list: Array<Item>) => {
+    const current = getHpForPlayers(list);
+    await OBR.scene.items.updateItems(list, (items) => {
+        items.forEach((item) => {
+            const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+            (item.metadata[itemMetadataKey] as HpTrackerMetadata).playerMap = {
+                ac: !!data.playerMap?.ac,
+                hp: !current,
+            };
+        });
+    });
+    for (const item of list) {
+        const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+        await updateHp(item, { ...data, playerMap: { ac: !!data.playerMap?.ac, hp: !current } });
+    }
+};
+
+export const toggleAcForPlayers = async (list: Array<Item>) => {
+    const current = getAcForPlayers(list);
+    await OBR.scene.items.updateItems(list, (items) => {
+        items.forEach((item) => {
+            const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+            (item.metadata[itemMetadataKey] as HpTrackerMetadata).playerMap = {
+                ac: !current,
+                hp: !!data.playerMap?.hp,
+            };
+        });
+    });
+    for (const item of list) {
+        const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+        await updateAc(item, { ...data, playerMap: { hp: !!data.playerMap?.hp, ac: !current } });
     }
 };
 
@@ -66,24 +96,20 @@ export const toggleAcOnMap = async (list: Array<Item>) => {
         await updateAc(item, { ...data, acOnMap: !current });
     }
 };
-export const getCanPlayersSee = (list: Array<Item>) => {
-    const canSee = list.map((token) => {
+
+export const getTokenInPlayerList = (list: Array<Item>) => {
+    const inList = list.map((token) => {
         const metadata = token.metadata[itemMetadataKey] as HpTrackerMetadata;
-        return metadata.canPlayersSee;
+        return metadata.playerList;
     });
-    return canSee.some((see) => see);
+    return inList.some((l) => l);
 };
 
-export const toggleCanPlayerSee = async (list: Array<Item>) => {
-    const current = getCanPlayersSee(list);
+export const toggleTokenInPlayerList = async (list: Array<Item>) => {
+    const current = getTokenInPlayerList(list);
     await OBR.scene.items.updateItems(list, (items) => {
         items.forEach((item) => {
-            (item.metadata[itemMetadataKey] as HpTrackerMetadata).canPlayersSee = !current;
+            (item.metadata[itemMetadataKey] as HpTrackerMetadata).playerList = !current;
         });
     });
-    for (const item of list) {
-        const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
-        await updateHp(item, { ...data, canPlayersSee: !current });
-        await updateAc(item, { ...data, canPlayersSee: !current });
-    }
 };

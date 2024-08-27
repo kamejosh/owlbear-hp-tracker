@@ -1,11 +1,8 @@
-import { getRoomDiceUser } from "../../../helper/helpers.ts";
 import { useEffect, useRef, useState } from "react";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
 import { HpTrackerMetadata } from "../../../helper/types.ts";
-import OBR from "@owlbear-rodeo/sdk";
 import tippy from "tippy.js";
-import { useComponentContext } from "../../../context/ComponentContext.tsx";
 import { diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
@@ -19,12 +16,11 @@ import { PlayerButton } from "./PlayerButton.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 export const Initiative = ({ id }: { id: string }) => {
     const playerContext = usePlayerContext();
-    const component = useComponentContext((state) => state.component);
     const initRef = useRef<HTMLInputElement>(null);
     const initBonusRef = useRef<HTMLInputElement>(null);
     const room = useMetadataContext((state) => state.room);
     const [initHover, setInitHover] = useState<boolean>(false);
-    const [rollerApi, initialized, theme] = useDiceRoller((state) => [state.rollerApi, state.initialized, state.theme]);
+    const [rollerApi, theme] = useDiceRoller((state) => [state.rollerApi, state.theme]);
     const addRoll = useRollLogContext((state) => state.addRoll);
     const initButtonRef = useRef<HTMLButtonElement>(null);
     const token = useTokenListContext((state) => state.tokens?.get(id));
@@ -125,58 +121,56 @@ export const Initiative = ({ id }: { id: string }) => {
                 }}
                 className={"initiative"}
             />
-            {component !== "popover" ? (
-                <div
-                    className={`init-wrapper button-wrapper calculated`}
-                    onMouseEnter={() => {
-                        setInitHover(true);
+            <div
+                className={`init-wrapper button-wrapper calculated`}
+                onMouseEnter={() => {
+                    setInitHover(true);
+                }}
+                onMouseLeave={() => setInitHover(false)}
+            >
+                <button
+                    ref={initButtonRef}
+                    title={"Roll Initiative (including initiative modifier from statblock)"}
+                    className={`dice-button button`}
+                    onClick={async () => {
+                        const value = await rollInitiative(false);
+                        const newData = { ...data, initiative: value };
+                        updateTokenMetadata(newData, [id]);
                     }}
-                    onMouseLeave={() => setInitHover(false)}
                 >
-                    <button
-                        ref={initButtonRef}
-                        title={"Roll Initiative (including initiative modifier from statblock)"}
-                        className={`dice-button button`}
-                        disabled={
-                            getRoomDiceUser(room, OBR.player.id)?.diceRendering &&
-                            !initialized &&
-                            !room?.disableDiceRoller
-                        }
-                        onClick={async () => {
-                            const value = await rollInitiative(false);
-                            const newData = { ...data, initiative: value };
-                            updateTokenMetadata(newData, [id]);
-                        }}
-                    >
-                        <div className={"dice-preview"}>{getDicePreview()}</div>+{data.stats.initiativeBonus ?? 0}
-                    </button>
-                    <button
-                        className={`self ${initHover ? "visible" : "hidden"}`}
-                        disabled={
-                            getRoomDiceUser(room, OBR.player.id)?.diceRendering &&
-                            !initialized &&
-                            !room?.disableDiceRoller
-                        }
-                        onClick={async () => {
-                            const value = await rollInitiative(true);
-                            const newData = { ...data, initiative: value };
-                            updateTokenMetadata(newData, [id]);
-                        }}
-                    >
-                        HIDE
-                    </button>
-                </div>
-            ) : null}
+                    <div className={"dice-preview"}>{getDicePreview()}</div>
+                    {data.stats.initiativeBonus >= 0 ? "+" : ""}
+                    {data.stats.initiativeBonus ?? 0}
+                </button>
+                <button
+                    className={`self ${initHover ? "visible" : "hidden"}`}
+                    onClick={async () => {
+                        const value = await rollInitiative(true);
+                        const newData = { ...data, initiative: value };
+                        updateTokenMetadata(newData, [id]);
+                    }}
+                >
+                    HIDE
+                </button>
+            </div>
 
             <input
                 type={"number"}
                 size={1}
-                value={data.stats.initiativeBonus}
+                defaultValue={data.stats.initiativeBonus}
                 step={1}
                 ref={initBonusRef}
-                onChange={(e) => {
-                    const newData = { ...data, stats: { initiativeBonus: Number(e.target.value) } };
+                onBlur={(e) => {
+                    const value = Number(e.target.value);
+                    const newData = { ...data, stats: { initiativeBonus: value } };
                     updateTokenMetadata(newData, [id]);
+                }}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                        const value = Number(e.currentTarget.value);
+                        const newData = { ...data, stats: { initiativeBonus: value } };
+                        updateTokenMetadata(newData, [id]);
+                    }
                 }}
                 className={"initiative-bonus"}
             />

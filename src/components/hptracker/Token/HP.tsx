@@ -65,7 +65,7 @@ export const HP = ({ id }: { id: string }) => {
     }, [tempHpRef]);
 
     return (
-        <div className={"hp"}>
+        <div className={"token-hp"}>
             <HPSvg percent={(data.hp / (data.maxHp + (data.stats.tempHp ?? 0))) * 100} name={item.id} />
             {data.stats.tempHp ? (
                 <HPSvg percent={100} name={"tempHp"} className={"temp-hp-icon"} color={"#2109cf"} />
@@ -130,27 +130,25 @@ export const HP = ({ id }: { id: string }) => {
                 />
             </div>
             <div className={"bottom-row"}>
-                <div className={"temp-hp"}>
-                    <input
-                        type={"text"}
-                        defaultValue={data.stats.tempHp}
-                        ref={tempHpRef}
-                        onKeyDown={(e) => {
-                            if (e.key === "ArrowUp") {
-                                changeTempHp((data.stats.tempHp || 0) + 1, data, item, hpRef, tempHpRef);
-                            } else if (e.key === "ArrowDown") {
-                                changeTempHp((data.stats.tempHp || 0) - 1, data, item, hpRef, tempHpRef);
-                            } else if (e.key === "Enter") {
-                                const value = Number(e.currentTarget.value.replace(/[^0-9]/g, ""));
-                                changeTempHp(value, data, item, hpRef, tempHpRef);
-                            }
-                        }}
-                        onBlur={(e) => {
-                            const value = Number(e.target.value.replace(/[^0-9]/g, ""));
+                <input
+                    type={"text"}
+                    defaultValue={data.stats.tempHp}
+                    ref={tempHpRef}
+                    onKeyDown={(e) => {
+                        if (e.key === "ArrowUp") {
+                            changeTempHp((data.stats.tempHp || 0) + 1, data, item, hpRef, tempHpRef);
+                        } else if (e.key === "ArrowDown") {
+                            changeTempHp((data.stats.tempHp || 0) - 1, data, item, hpRef, tempHpRef);
+                        } else if (e.key === "Enter") {
+                            const value = Number(e.currentTarget.value.replace(/[^0-9]/g, ""));
                             changeTempHp(value, data, item, hpRef, tempHpRef);
-                        }}
-                    />
-                </div>
+                        }
+                    }}
+                    onBlur={(e) => {
+                        const value = Number(e.target.value.replace(/[^0-9]/g, ""));
+                        changeTempHp(value, data, item, hpRef, tempHpRef);
+                    }}
+                />
                 {playerContext.role === "GM" ? (
                     <MapButton
                         onClick={() => {
@@ -160,12 +158,15 @@ export const HP = ({ id }: { id: string }) => {
                             updateHp(item, newData);
                         }}
                         onContextMenu={() => {
-                            const newData = { ...data, playerMap: { ...data.playerMap, hp: !data.playerMap.hp } };
+                            const newData = {
+                                ...data,
+                                playerMap: { ac: !!data.playerMap?.ac, hp: !data.playerMap?.hp },
+                            };
                             updateTokenMetadata(newData, [id]);
                             updateHp(item, newData);
                         }}
                         active={data.hpOnMap}
-                        players={data.playerMap.hp}
+                        players={!!data.playerMap?.hp}
                         tooltip={"Show HP on map (right click for players)"}
                     />
                 ) : null}

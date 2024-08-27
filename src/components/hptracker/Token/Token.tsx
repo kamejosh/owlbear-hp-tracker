@@ -1,11 +1,9 @@
 import { HpTrackerMetadata } from "../../../helper/types.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
-import { CSSProperties, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "../../../helper/variables.ts";
-import { updateHp } from "../../../helper/hpHelpers.ts";
 import { getBgColor } from "../../../helper/helpers.ts";
-import { updateAc } from "../../../helper/acHelper.ts";
 import _ from "lodash";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
@@ -14,7 +12,8 @@ import { HP } from "./HP.tsx";
 import { AC } from "./AC.tsx";
 import { Initiative } from "./Initiative.tsx";
 import { Sheet } from "./Sheet.tsx";
-import { ShieldSvg } from "../../svgs/ShieldSvg.tsx";
+import { TokenIcon } from "./TokenIcon.tsx";
+import { useComponentContext } from "../../../context/ComponentContext.tsx";
 
 type TokenProps = {
     id: string;
@@ -24,6 +23,7 @@ type TokenProps = {
 };
 
 export const Token = (props: TokenProps) => {
+    const component = useComponentContext((state) => state.component);
     const playerContext = usePlayerContext();
     const [editName, setEditName] = useState<boolean>(false);
     const room = useMetadataContext((state) => state.room);
@@ -149,7 +149,7 @@ export const Token = (props: TokenProps) => {
         return (
             data.hpTrackerActive &&
             (playerContext.role === "GM" ||
-                (playerContext.role === "PLAYER" && item.visible && data.playerMap.hp && data.playerMap.ac) ||
+                (playerContext.role === "PLAYER" && item.visible && !!data.playerMap?.hp && !!data.playerMap?.ac) ||
                 item.createdUserId === playerContext.id)
         );
     };
@@ -157,7 +157,9 @@ export const Token = (props: TokenProps) => {
     return display() ? (
         <div
             ref={containerRef}
-            className={` token ${playerContext.role === "PLAYER" ? "player" : ""} ${props.selected ? "selected" : ""}`}
+            className={`token ${playerContext.role === "PLAYER" ? "player" : ""} ${
+                props.selected ? "selected" : ""
+            } ${component}`}
             style={{
                 background: `linear-gradient(to right, ${getBgColor(data)}, #1C1B22 50%, #1C1B22 )`,
             }}
@@ -171,35 +173,7 @@ export const Token = (props: TokenProps) => {
         >
             {props.popover ? null : (
                 <>
-                    <div className={"player-icon"}>
-                        <img src={item.image.url} alt={""} />
-                        {playerContext.role === "GM" ? (
-                            <>
-                                {data.playerMap.hp && data.hpOnMap ? (
-                                    <div
-                                        className={"preview-hp"}
-                                        style={
-                                            {
-                                                "--width": `${
-                                                    ((data.hp - (data.stats?.tempHp ?? 0)) / data.maxHp) * 100
-                                                }%`,
-                                            } as CSSProperties
-                                        }
-                                    >
-                                        {data.hp + (data.stats?.tempHp ?? 0)}/{data.maxHp}
-                                        {data.stats?.tempHp ? `(${data.stats.tempHp})` : null}
-                                    </div>
-                                ) : null}
-                                {data.playerMap.ac && data.acOnMap ? (
-                                    <div className={"preview-ac"}>
-                                        <ShieldSvg />
-                                        <span className={"preview-value"}>{data.armorClass}</span>
-                                    </div>
-                                ) : null}
-                            </>
-                        ) : null}
-                    </div>
-
+                    <TokenIcon id={props.id} />
                     <div className={"player-name"}>
                         {editName ? (
                             <input
@@ -233,47 +207,6 @@ export const Token = (props: TokenProps) => {
                     </div>
                 </>
             )}
-            {playerContext.role === "GM" ? (
-                <div className={"settings"}>
-                    <button
-                        title={"Toggle HP Bar visibility for GM and Players"}
-                        className={`toggle-button hp ${data.hpBar ? "on" : "off"}`}
-                        onClick={() => {
-                            const newData = { ...data, hpBar: !data.hpBar };
-                            handleValueChange(newData);
-                            updateHp(item, newData);
-                        }}
-                    />
-                    <button
-                        title={"Toggle HP displayed on Map"}
-                        className={`toggle-button map ${data.hpOnMap ? "on" : "off"}`}
-                        onClick={() => {
-                            const newData = { ...data, hpOnMap: !data.hpOnMap };
-                            handleValueChange(newData);
-                            updateHp(item, newData);
-                        }}
-                    />
-                    <button
-                        title={"Toggle AC displayed on Map"}
-                        className={`toggle-button ac ${data.acOnMap ? "on" : "off"}`}
-                        onClick={async () => {
-                            const newData = { ...data, acOnMap: !data.acOnMap };
-                            handleValueChange(newData);
-                            updateAc(item, newData);
-                        }}
-                    />
-                    <button
-                        title={"Toggle HP/AC visibility for players"}
-                        className={`toggle-button players ${data.canPlayersSee ? "on" : "off"}`}
-                        onClick={() => {
-                            const newData = { ...data, canPlayersSee: !data.canPlayersSee };
-                            handleValueChange(newData);
-                            updateHp(item, newData);
-                            updateAc(item, newData);
-                        }}
-                    />{" "}
-                </div>
-            ) : null}
             <HP id={props.id} />
             <AC id={props.id} />
             <Initiative id={props.id} />

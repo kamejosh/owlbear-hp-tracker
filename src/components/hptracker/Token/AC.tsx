@@ -32,7 +32,7 @@ export const AC = ({ id }: { id: string }) => {
     }, [acRef]);
 
     return (
-        <div className={"armor-class"}>
+        <div className={"token-ac"}>
             <ACSvg />
             <input
                 className={"ac-input"}
@@ -64,12 +64,12 @@ export const AC = ({ id }: { id: string }) => {
                         updateAc(item, newData);
                     }}
                     onContextMenu={() => {
-                        const newData = { ...data, playerMap: { ...data.playerMap, ac: !data.playerMap.ac } };
+                        const newData = { ...data, playerMap: { hp: !!data.playerMap?.hp, ac: !data.playerMap?.ac } };
                         updateTokenMetadata(newData, [id]);
                         updateAc(item, newData);
                     }}
                     active={data.acOnMap}
-                    players={data.playerMap.ac}
+                    players={!!data.playerMap?.ac}
                     tooltip={"Show AC on map (right click for players)"}
                 />
             ) : null}

@@ -89,7 +89,7 @@ const createText = async (text: string, token: Image) => {
         .textType("PLAIN")
         .width(width)
         .height(height * 0.8) // because of text lines leaving space below we have to move it to the middle manually
-        .position({ ...position, y: position.y + height * 0.2 })
+        .position({ ...position, y: position.y + height * 0.175 })
         .attachedTo(token.id)
         .plainText(text)
         .locked(true)
@@ -99,7 +99,8 @@ const createText = async (text: string, token: Image) => {
         .fillColor("white")
         .strokeColor("black")
         .strokeWidth(height / 30)
-        .fontSize(height * 0.8)
+        .fontSize(height * 0.75)
+        .lineHeight(1)
         .disableAttachmentBehavior(["ROTATION", "VISIBLE"])
         .visible(token.visible)
         .name("hp-text")
@@ -131,7 +132,7 @@ const handleHpOffsetUpdate = async (offset: number, hp: Item) => {
             } else if (hp.name === "hp-text") {
                 change.position = {
                     x: x + 2,
-                    y: bounds.position.y + bounds.height - height + offset + height * 0.2,
+                    y: bounds.position.y + bounds.height - height + offset + height * 0.175,
                 };
             } else {
                 change.position = {

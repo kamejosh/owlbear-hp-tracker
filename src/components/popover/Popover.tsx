@@ -10,18 +10,25 @@ import { updateHp } from "../../helper/hpHelpers.ts";
 import { getBgColor } from "../../helper/helpers.ts";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import {
+    getAcForPlayers,
     getAcOnMap,
-    getCanPlayersSee,
-    getHpBar,
+    getHpForPlayers,
     getHpOnMap,
+    getTokenInPlayerList,
+    toggleAcForPlayers,
     toggleAcOnMap,
-    toggleCanPlayerSee,
-    toggleHpBar,
+    toggleHpForPlayers,
     toggleHpOnMap,
+    toggleTokenInPlayerList,
 } from "../../helper/multiTokenHelper.ts";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { useTokenListContext } from "../../context/TokenContext.tsx";
 import { TokenContextWrapper } from "../TokenContextWrapper.tsx";
+import { MapButton } from "../hptracker/Token/MapButton.tsx";
+import { PlayerButton } from "../hptracker/Token/PlayerButton.tsx";
+import { HPSvg } from "../svgs/HPSvg.tsx";
+import { ACSvg } from "../svgs/ACSvg.tsx";
+import { InitiativeSvg } from "../svgs/InitiativeSvg.tsx";
 
 export const Popover = () => {
     const [ids, setIds] = useState<Array<string>>([]);
@@ -139,34 +146,43 @@ const MultiContent = ({ ids }: { ids: Array<string> }) => {
                 </div>
                 {playerContext.role === "GM" ? (
                     <div className={"settings"}>
-                        <button
-                            title={"Toggle HP Bar visibility for GM and Players"}
-                            className={`toggle-button hp ${getHpBar(items) ? "on" : "off"}`}
-                            onClick={() => {
-                                toggleHpBar(items);
-                            }}
-                        />
-                        <button
-                            title={"Toggle HP displayed on Map"}
-                            className={`toggle-button map ${getHpOnMap(items) ? "on" : "off"}`}
-                            onClick={() => {
-                                toggleHpOnMap(items);
-                            }}
-                        />
-                        <button
-                            title={"Toggle AC displayed on Map"}
-                            className={`toggle-button ac ${getAcOnMap(items) ? "on" : "off"}`}
-                            onClick={async () => {
-                                toggleAcOnMap(items);
-                            }}
-                        />
-                        <button
-                            title={"Toggle HP/AC visibility for players"}
-                            className={`toggle-button players ${getCanPlayersSee(items) ? "on" : "off"}`}
-                            onClick={() => {
-                                toggleCanPlayerSee(items);
-                            }}
-                        />{" "}
+                        <div className={"setting"}>
+                            <HPSvg percent={100} name={"hp"} color={"#888888"} />
+                            <MapButton
+                                onClick={() => {
+                                    toggleHpOnMap(items);
+                                }}
+                                onContextMenu={() => {
+                                    toggleHpForPlayers(items);
+                                }}
+                                active={getHpOnMap(items)}
+                                players={getHpForPlayers(items)}
+                                tooltip={"Show HP on map (right click for players)"}
+                            />
+                        </div>
+                        <div className={"setting"}>
+                            <ACSvg />
+                            <MapButton
+                                onClick={() => {
+                                    toggleAcOnMap(items);
+                                }}
+                                onContextMenu={() => {
+                                    toggleAcForPlayers(items);
+                                }}
+                                active={getAcOnMap(items)}
+                                players={getAcForPlayers(items)}
+                                tooltip={"Show AC on map (right click for players)"}
+                            />
+                        </div>
+                        <div className={"setting"}>
+                            <InitiativeSvg />
+                            <PlayerButton
+                                active={getTokenInPlayerList(items)}
+                                onClick={() => {
+                                    toggleTokenInPlayerList(items);
+                                }}
+                            />
+                        </div>
                     </div>
                 ) : null}
             </div>

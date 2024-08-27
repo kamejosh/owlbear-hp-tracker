@@ -4,23 +4,30 @@ import OBR, { Item, Metadata } from "@owlbear-rodeo/sdk";
 import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
 import { itemMetadataKey, metadataKey } from "../../helper/variables.ts";
 import {
+    getAcForPlayers,
     getAcOnMap,
-    getCanPlayersSee,
-    getHpBar,
+    getHpForPlayers,
     getHpOnMap,
+    getTokenInPlayerList,
+    toggleAcForPlayers,
     toggleAcOnMap,
-    toggleCanPlayerSee,
-    toggleHpBar,
+    toggleHpForPlayers,
     toggleHpOnMap,
+    toggleTokenInPlayerList,
 } from "../../helper/multiTokenHelper.ts";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { useDiceRoller } from "../../context/DDDiceContext.tsx";
-import { IDiceRoll, Operator } from "dddice-js";
+import { IDiceRoll, Operator, parseRollEquation } from "dddice-js";
 import { diceToRoll, getUserUuid, localRoll } from "../../helper/diceHelper.ts";
 import { getRoomDiceUser } from "../../helper/helpers.ts";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import { useRollLogContext } from "../../context/RollLogContext.tsx";
 import { useRef, useState } from "react";
+import { getDiceImage, getSvgForDiceType } from "../../helper/previewHelpers.tsx";
+import { D20 } from "../svgs/dice/D20.tsx";
+import "./drop-group.scss";
+import { MapButton } from "./Token/MapButton.tsx";
+import { PlayerButton } from "./Token/PlayerButton.tsx";
 
 type DropGroupProps = {
     title: string;
@@ -49,6 +56,29 @@ export const DropGroup = (props: DropGroupProps) => {
         const ownMetadata: Metadata = {};
         ownMetadata[metadataKey] = hpTrackerSceneMetadata;
         await OBR.scene.setMetadata(ownMetadata);
+    };
+
+    const getDicePreview = () => {
+        try {
+            const parsed = parseRollEquation(`1d${room?.initiativeDice}`, "dddice-bees");
+            const die = parsed.dice.find((d) => d.type !== "mod");
+            if (die) {
+                if (room?.disableDiceRoller) {
+                    return getSvgForDiceType(`d${room.initiativeDice}`);
+                } else {
+                    if (theme) {
+                        const image = getDiceImage(theme, die, 0);
+                        return image ?? <D20 />;
+                    } else {
+                        return <D20 />;
+                    }
+                }
+            } else {
+                return <D20 />;
+            }
+        } catch {
+            return <D20 />;
+        }
     };
 
     const roll = async (dice: string, statblock: string, hidden: boolean, id: string) => {
@@ -121,37 +151,37 @@ export const DropGroup = (props: DropGroupProps) => {
                     <span>{props.title}</span>
                 </div>
                 <div className={"settings"}>
-                    <button
-                        title={"Toggle HP Bar visibility for GM and Players"}
-                        className={`toggle-button hp ${getHpBar(props.list) ? "on" : "off"}`}
-                        onClick={() => {
-                            toggleHpBar(props.list);
-                        }}
-                    />
-                    <button
-                        title={"Toggle HP displayed on Map"}
-                        className={`toggle-button map ${getHpOnMap(props.list) ? "on" : "off"}`}
+                    <MapButton
                         onClick={() => {
                             toggleHpOnMap(props.list);
                         }}
+                        onContextMenu={() => {
+                            toggleHpForPlayers(props.list);
+                        }}
+                        active={getHpOnMap(props.list)}
+                        players={getHpForPlayers(props.list)}
+                        tooltip={"Show HP on map (right click for players)"}
                     />
-                    <button
-                        title={"Toggle AC displayed on Map"}
-                        className={`toggle-button ac ${getAcOnMap(props.list) ? "on" : "off"}`}
-                        onClick={async () => {
+                    <MapButton
+                        onClick={() => {
                             toggleAcOnMap(props.list);
                         }}
+                        onContextMenu={() => {
+                            toggleAcForPlayers(props.list);
+                        }}
+                        active={getAcOnMap(props.list)}
+                        players={getAcForPlayers(props.list)}
+                        tooltip={"Show AC on map (right click for players)"}
                     />
-                    <button
-                        title={"Toggle HP/AC visibility for players"}
-                        className={`toggle-button players ${getCanPlayersSee(props.list) ? "on" : "off"}`}
+                    <PlayerButton
+                        active={getTokenInPlayerList(props.list)}
                         onClick={() => {
-                            toggleCanPlayerSee(props.list);
+                            toggleTokenInPlayerList(props.list);
                         }}
                     />
                 </div>
                 <div
-                    className={"init-wrapper"}
+                    className={"init-wrapper button-wrapper"}
                     onMouseEnter={() => {
                         setInitHover(true);
                     }}
@@ -160,7 +190,7 @@ export const DropGroup = (props: DropGroupProps) => {
                     <button
                         ref={initButtonRef}
                         title={"Roll Initiative (including initiative modifier from statblock)"}
-                        className={`toggle-button initiative-button`}
+                        className={`dice-button button`}
                         disabled={
                             getRoomDiceUser(room, playerContext.id)?.diceRendering &&
                             !initialized &&
@@ -169,7 +199,9 @@ export const DropGroup = (props: DropGroupProps) => {
                         onClick={async () => {
                             await setInitiative(false);
                         }}
-                    />
+                    >
+                        <div className={"dice-preview"}>{getDicePreview()}</div>
+                    </button>
                     <button
                         className={`self ${initHover ? "visible" : "hidden"}`}
                         disabled={

@@ -274,28 +274,25 @@ const Content = () => {
                 <h1 className={"title"}>
                     HP Tracker<span className={"small"}>{version}</span>
                 </h1>
-                <div className={`player-wrapper headings ${playerContext.role === "PLAYER" ? "player" : ""}`}>
-                    <span>Name</span>
-                    {playerContext.role === "GM" ? <span>Settings</span> : null}
-                    <span className={"current-hp"}>HP / MAX</span>
-                    <span className={"temp-hp"}>TMP</span>
-                    <span className={"armor-class"}>AC</span>
-                    <span className={"initiative-wrapper"}>
-                        INIT
-                        {playerContext.role === "GM" ? (
-                            <button
-                                className={`sort-button ${reverseInitiativeOrder ? "reverse" : ""}`}
-                                title={"Order By Initiative"}
-                                onClick={() => {
-                                    orderByInitiative(reverseInitiativeOrder);
-                                    setReverseInitiativeOrder(!reverseInitiativeOrder);
-                                }}
-                            >
-                                ↓
-                            </button>
-                        ) : null}
-                    </span>
-                    <span className={"statblock-heading"}>INFO</span>
+                <div className={`headings ${playerContext.role === "PLAYER" ? "player" : ""}`}>
+                    {playerContext.role === "GM" ? (
+                        <>
+                            <span className={"toggle-preview"}>Toogle Player Preview</span>
+                            <span className={"initiative-order"}>
+                                Sort by Initiative{" "}
+                                <button
+                                    className={`sort-button ${reverseInitiativeOrder ? "reverse" : ""}`}
+                                    title={"Order By Initiative"}
+                                    onClick={() => {
+                                        orderByInitiative(reverseInitiativeOrder);
+                                        setReverseInitiativeOrder(!reverseInitiativeOrder);
+                                    }}
+                                >
+                                    ↓
+                                </button>
+                            </span>
+                        </>
+                    ) : null}
                 </div>
                 {playerContext.role === "GM" ? (
                     <DragDropContext onDragEnd={onDragEnd}>

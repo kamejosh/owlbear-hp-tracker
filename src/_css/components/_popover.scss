@@ -7,8 +7,6 @@ body:has(.popover-app) {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         justify-content: space-between;
-        align-items: center;
-        padding-inline: 10px;
         height: 100px;
         overflow: hidden;
 
@@ -17,9 +15,12 @@ body:has(.popover-app) {
             flex-direction: column;
             justify-content: flex-start;
             align-items: flex-start;
+            gap: 1px;
+            margin: 0;
             padding-left: 0;
             height: 100%;
             overflow-y: scroll;
+            line-height: 1;
             list-style: none;
 
             .token-entry {
@@ -44,13 +45,17 @@ body:has(.popover-app) {
         .changes {
             display: flex;
             flex-direction: column;
+            justify-content: center;
             gap: 1ch;
+            padding-inline: 10px;
+            height: 100%;
+
             .hp {
                 display: grid;
                 grid-template-areas:
                     "input heal"
                     "input damage";
-                justify-content: space-around;
+                justify-content: space-between;
                 align-items: center;
                 gap: 2px;
 
@@ -67,6 +72,24 @@ body:has(.popover-app) {
                 .damage {
                     grid-area: damage;
                     background-color: rgba(255, 0, 0, 0.2);
+                }
+            }
+
+            .settings {
+                display: flex;
+                justify-content: space-between;
+
+                .setting {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 2px;
+                    .hp-icon,
+                    .ac-icon,
+                    .initiative-icon {
+                        fill: #888888;
+                        height: 15px;
+                    }
                 }
             }
         }
@@ -88,76 +111,6 @@ body:has(.popover-app) {
         .popover {
             height: 100%;
             overflow: hidden;
-            .player-wrapper {
-                display: grid;
-                grid-template-areas:
-                    "hp temp"
-                    "ac init"
-                    "settings settings";
-                column-gap: 1ch;
-                row-gap: 2px;
-                justify-content: space-between;
-                border-bottom: none;
-                padding: 10px 10px;
-                height: calc(100% - 20px);
-
-                .settings {
-                    grid-area: settings;
-                    justify-self: center;
-                }
-
-                .current-hp {
-                    grid-area: hp;
-                    align-items: center;
-
-                    &::before {
-                        display: block;
-                        margin: 0;
-                        min-width: 26px;
-                        content: "HP: ";
-                    }
-                }
-
-                .temp-hp {
-                    grid-area: temp;
-                    justify-self: flex-end;
-                    white-space: nowrap;
-                }
-
-                .armor-class {
-                    grid-area: ac;
-                    align-items: center;
-                    min-width: unset;
-
-                    &::before {
-                        display: block;
-                        min-width: 26px;
-                        content: "AC: ";
-                    }
-                }
-
-                .initiative-wrapper {
-                    grid-area: init;
-                    flex-direction: row-reverse;
-                    align-items: center;
-                    justify-self: flex-end;
-                    width: auto;
-
-                    &::before {
-                        display: none;
-                    }
-
-                    &::after {
-                        display: block;
-                        min-width: 26px;
-                        content: "Init: ";
-                    }
-                }
-
-                input[type="text"] {
-                    width: 28px;
-                }
-            }
         }
     }
 }

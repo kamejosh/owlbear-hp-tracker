@@ -1,12 +1,24 @@
-.hp {
+.token-hp {
     display: grid;
     position: relative;
     grid-template-areas:
         "title hp"
         "temp-icon temp";
+    column-gap: 0.5ch;
+    row-gap: 0.2ch;
     grid-area: hp;
+    justify-content: start;
     align-items: flex-start;
     height: 46px;
+
+    input[type="text"],
+    input[type="number"] {
+        padding-inline: 4px;
+        padding-block: 0;
+        width: 25px;
+        height: 18px;
+        text-align: right;
+    }
 
     .hp-icon {
         grid-area: title;
@@ -30,7 +42,7 @@
             rotate: 15deg;
             background-color: var(--text-color);
             width: 1px;
-            height: 70%;
+            height: 15px;
         }
     }
 
@@ -38,15 +50,8 @@
         display: flex;
         grid-area: temp;
         justify-content: space-between;
+        align-self: start;
         justify-self: start;
         width: 100%;
-
-        .temp-hp {
-            height: 20px;
-        }
-
-        .map-button {
-            padding-top: 2px;
-        }
     }
 }

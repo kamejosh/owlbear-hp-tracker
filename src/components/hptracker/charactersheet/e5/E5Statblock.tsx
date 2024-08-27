@@ -29,10 +29,6 @@ export const E5StatBlock = ({ slug, itemId }: { slug: string; itemId: string }) 
                 </span>
             </div>
             <div className={"values"}>
-                <span className={"ac"}>
-                    <b>Armor Class</b> <AC id={itemId} />
-                    {!!statblock.armor_class.special ? `(${statblock.armor_class.special})` : null}
-                </span>
                 <span className={"hp"}>
                     <b>Hit Points</b> <HP id={itemId} />
                     {statblock.hp.hit_dice ? (
@@ -43,6 +39,10 @@ export const E5StatBlock = ({ slug, itemId }: { slug: string; itemId: string }) 
                             statblock={data.name}
                         />
                     ) : null}
+                </span>
+                <span className={"ac"}>
+                    <b>Armor Class</b> <AC id={itemId} />
+                    {!!statblock.armor_class.special ? `(${statblock.armor_class.special})` : null}
                 </span>
                 <span className={"speed"}>
                     <b>Speed</b>{" "}
