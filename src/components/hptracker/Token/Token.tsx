@@ -14,6 +14,7 @@ import { Initiative } from "./Initiative.tsx";
 import { Sheet } from "./Sheet.tsx";
 import { TokenIcon } from "./TokenIcon.tsx";
 import { useComponentContext } from "../../../context/ComponentContext.tsx";
+import { Rest } from "./Rest.tsx";
 
 type TokenProps = {
     id: string;
@@ -146,12 +147,7 @@ export const Token = (props: TokenProps) => {
     };
 
     const display = (): boolean => {
-        return (
-            data.hpTrackerActive &&
-            (playerContext.role === "GM" ||
-                (playerContext.role === "PLAYER" && item.visible && !!data.playerMap?.hp && !!data.playerMap?.ac) ||
-                item.createdUserId === playerContext.id)
-        );
+        return data.hpTrackerActive && (playerContext.role === "GM" || item.createdUserId === playerContext.id);
     };
 
     return display() ? (
@@ -211,24 +207,18 @@ export const Token = (props: TokenProps) => {
             <AC id={props.id} />
             <Initiative id={props.id} />
             {props.popover ? null : playerContext.role === "GM" || item.createdUserId === playerContext.id ? (
-                <Sheet id={props.id} />
+                <>
+                    <Sheet id={props.id} />
+                    <Rest id={props.id} />
+                </>
             ) : null}
         </div>
     ) : data.playerList && item.visible ? (
         <div
-            className={"player-wrapper player"}
+            className={"token"}
             style={{ background: `linear-gradient(to right, ${getBgColor(data)}, #242424 50%, #242424 )` }}
         >
-            <div className={"player-name"}>
-                <div
-                    className={"name"}
-                    onMouseDown={handleOnPlayerClick}
-                    onMouseUp={handleOnPlayerClick}
-                    onMouseLeave={handleOnPlayerClick}
-                >
-                    {data.name}
-                </div>
-            </div>
+            <TokenIcon id={props.id} />
         </div>
     ) : (
         <></>

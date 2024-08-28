@@ -68,7 +68,7 @@ export const HP = ({ id }: { id: string }) => {
         <div className={"token-hp"}>
             <HPSvg percent={(data.hp / (data.maxHp + (data.stats.tempHp ?? 0))) * 100} name={item.id} />
             {data.stats.tempHp ? (
-                <HPSvg percent={100} name={"tempHp"} className={"temp-hp-icon"} color={"#2109cf"} />
+                <HPSvg percent={100} name={"tempHp"} className={"temp-hp-icon"} color={"#2248ff"} />
             ) : null}
             <div className={"current-hp"}>
                 <input

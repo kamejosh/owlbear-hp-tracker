@@ -17,7 +17,7 @@ export const TokenIcon = ({ id }: { id: string }) => {
             <img src={item.image.url} alt={""} />
             {playerContext.role === "GM" ? (
                 <>
-                    {!!data.playerMap?.hp && data.hpOnMap ? (
+                    {data.hpOnMap ? (
                         <div
                             className={"preview-hp"}
                             style={
@@ -37,10 +37,12 @@ export const TokenIcon = ({ id }: { id: string }) => {
                                 } as CSSProperties
                             }
                         >
-                            <span className={"preview-hp-text"}>
-                                {data.hp}/{data.maxHp}
-                                {data.stats?.tempHp ? `(${data.stats.tempHp})` : null}
-                            </span>
+                            {!!data.playerMap?.hp ? (
+                                <span className={"preview-hp-text"}>
+                                    {data.hp}/{data.maxHp}
+                                    {data.stats?.tempHp ? `(${data.stats.tempHp})` : null}
+                                </span>
+                            ) : null}
                         </div>
                     ) : null}
                     {!!data.playerMap?.ac && data.acOnMap ? (

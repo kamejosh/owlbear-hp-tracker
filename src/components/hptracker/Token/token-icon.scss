@@ -31,7 +31,7 @@
             left: 1px;
             z-index: 1;
             background-color: #ff000088;
-            width: var(--width);
+            width: calc(var(--width) - 2px);
             height: calc(100% - 2px);
             content: "";
         }
@@ -43,7 +43,7 @@
             left: 1px;
             z-index: 2;
             background-color: #0000ffff;
-            width: var(--temp-width);
+            width: calc(var(--temp-width) - 2px);
             height: calc(100% - 2px);
             content: "";
         }

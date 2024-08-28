@@ -113,3 +113,19 @@ export const toggleTokenInPlayerList = async (list: Array<Item>) => {
         });
     });
 };
+
+export const rest = async (list: Array<Item>, restType: string) => {
+    await OBR.scene.items.updateItems(list, (items) => {
+        items.forEach((item) => {
+            const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+            const newLimits = data.stats.limits?.map((limit) => {
+                if (limit.resets.includes(restType)) {
+                    return { ...limit, used: 0 };
+                } else {
+                    return limit;
+                }
+            });
+            (item.metadata[itemMetadataKey] as HpTrackerMetadata).stats.limits = newLimits;
+        });
+    });
+};

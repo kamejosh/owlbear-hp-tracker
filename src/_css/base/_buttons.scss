@@ -2,11 +2,19 @@
 
 button,
 .button {
+    transition: all 0.25s ease;
     cursor: pointer;
+    outline: 1px solid transparent;
+    outline-offset: -2px;
     border: 1px solid lightgrey;
     border-radius: 4px;
     background-color: var(--bg-color);
     color: var(--text-color);
+
+    &:hover,
+    &:focus-visible {
+        outline: 1px solid lightgrey;
+    }
 }
 
 .help-buttons {

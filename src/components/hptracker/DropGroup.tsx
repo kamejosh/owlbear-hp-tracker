@@ -9,6 +9,7 @@ import {
     getHpForPlayers,
     getHpOnMap,
     getTokenInPlayerList,
+    rest,
     toggleAcForPlayers,
     toggleAcOnMap,
     toggleHpForPlayers,
@@ -28,6 +29,11 @@ import { D20 } from "../svgs/dice/D20.tsx";
 import "./drop-group.scss";
 import { MapButton } from "./Token/MapButton.tsx";
 import { PlayerButton } from "./Token/PlayerButton.tsx";
+import { HPSvg } from "../svgs/HPSvg.tsx";
+import { ACSvg } from "../svgs/ACSvg.tsx";
+import { InitiativeSvg } from "../svgs/InitiativeSvg.tsx";
+import { RestSvg } from "../svgs/RestSvg.tsx";
+import { updateTokenMetadata } from "../../helper/tokenHelper.ts";
 
 type DropGroupProps = {
     title: string;
@@ -151,71 +157,100 @@ export const DropGroup = (props: DropGroupProps) => {
                     <span>{props.title}</span>
                 </div>
                 <div className={"settings"}>
-                    <MapButton
-                        onClick={() => {
-                            toggleHpOnMap(props.list);
-                        }}
-                        onContextMenu={() => {
-                            toggleHpForPlayers(props.list);
-                        }}
-                        active={getHpOnMap(props.list)}
-                        players={getHpForPlayers(props.list)}
-                        tooltip={"Show HP on map (right click for players)"}
-                    />
-                    <MapButton
-                        onClick={() => {
-                            toggleAcOnMap(props.list);
-                        }}
-                        onContextMenu={() => {
-                            toggleAcForPlayers(props.list);
-                        }}
-                        active={getAcOnMap(props.list)}
-                        players={getAcForPlayers(props.list)}
-                        tooltip={"Show AC on map (right click for players)"}
-                    />
-                    <PlayerButton
-                        active={getTokenInPlayerList(props.list)}
-                        onClick={() => {
-                            toggleTokenInPlayerList(props.list);
-                        }}
-                    />
+                    <div className={"setting"}>
+                        <HPSvg percent={100} name={"hp"} color={"#888888"} />
+                        <MapButton
+                            onClick={() => {
+                                toggleHpOnMap(props.list);
+                            }}
+                            onContextMenu={() => {
+                                toggleHpForPlayers(props.list);
+                            }}
+                            active={getHpOnMap(props.list)}
+                            players={getHpForPlayers(props.list)}
+                            tooltip={"Show HP on map (right click for players)"}
+                        />
+                    </div>
+                    <div className={"setting"}>
+                        <ACSvg />
+                        <MapButton
+                            onClick={() => {
+                                toggleAcOnMap(props.list);
+                            }}
+                            onContextMenu={() => {
+                                toggleAcForPlayers(props.list);
+                            }}
+                            active={getAcOnMap(props.list)}
+                            players={getAcForPlayers(props.list)}
+                            tooltip={"Show AC on map (right click for players)"}
+                        />
+                    </div>
+                    <div className={"setting"}>
+                        <InitiativeSvg />
+                        <PlayerButton
+                            active={getTokenInPlayerList(props.list)}
+                            onClick={() => {
+                                toggleTokenInPlayerList(props.list);
+                            }}
+                        />
+                        <div
+                            className={"init-wrapper button-wrapper"}
+                            onMouseEnter={() => {
+                                setInitHover(true);
+                            }}
+                            onMouseLeave={() => setInitHover(false)}
+                        >
+                            <button
+                                ref={initButtonRef}
+                                title={"Roll Initiative (including initiative modifier from statblock)"}
+                                className={`dice-button button`}
+                                disabled={
+                                    getRoomDiceUser(room, playerContext.id)?.diceRendering &&
+                                    !initialized &&
+                                    !room?.disableDiceRoller
+                                }
+                                onClick={async () => {
+                                    await setInitiative(false);
+                                }}
+                            >
+                                <div className={"dice-preview"}>{getDicePreview()}</div>
+                            </button>
+                            <button
+                                className={`self ${initHover ? "visible" : "hidden"}`}
+                                disabled={
+                                    getRoomDiceUser(room, playerContext.id)?.diceRendering &&
+                                    !initialized &&
+                                    !room?.disableDiceRoller
+                                }
+                                onClick={async () => {
+                                    await setInitiative(true);
+                                }}
+                            >
+                                HIDE
+                            </button>
+                        </div>
+                    </div>
+                    <div className={"setting"}>
+                        <RestSvg color={"#888888"} />
+                        <button
+                            className={"button short"}
+                            onClick={() => {
+                                rest(props.list, "Short Rest");
+                            }}
+                        >
+                            short
+                        </button>
+                        <button
+                            className={"button long"}
+                            onClick={() => {
+                                rest(props.list, "Long Rest");
+                            }}
+                        >
+                            long
+                        </button>
+                    </div>
                 </div>
-                <div
-                    className={"init-wrapper button-wrapper"}
-                    onMouseEnter={() => {
-                        setInitHover(true);
-                    }}
-                    onMouseLeave={() => setInitHover(false)}
-                >
-                    <button
-                        ref={initButtonRef}
-                        title={"Roll Initiative (including initiative modifier from statblock)"}
-                        className={`dice-button button`}
-                        disabled={
-                            getRoomDiceUser(room, playerContext.id)?.diceRendering &&
-                            !initialized &&
-                            !room?.disableDiceRoller
-                        }
-                        onClick={async () => {
-                            await setInitiative(false);
-                        }}
-                    >
-                        <div className={"dice-preview"}>{getDicePreview()}</div>
-                    </button>
-                    <button
-                        className={`self ${initHover ? "visible" : "hidden"}`}
-                        disabled={
-                            getRoomDiceUser(room, playerContext.id)?.diceRendering &&
-                            !initialized &&
-                            !room?.disableDiceRoller
-                        }
-                        onClick={async () => {
-                            await setInitiative(true);
-                        }}
-                    >
-                        HIDE
-                    </button>
-                </div>
+
                 <button
                     className={"hide-group"}
                     onClick={async () => {

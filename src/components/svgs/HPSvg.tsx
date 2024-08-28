@@ -15,7 +15,7 @@ export const HPSvg = ({
                 <linearGradient id={name} x1="0" x2="0" y1="1" y2="0">
                     <stop stopColor={color ?? "#AA1404"} offset="0%" />
                     <stop stopColor={color ?? "#AA1404"} offset={`${percent}%`} />
-                    <stop stopColor="transparent" offset="100%" />
+                    <stop stopColor="black" offset="100%" />
                 </linearGradient>
             </defs>
             <path
