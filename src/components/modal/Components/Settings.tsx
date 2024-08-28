@@ -6,7 +6,7 @@ import { Switch } from "../../general/Switch/Switch.tsx";
 import { dndSvg, pfSvg } from "./SwitchBackground.ts";
 import { updateAcOffset } from "../../../helper/acHelper.ts";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
-import { updateRoomMetadata } from "../../../helper/helpers.ts";
+import { getRoomDiceUser, updateRoomMetadata } from "../../../helper/helpers.ts";
 
 export const Settings = () => {
     const [room, scene] = useMetadataContext((state) => [state.room, state.scene]);
@@ -139,7 +139,15 @@ export const Settings = () => {
                                 const disableDiceRoller = !room?.disableDiceRoller;
                                 await updateRoomMetadata(room, { disableDiceRoller: disableDiceRoller });
                                 if (!disableDiceRoller) {
-                                    await OBR.modal.open(diceTrayModal);
+                                    const diceRoomUser = getRoomDiceUser(room, OBR.player.id);
+                                    if (diceRoomUser) {
+                                        await OBR.modal.open({
+                                            ...diceTrayModal,
+                                            url: `https://dddice.com/room/${room.diceRoom!.slug}/stream?key=${
+                                                diceRoomUser.apiKey
+                                            }`,
+                                        });
+                                    }
                                 } else {
                                     await OBR.modal.close(diceTrayModalId);
                                 }

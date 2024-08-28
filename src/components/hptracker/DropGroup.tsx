@@ -33,7 +33,6 @@ import { HPSvg } from "../svgs/HPSvg.tsx";
 import { ACSvg } from "../svgs/ACSvg.tsx";
 import { InitiativeSvg } from "../svgs/InitiativeSvg.tsx";
 import { RestSvg } from "../svgs/RestSvg.tsx";
-import { updateTokenMetadata } from "../../helper/tokenHelper.ts";
 
 type DropGroupProps = {
     title: string;

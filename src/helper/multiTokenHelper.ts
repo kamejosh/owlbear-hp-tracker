@@ -115,6 +115,8 @@ export const toggleTokenInPlayerList = async (list: Array<Item>) => {
 };
 
 export const rest = async (list: Array<Item>, restType: string) => {
+    const hpUpdated: Array<string> = [];
+
     await OBR.scene.items.updateItems(list, (items) => {
         items.forEach((item) => {
             const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
@@ -126,6 +128,17 @@ export const rest = async (list: Array<Item>, restType: string) => {
                 }
             });
             (item.metadata[itemMetadataKey] as HpTrackerMetadata).stats.limits = newLimits;
+            if (restType === "Long Rest" && data.hp !== data.maxHp + (data.stats?.tempHp ?? 0)) {
+                (item.metadata[itemMetadataKey] as HpTrackerMetadata).hp = data.maxHp + (data.stats?.tempHp ?? 0);
+                hpUpdated.push(item.id);
+            }
         });
     });
+
+    const updated = list.filter((i) => hpUpdated.includes(i.id));
+
+    for (const item of updated) {
+        const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+        await updateHp(item, { ...data, hp: data.maxHp + (data.stats?.tempHp ?? 0) });
+    }
 };

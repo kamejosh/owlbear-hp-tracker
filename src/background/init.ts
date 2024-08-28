@@ -58,7 +58,7 @@ const initItems = async () => {
             await saveOrChangeText(token, data, textAttachments, textChanges);
         }
         if (data.acOnMap) {
-            await saveOrChangeAC(token, data, acAttachments, acChanges, token.visible && data.playerMap.ac);
+            await saveOrChangeAC(token, data, acAttachments, acChanges, token.visible && !!data.playerMap?.ac);
         }
     }
 

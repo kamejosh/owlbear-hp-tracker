@@ -297,8 +297,8 @@ export const saveOrChangeText = async (
             if ((a as Text).text.plainText !== hpText) {
                 change.text = hpText;
             }
-            if (a.visible !== (character.visible && data.playerMap.hp)) {
-                change.visible = character.visible && data.playerMap.hp;
+            if (a.visible !== (character.visible && !!data.playerMap?.hp)) {
+                change.visible = character.visible && !!data.playerMap?.hp;
             }
             if (!!change.text || change.visible !== undefined) {
                 textChanges.set(a.id, change);
@@ -306,7 +306,7 @@ export const saveOrChangeText = async (
         }
     } else {
         const text = await createText(hpText, character as Image);
-        text.visible = character.visible && data.playerMap.hp;
+        text.visible = character.visible && !!data.playerMap?.hp;
         await OBR.scene.items.addItems([text]);
     }
 };

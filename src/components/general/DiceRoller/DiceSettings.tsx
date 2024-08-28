@@ -133,10 +133,19 @@ export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean)
                     onChange={async () => {
                         if (room) {
                             const id = OBR.player.id;
-                            const diceRendering = getRoomDiceUser(room, id)?.diceRendering;
-                            await updateRoomMetadataDiceUser(room, id, { diceRendering: !diceRendering });
-                            if (!diceRendering) {
-                                await OBR.modal.open(diceTrayModal);
+                            const diceRoomUser = getRoomDiceUser(room, id);
+                            if (diceRoomUser) {
+                                await updateRoomMetadataDiceUser(room, id, {
+                                    diceRendering: !diceRoomUser.diceRendering,
+                                });
+                                if (!diceRoomUser.diceRendering) {
+                                    await OBR.modal.open({
+                                        ...diceTrayModal,
+                                        url: `https://dddice.com/room/${room.diceRoom!.slug}/stream?key=${
+                                            diceRoomUser.apiKey
+                                        }`,
+                                    });
+                                }
                             }
                         }
                     }}
