@@ -14,6 +14,7 @@ export const TokenContextWrapper = (props: PropsWithChildren) => {
                 itemMetadataKey in item.metadata &&
                 (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpTrackerActive
         );
+        console.log(initialItems.length);
         setTokens(initialItems);
     };
 

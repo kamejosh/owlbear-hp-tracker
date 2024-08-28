@@ -5,6 +5,7 @@ import OBR from "@owlbear-rodeo/sdk";
 import { modalId } from "../../helper/variables.ts";
 import { Settings } from "./Components/Settings.tsx";
 import { DiceLogin } from "./Components/DiceLogin.tsx";
+import { TokenContextWrapper } from "../TokenContextWrapper.tsx";
 
 export const Modal = () => {
     return (
@@ -23,7 +24,11 @@ const Content = () => {
         } else if (content === "changelog") {
             return <Changelog />;
         } else if (content === "settings") {
-            return <Settings />;
+            return (
+                <TokenContextWrapper>
+                    <Settings />
+                </TokenContextWrapper>
+            );
         } else if (content === "dddice") {
             return <DiceLogin />;
         } else {

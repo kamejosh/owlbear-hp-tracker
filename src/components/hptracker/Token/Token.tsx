@@ -1,6 +1,6 @@
 import { HpTrackerMetadata } from "../../../helper/types.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "../../../helper/variables.ts";
 import { getBgColor } from "../../../helper/helpers.ts";
@@ -26,7 +26,6 @@ type TokenProps = {
 export const Token = (props: TokenProps) => {
     const component = useComponentContext((state) => state.component);
     const playerContext = usePlayerContext();
-    const [editName, setEditName] = useState<boolean>(false);
     const room = useMetadataContext((state) => state.room);
     const containerRef = useRef<HTMLDivElement>(null);
     const token = useTokenListContext((state) => state.tokens?.get(props.id));
@@ -44,15 +43,6 @@ export const Token = (props: TokenProps) => {
             }
         }
     }, [room?.allowNegativeNumbers]);
-
-    const handleValueChange = (newData: HpTrackerMetadata) => {
-        OBR.scene.items.updateItems([props.id], (items) => {
-            items.forEach((item) => {
-                // just assigning currentData did not trigger onChange event. Spreading helps
-                item.metadata[itemMetadataKey] = { ...newData };
-            });
-        });
-    };
 
     const getGroupSelectRange = (currentSelection: Array<string>): Array<string> | null => {
         const currentGroup = data.group;
@@ -136,16 +126,6 @@ export const Token = (props: TokenProps) => {
         }
     };
 
-    const handleOnPlayerDoubleClick = async () => {
-        const bounds = await OBR.scene.items.getItemBounds([props.id]);
-        await OBR.player.select([props.id]);
-        await OBR.viewport.animateToBounds({
-            ...bounds,
-            min: { x: bounds.min.x - 1000, y: bounds.min.y - 1000 },
-            max: { x: bounds.max.x + 1000, y: bounds.max.y + 1000 },
-        });
-    };
-
     const display = (): boolean => {
         return data.hpTrackerActive && (playerContext.role === "GM" || item.createdUserId === playerContext.id);
     };
@@ -162,47 +142,8 @@ export const Token = (props: TokenProps) => {
             onClick={(e) => {
                 handleOnPlayerClick(e);
             }}
-            onDoubleClick={(e) => {
-                e.preventDefault();
-                handleOnPlayerDoubleClick();
-            }}
         >
-            {props.popover ? null : (
-                <>
-                    <TokenIcon id={props.id} />
-                    <div className={"player-name"}>
-                        {editName ? (
-                            <input
-                                className={"edit-name"}
-                                type={"text"}
-                                value={data.name}
-                                onChange={(e) => {
-                                    const newData = { ...data, name: e.target.value };
-                                    handleValueChange(newData);
-                                }}
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter") {
-                                        setEditName(false);
-                                    }
-                                }}
-                            />
-                        ) : (
-                            <div
-                                className={"name"}
-                                onClick={(e) => {
-                                    handleOnPlayerClick(e);
-                                }}
-                                onDoubleClick={(e) => {
-                                    e.preventDefault();
-                                    handleOnPlayerDoubleClick();
-                                }}
-                            >
-                                {data.name}
-                            </div>
-                        )}
-                    </div>
-                </>
-            )}
+            <TokenIcon id={props.id} />
             <HP id={props.id} />
             <AC id={props.id} />
             <Initiative id={props.id} />

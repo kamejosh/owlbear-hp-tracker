@@ -53,6 +53,11 @@
                 border-bottom: none;
             }
         }
+
+        &.hp-mode {
+            display: flex;
+            flex-direction: column;
+        }
     }
 
     .ruleset {

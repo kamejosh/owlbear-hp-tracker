@@ -84,6 +84,7 @@ export type RoomMetadata = {
     diceUser?: Array<DiceUser>;
     disableDiceRoller?: boolean;
     tabletopAlmanacAPIKey?: string;
+    disableHpBar?: boolean;
 };
 
 export type AttachmentMetadata = {

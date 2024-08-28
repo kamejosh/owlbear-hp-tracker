@@ -153,7 +153,9 @@ export const HP = ({ id }: { id: string }) => {
                     <MapButton
                         onClick={() => {
                             const b = !data.hpOnMap;
-                            const newData = { ...data, hpOnMap: b, hpBar: b };
+                            const newData = { ...data, hpOnMap: b, hpBar: b && !room?.disableHpBar };
+
+                            console.log(newData.hpBar, room?.disableHpBar);
                             updateTokenMetadata(newData, [id]);
                             updateHp(item, newData);
                         }}

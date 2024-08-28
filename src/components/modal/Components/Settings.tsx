@@ -1,14 +1,17 @@
 import { diceTrayModal, diceTrayModalId, modalId } from "../../../helper/variables.ts";
 import OBR from "@owlbear-rodeo/sdk";
-import { updateHpOffset } from "../../../helper/hpHelpers.ts";
+import { updateHp, updateHpOffset } from "../../../helper/hpHelpers.ts";
 import { Groups } from "./Groups.tsx";
 import { Switch } from "../../general/Switch/Switch.tsx";
 import { dndSvg, pfSvg } from "./SwitchBackground.ts";
 import { updateAcOffset } from "../../../helper/acHelper.ts";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { getRoomDiceUser, updateRoomMetadata } from "../../../helper/helpers.ts";
+import { useTokenListContext } from "../../../context/TokenContext.tsx";
+import { updateTokenMetadata } from "../../../helper/tokenHelper.ts";
 
 export const Settings = () => {
+    const tokens = useTokenListContext((state) => state.tokens);
     const [room, scene] = useMetadataContext((state) => [state.room, state.scene]);
 
     const handleOffsetChange = (value: number) => {
@@ -59,23 +62,43 @@ export const Settings = () => {
                         />
                     </div>
                     <div className={"hp-mode setting"}>
-                        HP Bar Segments:{" "}
-                        <input
-                            type={"text"}
-                            size={2}
-                            value={room?.hpBarSegments || 0}
-                            onChange={(e) => {
-                                const nValue = Number(e.target.value.replace(/[^0-9]/g, ""));
-                                updateRoomMetadata(room, { hpBarSegments: nValue });
-                            }}
-                            onKeyDown={(e) => {
-                                if (e.key === "ArrowUp") {
-                                    updateRoomMetadata(room, { hpBarSegments: (room?.hpBarSegments || 0) + 1 });
-                                } else if (e.key === "ArrowDown") {
-                                    updateRoomMetadata(room, { hpBarSegments: (room?.hpBarSegments || 0) + -1 });
-                                }
-                            }}
-                        />
+                        <div>
+                            HP Bar Segments:{" "}
+                            <input
+                                type={"text"}
+                                size={2}
+                                value={room?.hpBarSegments || 0}
+                                onChange={(e) => {
+                                    const nValue = Number(e.target.value.replace(/[^0-9]/g, ""));
+                                    updateRoomMetadata(room, { hpBarSegments: nValue });
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === "ArrowUp") {
+                                        updateRoomMetadata(room, { hpBarSegments: (room?.hpBarSegments || 0) + 1 });
+                                    } else if (e.key === "ArrowDown") {
+                                        updateRoomMetadata(room, { hpBarSegments: (room?.hpBarSegments || 0) + -1 });
+                                    }
+                                }}
+                            />
+                        </div>
+                        <div>
+                            Disable HP Bar:
+                            <input
+                                type={"checkbox"}
+                                checked={!!room?.disableHpBar}
+                                onChange={() => {
+                                    updateRoomMetadata(room, { disableHpBar: !room?.disableHpBar });
+                                    tokens?.forEach((token) => {
+                                        const data = {
+                                            ...token.data,
+                                            hpBar: token.data.hpOnMap && !!room?.disableHpBar,
+                                        };
+                                        updateTokenMetadata(data, [token.item.id]);
+                                        updateHp(token.item, data);
+                                    });
+                                }}
+                            />
+                        </div>
                     </div>
                     <div className={"hp-position setting"}>
                         Text and Bar Offset:{" "}

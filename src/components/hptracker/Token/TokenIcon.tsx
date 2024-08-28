@@ -3,21 +3,33 @@ import { ShieldSvg } from "../../svgs/ShieldSvg.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
 import { HpTrackerMetadata } from "../../../helper/types.ts";
-import { Image } from "@owlbear-rodeo/sdk";
+import OBR, { Image } from "@owlbear-rodeo/sdk";
 import "./token-icon.scss";
+import { useMetadataContext } from "../../../context/MetadataContext.ts";
 
 export const TokenIcon = ({ id }: { id: string }) => {
     const playerContext = usePlayerContext();
+    const room = useMetadataContext((state) => state.room);
     const token = useTokenListContext((state) => state.tokens?.get(id));
     const data = token?.data as HpTrackerMetadata;
     const item = token?.item as Image;
 
+    const handleOnPlayerDoubleClick = async () => {
+        const bounds = await OBR.scene.items.getItemBounds([id]);
+        await OBR.player.select([id]);
+        await OBR.viewport.animateToBounds({
+            ...bounds,
+            min: { x: bounds.min.x - 1000, y: bounds.min.y - 1000 },
+            max: { x: bounds.max.x + 1000, y: bounds.max.y + 1000 },
+        });
+    };
+
     return (
-        <div className={"token-icon"}>
+        <div className={"token-icon"} onDoubleClick={handleOnPlayerDoubleClick}>
             <img src={item.image.url} alt={""} />
             {playerContext.role === "GM" ? (
                 <>
-                    {data.hpOnMap ? (
+                    {data.hpOnMap && !room?.disableHpBar ? (
                         <div
                             className={"preview-hp"}
                             style={

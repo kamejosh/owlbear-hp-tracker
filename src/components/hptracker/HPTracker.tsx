@@ -18,6 +18,8 @@ import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { uniq } from "lodash";
 import { TokenContextWrapper } from "../TokenContextWrapper.tsx";
 import { useTokenListContext } from "../../context/TokenContext.tsx";
+import { PlayerSvg } from "../svgs/PlayerSvg.tsx";
+import tippy from "tippy.js";
 
 export const HPTracker = () => {
     return (
@@ -277,7 +279,16 @@ const Content = () => {
                 <div className={`headings ${playerContext.role === "PLAYER" ? "player" : ""}`}>
                     {playerContext.role === "GM" ? (
                         <>
-                            <span className={"toggle-preview"}>Toogle Player Preview</span>
+                            <button
+                                className={"toggle-preview"}
+                                ref={(e) => {
+                                    if (e) {
+                                        tippy(e, { content: "Toogle Preview Mode" });
+                                    }
+                                }}
+                            >
+                                <PlayerSvg />
+                            </button>
                             <span className={"initiative-order"}>
                                 Sort by Initiative{" "}
                                 <button
