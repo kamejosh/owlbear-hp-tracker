@@ -4,7 +4,7 @@ import { FreeMode, Mousewheel } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/mousewheel";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { itemMetadataKey } from "../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../helper/types.ts";
 import SwiperClass from "swiper/types/swiper-class";
@@ -12,6 +12,7 @@ import { getBgColor, sortItems, updateSceneMetadata } from "../../helper/helpers
 import { useTokenListContext } from "../../context/TokenContext.tsx";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
+import { usePlayerContext } from "../../context/PlayerContext.ts";
 
 type StatblockListProps = {
     minimized: boolean;
@@ -21,11 +22,22 @@ type StatblockListProps = {
 };
 export const StatblockList = (props: StatblockListProps) => {
     const tokens = useTokenListContext((state) => state.tokens);
+    const playerContext = usePlayerContext();
     const [scene, collapsedStatblocks] = useMetadataContext((state) => [state.scene, state.scene?.collapsedStatblocks]);
     const { isReady } = SceneReadyContext();
     const [id, setId] = useState<string | undefined>();
     const [swiper, setSwiper] = useState<SwiperClass>();
-    const items = tokens ? [...tokens].map((t) => t[1].item).sort(sortItems) : [];
+    const items = useCallback(() => {
+        if (tokens) {
+            const itemList = [...tokens].map((t) => t[1].item).sort(sortItems);
+            if (playerContext.role === "GM") {
+                return itemList;
+            } else if (playerContext.role === "PLAYER") {
+                return itemList.filter((item) => item.createdUserId === playerContext.id);
+            }
+        }
+        return [];
+    }, [tokens, playerContext])();
 
     useEffect(() => {
         if (!id && items.length > 0) {

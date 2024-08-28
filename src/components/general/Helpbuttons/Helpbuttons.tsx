@@ -36,28 +36,28 @@ export const Helpbuttons = (props: HelpButtonsProps) => {
                     ></path>
                 </svg>
             </a>
+            <button
+                className={"statblock-button top-button"}
+                onClick={async () => {
+                    // width needs to be big, to position statblock popover to the right
+                    let width = 10000;
+                    let height = 600;
+                    try {
+                        width = await OBR.viewport.getWidth();
+                        height = await OBR.viewport.getHeight();
+                    } catch {}
+
+                    await OBR.popover.open({
+                        ...statblockPopover,
+                        width: Math.min(room?.statblockPopover?.width || 500, width),
+                        height: Math.min(room?.statblockPopover?.height || 600, height),
+                        anchorPosition: { top: 55, left: width - 70 },
+                    });
+                }}
+                title={"Statblocks"}
+            ></button>
             {playerContext.role == "GM" ? (
                 <>
-                    <button
-                        className={"statblock-button top-button"}
-                        onClick={async () => {
-                            // width needs to be big, to position statblock popover to the right
-                            let width = 10000;
-                            let height = 600;
-                            try {
-                                width = await OBR.viewport.getWidth();
-                                height = await OBR.viewport.getHeight();
-                            } catch {}
-
-                            await OBR.popover.open({
-                                ...statblockPopover,
-                                width: Math.min(room?.statblockPopover?.width || 500, width),
-                                height: Math.min(room?.statblockPopover?.height || 600, height),
-                                anchorPosition: { top: 55, left: width - 70 },
-                            });
-                        }}
-                        title={"Statblocks"}
-                    ></button>
                     <button
                         className={"settings-button top-button"}
                         onClick={async () => {
