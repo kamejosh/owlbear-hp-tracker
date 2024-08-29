@@ -6,8 +6,10 @@ import { HpTrackerMetadata } from "../../../helper/types.ts";
 import OBR, { Image } from "@owlbear-rodeo/sdk";
 import "./token-icon.scss";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
+import { useUISettingsContext } from "../../../context/UISettingsContext.ts";
 
 export const TokenIcon = ({ id }: { id: string }) => {
+    const playerPreview = useUISettingsContext((state) => state.playerPreview);
     const playerContext = usePlayerContext();
     const room = useMetadataContext((state) => state.room);
     const token = useTokenListContext((state) => state.tokens?.get(id));
@@ -27,7 +29,7 @@ export const TokenIcon = ({ id }: { id: string }) => {
     return (
         <div className={"token-icon"} onDoubleClick={handleOnPlayerDoubleClick}>
             <img src={item.image.url} alt={""} />
-            {playerContext.role === "GM" ? (
+            {playerContext.role === "GM" && playerPreview ? (
                 <>
                     {data.hpOnMap && !room?.disableHpBar ? (
                         <div

@@ -11,4 +11,58 @@
             font-size: 10px;
         }
     }
+
+    .headings {
+        display: flex;
+        align-items: center;
+        gap: 1ch;
+        margin-left: 2ch;
+        height: 25px;
+
+        .toggle-preview {
+            opacity: 0.8;
+            height: 20px;
+
+            &.active {
+                .player-icon {
+                    fill: white;
+                }
+            }
+
+            .player-icon {
+                fill: grey;
+                height: 19px;
+            }
+        }
+
+        .initiative-order {
+            display: flex;
+            gap: 0.5ch;
+
+            .initiative-icon {
+                fill: green;
+            }
+
+            .sort-button {
+                padding-inline: 0;
+                width: 25px;
+                height: 20px;
+
+                &.reverse {
+                    .arrow-icon {
+                        scale: 1;
+                    }
+                }
+
+                .arrow-icon {
+                    scale: -1;
+                    transition: all 0.25s ease;
+                    width: 100%;
+                    height: 17px;
+                    fill: white;
+                    object-position: center;
+                }
+            }
+        }
+    }
 }

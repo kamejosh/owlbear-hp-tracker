@@ -20,6 +20,9 @@ import { TokenContextWrapper } from "../TokenContextWrapper.tsx";
 import { useTokenListContext } from "../../context/TokenContext.tsx";
 import { PlayerSvg } from "../svgs/PlayerSvg.tsx";
 import tippy from "tippy.js";
+import { InitiativeSvg } from "../svgs/InitiativeSvg.tsx";
+import { ArrowSvg } from "../svgs/ArrowSvg.tsx";
+import { useUISettingsContext } from "../../context/UISettingsContext.ts";
 
 export const HPTracker = () => {
     return (
@@ -42,6 +45,10 @@ const Content = () => {
     const [reverseInitiativeOrder, setReverseInitiativeOrder] = useState<boolean>(false);
     const { isReady } = SceneReadyContext();
     const characterId = useCharSheet((state) => state.characterId);
+    const [playerPreview, setPlayerPreview] = useUISettingsContext((state) => [
+        state.playerPreview,
+        state.setPlayerPreview,
+    ]);
 
     const initHpTracker = async () => {
         if (
@@ -111,7 +118,7 @@ const Content = () => {
         return tokenMap;
     }, [scene?.groups, items])();
 
-    const playerTokens = room?.playerSort && items ? [...items].sort(sortItemsInitiative) : items ?? [];
+    const playerTokens = room?.playerSort && items ? items.sort(sortItemsInitiative) : items ?? [];
 
     const reorderMetadataIndexMulti = (destList: Array<Item>, group: string, sourceList: Array<Item>) => {
         const combinedList = destList.concat(sourceList);
@@ -280,26 +287,34 @@ const Content = () => {
                     {playerContext.role === "GM" ? (
                         <>
                             <button
-                                className={"toggle-preview"}
+                                className={`toggle-preview ${playerPreview ? "active" : ""}`}
                                 ref={(e) => {
                                     if (e) {
-                                        tippy(e, { content: "Toogle Preview Mode" });
+                                        tippy(e, { content: "Toggle Preview Mode" });
                                     }
+                                }}
+                                onClick={() => {
+                                    setPlayerPreview(!playerPreview);
                                 }}
                             >
                                 <PlayerSvg />
                             </button>
                             <span className={"initiative-order"}>
-                                Sort by Initiative{" "}
+                                <InitiativeSvg />
                                 <button
-                                    className={`sort-button ${reverseInitiativeOrder ? "reverse" : ""}`}
+                                    ref={(e) => {
+                                        if (e) {
+                                            tippy(e, { content: "sort tokens by initiative" });
+                                        }
+                                    }}
+                                    className={`sort-button button ${reverseInitiativeOrder ? "reverse" : ""}`}
                                     title={"Order By Initiative"}
                                     onClick={() => {
                                         orderByInitiative(reverseInitiativeOrder);
                                         setReverseInitiativeOrder(!reverseInitiativeOrder);
                                     }}
                                 >
-                                    ↓
+                                    <ArrowSvg />
                                 </button>
                             </span>
                         </>
