@@ -5,7 +5,6 @@ import { IAvailableDie, IDiceRoll, IDieType, ITheme, Operator, parseRollEquation
 import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { AddSvg } from "../../svgs/AddSvg.tsx";
 import { diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
-import tippy, { Instance } from "tippy.js";
 import { RollLogSvg } from "../../svgs/RollLogSvg.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
@@ -13,6 +12,7 @@ import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 import { getDiceImage, getSvgForDiceType, getThemePreview } from "../../../helper/previewHelpers.tsx";
 import { Select } from "../Select.tsx";
 import { isNull } from "lodash";
+import Tippy from "@tippyjs/react";
 
 type DiceRoomButtonsProps = {
     open: boolean;
@@ -37,24 +37,8 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
     const [hover, setHover] = useState<boolean>(false);
     const [addCustom, setAddCustom] = useState<boolean>(false);
     const [validCustom, setValidCustom] = useState<boolean>(false);
-    const [tippyInstance, setTippyInstance] = useState<Instance>();
     const [currentCustomTheme, setCurrentCustomTheme] = useState<ITheme | null>(theme);
-    const buttonRef = useRef<HTMLButtonElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
-
-    useEffect(() => {
-        if (buttonRef.current) {
-            if (!tippyInstance) {
-                setTippyInstance(
-                    tippy(buttonRef.current, {
-                        content: props.customDice?.dice || "Add new custom dice roll",
-                    })
-                );
-            } else {
-                tippyInstance.setContent(props.customDice?.dice || "Add new custom dice roll");
-            }
-        }
-    }, [props.customDice]);
 
     useEffect(() => {
         setCurrentCustomTheme(theme);
@@ -173,21 +157,22 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
             onMouseEnter={() => setHover(true)}
             onMouseLeave={() => setHover(false)}
         >
-            <button
-                ref={buttonRef}
-                className={`button custom-dice dice-${props.button} ${isEnabled() ? "enabled" : "disabled"} ${
-                    addCustom ? "open" : ""
-                }`}
-                onClick={async (e) => {
-                    if (!props.customDice && buttons.hasOwnProperty(String(props.button))) {
-                        setAddCustom(true);
-                    } else if (props.customDice) {
-                        await roll(e.currentTarget);
-                    }
-                }}
-            >
-                {props.customDice ? getDicePreview() : <AddSvg />}
-            </button>
+            <Tippy content={"Add new custom dice roll"}>
+                <button
+                    className={`button custom-dice dice-${props.button} ${isEnabled() ? "enabled" : "disabled"} ${
+                        addCustom ? "open" : ""
+                    }`}
+                    onClick={async (e) => {
+                        if (!props.customDice && buttons.hasOwnProperty(String(props.button))) {
+                            setAddCustom(true);
+                        } else if (props.customDice) {
+                            await roll(e.currentTarget);
+                        }
+                    }}
+                >
+                    {props.customDice ? getDicePreview() : <AddSvg />}
+                </button>
+            </Tippy>
             {addCustom ? (
                 <div className={"add-custom-dice"}>
                     <div className={`setting dice-theme valid searching`}>
@@ -339,30 +324,27 @@ const QuickButtons = ({ open }: { open: boolean }) => {
     const getDiceList = () => {
         const DiceListEntry = ({ preview, name }: { preview: ReactNode; name: string }) => {
             return (
-                <li
-                    className={"quick-roll"}
-                    onClick={async (e) => {
-                        await roll(e.currentTarget, name);
-                    }}
-                    ref={(e) => {
-                        if (e) {
-                            tippy(e, { content: name });
-                        }
-                    }}
-                >
-                    <div className={"quick-preview"}>{preview}</div>
-                    <button
-                        className={"self"}
+                <Tippy content={name}>
+                    <li
+                        className={"quick-roll"}
                         onClick={async (e) => {
-                            e.stopPropagation();
-                            if (e.currentTarget.parentElement) {
-                                await roll(e.currentTarget.parentElement, name, true);
-                            }
+                            await roll(e.currentTarget, name);
                         }}
                     >
-                        SELF
-                    </button>
-                </li>
+                        <div className={"quick-preview"}>{preview}</div>
+                        <button
+                            className={"self"}
+                            onClick={async (e) => {
+                                e.stopPropagation();
+                                if (e.currentTarget.parentElement) {
+                                    await roll(e.currentTarget.parentElement, name, true);
+                                }
+                            }}
+                        >
+                            SELF
+                        </button>
+                    </li>
+                </Tippy>
             );
         };
 
@@ -465,33 +447,27 @@ export const DiceRoomButtons = (props: DiceRoomButtonsProps) => {
             {Object.values(buttons).map((value, index) => {
                 return <CustomDiceButton key={index} button={index + 1} customDice={value} />;
             })}
-            <button
-                className={`open-dice-tray button icon ${props.open ? "open" : "closed"}`}
-                ref={(e) => {
-                    if (e) {
-                        tippy(e, { content: "Log & Settings" });
-                    }
-                }}
-                onClick={(e) => {
-                    props.setOpen(!props.open);
-                    e.currentTarget.blur();
-                }}
-            >
-                <RollLogSvg />
-            </button>
-            <div className={`quick-button-wrapper`}>
-                <QuickButtons open={quick} />
+            <Tippy content={"Log & Settings"}>
                 <button
-                    onClick={() => setQuick(!quick)}
-                    className={`quick-roll-button button icon ${quick ? "open" : ""}`}
-                    ref={(e) => {
-                        if (e) {
-                            tippy(e, { content: "Quick roll" });
-                        }
+                    className={`open-dice-tray button icon ${props.open ? "open" : "closed"}`}
+                    onClick={(e) => {
+                        props.setOpen(!props.open);
+                        e.currentTarget.blur();
                     }}
                 >
-                    <DiceSvg />
+                    <RollLogSvg />
                 </button>
+            </Tippy>
+            <div className={`quick-button-wrapper`}>
+                <QuickButtons open={quick} />
+                <Tippy content={"Quick roll"}>
+                    <button
+                        onClick={() => setQuick(!quick)}
+                        className={`quick-roll-button button icon ${quick ? "open" : ""}`}
+                    >
+                        <DiceSvg />
+                    </button>
+                </Tippy>
             </div>
         </div>
     );

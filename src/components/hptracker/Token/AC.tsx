@@ -4,12 +4,12 @@ import { useTokenListContext } from "../../../context/TokenContext.tsx";
 import { HpTrackerMetadata } from "../../../helper/types.ts";
 import { Image } from "@owlbear-rodeo/sdk";
 import { useEffect, useRef } from "react";
-import tippy from "tippy.js";
 import { ACSvg } from "../../svgs/ACSvg.tsx";
 import { MapButton } from "./MapButton.tsx";
 import "./ac.scss";
 import { updateAc } from "../../../helper/acHelper.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
+import Tippy from "@tippyjs/react";
 
 export const AC = ({ id }: { id: string }) => {
     const playerContext = usePlayerContext();
@@ -25,37 +25,32 @@ export const AC = ({ id }: { id: string }) => {
         }
     }, [data?.armorClass]);
 
-    useEffect(() => {
-        if (acRef.current) {
-            tippy(acRef.current, { content: "Set AC" });
-        }
-    }, [acRef]);
-
     return (
         <div className={"token-ac"}>
             <ACSvg />
-            <input
-                className={"ac-input"}
-                ref={acRef}
-                type={"text"}
-                size={1}
-                value={data.armorClass}
-                onChange={(e) => {
-                    let factor = 1;
-                    if (room?.allowNegativeNumbers) {
-                        factor = e.target.value.startsWith("-") ? -1 : 1;
-                    }
-                    const value = Number(e.target.value.replace(/[^0-9]/g, ""));
-                    changeArmorClass(value * factor, data, item, room);
-                }}
-                onKeyDown={(e) => {
-                    if (e.key === "ArrowUp") {
-                        changeArmorClass(data.armorClass + 1, data, item, room);
-                    } else if (e.key === "ArrowDown") {
-                        changeArmorClass(data.armorClass - 1, data, item, room);
-                    }
-                }}
-            />
+            <Tippy content={"Set AC"}>
+                <input
+                    className={"ac-input"}
+                    type={"text"}
+                    size={1}
+                    value={data.armorClass}
+                    onChange={(e) => {
+                        let factor = 1;
+                        if (room?.allowNegativeNumbers) {
+                            factor = e.target.value.startsWith("-") ? -1 : 1;
+                        }
+                        const value = Number(e.target.value.replace(/[^0-9]/g, ""));
+                        changeArmorClass(value * factor, data, item, room);
+                    }}
+                    onKeyDown={(e) => {
+                        if (e.key === "ArrowUp") {
+                            changeArmorClass(data.armorClass + 1, data, item, room);
+                        } else if (e.key === "ArrowDown") {
+                            changeArmorClass(data.armorClass - 1, data, item, room);
+                        }
+                    }}
+                />
+            </Tippy>
             {playerContext.role === "GM" ? (
                 <MapButton
                     onClick={() => {

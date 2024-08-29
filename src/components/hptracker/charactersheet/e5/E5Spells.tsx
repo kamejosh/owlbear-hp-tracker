@@ -7,7 +7,7 @@ import { capitalize } from "lodash";
 import { E5SpellSlot } from "../../../../api/e5/useE5Api.ts";
 import { HpTrackerMetadata } from "../../../../helper/types.ts";
 import { useMetadataContext } from "../../../../context/MetadataContext.ts";
-import tippy, { Instance } from "tippy.js";
+import Tippy from "@tippyjs/react";
 
 type Spell = components["schemas"]["src__types__e5__Spell"];
 
@@ -29,7 +29,6 @@ const Spell = ({
     attack?: string | null;
 }) => {
     const [open, setOpen] = useState<boolean>(false);
-    const [tooltip, setTooltip] = useState<Instance>();
     const room = useMetadataContext((state) => state.room);
 
     const getSpellLevel = () => {
@@ -64,57 +63,43 @@ const Spell = ({
                         <h4 className={"spell-name"}>{spell.name}</h4>
                         <span className={"spell-level"}>({getSpellLevel()})</span>
                         {spellSlots && spellSlots.length > 0 ? (
-                            <div
-                                ref={(e) => {
-                                    if (e) {
-                                        if (tooltip) {
-                                            if (limitReached) {
-                                                tooltip.enable();
-                                                tooltip.setContent("No more spellslots");
-                                            } else {
-                                                tooltip.disable();
-                                            }
-                                        } else {
-                                            if (limitReached) {
-                                                setTooltip(tippy(e, { content: "No more spellslots" }));
-                                            }
-                                        }
-                                    }
-                                }}
-                                className={`button-wrapper enabled ${
-                                    room?.disableDiceRoller ? "calculated" : "three-d-dice"
-                                }`}
-                            >
-                                {spell.is_attack && attack ? (
-                                    <>
-                                        <DiceButton
-                                            dice={`1d20+${attack}`}
-                                            text={`+${attack}&nbspattack`}
-                                            context={`${capitalize(spell.name)}: Attack`}
-                                            statblock={statblock}
-                                            onRoll={async () => {
+                            <Tippy content={"No more spellslots"} disabled={!limitReached}>
+                                <div
+                                    className={`button-wrapper enabled ${
+                                        room?.disableDiceRoller ? "calculated" : "three-d-dice"
+                                    }`}
+                                >
+                                    {spell.is_attack && attack ? (
+                                        <>
+                                            <DiceButton
+                                                dice={`1d20+${attack}`}
+                                                text={`+${attack}&nbspattack`}
+                                                context={`${capitalize(spell.name)}: Attack`}
+                                                statblock={statblock}
+                                                onRoll={async () => {
+                                                    if (itemId && limitValues) {
+                                                        await updateLimit(itemId, limitValues);
+                                                    }
+                                                }}
+                                                limitReached={limitReached}
+                                            />
+                                        </>
+                                    ) : (
+                                        <button
+                                            className={`dice-button button ${limitReached ? "limit" : ""}`}
+                                            onClick={async () => {
                                                 if (itemId && limitValues) {
                                                     await updateLimit(itemId, limitValues);
                                                 }
                                             }}
-                                            limitReached={limitReached}
-                                        />
-                                    </>
-                                ) : (
-                                    <button
-                                        className={`dice-button button ${limitReached ? "limit" : ""}`}
-                                        onClick={async () => {
-                                            if (itemId && limitValues) {
-                                                await updateLimit(itemId, limitValues);
-                                            }
-                                        }}
-                                    >
-                                        <div className={"dice-preview"}></div>
-                                        cast
-                                        <div className={"dice-preview"}></div>
-                                    </button>
-                                )}
-                            </div>
+                                        >
+                                            <div className={"dice-preview"}></div>
+                                            cast
+                                            <div className={"dice-preview"}></div>
+                                        </button>
+                                    )}
+                                </div>
+                            </Tippy>
                         ) : null}
                     </div>
                     {spell.dc ? (

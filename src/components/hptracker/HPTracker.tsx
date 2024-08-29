@@ -19,10 +19,10 @@ import { uniq } from "lodash";
 import { TokenContextWrapper } from "../TokenContextWrapper.tsx";
 import { useTokenListContext } from "../../context/TokenContext.tsx";
 import { PlayerSvg } from "../svgs/PlayerSvg.tsx";
-import tippy from "tippy.js";
 import { InitiativeSvg } from "../svgs/InitiativeSvg.tsx";
 import { ArrowSvg } from "../svgs/ArrowSvg.tsx";
 import { useUISettingsContext } from "../../context/UISettingsContext.ts";
+import Tippy from "@tippyjs/react";
 
 export const HPTracker = () => {
     return (
@@ -286,36 +286,30 @@ const Content = () => {
                 <div className={`headings ${playerContext.role === "PLAYER" ? "player" : ""}`}>
                     {playerContext.role === "GM" ? (
                         <>
-                            <button
-                                className={`toggle-preview ${playerPreview ? "active" : ""}`}
-                                ref={(e) => {
-                                    if (e) {
-                                        tippy(e, { content: "Toggle Preview Mode" });
-                                    }
-                                }}
-                                onClick={() => {
-                                    setPlayerPreview(!playerPreview);
-                                }}
-                            >
-                                <PlayerSvg />
-                            </button>
-                            <span className={"initiative-order"}>
-                                <InitiativeSvg />
+                            <Tippy content={"Toggle Player Preview Mode"}>
                                 <button
-                                    ref={(e) => {
-                                        if (e) {
-                                            tippy(e, { content: "sort tokens by initiative" });
-                                        }
-                                    }}
-                                    className={`sort-button button ${reverseInitiativeOrder ? "reverse" : ""}`}
-                                    title={"Order By Initiative"}
+                                    className={`toggle-preview ${playerPreview ? "active" : ""}`}
                                     onClick={() => {
-                                        orderByInitiative(reverseInitiativeOrder);
-                                        setReverseInitiativeOrder(!reverseInitiativeOrder);
+                                        setPlayerPreview(!playerPreview);
                                     }}
                                 >
-                                    <ArrowSvg />
+                                    <PlayerSvg />
                                 </button>
+                            </Tippy>
+                            <span className={"initiative-order"}>
+                                <InitiativeSvg />
+                                <Tippy content={"Sort tokens by initiative"}>
+                                    <button
+                                        className={`sort-button button ${reverseInitiativeOrder ? "reverse" : ""}`}
+                                        title={"Order By Initiative"}
+                                        onClick={() => {
+                                            orderByInitiative(reverseInitiativeOrder);
+                                            setReverseInitiativeOrder(!reverseInitiativeOrder);
+                                        }}
+                                    >
+                                        <ArrowSvg />
+                                    </button>
+                                </Tippy>
                             </span>
                         </>
                     ) : null}

@@ -38,6 +38,7 @@
         "@dice-roller/rpg-dice-roller": "^5.5.0",
         "@owlbear-rodeo/sdk": "^2.4.0",
         "@tanstack/react-query": "^5.32.0",
+        "@tippyjs/react": "^4.2.6",
         "add": "^2.0.6",
         "axios": "^1.6.8",
         "axios-retry": "^4.1.0",
@@ -48,7 +49,6 @@
         "react-markdown": "^9.0.1",
         "remark-gfm": "^4.0.0",
         "swiper": "^11.1.1",
-        "tippy.js": "^6.3.7",
         "uuid": "^9.0.1",
         "yarn": "^1.22.22",
         "zustand": "^4.5.2"

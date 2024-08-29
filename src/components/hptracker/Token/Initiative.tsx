@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
 import { HpTrackerMetadata } from "../../../helper/types.ts";
-import tippy from "tippy.js";
 import { diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
@@ -14,6 +13,7 @@ import { InitiativeSvg } from "../../svgs/InitiativeSvg.tsx";
 import "./initiative.scss";
 import { PlayerButton } from "./PlayerButton.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
+import Tippy from "@tippyjs/react";
 export const Initiative = ({ id }: { id: string }) => {
     const playerContext = usePlayerContext();
     const initRef = useRef<HTMLInputElement>(null);
@@ -37,18 +37,6 @@ export const Initiative = ({ id }: { id: string }) => {
             initBonusRef.current.value = String(data?.stats.initiativeBonus);
         }
     }, [data?.stats.initiativeBonus]);
-
-    useEffect(() => {
-        if (initRef.current) {
-            tippy(initRef.current, { content: "Set Initiative" });
-        }
-    }, [initRef]);
-
-    useEffect(() => {
-        if (initBonusRef.current) {
-            tippy(initBonusRef.current, { content: "Set Initiative Bonus" });
-        }
-    }, [initBonusRef]);
 
     const getDicePreview = () => {
         try {
@@ -109,18 +97,20 @@ export const Initiative = ({ id }: { id: string }) => {
     return (
         <div className={"initiative-wrapper"}>
             <InitiativeSvg />
-            <input
-                type={"number"}
-                size={1}
-                value={String(data.initiative)}
-                step={0.1}
-                ref={initRef}
-                onChange={(e) => {
-                    const newData = { ...data, initiative: Number(e.target.value) };
-                    updateTokenMetadata(newData, [id]);
-                }}
-                className={"initiative"}
-            />
+            <Tippy content={"Set initiative"}>
+                <input
+                    type={"number"}
+                    size={1}
+                    value={String(data.initiative)}
+                    step={0.1}
+                    ref={initRef}
+                    onChange={(e) => {
+                        const newData = { ...data, initiative: Number(e.target.value) };
+                        updateTokenMetadata(newData, [id]);
+                    }}
+                    className={"initiative"}
+                />
+            </Tippy>
             <div
                 className={`init-wrapper button-wrapper calculated`}
                 onMouseEnter={() => {
@@ -154,26 +144,28 @@ export const Initiative = ({ id }: { id: string }) => {
                 </button>
             </div>
 
-            <input
-                type={"number"}
-                size={1}
-                defaultValue={data.stats.initiativeBonus}
-                step={1}
-                ref={initBonusRef}
-                onBlur={(e) => {
-                    const value = Number(e.target.value);
-                    const newData = { ...data, stats: { initiativeBonus: value } };
-                    updateTokenMetadata(newData, [id]);
-                }}
-                onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                        const value = Number(e.currentTarget.value);
+            <Tippy content={"Set initiative bonus"}>
+                <input
+                    type={"number"}
+                    size={1}
+                    defaultValue={data.stats.initiativeBonus}
+                    step={1}
+                    ref={initBonusRef}
+                    onBlur={(e) => {
+                        const value = Number(e.target.value);
                         const newData = { ...data, stats: { initiativeBonus: value } };
                         updateTokenMetadata(newData, [id]);
-                    }
-                }}
-                className={"initiative-bonus"}
-            />
+                    }}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            const value = Number(e.currentTarget.value);
+                            const newData = { ...data, stats: { initiativeBonus: value } };
+                            updateTokenMetadata(newData, [id]);
+                        }
+                    }}
+                    className={"initiative-bonus"}
+                />
+            </Tippy>
             {playerContext.role === "GM" ? (
                 <PlayerButton
                     active={!!data.playerList}

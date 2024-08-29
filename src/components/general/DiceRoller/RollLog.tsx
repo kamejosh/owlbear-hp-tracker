@@ -1,10 +1,10 @@
 import { DiceButton } from "./DiceButtonWrapper.tsx";
 import { RollLogEntryType, useRollLogContext } from "../../../context/RollLogContext.tsx";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { useInterval } from "../../../helper/hooks.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
-import tippy from "tippy.js";
 import { isObject } from "lodash";
+import Tippy from "@tippyjs/react";
 
 type RollLogEntryProps = {
     entry: RollLogEntryType;
@@ -43,7 +43,6 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
     const playerContext = usePlayerContext();
     const rollTime = new Date(props.entry.created_at);
     const now = new Date();
-    const detailsRef = useRef<HTMLDivElement>(null);
     const [hidden, setHidden] = useState<boolean>(props.entry.is_hidden);
 
     const ownRoll =
@@ -77,12 +76,6 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
         const nowTime = new Date();
         setRollTimeText(getRollTimeText(nowTime.getTime() - rollTime.getTime()));
     }, 60000);
-
-    useEffect(() => {
-        if (detailsRef.current) {
-            tippy(detailsRef.current, { content: getDetailedResult(), maxWidth: "100vw" });
-        }
-    }, [detailsRef]);
 
     const getDetailedResult = useCallback(() => {
         if (
@@ -138,9 +131,9 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
                 statblock={props.entry.username}
             />
             <div className={"roll-equation"}>{props.entry.equation}</div>
-            <div ref={detailsRef} className={"detailed-result"}>
-                {getDetailedResult()}
-            </div>
+            <Tippy content={getDetailedResult()} maxWidth={"100vw"}>
+                <div className={"detailed-result"}>{getDetailedResult()}</div>
+            </Tippy>
             <div className={"divider"}>=</div>
             <div className={"total"}>{hidden ? "?" : String(props.entry.total_value)}</div>
             {props.entry.is_hidden && ownRoll ? (
