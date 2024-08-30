@@ -33,6 +33,7 @@ import { HPSvg } from "../svgs/HPSvg.tsx";
 import { ACSvg } from "../svgs/ACSvg.tsx";
 import { InitiativeSvg } from "../svgs/InitiativeSvg.tsx";
 import { RestSvg } from "../svgs/RestSvg.tsx";
+import Tippy from "@tippyjs/react";
 
 type DropGroupProps = {
     title: string;
@@ -152,18 +153,20 @@ export const DropGroup = (props: DropGroupProps) => {
             }`}
         >
             <div className={"group-title"}>
-                <div className={"group-name"}>
-                    <span>{props.title}</span>
-                </div>
+                <Tippy content={props.title}>
+                    <div className={"group-name"}>
+                        <span>{props.title}</span>
+                    </div>
+                </Tippy>
                 <div className={"settings"}>
                     <div className={"setting"}>
                         <HPSvg percent={100} name={"hp"} color={"#888888"} />
                         <MapButton
-                            onClick={() => {
-                                toggleHpOnMap(props.list);
+                            onClick={async () => {
+                                await toggleHpOnMap(props.list);
                             }}
-                            onContextMenu={() => {
-                                toggleHpForPlayers(props.list);
+                            onContextMenu={async () => {
+                                await toggleHpForPlayers(props.list);
                             }}
                             active={getHpOnMap(props.list)}
                             players={getHpForPlayers(props.list)}
@@ -173,11 +176,11 @@ export const DropGroup = (props: DropGroupProps) => {
                     <div className={"setting"}>
                         <ACSvg />
                         <MapButton
-                            onClick={() => {
-                                toggleAcOnMap(props.list);
+                            onClick={async () => {
+                                await toggleAcOnMap(props.list);
                             }}
-                            onContextMenu={() => {
-                                toggleAcForPlayers(props.list);
+                            onContextMenu={async () => {
+                                await toggleAcForPlayers(props.list);
                             }}
                             active={getAcOnMap(props.list)}
                             players={getAcForPlayers(props.list)}

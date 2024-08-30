@@ -149,11 +149,11 @@ const MultiContent = ({ ids }: { ids: Array<string> }) => {
                         <div className={"setting"}>
                             <HPSvg percent={100} name={"hp"} color={"#888888"} />
                             <MapButton
-                                onClick={() => {
-                                    toggleHpOnMap(items);
+                                onClick={async () => {
+                                    await toggleHpOnMap(items);
                                 }}
-                                onContextMenu={() => {
-                                    toggleHpForPlayers(items);
+                                onContextMenu={async () => {
+                                    await toggleHpForPlayers(items);
                                 }}
                                 active={getHpOnMap(items)}
                                 players={getHpForPlayers(items)}
@@ -163,11 +163,11 @@ const MultiContent = ({ ids }: { ids: Array<string> }) => {
                         <div className={"setting"}>
                             <ACSvg />
                             <MapButton
-                                onClick={() => {
-                                    toggleAcOnMap(items);
+                                onClick={async () => {
+                                    await toggleAcOnMap(items);
                                 }}
-                                onContextMenu={() => {
-                                    toggleAcForPlayers(items);
+                                onContextMenu={async () => {
+                                    await toggleAcForPlayers(items);
                                 }}
                                 active={getAcOnMap(items)}
                                 players={getAcForPlayers(items)}

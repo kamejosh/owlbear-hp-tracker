@@ -53,15 +53,15 @@ export const AC = ({ id }: { id: string }) => {
             </Tippy>
             {playerContext.role === "GM" ? (
                 <MapButton
-                    onClick={() => {
+                    onClick={async () => {
                         const newData = { ...data, acOnMap: !data.acOnMap };
                         updateTokenMetadata(newData, [id]);
-                        updateAc(item, newData);
+                        await updateAc(item, newData);
                     }}
-                    onContextMenu={() => {
+                    onContextMenu={async () => {
                         const newData = { ...data, playerMap: { hp: !!data.playerMap?.hp, ac: !data.playerMap?.ac } };
                         updateTokenMetadata(newData, [id]);
-                        updateAc(item, newData);
+                        await updateAc(item, newData);
                     }}
                     active={data.acOnMap}
                     players={!!data.playerMap?.ac}

@@ -139,19 +139,19 @@ export const HP = ({ id }: { id: string }) => {
                 </Tippy>
                 {playerContext.role === "GM" ? (
                     <MapButton
-                        onClick={() => {
+                        onClick={async () => {
                             const b = !data.hpOnMap;
                             const newData = { ...data, hpOnMap: b, hpBar: b && !room?.disableHpBar };
                             updateTokenMetadata(newData, [id]);
-                            updateHp(item, newData);
+                            return updateHp(item, newData);
                         }}
-                        onContextMenu={() => {
+                        onContextMenu={async () => {
                             const newData = {
                                 ...data,
                                 playerMap: { ac: !!data.playerMap?.ac, hp: !data.playerMap?.hp },
                             };
                             updateTokenMetadata(newData, [id]);
-                            updateHp(item, newData);
+                            return updateHp(item, newData);
                         }}
                         active={data.hpOnMap}
                         players={!!data.playerMap?.hp}

@@ -88,18 +88,18 @@ const createText = async (text: string, token: Image) => {
     const textItem = buildText()
         .textType("PLAIN")
         .width(width)
-        .height(height * 0.8) // because of text lines leaving space below we have to move it to the middle manually
-        .position({ ...position, y: position.y + height * 0.175 })
+        .height(height)
+        .position({ ...position, y: position.y + height * 0.1 }) // remove the height * 0.1 modifier once the new rendering engine is released
         .attachedTo(token.id)
         .plainText(text)
         .locked(true)
         .textAlign("CENTER")
-        .textAlignVertical("MIDDLE")
+        .textAlignVertical("BOTTOM")
         .fontWeight(600)
         .fillColor("white")
         .strokeColor("black")
         .strokeWidth(height / 30)
-        .fontSize(height * 0.75)
+        .fontSize(height)
         .lineHeight(1)
         .disableAttachmentBehavior(["ROTATION", "VISIBLE"])
         .visible(token.visible)
@@ -132,7 +132,7 @@ const handleHpOffsetUpdate = async (offset: number, hp: Item) => {
             } else if (hp.name === "hp-text") {
                 change.position = {
                     x: x + 2,
-                    y: bounds.position.y + bounds.height - height + offset + height * 0.175,
+                    y: bounds.position.y + bounds.height - height + offset + height * 0.1,
                 };
             } else {
                 change.position = {
