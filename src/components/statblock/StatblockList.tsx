@@ -27,6 +27,7 @@ export const StatblockList = (props: StatblockListProps) => {
     const { isReady } = SceneReadyContext();
     const [id, setId] = useState<string | undefined>();
     const [swiper, setSwiper] = useState<SwiperClass>();
+    const [scrollTargets, setScrollTargets] = useState<Array<{ name: string; target: string }>>([]);
     const items = useCallback(() => {
         if (tokens) {
             const itemList = [...tokens].map((t) => t[1].item).sort(sortItems);
@@ -142,7 +143,20 @@ export const StatblockList = (props: StatblockListProps) => {
                 })}
                 <SwiperSlide className={"post"}> </SwiperSlide>
             </Swiper>
-            {props.minimized ? null : <div className={"statblock-sheet"}>{id ? <Statblock id={id} /> : null}</div>}
+            {props.minimized ? null : (
+                <div className={"statblock-sheet"}>
+                    <ul className={"jump-links fixed"}>
+                        {scrollTargets.map((t) => {
+                            return (
+                                <li className={"button"}>
+                                    <a href={`#${t.target}`}>{t.name}</a>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                    {id ? <Statblock id={id} setScrollTargets={setScrollTargets} /> : null}
+                </div>
+            )}
         </>
     ) : (
         <></>

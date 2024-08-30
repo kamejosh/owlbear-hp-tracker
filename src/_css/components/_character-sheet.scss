@@ -3,10 +3,6 @@
 .character-sheet {
     margin-bottom: 45px;
 
-    .scroll-target {
-        scroll-margin-top: 160px;
-    }
-
     .background {
         position: fixed;
         top: 0;
@@ -77,22 +73,6 @@
 
                 .note {
                     font-size: 12px;
-                }
-            }
-
-            .jump-links {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: flex-start;
-                gap: 1ch;
-                margin: 0;
-                padding-left: 0;
-                list-style: none;
-
-                a {
-                    padding-inline: 1ch;
-                    color: lightgrey;
-                    font-weight: 400;
                 }
             }
         }
@@ -757,4 +737,32 @@ b {
             padding: 4px;
         }
     }
+}
+
+.jump-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 1ch;
+    margin: 0;
+    padding-left: 0;
+    list-style: none;
+
+    &.fixed {
+        position: fixed;
+        top: calc(65px + 1rem);
+        z-index: 3;
+        background: linear-gradient(to top, #ffffff00, var(--bg-color) 20px);
+        padding-bottom: 20px;
+    }
+
+    a {
+        padding-inline: 1ch;
+        color: lightgrey;
+        font-weight: 400;
+    }
+}
+
+.scroll-target {
+    scroll-margin-top: 160px;
 }

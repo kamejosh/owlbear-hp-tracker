@@ -37,7 +37,7 @@ body:has(.statblock-app) {
             position: sticky;
             top: calc(30px + 1rem);
             margin-top: calc(10px + 1rem);
-            background: linear-gradient(to top, #ffffff00, var(--bg-color) 20px);
+            background-color: var(--bg-color);
             padding: 0 0 20px;
             overflow: hidden;
             list-style: none;
