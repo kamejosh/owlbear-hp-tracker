@@ -127,7 +127,12 @@ export const Token = (props: TokenProps) => {
     };
 
     const display = (): boolean => {
-        return data.hpTrackerActive && (playerContext.role === "GM" || item.createdUserId === playerContext.id);
+        return (
+            data.hpTrackerActive &&
+            (playerContext.role === "GM" ||
+                item.createdUserId === playerContext.id ||
+                (!!data.playerMap?.hp && !!data.playerMap?.ac && !!data.playerList))
+        );
     };
 
     return display() ? (

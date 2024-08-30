@@ -17,6 +17,10 @@
     text-rendering: optimizeLegibility;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     display: flex;
     position: relative;

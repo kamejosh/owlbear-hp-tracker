@@ -123,6 +123,7 @@
         .hide-group {
             display: flex;
             align-items: center;
+            align-self: center;
             justify-self: end;
             cursor: pointer;
             outline: 1px solid white;

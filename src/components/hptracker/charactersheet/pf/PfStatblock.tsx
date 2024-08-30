@@ -8,16 +8,46 @@ import { PfSpells } from "./PfSpells.tsx";
 import { HP } from "../../Token/HP.tsx";
 import { AC } from "../../Token/AC.tsx";
 import { Initiative } from "../../Token/Initiative.tsx";
+import { useEffect } from "react";
 
-export const PfStatBlock = ({ slug, name, itemId }: { slug: string; name: string; itemId: string }) => {
+export const PfStatBlock = ({
+    slug,
+    name,
+    itemId,
+    setScrollTargets,
+}: {
+    slug: string;
+    name: string;
+    itemId: string;
+    setScrollTargets?: (scrollTargets: Array<{ name: string; target: string }>) => void;
+}) => {
     const room = useMetadataContext((state) => state.room);
     const statblockQuery = usePfGetStatblock(slug, room?.tabletopAlmanacAPIKey);
 
     const statblock = statblockQuery.isSuccess && statblockQuery.data ? statblockQuery.data : null;
 
+    useEffect(() => {
+        if (statblock && setScrollTargets) {
+            const scrollTargets = new Array({ name: "top", target: "StatblockTop" });
+            if (Object.entries(statblock.saving_throws).filter((st) => !!st[1]).length > 0) {
+                scrollTargets.push({ name: "saves", target: "StatblockSavingThrows" });
+            }
+            if (statblock.skills && Object.entries(statblock.skills).filter(([_, value]) => !!value).length > 0) {
+                scrollTargets.push({ name: "skills", target: "StatblockSkills" });
+            }
+            if (statblock.actions) {
+                scrollTargets.push({ name: "actions", target: "StatblockActions" });
+            }
+            if (statblock.spells && statblock.spells.length > 0) {
+                scrollTargets.push({ name: "spells", target: "StatblockSpells" });
+            }
+            setScrollTargets(scrollTargets);
+        }
+    }, [statblock]);
+
     return statblock ? (
         <div className={"pf-sheet"}>
-            <div className={"what"}>
+            <div className={"what"} id={"StatblockTop"}>
                 <h3>{statblock.name}</h3>
                 <i>
                     Type: {statblock.type}, Level: {statblock.level}
@@ -87,7 +117,7 @@ export const PfStatBlock = ({ slug, name, itemId }: { slug: string; name: string
                     );
                 })}
             </div>
-            <div className={"saving-throws"}>
+            <div className={"saving-throws"} id={"StatblockSavingThrows"}>
                 {Object.entries(statblock.saving_throws).filter((st) => !!st[1]).length > 0 ? (
                     <>
                         <b>Saving Throws</b>
@@ -135,7 +165,7 @@ export const PfStatBlock = ({ slug, name, itemId }: { slug: string; name: string
                 </div>
             ) : null}
             {statblock.skills && statblock.skills.length > 0 ? (
-                <div className={"skills"}>
+                <div className={"skills"} id={"StatblockSkills"}>
                     <h3>Skills</h3>
                     <div className={"skill-list"}>
                         {statblock.skills?.map((skill) => {
@@ -182,7 +212,7 @@ export const PfStatBlock = ({ slug, name, itemId }: { slug: string; name: string
                 </div>
             ) : null}
 
-            <div className={"actions"}>
+            <div className={"actions"} id={"StatblockActions"}>
                 <h3>Actions</h3>
                 <ul className={"ability-list"}>
                     {statblock.actions.map((action, index) => {

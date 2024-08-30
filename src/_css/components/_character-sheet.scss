@@ -3,6 +3,10 @@
 .character-sheet {
     margin-bottom: 45px;
 
+    .scroll-target {
+        scroll-margin-top: 160px;
+    }
+
     .background {
         position: fixed;
         top: 0;
@@ -60,17 +64,36 @@
         margin-top: 30px;
         width: 100%;
 
-        .statblock-name {
+        .statblock-top {
             position: sticky;
             top: 0;
             z-index: 2;
-            margin: 0;
             background: linear-gradient(to bottom, var(--bg-color) 90%, transparent);
             padding-block: 0.8em 8px;
             text-align: center;
 
-            .note {
-                font-size: 12px;
+            .statblock-name {
+                margin: 0;
+
+                .note {
+                    font-size: 12px;
+                }
+            }
+
+            .jump-links {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: flex-start;
+                gap: 1ch;
+                margin: 0;
+                padding-left: 0;
+                list-style: none;
+
+                a {
+                    padding-inline: 1ch;
+                    color: lightgrey;
+                    font-weight: 400;
+                }
             }
         }
 
@@ -319,7 +342,7 @@
     }
 }
 
-.open5e-sheet {
+.e5-statblock {
     display: grid;
     grid-template-columns: 1fr;
     gap: 10px 30px;
@@ -356,8 +379,8 @@
         grid-template-columns: repeat(2, auto);
         grid-column: span 1;
         flex-direction: column;
+        justify-items: flex-start;
         gap: 1ch;
-        width: min-content;
 
         .hp {
             .hit-dice {
@@ -464,7 +487,8 @@
         }
     }
 
-    .resistances {
+    .resistances,
+    .items {
         grid-column: span 1;
 
         @include breakpoint.laptop {

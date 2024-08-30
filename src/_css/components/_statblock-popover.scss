@@ -29,6 +29,7 @@ body:has(.statblock-app) {
         }
 
         .help-buttons {
+            position: fixed;
             z-index: 200;
         }
 

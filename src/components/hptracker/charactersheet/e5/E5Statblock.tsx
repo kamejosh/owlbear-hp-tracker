@@ -11,17 +11,57 @@ import { E5Spells } from "./E5Spells.tsx";
 import { HP } from "../../Token/HP.tsx";
 import { AC } from "../../Token/AC.tsx";
 import { Initiative } from "../../Token/Initiative.tsx";
+import { Rest } from "../../Token/Rest.tsx";
+import { useEffect } from "react";
 
-export const E5StatBlock = ({ slug, itemId }: { slug: string; itemId: string }) => {
+export const E5StatBlock = ({
+    slug,
+    itemId,
+    setScrollTargets,
+}: {
+    slug: string;
+    itemId: string;
+    setScrollTargets?: (scrollTargets: Array<{ name: string; target: string }>) => void;
+}) => {
     const room = useMetadataContext((state) => state.room);
     const statblockQuery = useE5GetStatblock(slug, room?.tabletopAlmanacAPIKey);
     const statblock = statblockQuery.isSuccess && statblockQuery.data ? statblockQuery.data : null;
     const token = useTokenListContext((state) => state.tokens?.get(itemId));
     const data = token?.data as HpTrackerMetadata;
 
+    useEffect(() => {
+        if (statblock && setScrollTargets) {
+            const scrollTargets = new Array({ name: "top", target: "StatblockTop" });
+            if (Object.entries(statblock.saving_throws).filter((st) => !!st[1]).length > 0) {
+                scrollTargets.push({ name: "saves", target: "StatblockSavingThrows" });
+            }
+            if (statblock.skills && Object.entries(statblock.skills).filter(([_, value]) => !!value).length > 0) {
+                scrollTargets.push({ name: "skills", target: "StatblockSkills" });
+            }
+            if (
+                statblock.damage_vulnerabilities ||
+                statblock.damage_resistances ||
+                statblock.damage_immunities ||
+                statblock.condition_immunities
+            ) {
+                scrollTargets.push({ name: "immunities", target: "StatblockImmunities" });
+            }
+            if (statblock.actions && statblock.actions.length > 0) {
+                scrollTargets.push({ name: "actions", target: "StatblockActions" });
+            }
+            if (statblock.bonus_actions && statblock.bonus_actions.length > 0) {
+                scrollTargets.push({ name: "bonus", target: "StatblockBonusActions" });
+            }
+            if (statblock.spells && statblock.spells.length > 0) {
+                scrollTargets.push({ name: "spells", target: "StatblockSpells" });
+            }
+            setScrollTargets(scrollTargets);
+        }
+    }, [statblock]);
+
     return statblock ? (
-        <div className={"open5e-sheet"}>
-            <div className={"what"}>
+        <div className={"e5-statblock"}>
+            <div className={"what scroll-target"} id={"StatblockTop"}>
                 <h3>{statblock.name}</h3>
                 <i>
                     {statblock.size} {statblock.type} {statblock.subtype ? `, ${statblock.subtype}` : null}
@@ -42,6 +82,14 @@ export const E5StatBlock = ({ slug, itemId }: { slug: string; itemId: string }) 
                 </div>
             </div>
             <div className={"values"}>
+                <div className={"init"}>
+                    <b>Initiative</b>
+                    <Initiative id={itemId} />
+                </div>
+                <span className={"ac"}>
+                    <b>Armor Class</b> <AC id={itemId} />
+                    {!!statblock.armor_class.special ? `(${statblock.armor_class.special})` : null}
+                </span>
                 <span className={"hp"}>
                     <b>Hit Points</b> <HP id={itemId} />
                     {statblock.hp.hit_dice ? (
@@ -55,13 +103,9 @@ export const E5StatBlock = ({ slug, itemId }: { slug: string; itemId: string }) 
                         </div>
                     ) : null}
                 </span>
-                <div className={"init"}>
-                    <b>Initiative</b>
-                    <Initiative id={itemId} />
-                </div>
-                <span className={"ac"}>
-                    <b>Armor Class</b> <AC id={itemId} />
-                    {!!statblock.armor_class.special ? `(${statblock.armor_class.special})` : null}
+                <span className={"rest"}>
+                    <b>Rest</b>
+                    <Rest id={itemId} />
                 </span>
             </div>
             <div className={"stats"}>
@@ -86,7 +130,7 @@ export const E5StatBlock = ({ slug, itemId }: { slug: string; itemId: string }) 
                     );
                 })}
             </div>
-            <div className={"tidbits"}>
+            <div className={"tidbits scroll-target"} id={"StatblockSavingThrows"}>
                 {Object.entries(statblock.saving_throws).filter((st) => !!st[1]).length > 0 ? (
                     <div className={"tidbit saving-throws"}>
                         <div className={"bold"}>Saving Throws</div>
@@ -120,15 +164,12 @@ export const E5StatBlock = ({ slug, itemId }: { slug: string; itemId: string }) 
                     <b>Languages</b> {statblock.languages?.join(", ")}
                 </div>
                 <div className={"tidbit"}>
-                    <b>Items</b> {statblock.items?.join(", ")}
-                </div>
-                <div className={"tidbit"}>
                     <b>Challenge</b> {statblock.challenge_rating}
                 </div>
             </div>
             <About about={statblock.about} slug={slug} />
             {statblock.skills && Object.entries(statblock.skills).filter(([_, value]) => !!value).length > 0 ? (
-                <div className={"skills"}>
+                <div className={"skills scroll-target"} id={"StatblockSkills"}>
                     <h3>Skills</h3>
                     <ul className={"skill-list"}>
                         {Object.entries(statblock.skills).map(([key, value], index) => {
@@ -153,11 +194,16 @@ export const E5StatBlock = ({ slug, itemId }: { slug: string; itemId: string }) 
                     </ul>
                 </div>
             ) : null}
+            {statblock.items && statblock.items.length > 0 ? (
+                <div className={"items"}>
+                    <h3>Items</h3> {statblock.items?.join(", ")}
+                </div>
+            ) : null}
             {statblock.damage_vulnerabilities ||
             statblock.damage_resistances ||
             statblock.damage_immunities ||
             statblock.condition_immunities ? (
-                <div className={"resistances"}>
+                <div className={"resistances scroll-target"} id={"StatblockImmunities"}>
                     {statblock.damage_vulnerabilities ? (
                         <>
                             <h3>Damage Vulnerabilities</h3> {statblock.damage_vulnerabilities}
@@ -196,6 +242,38 @@ export const E5StatBlock = ({ slug, itemId }: { slug: string; itemId: string }) 
                     })}
                 </div>
             ) : null}
+            {statblock.actions && statblock.actions.length > 0 ? (
+                <div className={"actions scroll-target"} id={"StatblockActions"}>
+                    <h3>Actions</h3>
+                    <ul className={"ability-list"}>
+                        {statblock.actions.map((action, index) => (
+                            <E5Ability
+                                ability={action}
+                                key={action.name + index}
+                                statblock={data.name}
+                                tokenData={data}
+                                itemId={itemId}
+                            />
+                        ))}
+                    </ul>
+                </div>
+            ) : null}
+            {statblock.bonus_actions && statblock.bonus_actions.length > 0 ? (
+                <div className={"bonus-actions scroll-target"} id={"StatblockBonusActions"}>
+                    <h3>Bonus Actions</h3>
+                    <ul className={"ability-list"}>
+                        {statblock.bonus_actions.map((action, index) => (
+                            <E5Ability
+                                ability={action}
+                                key={action.name + index}
+                                statblock={data.name}
+                                tokenData={data}
+                                itemId={itemId}
+                            />
+                        ))}
+                    </ul>
+                </div>
+            ) : null}
             {statblock.special_abilities && statblock.special_abilities.length > 0 ? (
                 <div className={"special-abilities"}>
                     <h3>Special Abilities</h3>
@@ -212,22 +290,6 @@ export const E5StatBlock = ({ slug, itemId }: { slug: string; itemId: string }) 
                     </ul>
                 </div>
             ) : null}
-            {statblock.actions && statblock.actions.length > 0 ? (
-                <div className={"actions"}>
-                    <h3>Actions</h3>
-                    <ul className={"ability-list"}>
-                        {statblock.actions.map((action, index) => (
-                            <E5Ability
-                                ability={action}
-                                key={action.name + index}
-                                statblock={data.name}
-                                tokenData={data}
-                                itemId={itemId}
-                            />
-                        ))}
-                    </ul>
-                </div>
-            ) : null}
             {statblock.reactions && statblock.reactions.length > 0 ? (
                 <div className={"reactions"}>
                     <h3>Reactions</h3>
@@ -236,22 +298,6 @@ export const E5StatBlock = ({ slug, itemId }: { slug: string; itemId: string }) 
                             <E5Ability
                                 ability={reaction}
                                 key={reaction.name + index}
-                                statblock={data.name}
-                                tokenData={data}
-                                itemId={itemId}
-                            />
-                        ))}
-                    </ul>
-                </div>
-            ) : null}
-            {statblock.bonus_actions && statblock.bonus_actions.length > 0 ? (
-                <div className={"bonus-actions"}>
-                    <h3>Bonus Actions</h3>
-                    <ul className={"ability-list"}>
-                        {statblock.bonus_actions.map((action, index) => (
-                            <E5Ability
-                                ability={action}
-                                key={action.name + index}
                                 statblock={data.name}
                                 tokenData={data}
                                 itemId={itemId}

@@ -253,7 +253,7 @@ export const E5Spells = (props: {
         });
 
     return (
-        <div className={"spells"}>
+        <div className={"spells scroll-target"} id={"StatblockSpells"}>
             <div className={"top"}>
                 <h3>Spells</h3>
                 {props.dc ? <span>DC {props.dc}</span> : null}

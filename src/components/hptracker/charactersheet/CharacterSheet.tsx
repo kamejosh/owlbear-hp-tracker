@@ -25,6 +25,7 @@ type StatblockWrapperProps = {
     search: string;
     itemId: string;
     setEmpty: (empty: boolean) => void;
+    setScrollTargets: (targets: Array<{ name: string; target: string }>) => void;
 };
 
 const getSearchString = (name: string): string => {
@@ -123,7 +124,7 @@ const StatblockWrapper = (props: StatblockWrapperProps) => {
     return (
         <>
             {props.data.sheet && !props.forceSearch ? (
-                <Statblock id={props.itemId} />
+                <Statblock id={props.itemId} setScrollTargets={props.setScrollTargets} />
             ) : props.search !== "" ? (
                 ruleSetMap.get(room?.ruleset || "e5")
             ) : (
@@ -144,6 +145,7 @@ export const CharacterSheet = (props: { itemId: string }) => {
     const [forceSearch, setForceSearch] = useState<boolean>(false);
     const [emptySearch, setEmptySearch] = useState<boolean>(false);
     const [backgroundColor, setBackgroundColor] = useState<string>();
+    const [scrollTargets, setScrollTargets] = useState<Array<{ name: string; target: string }>>([]);
 
     const initData = async () => {
         if (playerContext.role !== "GM" && item.createdUserId === OBR.player.id) {
@@ -176,9 +178,20 @@ export const CharacterSheet = (props: { itemId: string }) => {
             <Helpbuttons />
             {item && data ? (
                 <div className={"content"}>
-                    <h2 className={"statblock-name"}>
-                        {data.name} <span className={"note"}>(using {room?.ruleset} Filter)</span>
-                    </h2>
+                    <div className={"statblock-top"}>
+                        <h2 className={"statblock-name"}>
+                            {data.name} <span className={"note"}>(using {room?.ruleset} Filter)</span>
+                        </h2>
+                        <ul className={"jump-links"}>
+                            {scrollTargets.map((t) => {
+                                return (
+                                    <li className={"button"}>
+                                        <a href={`#${t.target}`}>{t.name}</a>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    </div>
                     {room?.ruleset === "e5" || room?.ruleset === "pf" ? (
                         <>
                             <SearchWrapper
@@ -194,6 +207,7 @@ export const CharacterSheet = (props: { itemId: string }) => {
                                 setForceSearch={setForceSearch}
                                 itemId={props.itemId}
                                 setEmpty={setEmptySearch}
+                                setScrollTargets={setScrollTargets}
                             />
                         </>
                     ) : (
