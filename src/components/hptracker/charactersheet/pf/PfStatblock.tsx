@@ -36,22 +36,20 @@ export const PfStatBlock = ({ slug, name, itemId }: { slug: string; name: string
                         </div>
                     ) : null}
                 </span>
-            </div>
-            <div className={"values"}>
-                <span className={"hp"}>
-                    <b>Hit Points</b> <HP id={itemId} /> {statblock.hp.special ? `(${statblock.hp.special})` : null}
-                </span>
-                <span className={"ac"}>
-                    <b>Armor Class</b> <AC id={itemId} />
-                    {statblock.armor_class.special ? `(${statblock.armor_class.special})` : null}
-                </span>
-                <Initiative id={itemId} />
                 <span className={"speed"}>
                     <b>Speed</b> {statblock.speed}
                 </span>
+            </div>
+            <div className={"values"}>
+                <span className={"init"}>
+                    <b>Initiative</b>
+                    <Initiative id={itemId} />
+                </span>
                 {statblock.perception ? (
                     <span className={"perception"}>
-                        <b>Perception</b>{" "}
+                        <div>
+                            <b>Perception</b>
+                        </div>
                         <DiceButton
                             dice={`d20${statblock.perception}`}
                             text={statblock.perception}
@@ -60,6 +58,13 @@ export const PfStatBlock = ({ slug, name, itemId }: { slug: string; name: string
                         />
                     </span>
                 ) : null}
+                <span className={"hp"}>
+                    <b>Hit Points</b> <HP id={itemId} /> {statblock.hp.special ? `(${statblock.hp.special})` : null}
+                </span>
+                <span className={"ac"}>
+                    <b>Armor Class</b> <AC id={itemId} />
+                    {statblock.armor_class.special ? `(${statblock.armor_class.special})` : null}
+                </span>
             </div>
             <div className={"stats"}>
                 {Object.entries(statblock.stats).map(([stat, value]) => {

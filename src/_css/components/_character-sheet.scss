@@ -204,10 +204,21 @@
     }
 
     .values {
-        display: flex;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
         grid-column: span 1;
-        flex-direction: column;
-        justify-content: flex-end;
+
+        .init {
+            .initiative-wrapper {
+                width: min-content;
+                .init-wrapper {
+                    width: auto;
+                    .dice-button {
+                        width: min-content;
+                    }
+                }
+            }
+        }
     }
 
     .about {

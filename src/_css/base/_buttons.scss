@@ -204,6 +204,7 @@ button,
             &:hover,
             &:focus-visible {
                 translate: 0 2px;
+                outline-color: transparent;
             }
         }
     }
