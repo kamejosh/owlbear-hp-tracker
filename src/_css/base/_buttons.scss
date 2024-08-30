@@ -25,6 +25,9 @@ button,
     grid-template-columns: repeat(5, 25px);
     grid-auto-flow: row;
     gap: 0.5ch;
+    z-index: 200;
+    box-shadow: 0 0 10px var(--bg-color);
+    background-color: var(--bg-color);
 
     @include breakpoint.mobile-and-tablet-only {
         grid-template-columns: repeat(8, 25px);

@@ -80,7 +80,8 @@
 
         .settings {
             display: flex;
-            gap: 1ch;
+            flex-wrap: wrap;
+            gap: 0.5ch 1ch;
 
             .setting {
                 display: flex;

@@ -14,7 +14,7 @@ export const Statblock = ({ id }: { id: string }) => {
             {room && room.ruleset === "e5" ? (
                 <E5StatBlock slug={data.sheet} itemId={id} />
             ) : (
-                <PfStatBlock slug={data.sheet} name={data.name} />
+                <PfStatBlock slug={data.sheet} name={data.name} itemId={id} />
             )}
         </div>
     );

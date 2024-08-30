@@ -5,8 +5,11 @@ import { capitalize } from "lodash";
 import { About } from "../About.tsx";
 import { PfAbility } from "./PfAbility.tsx";
 import { PfSpells } from "./PfSpells.tsx";
+import { HP } from "../../Token/HP.tsx";
+import { AC } from "../../Token/AC.tsx";
+import { Initiative } from "../../Token/Initiative.tsx";
 
-export const PfStatBlock = ({ slug, name }: { slug: string; name: string }) => {
+export const PfStatBlock = ({ slug, name, itemId }: { slug: string; name: string; itemId: string }) => {
     const room = useMetadataContext((state) => state.room);
     const statblockQuery = usePfGetStatblock(slug, room?.tabletopAlmanacAPIKey);
 
@@ -35,13 +38,14 @@ export const PfStatBlock = ({ slug, name }: { slug: string; name: string }) => {
                 </span>
             </div>
             <div className={"values"}>
+                <span className={"hp"}>
+                    <b>Hit Points</b> <HP id={itemId} /> {statblock.hp.special ? `(${statblock.hp.special})` : null}
+                </span>
                 <span className={"ac"}>
-                    <b>Armor Class</b> {statblock.armor_class.value}{" "}
+                    <b>Armor Class</b> <AC id={itemId} />
                     {statblock.armor_class.special ? `(${statblock.armor_class.special})` : null}
                 </span>
-                <span className={"hp"}>
-                    <b>Hit Points</b> {statblock.hp.value} {statblock.hp.special ? `(${statblock.hp.special})` : null}
-                </span>
+                <Initiative id={itemId} />
                 <span className={"speed"}>
                     <b>Speed</b> {statblock.speed}
                 </span>

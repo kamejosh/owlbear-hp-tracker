@@ -10,6 +10,7 @@ import { E5Ability } from "./E5Ability.tsx";
 import { E5Spells } from "./E5Spells.tsx";
 import { HP } from "../../Token/HP.tsx";
 import { AC } from "../../Token/AC.tsx";
+import { Initiative } from "../../Token/Initiative.tsx";
 
 export const E5StatBlock = ({ slug, itemId }: { slug: string; itemId: string }) => {
     const room = useMetadataContext((state) => state.room);
@@ -22,29 +23,12 @@ export const E5StatBlock = ({ slug, itemId }: { slug: string; itemId: string }) 
         <div className={"open5e-sheet"}>
             <div className={"what"}>
                 <h3>{statblock.name}</h3>
-                <span>
+                <i>
                     {statblock.size} {statblock.type} {statblock.subtype ? `, ${statblock.subtype}` : null}
                     {statblock.alignment ? `, ${statblock.alignment}` : null}
                     {statblock.group ? `, ${statblock.group}` : null}
-                </span>
-            </div>
-            <div className={"values"}>
-                <span className={"hp"}>
-                    <b>Hit Points</b> <HP id={itemId} />
-                    {statblock.hp.hit_dice ? (
-                        <DiceButton
-                            dice={statblock.hp.hit_dice}
-                            text={statblock.hp.hit_dice}
-                            context={data.name + ": Hit Dice"}
-                            statblock={data.name}
-                        />
-                    ) : null}
-                </span>
-                <span className={"ac"}>
-                    <b>Armor Class</b> <AC id={itemId} />
-                    {!!statblock.armor_class.special ? `(${statblock.armor_class.special})` : null}
-                </span>
-                <span className={"speed"}>
+                </i>
+                <div className={"speed"}>
                     <b>Speed</b>{" "}
                     {Object.entries(statblock.speed)
                         .map(([key, value]) => {
@@ -55,6 +39,29 @@ export const E5StatBlock = ({ slug, itemId }: { slug: string; itemId: string }) 
                         })
                         .filter((v) => !!v)
                         .join(", ")}
+                </div>
+            </div>
+            <div className={"values"}>
+                <span className={"hp"}>
+                    <b>Hit Points</b> <HP id={itemId} />
+                    {statblock.hp.hit_dice ? (
+                        <div className={"hit-dice"}>
+                            <DiceButton
+                                dice={statblock.hp.hit_dice}
+                                text={statblock.hp.hit_dice}
+                                context={data.name + ": Hit Dice"}
+                                statblock={data.name}
+                            />
+                        </div>
+                    ) : null}
+                </span>
+                <div className={"init"}>
+                    <b>Initiative</b>
+                    <Initiative id={itemId} />
+                </div>
+                <span className={"ac"}>
+                    <b>Armor Class</b> <AC id={itemId} />
+                    {!!statblock.armor_class.special ? `(${statblock.armor_class.special})` : null}
                 </span>
             </div>
             <div className={"stats"}>
@@ -104,9 +111,11 @@ export const E5StatBlock = ({ slug, itemId }: { slug: string; itemId: string }) 
                         </div>
                     </div>
                 ) : null}
-                <div className={"tidbit"}>
-                    <b>Senses</b> {statblock.senses?.join(", ")}
-                </div>
+                {statblock.senses && statblock.senses.length > 0 ? (
+                    <div className={"tidbit"}>
+                        <b>Senses</b> {statblock.senses?.join(", ")}
+                    </div>
+                ) : null}
                 <div className={"tidbit"}>
                     <b>Languages</b> {statblock.languages?.join(", ")}
                 </div>

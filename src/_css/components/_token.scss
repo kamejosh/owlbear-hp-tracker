@@ -3,9 +3,10 @@
 .token {
     display: grid;
     position: relative;
-    grid-template-columns: repeat(5, auto);
-    grid-template-areas: "icon hp ac init sheet rest";
+    grid-template-areas: "icon hp ac" ". init rest" ". sheet sheet";
     column-gap: 1ch;
+    row-gap: 0.5ch;
+    flex-wrap: wrap;
     justify-content: flex-start;
     cursor: pointer;
     border-radius: 4px;
@@ -13,10 +14,24 @@
     padding-block: 2px;
     min-height: 46px;
 
+    @include breakpoint.tablet {
+        grid-template-areas: "icon hp ac init" ". sheet sheet rest";
+    }
+
+    @include breakpoint.laptop {
+        grid-template-rows: 1fr;
+        grid-template-columns: repeat(5, auto);
+        grid-template-areas: "icon hp ac init sheet rest";
+    }
+
     &.popover {
         grid-template-areas:
             "hp ac sheet"
             "init . .";
+
+        .token-icon {
+            display: none;
+        }
     }
 
     &.selected {
