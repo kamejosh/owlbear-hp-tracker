@@ -1,4 +1,4 @@
-import { CSSProperties } from "react";
+import React, { CSSProperties } from "react";
 import { ShieldSvg } from "../../svgs/ShieldSvg.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
@@ -8,7 +8,13 @@ import "./token-icon.scss";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useUISettingsContext } from "../../../context/UISettingsContext.ts";
 
-export const TokenIcon = ({ id }: { id: string }) => {
+export const TokenIcon = ({
+    id,
+    onClick,
+}: {
+    id: string;
+    onClick?: (e: React.MouseEvent<HTMLDivElement>) => Promise<void>;
+}) => {
     const playerPreview = useUISettingsContext((state) => state.playerPreview);
     const playerContext = usePlayerContext();
     const room = useMetadataContext((state) => state.room);
@@ -27,7 +33,7 @@ export const TokenIcon = ({ id }: { id: string }) => {
     };
 
     return (
-        <div className={"token-icon"} onDoubleClick={handleOnPlayerDoubleClick}>
+        <div className={"token-icon"} onDoubleClick={handleOnPlayerDoubleClick} onClick={onClick}>
             <img src={item.image.url} alt={""} />
             {playerContext.role === "GM" && playerPreview ? (
                 <>

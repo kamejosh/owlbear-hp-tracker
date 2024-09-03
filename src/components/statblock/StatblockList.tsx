@@ -41,8 +41,11 @@ export const StatblockList = (props: StatblockListProps) => {
     }, [tokens, playerContext])();
 
     useEffect(() => {
-        if (!id && items.length > 0) {
+        if ((!id || !items.map((i) => i.id).includes(id)) && items.length > 0) {
             setId(items[0].id);
+            if (swiper) {
+                swiper.slideTo(0, 100, false);
+            }
         }
     }, [items, id]);
 
@@ -148,7 +151,7 @@ export const StatblockList = (props: StatblockListProps) => {
                     <ul className={"jump-links fixed"}>
                         {scrollTargets.map((t) => {
                             return (
-                                <li className={"button"}>
+                                <li key={t.name} className={"button"}>
                                     <a href={`#${t.target}`}>{t.name}</a>
                                 </li>
                             );

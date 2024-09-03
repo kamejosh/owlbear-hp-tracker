@@ -156,8 +156,10 @@ export const CharacterSheet = (props: { itemId: string }) => {
     useEffect(() => {
         if (item) {
             initData();
+        } else {
+            setId(null);
         }
-    }, [token]);
+    }, [item]);
 
     useEffect(() => {
         if (data?.sheet && data?.ruleset === room?.ruleset) {

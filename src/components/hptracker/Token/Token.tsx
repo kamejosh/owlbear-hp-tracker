@@ -94,8 +94,8 @@ export const Token = (props: TokenProps) => {
         return null;
     };
 
-    const handleOnPlayerClick = async (e: React.MouseEvent<HTMLDivElement>) => {
-        if (e.target !== containerRef.current) {
+    const handleOnPlayerClick = async (e: React.MouseEvent<HTMLDivElement>, force?: boolean) => {
+        if (!force && (e.target as HTMLElement).tagName !== "DIV") {
             // we prevent subcomponent clicking triggering this function
             return;
         }
@@ -148,7 +148,12 @@ export const Token = (props: TokenProps) => {
                 handleOnPlayerClick(e);
             }}
         >
-            <TokenIcon id={props.id} />
+            <TokenIcon
+                id={props.id}
+                onClick={async (e) => {
+                    handleOnPlayerClick(e, true);
+                }}
+            />
             <HP id={props.id} />
             <AC id={props.id} />
             <Initiative id={props.id} />

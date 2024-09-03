@@ -33,6 +33,7 @@ export const createAC = async (ac: number, token: Image) => {
         .disableAttachmentBehavior(["VISIBLE", "ROTATION"])
         .visible(token.visible)
         .locked(true)
+        .disableHit(true)
         .attachedTo(token.id)
         .build();
 
@@ -49,6 +50,7 @@ export const createAC = async (ac: number, token: Image) => {
         .strokeColor("black")
         .strokeWidth(2)
         .fontWeight(600)
+        .disableHit(true)
         .textAlignVertical("MIDDLE")
         .visible(token.visible)
         .build();
