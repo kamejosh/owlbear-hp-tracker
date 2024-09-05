@@ -34,6 +34,9 @@ import { ACSvg } from "../svgs/ACSvg.tsx";
 import { InitiativeSvg } from "../svgs/InitiativeSvg.tsx";
 import { RestSvg } from "../svgs/RestSvg.tsx";
 import Tippy from "@tippyjs/react";
+import { useBattleContext } from "../../context/BattleContext.tsx";
+import { FlagSvg } from "../svgs/FlagSvg.tsx";
+import { BattleSvg } from "../svgs/BattleSvg.tsx";
 
 type DropGroupProps = {
     title: string;
@@ -45,6 +48,11 @@ type DropGroupProps = {
 export const DropGroup = (props: DropGroupProps) => {
     const [room, scene] = useMetadataContext((state) => [state.room, state.scene]);
     const [rollerApi, initialized, theme] = useDiceRoller((state) => [state.rollerApi, state.initialized, state.theme]);
+    const [groups, addGroup, removeGroup] = useBattleContext((state) => [
+        state.groups,
+        state.addGroup,
+        state.removeGroup,
+    ]);
     const addRoll = useRollLogContext((state) => state.addRoll);
     const playerContext = usePlayerContext();
     const initButtonRef = useRef<HTMLButtonElement>(null);
@@ -153,11 +161,27 @@ export const DropGroup = (props: DropGroupProps) => {
             }`}
         >
             <div className={"group-title"}>
-                <Tippy content={props.title}>
-                    <div className={"group-name"}>
-                        <span>{props.title}</span>
-                    </div>
-                </Tippy>
+                <div className={"group-general"}>
+                    <Tippy content={props.title}>
+                        <div className={"group-name"}>
+                            <span>{props.title}</span>
+                        </div>
+                    </Tippy>
+                    <Tippy content={groups.includes(props.title) ? "Remove from Battle" : "Add to Battle"}>
+                        <button
+                            className={`button battle-state ${groups.includes(props.title) ? "active" : ""}`}
+                            onClick={() => {
+                                if (groups.includes(props.title)) {
+                                    removeGroup(props.title);
+                                } else {
+                                    addGroup(props.title);
+                                }
+                            }}
+                        >
+                            {groups.includes(props.title) ? <BattleSvg /> : <FlagSvg />}
+                        </button>
+                    </Tippy>
+                </div>
                 <div className={"settings"}>
                     <div className={"setting"}>
                         <HPSvg percent={100} name={"hp"} color={"#888888"} />

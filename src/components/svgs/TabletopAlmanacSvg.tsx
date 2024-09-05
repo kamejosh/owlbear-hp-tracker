@@ -1,4 +1,4 @@
-export const TabletopAlamanvSvg = () => {
+export const TabletopAlmanacSvg = () => {
     return (
         <svg
             version="1.0"

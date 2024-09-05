@@ -2,7 +2,7 @@ import OBR from "@owlbear-rodeo/sdk";
 import { changelogModal, helpModal, settingsModal, statblockPopover } from "../../../helper/variables.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
-import { TabletopAlamanvSvg } from "../../svgs/TabletopAlamanvSvg.tsx";
+import { TabletopAlmanacSvg } from "../../svgs/TabletopAlmanacSvg.tsx";
 
 type HelpButtonsProps = {
     ignoredChanges?: boolean;
@@ -21,7 +21,7 @@ export const Helpbuttons = (props: HelpButtonsProps) => {
                 title={"Tabletop Almanac"}
                 target={"_blank"}
             >
-                <TabletopAlamanvSvg />
+                <TabletopAlmanacSvg />
             </a>
             <a
                 href={"https://www.patreon.com/TTRPGAPI"}

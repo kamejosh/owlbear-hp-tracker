@@ -15,6 +15,10 @@ button,
     &:focus-visible {
         outline: 1px solid lightgrey;
     }
+
+    &:disabled {
+        background-color: var(--limit-color);
+    }
 }
 
 .help-buttons {

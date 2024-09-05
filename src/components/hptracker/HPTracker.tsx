@@ -23,6 +23,7 @@ import { InitiativeSvg } from "../svgs/InitiativeSvg.tsx";
 import { ArrowSvg } from "../svgs/ArrowSvg.tsx";
 import { useUISettingsContext } from "../../context/UISettingsContext.ts";
 import Tippy from "@tippyjs/react";
+import { BattleRounds } from "./Token/BattleRounds.tsx";
 
 export const HPTracker = () => {
     return (
@@ -311,6 +312,7 @@ const Content = () => {
                                     </button>
                                 </Tippy>
                             </span>
+                            <BattleRounds />
                         </>
                     ) : null}
                 </div>

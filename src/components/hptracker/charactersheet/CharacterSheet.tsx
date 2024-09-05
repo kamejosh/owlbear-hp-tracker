@@ -51,7 +51,7 @@ const SearchWrapper = (props: SearchWrapperProps) => {
                         <div className={"custom-statblock-wrapper"}>
                             To create custom statblocks go to{" "}
                             <a href={"https://tabletop-almanac.com"} target={"_blank"}>
-                                Tabletop Alamanc
+                                Tabletop Almanac
                             </a>{" "}
                             and enter you API Key here:
                             <input

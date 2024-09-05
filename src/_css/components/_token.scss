@@ -13,6 +13,7 @@
     padding-left: 20px;
     padding-block: 2px;
     min-height: 46px;
+    scroll-margin: 100px;
 
     @include breakpoint.tablet {
         grid-template-areas: "icon hp ac init" ". sheet sheet rest";

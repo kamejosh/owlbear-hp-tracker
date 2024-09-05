@@ -49,9 +49,12 @@ export const HP = ({ id }: { id: string }) => {
     return (
         <div className={"token-hp"}>
             <HPSvg percent={(data.hp / (data.maxHp + (data.stats.tempHp ?? 0))) * 100} name={item.id} />
-            {data.stats.tempHp ? (
-                <HPSvg percent={100} name={"tempHp"} className={"temp-hp-icon"} color={"#2248ff"} />
-            ) : null}
+            <HPSvg
+                percent={data.stats.tempHp && data.stats.tempHp > 0 ? 100 : 0}
+                name={`tempHp-${item.id}`}
+                className={"temp-hp-icon"}
+                color={"#2248ff"}
+            />
             <div className={"current-hp"}>
                 <Tippy content={"Set current HP"}>
                     <input
@@ -155,7 +158,7 @@ export const HP = ({ id }: { id: string }) => {
                         }}
                         active={data.hpOnMap}
                         players={!!data.playerMap?.hp}
-                        tooltip={"Show HP on map (right click for players)"}
+                        tooltip={"Add HP to map (players: right click)"}
                     />
                 ) : null}
             </div>

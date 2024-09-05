@@ -15,6 +15,7 @@ import { Sheet } from "./Sheet.tsx";
 import { TokenIcon } from "./TokenIcon.tsx";
 import { useComponentContext } from "../../../context/ComponentContext.tsx";
 import { Rest } from "./Rest.tsx";
+import { useBattleContext } from "../../../context/BattleContext.tsx";
 
 type TokenProps = {
     id: string;
@@ -31,6 +32,8 @@ export const Token = (props: TokenProps) => {
     const token = useTokenListContext((state) => state.tokens?.get(props.id));
     const data = token?.data as HpTrackerMetadata;
     const item = token?.item as Image;
+    const current = useBattleContext((state) => state.current);
+    const start = useRef<number>(0);
 
     useEffect(() => {
         // could be undefined so we check for boolean
@@ -43,6 +46,12 @@ export const Token = (props: TokenProps) => {
             }
         }
     }, [room?.allowNegativeNumbers]);
+
+    useEffect(() => {
+        if (current === item.id && containerRef.current) {
+            containerRef.current.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+        }
+    }, [current]);
 
     const getGroupSelectRange = (currentSelection: Array<string>): Array<string> | null => {
         const currentGroup = data.group;
@@ -126,6 +135,22 @@ export const Token = (props: TokenProps) => {
         }
     };
 
+    const handleOnPlayerDoubleClick = async (
+        e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>
+    ) => {
+        if ((e.target as HTMLElement).tagName !== "DIV") {
+            // we prevent subcomponent clicking triggering this function
+            return;
+        }
+        const bounds = await OBR.scene.items.getItemBounds([props.id]);
+        await OBR.player.select([props.id]);
+        await OBR.viewport.animateToBounds({
+            ...bounds,
+            min: { x: bounds.min.x - 1000, y: bounds.min.y - 1000 },
+            max: { x: bounds.max.x + 1000, y: bounds.max.y + 1000 },
+        });
+    };
+
     const display = (): boolean => {
         return (
             data.hpTrackerActive &&
@@ -140,12 +165,23 @@ export const Token = (props: TokenProps) => {
             ref={containerRef}
             className={`token ${playerContext.role === "PLAYER" ? "player" : ""} ${
                 props.selected ? "selected" : ""
-            } ${component}`}
+            } ${component} ${current === item.id ? "current" : ""}`}
             style={{
                 background: `linear-gradient(to right, ${getBgColor(data)}, #1C1B22 50%, #1C1B22 )`,
             }}
             onClick={(e) => {
                 handleOnPlayerClick(e);
+            }}
+            onDoubleClick={(e) => {
+                handleOnPlayerDoubleClick(e);
+            }}
+            onTouchStart={(e) => {
+                const now = Date.now();
+                if (now - start.current < 300) {
+                    handleOnPlayerDoubleClick(e);
+                } else {
+                    start.current = now;
+                }
             }}
         >
             <TokenIcon

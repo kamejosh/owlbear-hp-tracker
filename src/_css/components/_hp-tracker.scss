@@ -1,3 +1,5 @@
+@use "../utilities/breakpoint";
+
 .hp-tracker {
     display: flex;
     flex-direction: column;
@@ -14,10 +16,21 @@
 
     .headings {
         display: flex;
+        position: sticky;
+        top: 1rem;
         align-items: center;
         gap: 1ch;
-        margin-left: 2ch;
+        z-index: 200;
+        box-shadow: 0 0 10px var(--bg-color);
+        border-radius: 4px;
+        background-color: var(--bg-color);
+        padding: 4px;
+        width: min-content;
         height: 25px;
+
+        @include breakpoint.laptop {
+            margin-left: 1ch;
+        }
 
         .toggle-preview {
             opacity: 0.8;
@@ -62,6 +75,25 @@
                     fill: white;
                     object-position: center;
                 }
+            }
+        }
+
+        .battle-rounds {
+            display: flex;
+            align-items: center;
+            gap: 0.5ch;
+            height: 20px;
+
+            button {
+                height: 20px;
+                white-space: nowrap;
+            }
+
+            .battle-round {
+                box-shadow: 0 0 -4px var(--bg-color);
+                font-weight: bold;
+                //background-color: lightgrey;
+                line-height: 1;
             }
         }
     }
