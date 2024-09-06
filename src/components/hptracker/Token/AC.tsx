@@ -65,7 +65,7 @@ export const AC = ({ id }: { id: string }) => {
                     }}
                     active={data.acOnMap}
                     players={!!data.playerMap?.ac}
-                    tooltip={"Show AC on map (right click for players)"}
+                    tooltip={"Add HP to map (players: right click)"}
                 />
             ) : null}
         </div>

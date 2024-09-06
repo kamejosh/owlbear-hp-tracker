@@ -13,6 +13,8 @@ import { AC } from "../../Token/AC.tsx";
 import { Initiative } from "../../Token/Initiative.tsx";
 import { Rest } from "../../Token/Rest.tsx";
 import { useEffect } from "react";
+import { Image } from "@owlbear-rodeo/sdk";
+import { getTokenName } from "../../../../helper/helpers.ts";
 
 export const E5StatBlock = ({
     slug,
@@ -28,6 +30,7 @@ export const E5StatBlock = ({
     const statblock = statblockQuery.isSuccess && statblockQuery.data ? statblockQuery.data : null;
     const token = useTokenListContext((state) => state.tokens?.get(itemId));
     const data = token?.data as HpTrackerMetadata;
+    const item = token?.item as Image;
 
     useEffect(() => {
         if (statblock && setScrollTargets) {
@@ -97,8 +100,8 @@ export const E5StatBlock = ({
                             <DiceButton
                                 dice={statblock.hp.hit_dice}
                                 text={statblock.hp.hit_dice}
-                                context={data.name + ": Hit Dice"}
-                                statblock={data.name}
+                                context={getTokenName(item) + ": Hit Dice"}
+                                statblock={getTokenName(item)}
                             />
                         </div>
                     ) : null}
@@ -123,7 +126,7 @@ export const E5StatBlock = ({
                                         Math.floor((value - 10) / 2)
                                     )}
                                     context={`${capitalize(stat)}: Check`}
-                                    statblock={data.name}
+                                    statblock={getTokenName(item)}
                                 />
                             </div>
                         </div>
@@ -145,7 +148,7 @@ export const E5StatBlock = ({
                                                     dice={`d20+${value}`}
                                                     text={`+${value}`}
                                                     context={`${capitalize(key.substring(0, 3))}: Save`}
-                                                    statblock={data.name}
+                                                    statblock={getTokenName(item)}
                                                 />
                                             </span>
                                         );
@@ -185,7 +188,7 @@ export const E5StatBlock = ({
                                                 Math.floor(value)
                                             )}
                                             context={`${capitalize(key)}: Check`}
-                                            statblock={data.name}
+                                            statblock={getTokenName(item)}
                                         />
                                     </li>
                                 );
@@ -250,7 +253,7 @@ export const E5StatBlock = ({
                             <E5Ability
                                 ability={action}
                                 key={action.name + index}
-                                statblock={data.name}
+                                statblock={getTokenName(item)}
                                 tokenData={data}
                                 itemId={itemId}
                             />
@@ -266,7 +269,7 @@ export const E5StatBlock = ({
                             <E5Ability
                                 ability={action}
                                 key={action.name + index}
-                                statblock={data.name}
+                                statblock={getTokenName(item)}
                                 tokenData={data}
                                 itemId={itemId}
                             />
@@ -282,7 +285,7 @@ export const E5StatBlock = ({
                             <E5Ability
                                 ability={ability}
                                 key={ability.name + index}
-                                statblock={data.name}
+                                statblock={getTokenName(item)}
                                 tokenData={data}
                                 itemId={itemId}
                             />
@@ -298,7 +301,7 @@ export const E5StatBlock = ({
                             <E5Ability
                                 ability={reaction}
                                 key={reaction.name + index}
-                                statblock={data.name}
+                                statblock={getTokenName(item)}
                                 tokenData={data}
                                 itemId={itemId}
                             />
@@ -314,7 +317,7 @@ export const E5StatBlock = ({
                             <E5Ability
                                 ability={action}
                                 key={action.name + index}
-                                statblock={data.name}
+                                statblock={getTokenName(item)}
                                 tokenData={data}
                                 itemId={itemId}
                             />
@@ -330,7 +333,7 @@ export const E5StatBlock = ({
                             <E5Ability
                                 ability={action}
                                 key={action.name + index}
-                                statblock={data.name}
+                                statblock={getTokenName(item)}
                                 tokenData={data}
                                 itemId={itemId}
                             />
@@ -347,7 +350,7 @@ export const E5StatBlock = ({
                             <E5Ability
                                 ability={legendary_action}
                                 key={legendary_action.name + index}
-                                statblock={data.name}
+                                statblock={getTokenName(item)}
                                 tokenData={data}
                                 itemId={itemId}
                             />
@@ -382,7 +385,7 @@ export const E5StatBlock = ({
             {statblock.spells && statblock.spells.length > 0 ? (
                 <E5Spells
                     spells={statblock.spells}
-                    statblock={data.name}
+                    statblock={getTokenName(item)}
                     spellSlots={statblock.spell_slots}
                     tokenData={data}
                     itemId={itemId}

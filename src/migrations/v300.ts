@@ -19,7 +19,6 @@ export const migrateTo300 = async () => {
             items.forEach((item) => {
                 const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
                 const newMetadata: HpTrackerMetadata = {
-                    name: data.name,
                     hp: data.hp,
                     maxHp: data.maxHp,
                     armorClass: data.armorClass,

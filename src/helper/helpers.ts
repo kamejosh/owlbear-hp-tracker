@@ -468,3 +468,15 @@ export const updateLimit = async (itemId: string, limitValues: Limit) => {
         });
     }
 };
+
+export const getTokenName = (token: Image) => {
+    try {
+        if (token.text && token.text.plainText) {
+            return token.text.plainText;
+        } else {
+            return token.name;
+        }
+    } catch {
+        return "";
+    }
+};

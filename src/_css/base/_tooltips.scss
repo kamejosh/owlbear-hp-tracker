@@ -6,3 +6,22 @@
 .tippy-arrow {
     color: dimgrey;
 }
+
+.token-name-tooltip {
+    translate: 0 54px;
+    border: 1px solid dimgrey;
+    border-radius: 4px;
+    background-color: var(--bg-color);
+    height: 18px;
+    font-weight: 500;
+    font-family: system-ui;
+
+    .tippy-arrow {
+        display: none;
+    }
+
+    .tippy-content {
+        padding-block: 2px;
+        line-height: 1;
+    }
+}

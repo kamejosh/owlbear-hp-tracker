@@ -7,7 +7,7 @@ import { HpTrackerMetadata } from "../../helper/types.ts";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { Loader } from "../general/Loader.tsx";
 import { updateHp } from "../../helper/hpHelpers.ts";
-import { getBgColor } from "../../helper/helpers.ts";
+import { getBgColor, getTokenName } from "../../helper/helpers.ts";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import {
     getAcForPlayers,
@@ -112,7 +112,7 @@ const MultiContent = ({ ids }: { ids: Array<string> }) => {
                                     )}, #1C1B22 90%, #1C1B22 )`,
                                 }}
                             >
-                                {d.name}
+                                {getTokenName(item)}
                             </li>
                         );
                     }

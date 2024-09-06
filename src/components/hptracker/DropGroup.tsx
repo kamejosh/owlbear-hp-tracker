@@ -1,6 +1,6 @@
 import { Droppable } from "react-beautiful-dnd";
 import { DraggableTokenList } from "./TokenList.tsx";
-import OBR, { Item, Metadata } from "@owlbear-rodeo/sdk";
+import OBR, { Image, Metadata } from "@owlbear-rodeo/sdk";
 import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
 import { itemMetadataKey, metadataKey } from "../../helper/variables.ts";
 import {
@@ -20,7 +20,7 @@ import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { useDiceRoller } from "../../context/DDDiceContext.tsx";
 import { IDiceRoll, Operator, parseRollEquation } from "dddice-js";
 import { diceToRoll, getUserUuid, localRoll } from "../../helper/diceHelper.ts";
-import { getRoomDiceUser } from "../../helper/helpers.ts";
+import { getRoomDiceUser, getTokenName } from "../../helper/helpers.ts";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import { useRollLogContext } from "../../context/RollLogContext.tsx";
 import { useRef, useState } from "react";
@@ -40,9 +40,9 @@ import { BattleSvg } from "../svgs/BattleSvg.tsx";
 
 type DropGroupProps = {
     title: string;
-    list: Array<Item>;
+    list: Array<Image>;
     selected: Array<string>;
-    tokenLists: Map<string, Array<Item>>;
+    tokenLists: Map<string, Array<Image>>;
 };
 
 export const DropGroup = (props: DropGroupProps) => {
@@ -129,9 +129,9 @@ export const DropGroup = (props: DropGroupProps) => {
             const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
             const dice = `1d${room?.initiativeDice ?? 20}+${data.stats.initiativeBonus}`;
             if (getRoomDiceUser(room, OBR.player.id)?.diceRendering && !room?.disableDiceRoller) {
-                promises.push(roll(dice, data.name, hidden, item.id));
+                promises.push(roll(dice, getTokenName(item), hidden, item.id));
             } else {
-                promises.push(diceLessRoll(dice, data.name, hidden, item.id));
+                promises.push(diceLessRoll(dice, getTokenName(item), hidden, item.id));
             }
         }
 

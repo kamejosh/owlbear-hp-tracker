@@ -206,7 +206,6 @@ const setupContextMenu = async () => {
                         } else {
                             // variable allows us to be typesafe
                             const defaultMetadata: HpTrackerMetadata = {
-                                name: item.name,
                                 hp: 0,
                                 maxHp: 0,
                                 armorClass: 0,

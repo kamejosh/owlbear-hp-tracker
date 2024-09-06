@@ -11,7 +11,7 @@ import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 import { getDiceImage, getSvgForDiceType, getThemePreview } from "../../../helper/previewHelpers.tsx";
 import { Select } from "../Select.tsx";
-import { isNull } from "lodash";
+import { isNull, isString } from "lodash";
 import Tippy from "@tippyjs/react";
 
 type DiceRoomButtonsProps = {
@@ -157,7 +157,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
             onMouseEnter={() => setHover(true)}
             onMouseLeave={() => setHover(false)}
         >
-            <Tippy content={"Add new custom dice roll"}>
+            <Tippy content={props.customDice ? props.customDice.dice : "Add new custom dice roll"}>
                 <button
                     className={`button custom-dice dice-${props.button} ${isEnabled() ? "enabled" : "disabled"} ${
                         addCustom ? "open" : ""
@@ -439,8 +439,19 @@ const QuickButtons = ({ open }: { open: boolean }) => {
 };
 
 export const DiceRoomButtons = (props: DiceRoomButtonsProps) => {
-    const { buttons } = useDiceButtonsContext();
+    const { buttons, setButtons } = useDiceButtonsContext();
     const [quick, setQuick] = useState<boolean>(false);
+
+    useEffect(() => {
+        // In older version the value was only a string, we need to delete those buttons
+        if (buttons) {
+            Object.entries(buttons).forEach(([k, v]) => {
+                if (v && isString(v)) {
+                    setButtons({ [k]: null });
+                }
+            });
+        }
+    }, [buttons]);
 
     return (
         <div className={"dice-room-buttons"}>

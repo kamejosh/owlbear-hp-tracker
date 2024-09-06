@@ -14,6 +14,8 @@ import "./initiative.scss";
 import { PlayerButton } from "./PlayerButton.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import Tippy from "@tippyjs/react";
+import { Image } from "@owlbear-rodeo/sdk";
+import { getTokenName } from "../../../helper/helpers.ts";
 export const Initiative = ({ id }: { id: string }) => {
     const playerContext = usePlayerContext();
     const initRef = useRef<HTMLInputElement>(null);
@@ -25,6 +27,7 @@ export const Initiative = ({ id }: { id: string }) => {
     const initButtonRef = useRef<HTMLButtonElement>(null);
     const token = useTokenListContext((state) => state.tokens?.get(id));
     const data = token?.data as HpTrackerMetadata;
+    const item = token?.item as Image;
 
     useEffect(() => {
         if (initRef && initRef.current) {
@@ -73,7 +76,7 @@ export const Initiative = ({ id }: { id: string }) => {
             if (parsed) {
                 const rollData = await rollWrapper(rollerApi, parsed.dice, {
                     operator: parsed.operator,
-                    external_id: data.name,
+                    external_id: getTokenName(item),
                     label: "Initiative: Roll",
                     whisper: hidden ? await getUserUuid(room, rollerApi) : undefined,
                 });
@@ -83,7 +86,7 @@ export const Initiative = ({ id }: { id: string }) => {
                 }
             }
         } else {
-            const result = await localRoll(dice, "Initiative: Roll", addRoll, hidden, data.name);
+            const result = await localRoll(dice, "Initiative: Roll", addRoll, hidden, getTokenName(item));
             initButtonRef.current?.classList.remove("rolling");
             if (result) {
                 initiativeValue = result.total;

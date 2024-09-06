@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
-import OBR, { Item } from "@owlbear-rodeo/sdk";
+import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
 import { changelogModal, itemMetadataKey, version } from "../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../helper/types.ts";
 import { DragDropContext, DraggableLocation, DropResult } from "react-beautiful-dnd";
@@ -83,7 +83,7 @@ const Content = () => {
         });
     }, []);
 
-    const reorderMetadataIndex = (list: Array<Item>, group?: string) => {
+    const reorderMetadataIndex = (list: Array<Image>, group?: string) => {
         OBR.scene.items.updateItems(list, (items) => {
             items.forEach((item, index) => {
                 const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
@@ -97,7 +97,7 @@ const Content = () => {
     };
 
     const tokenLists = useCallback(() => {
-        const tokenMap = new Map<string, Array<Item>>();
+        const tokenMap = new Map<string, Array<Image>>();
 
         scene?.groups?.forEach((group) => {
             const groupItems = items?.filter((item) => {
@@ -143,7 +143,7 @@ const Content = () => {
     };
 
     const reorder = (
-        list: Item[],
+        list: Array<Image>,
         startIndex: number,
         endIndex: number,
         dragItem: DropResult,
@@ -152,14 +152,14 @@ const Content = () => {
         const result = Array.from(list);
         result.sort(sortItems);
         const [removed] = result.splice(startIndex, 1);
-        const multiRemove: Array<Item> = [removed];
+        const multiRemove: Array<Image> = [removed];
 
         if (multiMove) {
             const alsoSelected = result.filter(
                 (item) => selectedTokens.includes(item.id) && item.id != dragItem.draggableId
             );
 
-            let localRemove: Array<Item> = [];
+            let localRemove: Array<Image> = [];
 
             alsoSelected.forEach((item) => {
                 localRemove = localRemove.concat(
@@ -282,7 +282,7 @@ const Content = () => {
             <div className={"hp-tracker"}>
                 <Helpbuttons ignoredChanges={ignoredChanges} setIgnoredChange={setIgnoredChanges} />
                 <h1 className={"title"}>
-                    GM Toolkit <span className={"small"}>{version}</span>
+                    GM Grimoire <span className={"small"}>{version}</span>
                 </h1>
                 <div className={`headings ${playerContext.role === "PLAYER" ? "player" : ""}`}>
                     {playerContext.role === "GM" ? (

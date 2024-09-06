@@ -7,6 +7,8 @@ import OBR, { Image } from "@owlbear-rodeo/sdk";
 import "./token-icon.scss";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useUISettingsContext } from "../../../context/UISettingsContext.ts";
+import Tippy from "@tippyjs/react";
+import { getTokenName } from "../../../helper/helpers.ts";
 
 export const TokenIcon = ({
     id,
@@ -33,46 +35,48 @@ export const TokenIcon = ({
     };
 
     return (
-        <div className={"token-icon"} onDoubleClick={handleOnPlayerDoubleClick} onClick={onClick}>
-            <img src={item.image.url} alt={""} />
-            {playerContext.role === "GM" && playerPreview ? (
-                <>
-                    {data.hpOnMap && !room?.disableHpBar ? (
-                        <div
-                            className={"preview-hp"}
-                            style={
-                                {
-                                    "--width": `${
-                                        data.maxHp !== 0
-                                            ? ((data.hp - (data.stats?.tempHp ?? 0)) / data.maxHp) * 100
-                                            : 0
-                                    }%`,
-                                    "--temp-width": `${
-                                        (data.maxHp !== 0
-                                            ? data.stats?.tempHp
-                                                ? data.stats.tempHp / data.maxHp
+        <Tippy content={getTokenName(item)} className={"token-name-tooltip"}>
+            <div className={"token-icon"} onDoubleClick={handleOnPlayerDoubleClick} onClick={onClick}>
+                <img src={item.image.url} alt={""} />
+                {playerContext.role === "GM" && playerPreview ? (
+                    <>
+                        {data.hpOnMap && !room?.disableHpBar ? (
+                            <div
+                                className={"preview-hp"}
+                                style={
+                                    {
+                                        "--width": `${
+                                            data.maxHp !== 0
+                                                ? ((data.hp - (data.stats?.tempHp ?? 0)) / data.maxHp) * 100
                                                 : 0
-                                            : 0) * 100
-                                    }%`,
-                                } as CSSProperties
-                            }
-                        >
-                            {!!data.playerMap?.hp ? (
-                                <span className={"preview-hp-text"}>
-                                    {data.hp}/{data.maxHp}
-                                    {data.stats?.tempHp ? `(${data.stats.tempHp})` : null}
-                                </span>
-                            ) : null}
-                        </div>
-                    ) : null}
-                    {!!data.playerMap?.ac && data.acOnMap ? (
-                        <div className={"preview-ac"}>
-                            <ShieldSvg />
-                            <span className={"preview-value"}>{data.armorClass}</span>
-                        </div>
-                    ) : null}
-                </>
-            ) : null}
-        </div>
+                                        }%`,
+                                        "--temp-width": `${
+                                            (data.maxHp !== 0
+                                                ? data.stats?.tempHp
+                                                    ? data.stats.tempHp / data.maxHp
+                                                    : 0
+                                                : 0) * 100
+                                        }%`,
+                                    } as CSSProperties
+                                }
+                            >
+                                {!!data.playerMap?.hp ? (
+                                    <span className={"preview-hp-text"}>
+                                        {data.hp}/{data.maxHp}
+                                        {data.stats?.tempHp ? `(${data.stats.tempHp})` : null}
+                                    </span>
+                                ) : null}
+                            </div>
+                        ) : null}
+                        {!!data.playerMap?.ac && data.acOnMap ? (
+                            <div className={"preview-ac"}>
+                                <ShieldSvg />
+                                <span className={"preview-value"}>{data.armorClass}</span>
+                            </div>
+                        ) : null}
+                    </>
+                ) : null}
+            </div>
+        </Tippy>
     );
 };

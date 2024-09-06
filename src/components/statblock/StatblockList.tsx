@@ -8,7 +8,7 @@ import { useCallback, useEffect, useState } from "react";
 import { itemMetadataKey } from "../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../helper/types.ts";
 import SwiperClass from "swiper/types/swiper-class";
-import { getBgColor, sortItems, updateSceneMetadata } from "../../helper/helpers.ts";
+import { getBgColor, getTokenName, sortItems, updateSceneMetadata } from "../../helper/helpers.ts";
 import { useTokenListContext } from "../../context/TokenContext.tsx";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
@@ -111,14 +111,14 @@ export const StatblockList = (props: StatblockListProps) => {
                                 }
                             }}
                             key={item.id}
-                            title={tokenData.name}
+                            title={getTokenName(item)}
                             style={{
                                 background: `linear-gradient(to right, ${getBgColor(
                                     tokenData
                                 )}, #1C1B22 100%, #1C1B22 )`,
                             }}
                         >
-                            <span className={"name"}>{tokenData.name}</span>
+                            <span className={"name"}>{getTokenName(item)}</span>
                             <span className={"hp"}>
                                 {tokenData.hp}/{tokenData.maxHp}
                             </span>

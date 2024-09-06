@@ -8,11 +8,11 @@ import { SearchResult5e, SearchResultPf } from "./SearchResult.tsx";
 import { Statblock } from "./Statblock.tsx";
 import { Helpbuttons } from "../../general/Helpbuttons/Helpbuttons.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
-import { updateRoomMetadata } from "../../../helper/helpers.ts";
+import { getTokenName, updateRoomMetadata } from "../../../helper/helpers.ts";
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
 
 type SearchWrapperProps = {
-    data: HpTrackerMetadata;
+    name: string;
     setSearch: (search: string) => void;
     setForceSearch: (force: boolean) => void;
     empty: boolean;
@@ -72,7 +72,7 @@ const SearchWrapper = (props: SearchWrapperProps) => {
                                     ? "No results for this input, try another name"
                                     : "Enter the name of the creature you're searching"
                             }
-                            defaultValue={getSearchString(props.data.name)}
+                            defaultValue={getSearchString(props.name)}
                             onKeyDown={(e) => {
                                 if (e.key === "Enter") {
                                     props.setSearch(e.currentTarget.value);
@@ -182,7 +182,7 @@ export const CharacterSheet = (props: { itemId: string }) => {
                 <div className={"content"}>
                     <div className={"statblock-top"}>
                         <h2 className={"statblock-name"}>
-                            {data.name} <span className={"note"}>(using {room?.ruleset} Filter)</span>
+                            {getTokenName(item)} <span className={"note"}>(using {room?.ruleset} Filter)</span>
                         </h2>
                         <ul className={"jump-links"}>
                             {scrollTargets.map((t) => {
@@ -197,7 +197,7 @@ export const CharacterSheet = (props: { itemId: string }) => {
                     {room?.ruleset === "e5" || room?.ruleset === "pf" ? (
                         <>
                             <SearchWrapper
-                                data={data}
+                                name={getTokenName(item)}
                                 setSearch={setSearch}
                                 setForceSearch={setForceSearch}
                                 empty={emptySearch}

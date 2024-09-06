@@ -1,3 +1,23 @@
+# 3.0.0
+
++ HP Tracker is now called DM Toolkit
+  + There is so much more than just HP Tracking going on
+  + It's a complete toolkit for Dungeon and Game Masters so the renaming was something that had to be done to reflect the state of the extension
++ There is a completely new Design for the token list 
+  + It aims to simplify the core functionality and make everything accessible with a click
+  + It comes with lots of tooltips to make it easier to know what things do and a lot more visual feedback what the current state is
++ Token Preview in the token list (including mode that shows what players see)
++ Dedicated map buttons that add HP or AC to the map and make them visible for players (right click or long press)
++ Initiative Bonus can now be directly set in the token list (and is visible in the roll button)
++ Tokens can now be assigned to players directly 
++ Short and Long Rest buttons that heal and reset limited statblock abilities.
++ Battle Round tracking (finally) that allows to keep track of who's turn it is across different groups with the click of a button
++ Code optimization for better performance
++ Statblock Popover now allows collapsing of statblocks for a better overview
++ Statblock Popover can now be opened directly from the token list
++ In Scene indicator who's turn it currently is
++ And a few bug fixes along the way
+
 # 2.3.1
 
 + Improve dddice Integration
