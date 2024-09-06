@@ -9,8 +9,11 @@ import { useEffect, useState } from "react";
 import OBR, { Image, Player } from "@owlbear-rodeo/sdk";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import Tippy from "@tippyjs/react";
+import { statblockPopover } from "../../../helper/variables.ts";
+import { useMetadataContext } from "../../../context/MetadataContext.ts";
 
 export const Sheet = ({ id }: { id: string }) => {
+    const room = useMetadataContext((state) => state.room);
     const playerContext = usePlayerContext();
     const token = useTokenListContext((state) => state.tokens?.get(id));
     const setId = useCharSheet((state) => state.setId);
@@ -35,8 +38,29 @@ export const Sheet = ({ id }: { id: string }) => {
             <SheetSvg />
             {data.sheet ? (
                 <>
-                    <Tippy content={data.sheet}>
-                        <button onClick={() => setId(id)}>open</button>
+                    <Tippy content={"open statblock (RMB in popover)"}>
+                        <button
+                            onClick={() => setId(id)}
+                            onContextMenu={async (e) => {
+                                e.preventDefault();
+                                let width = 10000;
+                                let height = 600;
+                                try {
+                                    width = await OBR.viewport.getWidth();
+                                    height = await OBR.viewport.getHeight();
+                                } catch {}
+
+                                await OBR.player.select([id]);
+                                await OBR.popover.open({
+                                    ...statblockPopover,
+                                    width: Math.min(room?.statblockPopover?.width || 500, width),
+                                    height: Math.min(room?.statblockPopover?.height || 600, height),
+                                    anchorPosition: { top: 55, left: width - 70 },
+                                });
+                            }}
+                        >
+                            open
+                        </button>
                     </Tippy>
                     <Tippy content={"Remove statblock"}>
                         <button

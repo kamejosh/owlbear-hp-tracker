@@ -25,8 +25,12 @@ export const BattleRounds = () => {
     const battleTokens = tokensData
         .filter((td) => groups.includes(td.data.group ?? ""))
         .sort((a, b) => {
-            if (b.data.initiative === a.data.initiative && !isUndefined(b.data.index) && !isUndefined(a.data.index)) {
-                return a.data.index - b.data.index;
+            if (
+                b.data.initiative === a.data.initiative &&
+                !isUndefined(b.data.stats.initiativeBonus) &&
+                !isUndefined(a.data.stats.initiativeBonus)
+            ) {
+                return b.data.stats.initiativeBonus - a.data.stats.initiativeBonus;
             }
             return b.data.initiative - a.data.initiative;
         });

@@ -282,7 +282,7 @@ const Content = () => {
             <div className={"hp-tracker"}>
                 <Helpbuttons ignoredChanges={ignoredChanges} setIgnoredChange={setIgnoredChanges} />
                 <h1 className={"title"}>
-                    HP Tracker<span className={"small"}>{version}</span>
+                    GM Toolkit <span className={"small"}>{version}</span>
                 </h1>
                 <div className={`headings ${playerContext.role === "PLAYER" ? "player" : ""}`}>
                     {playerContext.role === "GM" ? (

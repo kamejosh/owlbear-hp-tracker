@@ -26,7 +26,6 @@ export const createIndicator = async (token: Image) => {
         .build();
 
     await OBR.scene.items.addItems([indicator]);
-    return indicator;
 };
 
 export const setIndicator = async (current: Image) => {
@@ -52,7 +51,7 @@ export const setIndicator = async (current: Image) => {
 };
 
 export const destroyIndicator = async () => {
-    const items = await OBR.scene.items.getItems<Shape>((item) => item.name === indicatorName);
+    const items = await OBR.scene.items.getItems<Shape | Image>((item) => item.name === indicatorName);
     if (items.length > 0) {
         await OBR.scene.items.deleteItems(items.map((i) => i.id));
     }

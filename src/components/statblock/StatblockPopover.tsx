@@ -26,6 +26,10 @@ const Content = () => {
     const { isReady } = SceneReadyContext();
 
     const initPopover = async () => {
+        const playerSelection = await OBR.player.getSelection();
+        if (playerSelection && playerSelection.length === 1) {
+            setSelection(playerSelection[0]);
+        }
         OBR.player.onChange(async (player) => {
             if (player.selection && player.selection.length === 1) {
                 if (player.selection[0] !== selection) {
