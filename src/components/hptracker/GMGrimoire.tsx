@@ -279,11 +279,11 @@ const Content = () => {
         characterId ? (
             <CharacterSheet itemId={characterId} />
         ) : (
-            <div className={"gm-grimoire"}>
+            <div className={`gm-grimoire ${playerContext.role === "PLAYER" ? "player" : ""}`}>
                 <Helpbuttons ignoredChanges={ignoredChanges} setIgnoredChange={setIgnoredChanges} />
                 {playerContext.role === "PLAYER" ? (
                     <h1 className={"title"}>
-                        GM Grimoire <span className={"small"}>{version}</span>
+                        GM's Grimoire <span className={"small"}>{version}</span>
                     </h1>
                 ) : null}
                 {playerContext.role === "GM" ? (

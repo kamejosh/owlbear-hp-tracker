@@ -2,12 +2,26 @@
 
 .gm-grimoire {
     display: flex;
+    position: relative;
     flex-direction: column;
     gap: 2px;
     margin-bottom: 36px;
 
+    &.player {
+        .help-buttons {
+            margin-top: 0;
+        }
+    }
+
     .title {
-        align-self: flex-start;
+        display: none;
+        position: absolute;
+        top: 1rem;
+        margin: 0;
+
+        @include breakpoint.laptop {
+            display: initial;
+        }
 
         .small {
             font-size: 10px;

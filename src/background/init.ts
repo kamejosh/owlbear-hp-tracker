@@ -136,7 +136,7 @@ const setupContextMenu = async () => {
         icons: [
             {
                 icon: "/iconPopover.svg",
-                label: "GM Grimoire",
+                label: "GM's Grimoire",
                 filter: {
                     some: [{ key: ["metadata", `${itemMetadataKey}`, "hpTrackerActive"], value: true }],
                     roles: ["GM"],
@@ -144,7 +144,7 @@ const setupContextMenu = async () => {
             },
             {
                 icon: "/iconPopover.svg",
-                label: "GM Grimoire",
+                label: "GM's Grimoire",
                 filter: {
                     every: [{ key: ["metadata", `${itemMetadataKey}`, "hpTrackerActive"], value: true }],
                     some: [

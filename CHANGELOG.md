@@ -16,6 +16,7 @@
 + Statblock Popover now allows collapsing of statblocks for a better overview
 + Statblock Popover can now be opened directly from the token list
 + In Scene indicator who's turn it currently is
++ Custom Dice can now use themes not matching a full DnD set
 + And a few bug fixes along the way
 
 # 2.3.1

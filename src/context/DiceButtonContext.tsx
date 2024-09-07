@@ -7,6 +7,7 @@ import { createStore } from "zustand/vanilla";
 export type CustomDieNotation = {
     dice: string;
     theme?: string;
+    removed?: boolean;
 };
 
 export type DiceButtonsType = {

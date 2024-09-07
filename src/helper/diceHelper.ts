@@ -115,7 +115,7 @@ export const getApiKey = async (room: RoomMetadata | null) => {
     }
 
     if (!apiKey) {
-        apiKey = (await new ThreeDDiceAPI(undefined, "GM Grimoire").user.guest()).data;
+        apiKey = (await new ThreeDDiceAPI(undefined, "GM's Grimoire").user.guest()).data;
         updateKey = true;
     }
 

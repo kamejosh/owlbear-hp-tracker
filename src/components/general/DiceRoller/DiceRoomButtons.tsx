@@ -153,24 +153,31 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
 
     return (
         <div
-            className={`custom-dice-wrapper ${props.customDice ? "has-dice" : ""}`}
+            className={`custom-dice-wrapper ${props.customDice && !props.customDice.removed ? "has-dice" : ""}`}
             onMouseEnter={() => setHover(true)}
             onMouseLeave={() => setHover(false)}
         >
-            <Tippy content={props.customDice ? props.customDice.dice : "Add new custom dice roll"}>
+            <Tippy
+                content={
+                    props.customDice && !props.customDice.removed ? props.customDice.dice : "Add new custom dice roll"
+                }
+            >
                 <button
                     className={`button custom-dice dice-${props.button} ${isEnabled() ? "enabled" : "disabled"} ${
                         addCustom ? "open" : ""
                     }`}
                     onClick={async (e) => {
-                        if (!props.customDice && buttons.hasOwnProperty(String(props.button))) {
+                        if (
+                            (!props.customDice || props.customDice.removed) &&
+                            buttons.hasOwnProperty(String(props.button))
+                        ) {
                             setAddCustom(true);
-                        } else if (props.customDice) {
+                        } else if (props.customDice && !props.customDice.removed) {
                             await roll(e.currentTarget);
                         }
                     }}
                 >
-                    {props.customDice ? getDicePreview() : <AddSvg />}
+                    {props.customDice && !props.customDice.removed ? getDicePreview() : <AddSvg />}
                 </button>
             </Tippy>
             {addCustom ? (
@@ -278,13 +285,17 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                     </div>
                 </div>
             ) : null}
-            {props.customDice ? (
+            {props.customDice && !props.customDice.removed ? (
                 <button
                     className={`remove-dice ${hover ? "hover" : ""}`}
                     onClick={() => {
-                        if (props.customDice && buttons.hasOwnProperty(String(props.button))) {
+                        if (
+                            props.customDice &&
+                            !props.customDice.removed &&
+                            buttons.hasOwnProperty(String(props.button))
+                        ) {
                             const newButton = {
-                                [props.button]: null,
+                                [props.button]: { ...props.customDice, removed: true },
                             };
                             setButtons(newButton);
                         }
