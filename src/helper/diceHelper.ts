@@ -115,7 +115,7 @@ export const getApiKey = async (room: RoomMetadata | null) => {
     }
 
     if (!apiKey) {
-        apiKey = (await new ThreeDDiceAPI(undefined, "HP Tracker").user.guest()).data;
+        apiKey = (await new ThreeDDiceAPI(undefined, "GM Grimoire").user.guest()).data;
         updateKey = true;
     }
 
@@ -168,7 +168,7 @@ export const getDiceRoom = async (
                     await updateRoomMetadataDiceRoom(room, newDiceRoom.slug);
                     return newDiceRoom;
                 } else {
-                    console.warn("HP Tracker - unable to connect to dddice room");
+                    console.warn("GM's Grimoire - unable to connect to dddice room");
                 }
             }
         }
@@ -248,7 +248,7 @@ const setCustomDiceButtons = (participant: IRoomParticipant) => {
 };
 
 export const dddiceApiLogin = async (room: RoomMetadata | null, user?: IUser) => {
-    const rollerApi = new ThreeDDiceAPI(await getApiKey(room), "HP Tracker");
+    const rollerApi = new ThreeDDiceAPI(await getApiKey(room), "GM's Grimoire");
     return connectToDddiceRoom(rollerApi, room, user);
 };
 

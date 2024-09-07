@@ -25,7 +25,7 @@ import { useUISettingsContext } from "../../context/UISettingsContext.ts";
 import Tippy from "@tippyjs/react";
 import { BattleRounds } from "./Token/BattleRounds.tsx";
 
-export const HPTracker = () => {
+export const GMGrimoire = () => {
     return (
         <ContextWrapper component={"action_window"}>
             <TokenContextWrapper>
@@ -51,7 +51,7 @@ const Content = () => {
         state.setPlayerPreview,
     ]);
 
-    const initHpTracker = async () => {
+    const initGrimoire = async () => {
         if (
             playerContext.role === "GM" &&
             !room?.ignoreUpdateNotification &&
@@ -67,13 +67,13 @@ const Content = () => {
             });
         } else if (playerContext.role === "GM" && scene?.version && compare(scene.version, version, "<")) {
             setIgnoredChanges(true);
-            await OBR.notification.show(`HP Tracker has been updated to version ${version}`, "SUCCESS");
+            await OBR.notification.show(`GM's Grimoire has been updated to version ${version}`, "SUCCESS");
         }
     };
 
     useEffect(() => {
         if (isReady) {
-            initHpTracker();
+            initGrimoire();
         }
     }, [isReady]);
 
@@ -279,13 +279,15 @@ const Content = () => {
         characterId ? (
             <CharacterSheet itemId={characterId} />
         ) : (
-            <div className={"hp-tracker"}>
+            <div className={"gm-grimoire"}>
                 <Helpbuttons ignoredChanges={ignoredChanges} setIgnoredChange={setIgnoredChanges} />
-                <h1 className={"title"}>
-                    GM Grimoire <span className={"small"}>{version}</span>
-                </h1>
-                <div className={`headings ${playerContext.role === "PLAYER" ? "player" : ""}`}>
-                    {playerContext.role === "GM" ? (
+                {playerContext.role === "PLAYER" ? (
+                    <h1 className={"title"}>
+                        GM Grimoire <span className={"small"}>{version}</span>
+                    </h1>
+                ) : null}
+                {playerContext.role === "GM" ? (
+                    <div className={`headings`}>
                         <>
                             <Tippy content={"Toggle Player Preview Mode"}>
                                 <button
@@ -314,35 +316,37 @@ const Content = () => {
                             </span>
                             <BattleRounds />
                         </>
-                    ) : null}
+                    </div>
+                ) : null}
+                <div className={"grimoire-content"}>
+                    {playerContext.role === "GM" ? (
+                        <DragDropContext onDragEnd={onDragEnd}>
+                            {scene && scene.groups && scene.groups?.length > 0 ? (
+                                scene.groups?.map((group) => {
+                                    const list = tokenLists.get(group) || [];
+                                    return (
+                                        <DropGroup
+                                            key={group}
+                                            title={group}
+                                            list={list.sort(sortItems)}
+                                            selected={selectedTokens}
+                                            tokenLists={tokenLists}
+                                        />
+                                    );
+                                })
+                            ) : (
+                                <DropGroup
+                                    title={"Default"}
+                                    list={Array.from(items ?? []).sort(sortItems)}
+                                    selected={selectedTokens}
+                                    tokenLists={tokenLists}
+                                />
+                            )}
+                        </DragDropContext>
+                    ) : (
+                        <PlayerTokenList tokens={playerTokens} selected={selectedTokens} tokenLists={tokenLists} />
+                    )}
                 </div>
-                {playerContext.role === "GM" ? (
-                    <DragDropContext onDragEnd={onDragEnd}>
-                        {scene && scene.groups && scene.groups?.length > 0 ? (
-                            scene.groups?.map((group) => {
-                                const list = tokenLists.get(group) || [];
-                                return (
-                                    <DropGroup
-                                        key={group}
-                                        title={group}
-                                        list={list.sort(sortItems)}
-                                        selected={selectedTokens}
-                                        tokenLists={tokenLists}
-                                    />
-                                );
-                            })
-                        ) : (
-                            <DropGroup
-                                title={"Default"}
-                                list={Array.from(items ?? []).sort(sortItems)}
-                                selected={selectedTokens}
-                                tokenLists={tokenLists}
-                            />
-                        )}
-                    </DragDropContext>
-                ) : (
-                    <PlayerTokenList tokens={playerTokens} selected={selectedTokens} tokenLists={tokenLists} />
-                )}
             </div>
         )
     ) : (

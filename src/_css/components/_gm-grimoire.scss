@@ -1,6 +1,6 @@
 @use "../utilities/breakpoint";
 
-.hp-tracker {
+.gm-grimoire {
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -16,7 +16,7 @@
 
     .headings {
         display: flex;
-        position: sticky;
+        position: fixed;
         top: 1rem;
         align-items: center;
         gap: 1ch;
@@ -92,9 +92,22 @@
             .battle-round {
                 box-shadow: 0 0 -4px var(--bg-color);
                 font-weight: bold;
-                //background-color: lightgrey;
                 line-height: 1;
             }
+        }
+    }
+
+    .grimoire-content {
+        margin-top: 10px;
+
+        @include breakpoint.laptop {
+            margin-top: 60px;
+        }
+
+        .player-token-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
         }
     }
 }

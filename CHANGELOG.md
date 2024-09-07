@@ -1,6 +1,6 @@
 # 3.0.0
 
-+ HP Tracker is now called DM Toolkit
++ HP Tracker is now called GM's Grimoire
   + There is so much more than just HP Tracking going on
   + It's a complete toolkit for Dungeon and Game Masters so the renaming was something that had to be done to reflect the state of the extension
 + There is a completely new Design for the token list 

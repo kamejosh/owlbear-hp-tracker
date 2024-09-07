@@ -50,7 +50,7 @@ export const BattleRounds = () => {
     const changeCurrent = async (mod: number) => {
         if (groups.length === 0 || battleTokens.length === 0) {
             stopBattle();
-            await OBR.notification.show("HP Tracker - No groups or tokens assigned for battle!", "WARNING");
+            await OBR.notification.show("GM's Grimoire - No groups or tokens assigned for battle!", "WARNING");
             return;
         }
         const currentTokenIndex = current ? battleTokens.findIndex((bt) => bt.item.id === current) : 0;

@@ -1,17 +1,17 @@
 {
-    "name": "Dungeon Master - HP Tracker",
+    "name": "Game Master's Grimoire (HP Tracker)",
     "version": "3.0.0",
     "manifest_version": 1,
     "author": "Joshua Hercher",
     "description": "All-In-One Hitpoint and Initiative Tracking, 5e and PF2e and custom Statblocks, visibility settings, 3D dice-rolling and more.",
-    "icon": "/icon.svg",
+    "icon": "/GMG.svg",
     "homepage_url": "https://github.com/kamejosh/owlbear-hp-tracker",
     "action": {
-        "title": "HP Tracker",
+        "title": "GM's Grimoire",
         "icon": "/icon.svg",
         "popover": "/",
         "height": 1000,
-        "width": 610
+        "width": 579
     },
     "background_url": "/background.html"
 }

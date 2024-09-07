@@ -65,7 +65,7 @@ const initItems = async () => {
     await updateAcChanges(acChanges);
     await updateBarChanges(barChanges);
     await updateTextChanges(textChanges);
-    console.info("HP Tracker - Token initialization done");
+    console.info("GM's Grimoire - Token initialization done");
 };
 
 const initRoom = async () => {
@@ -136,7 +136,7 @@ const setupContextMenu = async () => {
         icons: [
             {
                 icon: "/iconPopover.svg",
-                label: "HP Tracker",
+                label: "GM Grimoire",
                 filter: {
                     some: [{ key: ["metadata", `${itemMetadataKey}`, "hpTrackerActive"], value: true }],
                     roles: ["GM"],
@@ -144,7 +144,7 @@ const setupContextMenu = async () => {
             },
             {
                 icon: "/iconPopover.svg",
-                label: "HP Tracker",
+                label: "GM Grimoire",
                 filter: {
                     every: [{ key: ["metadata", `${itemMetadataKey}`, "hpTrackerActive"], value: true }],
                     some: [
@@ -170,7 +170,7 @@ const setupContextMenu = async () => {
         icons: [
             {
                 icon: "/icon.svg",
-                label: "Activate HP Tracker",
+                label: "Add to Grimoire",
                 filter: {
                     every: [{ key: "type", value: "IMAGE" }],
                     some: [
@@ -185,7 +185,7 @@ const setupContextMenu = async () => {
             },
             {
                 icon: "/iconOff.svg",
-                label: "Deactivate HP Tracker",
+                label: "Remove from Grimoire",
                 filter: {
                     every: [{ key: ["metadata", `${itemMetadataKey}`, "hpTrackerActive"], value: true }],
                     roles: ["GM"],
@@ -293,17 +293,17 @@ const sceneReady = async () => {
     try {
         await migrations();
     } catch (e) {
-        console.warn("HP Tracker - Error while running migrations", e);
+        console.warn("GM's Grimoire - Error while running migrations", e);
     }
     try {
         await initItems();
     } catch (e) {
-        console.warn("HP Tracker - Error while initializing items", e);
+        console.warn("GM's Grimoire - Error while initializing items", e);
     }
     try {
         await initScene();
     } catch (e) {
-        console.warn("HP Tracker - Error while initializing Scene", e);
+        console.warn("GM's Grimoire - Error while initializing Scene", e);
     }
 };
 
@@ -322,18 +322,18 @@ const initTokens = async () => {
 };
 
 OBR.onReady(async () => {
-    console.info(`HP Tracker - version ${version} initializing`);
+    console.info(`GM's Grimoire - version ${version} initializing`);
     try {
         await setupContextMenu();
     } catch (e) {
-        console.warn("HP Tracker - error while setting up context menu");
+        console.warn("GM's Grimoire - error while setting up context menu");
     }
 
     if ((await OBR.player.getRole()) === "GM") {
         try {
             await initRoom();
         } catch (e) {
-            console.warn("HP Tracker - Error while initializing Room", e);
+            console.warn("GM's Grimoire - Error while initializing Room", e);
         }
 
         OBR.scene.onReadyChange(async (isReady) => {
@@ -350,17 +350,17 @@ OBR.onReady(async () => {
         try {
             await initTokens();
         } catch (e) {
-            console.warn("HP Tracker - error while initializing Token event handler", e);
+            console.warn("GM's Grimoire - error while initializing Token event handler", e);
         }
     }
     try {
         await setupDddice();
     } catch (e) {
         await OBR.notification.show(
-            "HP Tracker dice roller initialization error. Check browser logs for more info.",
+            "GM's Grimoire dice roller initialization error. Check browser logs for more info.",
             "ERROR"
         );
-        console.warn("HP Tracker - error while intializing dddice", e);
+        console.warn("GM's Grimoire - error while intializing dddice", e);
     }
-    console.info(`HP Tracker - initialization done`);
+    console.info(`GM's Grimoire - initialization done`);
 });

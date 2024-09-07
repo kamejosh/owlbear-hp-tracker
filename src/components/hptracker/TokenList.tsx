@@ -71,7 +71,7 @@ export const DraggableTokenList = React.memo(function DraggableTokenList(props: 
 
 export const PlayerTokenList = (props: TokenListProps) => {
     return (
-        <>
+        <div className={"player-token-list"}>
             {props.tokens.map((token) => {
                 const data = token.metadata[itemMetadataKey] as HpTrackerMetadata;
                 if (data) {
@@ -86,6 +86,6 @@ export const PlayerTokenList = (props: TokenListProps) => {
                     );
                 }
             })}
-        </>
+        </div>
     );
 };

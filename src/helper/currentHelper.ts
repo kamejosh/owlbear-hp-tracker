@@ -1,7 +1,7 @@
 import OBR, { buildShape, Image, Shape } from "@owlbear-rodeo/sdk";
 import { getImageBounds } from "./helpers.ts";
 
-const indicatorName = "HP Tracker - Indicator";
+const indicatorName = "GM's Grimoire - Indicator";
 
 export const createIndicator = async (token: Image) => {
     const bounds = await getImageBounds(token);

@@ -26,7 +26,7 @@ button,
     position: fixed;
     top: 1rem;
     right: 1rem;
-    grid-template-columns: repeat(5, 25px);
+    grid-template-columns: repeat(7, 25px);
     grid-auto-flow: row;
     gap: 0.5ch;
     z-index: 200;
@@ -34,13 +34,16 @@ button,
     background-color: var(--bg-color);
 
     @include breakpoint.mobile-and-tablet-only {
-        position: absolute;
-        grid-template-columns: repeat(8, 25px);
+        position: initial;
+        grid-template-columns: repeat(7, 25px);
         grid-template-areas:
-            "statblock settings patreon discord changelog help ta ta"
-            ". . . . . . ta ta";
+            "settings changelog help statblock statblock ta ta"
+            ". patreon discord statblock statblock ta ta";
+        justify-content: flex-end;
+        margin-top: 35px;
         box-shadow: none;
         background-color: transparent;
+        width: 100%;
 
         .tabletop-almanac-button {
             grid-area: ta;
@@ -69,13 +72,6 @@ button,
         .help-button {
             grid-area: help;
         }
-    }
-
-    .statblock-button {
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 -960 960 960' width='24'%3E%3Cpath d='M320-240h320v-80H320v80Zm0-160h320v-80H320v80ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z' fill='%23dddddd'/%3E%3C/svg%3E");
-        background-position: center;
-        background-size: 80%;
-        background-repeat: no-repeat;
     }
 
     .change-log-button {
@@ -157,13 +153,25 @@ button,
         }
     }
 
-    &.tabletop-almanac-button {
+    &.tabletop-almanac-button,
+    &.statblock-button {
         grid-row: span 2;
         grid-column: span 2;
-        width: calc(100% - 4px);
-        height: calc(100% - 4px);
+        width: 100%;
+        height: 100%;
         overflow: hidden;
+    }
 
+    &.statblock-button {
+        svg {
+            scale: 1.3;
+            overflow: hidden;
+        }
+    }
+
+    &.tabletop-almanac-button {
+        width: calc(100% - 2px);
+        height: calc(100% - 2px);
         svg {
             translate: 2px 0;
             scale: 2;

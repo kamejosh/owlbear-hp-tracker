@@ -132,5 +132,5 @@ export const setupDddice = async () => {
         } catch {}
     });
     blastMessage({ type: "dddice.isLoaded" });
-    console.info("HP Tracker - Finished setting up dddice");
+    console.info("GM's Grimoire - Finished setting up dddice");
 };
