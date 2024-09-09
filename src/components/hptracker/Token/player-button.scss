@@ -10,6 +10,9 @@
     }
 
     .player-default {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         border-color: grey;
         width: 35px;
         height: 20px;
@@ -17,9 +20,6 @@
 
         .player-icon {
             fill: grey;
-            position: relative;
-            top: -3px;
-            left: -1px;
             width: 23px;
             height: 23px;
         }

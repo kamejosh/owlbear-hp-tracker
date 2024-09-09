@@ -320,29 +320,35 @@ const Content = () => {
                 ) : null}
                 <div className={"grimoire-content"}>
                     {playerContext.role === "GM" ? (
-                        <DragDropContext onDragEnd={onDragEnd}>
-                            {scene && scene.groups && scene.groups?.length > 0 ? (
-                                scene.groups?.map((group) => {
-                                    const list = tokenLists.get(group) || [];
-                                    return (
-                                        <DropGroup
-                                            key={group}
-                                            title={group}
-                                            list={list.sort(sortItems)}
-                                            selected={selectedTokens}
-                                            tokenLists={tokenLists}
-                                        />
-                                    );
-                                })
-                            ) : (
-                                <DropGroup
-                                    title={"Default"}
-                                    list={Array.from(items ?? []).sort(sortItems)}
-                                    selected={selectedTokens}
-                                    tokenLists={tokenLists}
-                                />
-                            )}
-                        </DragDropContext>
+                        <>
+                            <div className={"gmg-name"}>
+                                <span>Game Master's Grimoire </span>
+                                <span className={"small"}>{version}</span>
+                            </div>
+                            <DragDropContext onDragEnd={onDragEnd}>
+                                {scene && scene.groups && scene.groups?.length > 0 ? (
+                                    scene.groups?.map((group) => {
+                                        const list = tokenLists.get(group) || [];
+                                        return (
+                                            <DropGroup
+                                                key={group}
+                                                title={group}
+                                                list={list.sort(sortItems)}
+                                                selected={selectedTokens}
+                                                tokenLists={tokenLists}
+                                            />
+                                        );
+                                    })
+                                ) : (
+                                    <DropGroup
+                                        title={"Default"}
+                                        list={Array.from(items ?? []).sort(sortItems)}
+                                        selected={selectedTokens}
+                                        tokenLists={tokenLists}
+                                    />
+                                )}
+                            </DragDropContext>
+                        </>
                     ) : (
                         <PlayerTokenList tokens={playerTokens} selected={selectedTokens} tokenLists={tokenLists} />
                     )}
