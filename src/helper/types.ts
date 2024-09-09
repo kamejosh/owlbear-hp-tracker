@@ -58,6 +58,7 @@ export type SceneMetadata = {
     groups?: Array<string>;
     openGroups?: Array<string>;
     collapsedStatblocks?: Array<string>;
+    statblockPopoverOpen?: boolean;
 };
 
 export type DiceUser = {

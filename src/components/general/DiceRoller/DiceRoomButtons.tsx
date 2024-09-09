@@ -13,6 +13,7 @@ import { getDiceImage, getSvgForDiceType, getThemePreview } from "../../../helpe
 import { Select } from "../Select.tsx";
 import { isNull, isString } from "lodash";
 import Tippy from "@tippyjs/react";
+import { usePlayerContext } from "../../../context/PlayerContext.ts";
 
 type DiceRoomButtonsProps = {
     open: boolean;
@@ -33,12 +34,14 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
     ]);
     const addRoll = useRollLogContext((state) => state.addRoll);
     const { buttons, setButtons } = useDiceButtonsContext();
-    const room = useMetadataContext((state) => state.room);
+    const [room, taSettings] = useMetadataContext((state) => [state.room, state.taSettings]);
     const [hover, setHover] = useState<boolean>(false);
     const [addCustom, setAddCustom] = useState<boolean>(false);
     const [validCustom, setValidCustom] = useState<boolean>(false);
     const [currentCustomTheme, setCurrentCustomTheme] = useState<ITheme | null>(theme);
     const inputRef = useRef<HTMLInputElement>(null);
+    const playerContext = usePlayerContext();
+    const defaultHidden = playerContext.role === "GM" && !!taSettings.gm_rolls_hidden;
 
     useEffect(() => {
         setCurrentCustomTheme(theme);
@@ -127,7 +130,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
         return <DiceSvg />;
     }, [theme, props.customDice, room?.disableDiceRoller, themes, rollerApi]);
 
-    const roll = async (button: HTMLButtonElement) => {
+    const roll = async (button: HTMLButtonElement, hide: boolean = false) => {
         button.classList.add("rolling");
         if (!room?.disableDiceRoller && rollerApi && theme && props.customDice) {
             let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined = diceToRoll(
@@ -138,10 +141,11 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                 await rollWrapper(rollerApi, parsed.dice, {
                     operator: parsed.operator,
                     label: "Roll: Custom",
+                    whisper: hide ? await getUserUuid(room, rollerApi) : undefined,
                 });
             }
         } else if (props.customDice) {
-            await localRoll(props.customDice.dice, "Roll: Custom", addRoll);
+            await localRoll(props.customDice.dice, "Roll: Custom", addRoll, hide);
         }
         button.classList.remove("rolling");
         button.blur();
@@ -173,7 +177,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                         ) {
                             setAddCustom(true);
                         } else if (props.customDice && !props.customDice.removed) {
-                            await roll(e.currentTarget);
+                            await roll(e.currentTarget, defaultHidden);
                         }
                     }}
                 >
@@ -286,23 +290,35 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                 </div>
             ) : null}
             {props.customDice && !props.customDice.removed ? (
-                <button
-                    className={`remove-dice ${hover ? "hover" : ""}`}
-                    onClick={() => {
-                        if (
-                            props.customDice &&
-                            !props.customDice.removed &&
-                            buttons.hasOwnProperty(String(props.button))
-                        ) {
-                            const newButton = {
-                                [props.button]: { ...props.customDice, removed: true },
-                            };
-                            setButtons(newButton);
-                        }
-                    }}
-                >
-                    x
-                </button>
+                <>
+                    <button
+                        className={`hidden-roll self ${hover ? "hover" : ""}`}
+                        onClick={(e) => {
+                            if (e.currentTarget.parentElement) {
+                                roll(e.currentTarget.parentElement as HTMLButtonElement, !defaultHidden);
+                            }
+                        }}
+                    >
+                        {defaultHidden ? "SHOW" : "HIDE"}
+                    </button>
+                    <button
+                        className={`remove-dice ${hover ? "hover" : ""}`}
+                        onClick={() => {
+                            if (
+                                props.customDice &&
+                                !props.customDice.removed &&
+                                buttons.hasOwnProperty(String(props.button))
+                            ) {
+                                const newButton = {
+                                    [props.button]: { ...props.customDice, removed: true },
+                                };
+                                setButtons(newButton);
+                            }
+                        }}
+                    >
+                        x
+                    </button>
+                </>
             ) : null}
         </div>
     );
@@ -311,8 +327,11 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
 const QuickButtons = ({ open }: { open: boolean }) => {
     const { theme, rollerApi } = useDiceRoller();
     const addRoll = useRollLogContext((state) => state.addRoll);
-    const { room } = useMetadataContext();
+    const [room, taSettings] = useMetadataContext((state) => [state.room, state.taSettings]);
     const [validCustom, setValidCustom] = useState<boolean>(true);
+    const playerContext = usePlayerContext();
+
+    const defaultHidden = playerContext.role === "GM" && !!taSettings.gm_rolls_hidden;
 
     const roll = async (element: HTMLElement, dice: string, hide: boolean = false) => {
         element.classList.add("rolling");
@@ -339,7 +358,7 @@ const QuickButtons = ({ open }: { open: boolean }) => {
                     <li
                         className={"quick-roll"}
                         onClick={async (e) => {
-                            await roll(e.currentTarget, name);
+                            await roll(e.currentTarget, name, defaultHidden);
                         }}
                     >
                         <div className={"quick-preview"}>{preview}</div>
@@ -348,11 +367,11 @@ const QuickButtons = ({ open }: { open: boolean }) => {
                             onClick={async (e) => {
                                 e.stopPropagation();
                                 if (e.currentTarget.parentElement) {
-                                    await roll(e.currentTarget.parentElement, name, true);
+                                    await roll(e.currentTarget.parentElement, name, !defaultHidden);
                                 }
                             }}
                         >
-                            SELF
+                            {defaultHidden ? "SHOW" : "HIDE"}
                         </button>
                     </li>
                 </Tippy>

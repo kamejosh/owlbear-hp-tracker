@@ -106,7 +106,11 @@
                 height: 20px;
 
                 &.active {
+                    justify-content: center;
+                    align-items: center;
                     svg {
+                        width: 15px;
+                        height: 15px;
                         fill: red;
                     }
                 }

@@ -1,11 +1,18 @@
 import OBR from "@owlbear-rodeo/sdk";
-import { changelogModal, helpModal, settingsModal, statblockPopover } from "../../../helper/variables.ts";
+import {
+    changelogModal,
+    helpModal,
+    settingsModal,
+    statblockPopover,
+    statblockPopoverId,
+} from "../../../helper/variables.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { TabletopAlmanacSvg } from "../../svgs/TabletopAlmanacSvg.tsx";
 import Tippy from "@tippyjs/react";
 import { SettingsSvg } from "../../svgs/SettingsSvg.tsx";
 import { StatblockSvg } from "../../svgs/StatblockSvg.tsx";
+import { updateSceneMetadata } from "../../../helper/helpers.ts";
 
 type HelpButtonsProps = {
     ignoredChanges?: boolean;
@@ -13,7 +20,7 @@ type HelpButtonsProps = {
 };
 
 export const Helpbuttons = (props: HelpButtonsProps) => {
-    const room = useMetadataContext((state) => state.room);
+    const [room, scene] = useMetadataContext((state) => [state.room, state.scene]);
     const playerContext = usePlayerContext();
 
     return (
@@ -28,24 +35,31 @@ export const Helpbuttons = (props: HelpButtonsProps) => {
                     <TabletopAlmanacSvg />
                 </a>
             </Tippy>
-            <Tippy content={"Open Statblock Popover"}>
+            <Tippy content={!!scene?.statblockPopoverOpen ? "Close Statblock Popover" : "Open Statblock Popover"}>
                 <button
-                    className={"statblock-button top-button"}
+                    className={`statblock-button top-button ${!!scene?.statblockPopoverOpen ? "open" : ""}`}
                     onClick={async () => {
-                        // width needs to be big, to position statblock popover to the right
-                        let width = 10000;
-                        let height = 600;
-                        try {
-                            width = await OBR.viewport.getWidth();
-                            height = await OBR.viewport.getHeight();
-                        } catch {}
+                        if (!!scene?.statblockPopoverOpen) {
+                            await updateSceneMetadata(scene, { statblockPopoverOpen: false });
+                            await OBR.popover.close(statblockPopoverId);
+                        } else {
+                            // width needs to be big, to position statblock popover to the right
+                            let width = 10000;
+                            let height = 600;
+                            try {
+                                width = await OBR.viewport.getWidth();
+                                height = await OBR.viewport.getHeight();
+                            } catch {}
 
-                        await OBR.popover.open({
-                            ...statblockPopover,
-                            width: Math.min(room?.statblockPopover?.width || 500, width),
-                            height: Math.min(room?.statblockPopover?.height || 600, height),
-                            anchorPosition: { top: 55, left: width - 70 },
-                        });
+                            await updateSceneMetadata(scene, { statblockPopoverOpen: true });
+
+                            await OBR.popover.open({
+                                ...statblockPopover,
+                                width: Math.min(room?.statblockPopover?.width || 500, width),
+                                height: Math.min(room?.statblockPopover?.height || 600, height),
+                                anchorPosition: { top: 55, left: width - 70 },
+                            });
+                        }
                     }}
                     title={"Statblocks"}
                 >

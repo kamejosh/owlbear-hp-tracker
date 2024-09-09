@@ -230,6 +230,22 @@
                 }
             }
 
+            .hidden-roll {
+                position: absolute;
+                right: 0;
+                bottom: -18px;
+                visibility: hidden;
+                opacity: 0;
+                z-index: 100;
+                transition: all 0.25s ease;
+
+                &.hover {
+                    translate: 0 -100%;
+                    visibility: visible;
+                    opacity: 1;
+                }
+            }
+
             .remove-dice {
                 position: absolute;
                 top: 1px;

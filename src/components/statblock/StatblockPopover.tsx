@@ -7,6 +7,7 @@ import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { DiceTray } from "../general/DiceRoller/DiceTray.tsx";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { TokenContextWrapper } from "../TokenContextWrapper.tsx";
+import { updateSceneMetadata } from "../../helper/helpers.ts";
 
 export const StatblockPopover = () => {
     return (
@@ -22,7 +23,7 @@ const Content = () => {
     const [minimized, setMinimized] = useState<boolean>(false);
     const [pinned, setPinned] = useState<boolean>(false);
     const [selection, setSelection] = useState<string>();
-    const [room] = useMetadataContext((state) => [state.room, state.scene]);
+    const [room, scene] = useMetadataContext((state) => [state.room, state.scene]);
     const { isReady } = SceneReadyContext();
 
     const initPopover = async () => {
@@ -74,7 +75,10 @@ const Content = () => {
                     </button>
                     <button
                         className={"top-button"}
-                        onClick={() => OBR.popover.close(statblockPopoverId)}
+                        onClick={async () => {
+                            await updateSceneMetadata(scene, { statblockPopoverOpen: false });
+                            await OBR.popover.close(statblockPopoverId);
+                        }}
                         title={"close"}
                     >
                         X

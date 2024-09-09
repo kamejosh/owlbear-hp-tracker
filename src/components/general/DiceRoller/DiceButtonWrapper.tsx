@@ -7,6 +7,7 @@ import { parseRollEquation } from "dddice-js";
 import { getDiceImage, getSvgForDiceType } from "../../../helper/previewHelpers.tsx";
 import { D20 } from "../../svgs/dice/D20.tsx";
 import Tippy from "@tippyjs/react";
+import { usePlayerContext } from "../../../context/PlayerContext.ts";
 
 type DiceButtonProps = {
     dice: string;
@@ -23,6 +24,8 @@ export const DiceButton = (props: DiceButtonProps) => {
     const [rollerApi, initialized, theme] = useDiceRoller((state) => [state.rollerApi, state.initialized, state.theme]);
     const [context, setContext] = useState<boolean>(false);
     const rollButton = useRef<HTMLButtonElement>(null);
+    const playerContext = usePlayerContext();
+    const defaultHidden = playerContext.role === "GM" && !!taSettings.gm_rolls_hidden;
 
     const addModifier = (originalDie: string, baseDie: string) => {
         if (originalDie.includes("+")) {
@@ -167,7 +170,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                     disabled={!isEnabled()}
                     className={`dice-button button ${props.limitReached ? "limit" : ""}`}
                     onClick={async () => {
-                        await roll();
+                        await roll(defaultHidden ? "SELF" : undefined);
                     }}
                 >
                     <div className={"dice-preview"}>{getDicePreview()}</div>
@@ -223,10 +226,10 @@ export const DiceButton = (props: DiceButtonProps) => {
                         className={"self"}
                         disabled={!isEnabled()}
                         onClick={async () => {
-                            await roll("SELF");
+                            await roll(defaultHidden ? undefined : "SELF");
                         }}
                     >
-                        HIDE
+                        {defaultHidden ? "SHOW" : "HIDE"}
                     </button>
                 </div>
             </div>

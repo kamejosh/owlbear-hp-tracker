@@ -46,7 +46,7 @@ type DropGroupProps = {
 };
 
 export const DropGroup = (props: DropGroupProps) => {
-    const [room, scene] = useMetadataContext((state) => [state.room, state.scene]);
+    const [room, scene, taSettings] = useMetadataContext((state) => [state.room, state.scene, state.taSettings]);
     const [rollerApi, initialized, theme] = useDiceRoller((state) => [state.rollerApi, state.initialized, state.theme]);
     const [groups, addGroup, removeGroup] = useBattleContext((state) => [
         state.groups,
@@ -56,6 +56,7 @@ export const DropGroup = (props: DropGroupProps) => {
     const addRoll = useRollLogContext((state) => state.addRoll);
     const playerContext = usePlayerContext();
     const initButtonRef = useRef<HTMLButtonElement>(null);
+    const defaultHidden = playerContext.role === "GM" && !!taSettings.gm_rolls_hidden;
 
     const [initHover, setInitHover] = useState<boolean>(false);
 
@@ -236,7 +237,7 @@ export const DropGroup = (props: DropGroupProps) => {
                                     !room?.disableDiceRoller
                                 }
                                 onClick={async () => {
-                                    await setInitiative(false);
+                                    await setInitiative(defaultHidden);
                                 }}
                             >
                                 <div className={"dice-preview"}>{getDicePreview()}</div>
@@ -249,10 +250,10 @@ export const DropGroup = (props: DropGroupProps) => {
                                     !room?.disableDiceRoller
                                 }
                                 onClick={async () => {
-                                    await setInitiative(true);
+                                    await setInitiative(!defaultHidden);
                                 }}
                             >
-                                HIDE
+                                {defaultHidden ? "SHOW" : "HIDE"}
                             </button>
                         </div>
                     </div>

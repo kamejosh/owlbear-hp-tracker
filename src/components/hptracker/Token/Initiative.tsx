@@ -20,7 +20,7 @@ export const Initiative = ({ id }: { id: string }) => {
     const playerContext = usePlayerContext();
     const initRef = useRef<HTMLInputElement>(null);
     const initBonusRef = useRef<HTMLInputElement>(null);
-    const room = useMetadataContext((state) => state.room);
+    const [room, taSettings] = useMetadataContext((state) => [state.room, state.taSettings]);
     const [initHover, setInitHover] = useState<boolean>(false);
     const [rollerApi, theme] = useDiceRoller((state) => [state.rollerApi, state.theme]);
     const addRoll = useRollLogContext((state) => state.addRoll);
@@ -28,6 +28,7 @@ export const Initiative = ({ id }: { id: string }) => {
     const token = useTokenListContext((state) => state.tokens?.get(id));
     const data = token?.data as HpTrackerMetadata;
     const item = token?.item as Image;
+    const defaultHidden = playerContext.role === "GM" && !!taSettings.gm_rolls_hidden;
 
     useEffect(() => {
         if (initRef && initRef.current) {
@@ -126,7 +127,7 @@ export const Initiative = ({ id }: { id: string }) => {
                     title={"Roll Initiative (including initiative modifier from statblock)"}
                     className={`dice-button button`}
                     onClick={async () => {
-                        const value = await rollInitiative(false);
+                        const value = await rollInitiative(defaultHidden);
                         const newData = { ...data, initiative: value };
                         updateTokenMetadata(newData, [id]);
                     }}
@@ -138,12 +139,12 @@ export const Initiative = ({ id }: { id: string }) => {
                 <button
                     className={`self ${initHover ? "visible" : "hidden"}`}
                     onClick={async () => {
-                        const value = await rollInitiative(true);
+                        const value = await rollInitiative(!defaultHidden);
                         const newData = { ...data, initiative: value };
                         updateTokenMetadata(newData, [id]);
                     }}
                 >
-                    HIDE
+                    {defaultHidden ? "SHOW" : "HIDE"}
                 </button>
             </div>
 

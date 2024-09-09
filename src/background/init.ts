@@ -1,4 +1,4 @@
-import OBR, { Metadata } from "@owlbear-rodeo/sdk";
+import OBR, { Image, Metadata } from "@owlbear-rodeo/sdk";
 import { ID, itemMetadataKey, metadataKey, version } from "../helper/variables.ts";
 import { migrate102To103 } from "../migrations/v103.ts";
 import { migrate105To106 } from "../migrations/v106.ts";
@@ -124,6 +124,9 @@ const initScene = async () => {
         if (!sceneData.collapsedStatblocks) {
             sceneData.collapsedStatblocks = [];
         }
+        if (!!sceneData?.statblockPopoverOpen) {
+            sceneData.statblockPopoverOpen = false;
+        }
 
         ownMetadata[metadataKey] = sceneData;
     }
@@ -195,7 +198,7 @@ const setupContextMenu = async () => {
         onClick: async (context) => {
             const tokenIds: Array<string> = [];
             const initTokens = async () => {
-                const itemStatblocks = await getInitialValues(context.items);
+                const itemStatblocks = await getInitialValues(context.items as Array<Image>);
                 await OBR.scene.items.updateItems(context.items, (items) => {
                     items.forEach((item) => {
                         tokenIds.push(item.id);

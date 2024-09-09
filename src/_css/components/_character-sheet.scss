@@ -603,6 +603,7 @@
             width: 100%;
 
             h3 {
+                margin-top: 0;
                 margin-bottom: 0;
                 line-height: 25px;
             }
@@ -723,6 +724,11 @@ b {
 }
 
 .spell-slots {
+    position: sticky;
+    top: 3rem;
+    z-index: 2;
+    border-bottom: none;
+
     .spell-slot-limits {
         display: flex;
         flex-wrap: wrap;
@@ -734,6 +740,7 @@ b {
             align-items: center;
             border: 1px solid lightslategray;
             border-radius: 8px;
+            background-color: var(--bg-color);
             padding: 4px;
         }
     }

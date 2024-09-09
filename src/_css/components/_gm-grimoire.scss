@@ -96,7 +96,16 @@
             display: flex;
             align-items: center;
             gap: 0.5ch;
+            border-radius: 4px;
             height: 20px;
+
+            &::before {
+                margin-right: 4px;
+                background-color: white;
+                width: 2px;
+                height: 100%;
+                content: "";
+            }
 
             button {
                 height: 20px;
@@ -105,6 +114,7 @@
 
             .battle-round {
                 box-shadow: 0 0 -4px var(--bg-color);
+                color: red;
                 font-weight: bold;
                 line-height: 1;
             }
