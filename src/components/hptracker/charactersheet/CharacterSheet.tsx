@@ -6,9 +6,8 @@ import { HpTrackerMetadata, Ruleset } from "../../../helper/types.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { SearchResult5e, SearchResultPf } from "./SearchResult.tsx";
 import { Statblock } from "./Statblock.tsx";
-import { Helpbuttons } from "../../general/Helpbuttons/Helpbuttons.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
-import { getTokenName, updateRoomMetadata } from "../../../helper/helpers.ts";
+import { getSearchString, getTokenName, updateRoomMetadata } from "../../../helper/helpers.ts";
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
 
 type SearchWrapperProps = {
@@ -26,15 +25,6 @@ type StatblockWrapperProps = {
     itemId: string;
     setEmpty: (empty: boolean) => void;
     setScrollTargets: (targets: Array<{ name: string; target: string }>) => void;
-};
-
-const getSearchString = (name: string): string => {
-    const nameParts = name.split(" ");
-    const lastToken = nameParts[nameParts.length - 1];
-    if (lastToken.length < 3 || /^\d+$/.test(lastToken) || /\d/.test(lastToken)) {
-        return nameParts.slice(0, nameParts.length - 1).join(" ");
-    }
-    return name;
 };
 
 const SearchWrapper = (props: SearchWrapperProps) => {
@@ -177,7 +167,6 @@ export const CharacterSheet = (props: { itemId: string }) => {
             <button className={"back-button"} onClick={() => setId(null)}>
                 Back
             </button>
-            <Helpbuttons />
             {item && data ? (
                 <div className={"content"}>
                     <div className={"statblock-top"}>

@@ -1,9 +1,9 @@
 ---
-title: HP Tracker
+title: Game Master's Grimoire (HP Tracker)
 description: All-In-One Hitpoint and Initiative Tracking with 5e and PF2e Statblocks included, player visibility settings, 3D dice-rolling and more.
 author: Joshua Hercher
-image: https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/HP_Tracker.png
-icon: https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/public/icon.svg
+image: https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/GameMastersGrimoire.png
+icon: https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/public/GMG.svg
 tags:
   - combat
   - tool

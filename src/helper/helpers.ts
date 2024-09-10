@@ -340,6 +340,15 @@ export const updateTokenSheet = (statblock: E5Statblock | PfStatblock, character
     });
 };
 
+export const getSearchString = (name: string): string => {
+    const nameParts = name.split(" ");
+    const lastToken = nameParts[nameParts.length - 1];
+    if (lastToken.length < 3 || /^\d+$/.test(lastToken) || /\d/.test(lastToken)) {
+        return nameParts.slice(0, nameParts.length - 1).join(" ");
+    }
+    return name;
+};
+
 export const getInitialValues = async (items: Array<Image>) => {
     const roomData = await OBR.room.getMetadata();
     let ruleset = "e5";
@@ -360,7 +369,7 @@ export const getInitialValues = async (items: Array<Image>) => {
 
     for (const item of items) {
         try {
-            const name = item.text.plainText ?? item.name;
+            const name = getSearchString(getTokenName(item));
             if (!(itemMetadataKey in item.metadata)) {
                 if (ruleset === "e5") {
                     const statblocks = await axios.request({
@@ -472,7 +481,7 @@ export const updateLimit = async (itemId: string, limitValues: Limit) => {
 
 export const getTokenName = (token: Image) => {
     try {
-        if (token.text && token.text.plainText) {
+        if (token.text && token.text.plainText && token.text.plainText.replaceAll(" ", "").length > 0) {
             return token.text.plainText;
         } else {
             return token.name;

@@ -33,6 +33,7 @@ export const migrateTo300 = async () => {
                         hp: !!data.canPlayersSee,
                         ac: !!data.canPlayersSee,
                     },
+                    canPlayersSee: false,
                     ruleset: data.ruleset,
                     index: data.index,
                     group: data.group,
