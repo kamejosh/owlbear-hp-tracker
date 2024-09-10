@@ -1,40 +1,60 @@
-<h1 id="content">Content</h1>
-
-- [Game Master's Grimoire - Owlbear Plugin](#game-masters-grimoire---owlbear-plugin)
-- [Quickstart](#quickstart)
-- [How it works](#how-it-works)
-  + [Adding Tokens to the Game Master's Grimoire](#adding-tokens-to-the-game-masters-grimoire)
-  + [Game Master's Grimoire Action Window](#game-masters-grimoire-action-window)
-    - [Version Information and Help Buttons](#version-information-and-help-buttons)
-    - [Settings](#settings)
-    - [Token List](#token-list)
-    - [Token](#token)
-      * [Toggle Buttons](#toggle-buttons)
-      * [Changing Values](#changing-values)
-      * [Temporary Hitpoints](#temporary-hitpoints)
-      * [Initializing Token](#initializing-token)
-    - [Statblock](#statblock)
-      - [Limited Abilities](#limited-abilities)
-    - [Player Action Window](#player-action-window)
-  + [Game Master's Grimoire Context Menu](#game-masters-grimoire-context-menu)
-    - [Single Selection](#single-selection)
-    - [Multi Selection](#multi-selection)
-  + [Statblock Popover](#game-masters-grimoire-statblock-popover)
-- [Custom Statblocks](#custom-statblocks)
-- [Dice Roller](#dice-roller)
-  + [Getting Started](#getting-started)
-  + [Login into dddice](#login-into-dddice)
-  + [Dice Settings](#dice-settings)
-    - [Dice Theme](#dice-theme)
-    - [dddice Room](#dddice-room)
-    - [3D Rendering](#3d-rendering)
-  + [Using The Dice Roller](#using-the-dice-roller)
-    - [Dice Buttons in Statblocks](#dice-buttons-in-statblocks)
-    - [Initiative Buttons](#initiative-buttons)
-    - [Custom Roll Buttons](#custom-roll-buttons)
-    - [Quick Roll Buttons](#quick-roll-buttons)
-  + [DnD Beyond Dice Rolls](#dnd-beyond-dice-rolls)
-  + [Simple Dice-Calculator](#simple-dice-calculator)
+<details>
+  <summary style="font-size:1.5rem;font-weight:bold;">Table of Content</summary>
+  <ul>
+    <li><a href="#game-masters-grimoire---owlbear-plugin">Game Master's Grimoire - Owlbear Plugin</a></li>
+    <li><a href="#quickstart">Quickstart</a></li>
+    <li><a href="#how-it-works">How it works</a></li>
+    <ul>
+      <li><a href="#adding-tokens-to-the-game-masters-grimoire">Adding Tokens to the Game Master's Grimoire</a></li>
+      <li><a href="#game-masters-grimoire-action-window">Game Master's Grimoire Action Window</a></li>
+      <ul>
+        <li><a href="#version-information-and-help-buttons">Version Information and Help Buttons</a></li>
+        <li><a href="#settings">Settings</a></li>
+        <li><a href="#token-list">Token List</a></li>
+        <li><a href="#group">Group</a></li>
+        <li><a href="#token">Token</a></li>
+        <ul>
+          <li><a href="#map-button">Map Button</a></li>
+          <li><a href="#changing-values">Changing Values</a></li>
+          <li><a href="#temporary-hitpoints">Temporary Hitpoints</a></li>
+          <li><a href="#initializing-token">Initializing Token</a></li>
+        </ul>
+        <li><a href="#statblock">Statblock</a></li>
+        <ul>
+          <li><a href="#limited-abilities">Limited Abilities</a></li>
+        </ul>
+        <li><a href="#player-action-window">Player Action Window</a></li>
+      </ul>
+      <li><a href="#game-masters-grimoire-context-menu">Game Master's Grimoire Context Menu</a></li>
+      <ul>
+        <li><a href="#single-selection">Single Selection</a></li>
+        <li><a href="#multi-selection">Multi Selection</a></li>
+      </ul>
+      <li><a href="#statblock-popover">Statblock Popover</a></li>
+    </ul>
+    <li><a href="#custom-statblocks">Custom Statblocks</a></li>
+    <li><a href="#dice-roller">Dice Roller</a></li>
+    <ul>
+      <li><a href="#getting-started">Getting Started</a></li>
+      <li><a href="#dddice-login">dddice Login</a></li>
+      <li><a href="#dice-settings">Dice Settings</a></li>
+      <ul>
+        <li><a href="#dice-theme">Dice Theme</a></li>
+        <li><a href="#dddice-room">dddice Room</a></li>
+        <li><a href="#3d-rendering">3D Rendering</a></li>
+      </ul>
+      <li><a href="#using-the-dice-roller">Using The Dice Roller</a></li>
+      <ul>
+        <li><a href="#dice-buttons-in-statblock">Dice Buttons in Statblocks</a></li>
+        <li><a href="#initiative-buttons">Initiative Buttons</a></li>
+        <li><a href="#custom-roll-buttons">Custom Roll Buttons</a></li>
+        <li><a href="#quick-roll-buttons">Quick Roll Buttons</a></li>
+      </ul>
+      <li><a href="#dnd-beyond-dice-rolls">DnD Beyond Dice Rolls</a></li>
+      <li><a href="#simple-dice-calculator">Simple Dice-Calculator</a></li>
+    </ul>
+  </ul>
+</details>
 
 <h1 id="game-masters-grimoire---owlbear-plugin">Game Master's Grimoire - Owlbear Plugin</h1>
 
@@ -390,7 +410,7 @@ If you are using a guest account, the username that will appear under your rolls
 
 You can now click on any dice button in your [statblocks](#statblock) and the dice will automatically roll.
 
-<h2 id="login into dddice">Login into dddice</h2>
+<h2 id="dddice-login">dddice login</h2>
 
 The login process is the same with the official dddice extension (as this integration was done with their help). When you open the roll log (scroll button on the bottom of the Action Window) you will se a Login Button on the top left of the Roll Log. When you click this Button an overlay appears. Just click the purple link and you are done. It might take a few seconds to register the login. If the overlay doesn't disappear after 5 seconds you were already authenticated, if that is not the case please [let me know](https://github.com/kamejosh/owlbear-hp-tracker/issues).
 
