@@ -4,7 +4,7 @@ import { FreeMode, Mousewheel } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/mousewheel";
-import { useCallback, useEffect, useState } from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import { itemMetadataKey } from "../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../helper/types.ts";
 import SwiperClass from "swiper/types/swiper-class";
@@ -39,6 +39,17 @@ export const StatblockList = (props: StatblockListProps) => {
         }
         return [];
     }, [tokens, playerContext])();
+    const [stickHeight, setStickyHeight] = useState<number>();
+    const jumpLinksRef = useRef<HTMLUListElement>(null);
+
+    useEffect(() => {
+        if(jumpLinksRef.current){
+            setTimeout(() => {
+                setStickyHeight(jumpLinksRef.current?.getBoundingClientRect().height);
+            }, 1000)
+        }
+
+    }, [jumpLinksRef.current, id]);
 
     useEffect(() => {
         if ((!id || !items.map((i) => i.id).includes(id)) && items.length > 0) {
@@ -147,8 +158,8 @@ export const StatblockList = (props: StatblockListProps) => {
                 <SwiperSlide className={"post"}> </SwiperSlide>
             </Swiper>
             {props.minimized ? null : (
-                <div className={"statblock-sheet"}>
-                    <ul className={"jump-links fixed"}>
+                <div className={"statblock-sheet"} style={{['--sticky-height' as string]: `${stickHeight}px` }}>
+                    <ul className={"jump-links fixed"} ref={jumpLinksRef}>
                         {scrollTargets.map((t) => {
                             return (
                                 <li key={t.name} className={"button"}>

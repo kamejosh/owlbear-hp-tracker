@@ -54,7 +54,7 @@ const Content = () => {
     const initGrimoire = async () => {
         if (
             playerContext.role === "GM" &&
-            !room?.ignoreUpdateNotification &&
+            (!room?.ignoreUpdateNotification || compare(version, "3.0.0", "=")) &&
             scene?.version &&
             compare(scene.version, version, "<")
         ) {
@@ -119,7 +119,7 @@ const Content = () => {
         return tokenMap;
     }, [scene?.groups, items])();
 
-    const playerTokens = room?.playerSort && items ? items.sort(sortItemsInitiative) : items ?? [];
+    const playerTokens = room?.playerSort && items ? items.sort(sortItemsInitiative) : (items ?? []);
 
     const reorderMetadataIndexMulti = (destList: Array<Item>, group: string, sourceList: Array<Item>) => {
         const combinedList = destList.concat(sourceList);
@@ -147,7 +147,7 @@ const Content = () => {
         startIndex: number,
         endIndex: number,
         dragItem: DropResult,
-        multiMove: boolean = false
+        multiMove: boolean = false,
     ) => {
         const result = Array.from(list);
         result.sort(sortItems);
@@ -156,7 +156,7 @@ const Content = () => {
 
         if (multiMove) {
             const alsoSelected = result.filter(
-                (item) => selectedTokens.includes(item.id) && item.id != dragItem.draggableId
+                (item) => selectedTokens.includes(item.id) && item.id != dragItem.draggableId,
             );
 
             let localRemove: Array<Image> = [];
@@ -165,8 +165,8 @@ const Content = () => {
                 localRemove = localRemove.concat(
                     result.splice(
                         result.findIndex((sourceItem) => sourceItem.id === item.id),
-                        1
-                    )
+                        1,
+                    ),
                 );
             });
 
@@ -188,7 +188,7 @@ const Content = () => {
         droppableSource: DraggableLocation,
         droppableDestination: DraggableLocation,
         result: DropResult,
-        multiMove: boolean = false
+        multiMove: boolean = false,
     ) => {
         const sourceClone = Array.from(source);
         const destClone = Array.from(destination);
@@ -197,7 +197,7 @@ const Content = () => {
 
         if (multiMove) {
             const alsoSelected = source.filter(
-                (item) => selectedTokens.includes(item.id) && item.id != result.draggableId
+                (item) => selectedTokens.includes(item.id) && item.id != result.draggableId,
             );
 
             let localRemove: Array<Item> = [];
@@ -206,8 +206,8 @@ const Content = () => {
                 localRemove = localRemove.concat(
                     sourceClone.splice(
                         sourceClone.findIndex((sourceItem) => sourceItem.id === item.id),
-                        1
-                    )
+                        1,
+                    ),
                 );
             });
 
@@ -235,7 +235,7 @@ const Content = () => {
                 result.source,
                 result.destination,
                 result,
-                selectedTokens.includes(result.draggableId)
+                selectedTokens.includes(result.draggableId),
             );
             return;
         }
@@ -249,7 +249,7 @@ const Content = () => {
             result.source.index,
             result.destination.index,
             result,
-            selectedTokens.includes(result.draggableId)
+            selectedTokens.includes(result.draggableId),
         );
     };
 

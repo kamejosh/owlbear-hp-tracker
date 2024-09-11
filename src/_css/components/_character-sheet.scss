@@ -63,7 +63,7 @@
         .statblock-top {
             position: sticky;
             top: 0;
-            z-index: 2;
+            z-index: 3;
             background: linear-gradient(to bottom, var(--bg-color) 90%, transparent);
             padding-block: 0.8em 8px;
             text-align: center;
@@ -725,9 +725,14 @@ b {
 
 .spell-slots {
     position: sticky;
-    top: 3rem;
+    top: calc( 16px + var(--sticky-height));
     z-index: 2;
     border-bottom: none;
+    transition: all 0.25s ease;
+
+    h3 {
+        margin-block: 0.3rem;
+    }
 
     .spell-slot-limits {
         display: flex;
@@ -757,8 +762,8 @@ b {
 
     &.fixed {
         position: fixed;
-        top: calc(65px + 1rem);
         z-index: 3;
+        top: calc(65px + 1rem);
         background: linear-gradient(to top, #ffffff00, var(--bg-color) 20px);
         padding-bottom: 20px;
     }

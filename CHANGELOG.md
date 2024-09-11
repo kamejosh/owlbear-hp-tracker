@@ -1,8 +1,13 @@
 # 3.0.0
 
-+ HP Tracker is now called GM's Grimoire
-  + There is so much more than just HP Tracking going on
-  + It's a complete toolkit for Dungeon and Game Masters so the renaming was something that had to be done to reflect the state of the extension
+## HP Tracker is now Game Masters's Grimoire
+
+<center>
+  <img alt="GMG" src="https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/feature/new-token-view/public/GMG.svg" width="50%" />
+</center>
+
+There is so much more than just HP Tracking going on. It's a complete toolkit for Dungeon and Game Masters so the renaming was something that had to be done to reflect the state of the extension
+
 + There is a completely new Design for the token list 
   + It aims to simplify the core functionality and make everything accessible with a click
   + It comes with lots of tooltips to make it easier to know what things do and a lot more visual feedback what the current state is
@@ -15,7 +20,7 @@
 + Code optimization for better performance
 + Statblock Popover now allows collapsing of statblocks for a better overview
 + Statblock Popover can now be opened directly from the token list
-+ In Scene indicator who's turn it currently is
++ In Scene indicator whose turn it currently is
 + Custom Dice can now use themes not matching a full DnD set
 + Statblock Popover button is bigger and now toggles visibility of statblock popover
 + Add setting in Tabletop Almanac to hide GM rolls by default

@@ -136,6 +136,8 @@ export const CharacterSheet = (props: { itemId: string }) => {
     const [emptySearch, setEmptySearch] = useState<boolean>(false);
     const [backgroundColor, setBackgroundColor] = useState<string>();
     const [scrollTargets, setScrollTargets] = useState<Array<{ name: string; target: string }>>([]);
+    const [stickHeight, setStickyHeight] = useState<number>();
+    const jumpLinksRef = useRef<HTMLUListElement>(null);
 
     const initData = async () => {
         if (playerContext.role !== "GM" && item.createdUserId === OBR.player.id) {
@@ -159,8 +161,17 @@ export const CharacterSheet = (props: { itemId: string }) => {
         }
     }, [data?.sheet]);
 
+    useEffect(() => {
+        if(jumpLinksRef.current){
+            setTimeout(() => {
+                setStickyHeight(jumpLinksRef.current?.clientHeight);
+            }, 1000)
+        }
+
+    }, [jumpLinksRef.current]);
+
     return (
-        <div className={`character-sheet`}>
+        <div className={`character-sheet`} style={{['--sticky-height' as string]: `${stickHeight}px` }}>
             {backgroundColor ? (
                 <div className={"background"} style={{ borderLeft: `5px solid ${backgroundColor}` }}></div>
             ) : null}
@@ -173,10 +184,10 @@ export const CharacterSheet = (props: { itemId: string }) => {
                         <h2 className={"statblock-name"}>
                             {getTokenName(item)} <span className={"note"}>(using {room?.ruleset} Filter)</span>
                         </h2>
-                        <ul className={"jump-links"}>
+                        <ul className={"jump-links"} ref={jumpLinksRef}>
                             {scrollTargets.map((t) => {
                                 return (
-                                    <li className={"button"}>
+                                    <li className={"button"} key={t.name}>
                                         <a href={`#${t.target}`}>{t.name}</a>
                                     </li>
                                 );

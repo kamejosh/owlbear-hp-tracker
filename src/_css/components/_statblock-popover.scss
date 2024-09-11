@@ -114,6 +114,7 @@ body:has(.statblock-app) {
                     &:hover,
                     &:focus-visible {
                         width: 100px;
+
                         .name,
                         .hp {
                             display: initial;
@@ -158,6 +159,10 @@ body:has(.statblock-app) {
                     }
                 }
             }
+        }
+
+        .spell-slots {
+            top: calc(32px + var(--sticky-height));
         }
     }
 }

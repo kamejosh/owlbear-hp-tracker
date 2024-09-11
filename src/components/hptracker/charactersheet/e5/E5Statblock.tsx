@@ -55,6 +55,9 @@ export const E5StatBlock = ({
             if (statblock.bonus_actions && statblock.bonus_actions.length > 0) {
                 scrollTargets.push({ name: "bonus", target: "StatblockBonusActions" });
             }
+            if (statblock.special_abilities && statblock.special_abilities.length > 0) {
+                scrollTargets.push({ name: "special", target: "SpecialAbilities" });
+            }
             if (statblock.spells && statblock.spells.length > 0) {
                 scrollTargets.push({ name: "spells", target: "StatblockSpells" });
             }
@@ -278,7 +281,7 @@ export const E5StatBlock = ({
                 </div>
             ) : null}
             {statblock.special_abilities && statblock.special_abilities.length > 0 ? (
-                <div className={"special-abilities"}>
+                <div className={"special-abilities"} id={"SpecialAbilities"}>
                     <h3>Special Abilities</h3>
                     <ul className={"ability-list"}>
                         {statblock.special_abilities?.map((ability, index) => (
