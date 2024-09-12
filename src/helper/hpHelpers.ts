@@ -154,13 +154,13 @@ export const updateHpOffset = async (offset: number) => {
         (item) =>
             item.type === "SHAPE" &&
             infoMetadataKey in item.metadata &&
-            (item.metadata[infoMetadataKey] as AttachmentMetadata).attachmentType === "BAR"
+            (item.metadata[infoMetadataKey] as AttachmentMetadata).attachmentType === "BAR",
     );
     const hpTexts = await OBR.scene.items.getItems(
         (item) =>
             item.type === "TEXT" &&
             infoMetadataKey in item.metadata &&
-            (item.metadata[infoMetadataKey] as AttachmentMetadata).attachmentType === "HP"
+            (item.metadata[infoMetadataKey] as AttachmentMetadata).attachmentType === "HP",
     );
     const barChanges = new Map<string, BarItemChanges>();
     const textChanges = new Map<string, TextItemChanges>();
@@ -237,7 +237,7 @@ export const updateBarChanges = async (changes: Map<string, BarItemChanges>) => 
                         }
                     }
                 });
-            }
+            },
         );
     }
 };
@@ -263,7 +263,7 @@ export const updateTextChanges = async (changes: Map<string, TextItemChanges>) =
                         }
                     }
                 });
-            }
+            },
         );
     }
 };
@@ -272,7 +272,7 @@ export const saveOrChangeBar = async (
     character: Item,
     data: HpTrackerMetadata,
     attachments: Item[],
-    shapeChanges: Map<string, BarItemChanges>
+    shapeChanges: Map<string, BarItemChanges>,
 ) => {
     if (attachments.length > 0) {
         for (const a of attachments) {
@@ -292,7 +292,7 @@ export const saveOrChangeText = async (
     character: Item,
     data: HpTrackerMetadata,
     attachments: Array<Item>,
-    textChanges: Map<string, TextItemChanges>
+    textChanges: Map<string, TextItemChanges>,
 ) => {
     const hpText = `${data.hp}/${data.maxHp}${!!data.stats.tempHp ? "(" + data.stats.tempHp + ")" : ""}`;
     if (attachments.length > 0) {
@@ -319,7 +319,7 @@ const handleBarAttachment = async (
     attachment: Item,
     character: Image,
     changeMap: Map<string, BarItemChanges>,
-    data: HpTrackerMetadata
+    data: HpTrackerMetadata,
 ): Promise<BarItemChanges> => {
     const shape = attachment as Shape;
     const bounds = await getImageBounds(character);
@@ -377,8 +377,8 @@ export const updateTextVisibility = async (tokens: Array<Item>) => {
 
         textAttachments.forEach((text) => {
             const change = textChanges.get(text.id) ?? {};
-            if (text.visible != (token.visible && data.canPlayersSee)) {
-                change.visible = token.visible && data.canPlayersSee;
+            if (text.visible != (token.visible && !!data.playerMap?.hp)) {
+                change.visible = token.visible && !!data.playerMap?.hp;
                 textChanges.set(text.id, change);
             }
         });

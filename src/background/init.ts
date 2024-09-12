@@ -38,7 +38,7 @@ import { migrateTo300 } from "../migrations/v300.ts";
 const initItems = async () => {
     const tokens = await OBR.scene.items.getItems(
         (item) =>
-            itemMetadataKey in item.metadata && (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpTrackerActive
+            itemMetadataKey in item.metadata && (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpTrackerActive,
     );
 
     const barChanges = new Map<string, BarItemChanges>();
@@ -149,14 +149,12 @@ const setupContextMenu = async () => {
                 icon: "/iconPopover.svg",
                 label: "GM's Grimoire",
                 filter: {
-                    every: [{ key: ["metadata", `${itemMetadataKey}`, "hpTrackerActive"], value: true }],
-                    some: [
+                    every: [
+                        { key: ["metadata", `${itemMetadataKey}`, "hpTrackerActive"], value: true, coordinator: "&&" },
                         {
-                            key: ["metadata", `${itemMetadataKey}`, "canPlayersSee"],
-                            value: true,
-                            coordinator: "||",
+                            key: ["createdUserId"],
+                            value: OBR.player.id,
                         },
-                        { key: ["createdUserId"], value: OBR.player.id },
                     ],
                     roles: ["PLAYER"],
                 },
@@ -361,7 +359,7 @@ OBR.onReady(async () => {
     } catch (e) {
         await OBR.notification.show(
             "GM's Grimoire dice roller initialization error. Check browser logs for more info.",
-            "ERROR"
+            "ERROR",
         );
         console.warn("GM's Grimoire - error while intializing dddice", e);
     }

@@ -81,7 +81,7 @@ const handleACOffsetUpdate = async (offset: { x: number; y: number }, ac: Item) 
 
 export const updateAcOffset = async (offset: { x: number; y: number }) => {
     const acCurves = await OBR.scene.items.getItems(
-        (item) => item.type === "CURVE" && infoMetadataKey in item.metadata
+        (item) => item.type === "CURVE" && infoMetadataKey in item.metadata,
     );
     const changeMap = new Map<string, ACItemChanges>();
     for (const acCurve of acCurves) {
@@ -124,7 +124,7 @@ export const updateAcChanges = async (changes: Map<string, ACItemChanges>) => {
                         }
                     }
                 });
-            }
+            },
         );
         await OBR.scene.items.updateItems(
             (item): item is Text => isText(item) && changes.has(item.id),
@@ -137,7 +137,7 @@ export const updateAcChanges = async (changes: Map<string, ACItemChanges>) => {
                         }
                     }
                 });
-            }
+            },
         );
     }
 };
@@ -147,7 +147,7 @@ export const saveOrChangeAC = async (
     data: HpTrackerMetadata,
     attachments: Item[],
     changeMap: Map<string, ACItemChanges>,
-    visible: boolean
+    visible: boolean,
 ) => {
     if (attachments.length > 0) {
         for (const a of attachments) {
@@ -183,8 +183,8 @@ export const updateAcVisibility = async (tokens: Array<Item>) => {
 
         acAttachments.forEach((curve) => {
             const change = acChanges.get(curve.id) ?? {};
-            if (curve.visible != (token.visible && data.canPlayersSee)) {
-                change.visible = token.visible && data.canPlayersSee;
+            if (curve.visible != (token.visible && !!data.playerMap?.ac)) {
+                change.visible = token.visible && !!data.playerMap?.ac;
                 acChanges.set(curve.id, change);
             }
         });
