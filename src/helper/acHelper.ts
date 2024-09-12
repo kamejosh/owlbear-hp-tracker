@@ -33,6 +33,7 @@ export const createAC = async (ac: number, token: Image) => {
         .disableAttachmentBehavior(["VISIBLE", "ROTATION"])
         .visible(token.visible)
         .locked(true)
+        .disableHit(true)
         .attachedTo(token.id)
         .build();
 
@@ -49,6 +50,7 @@ export const createAC = async (ac: number, token: Image) => {
         .strokeColor("black")
         .strokeWidth(2)
         .fontWeight(600)
+        .disableHit(true)
         .textAlignVertical("MIDDLE")
         .visible(token.visible)
         .build();
@@ -94,17 +96,13 @@ export const updateAc = async (token: Item, data: HpTrackerMetadata) => {
     const acAttachment = (await getAttachedItems(token.id, ["CURVE"])).filter((a) => attachmentFilter(a, "AC"));
 
     const show = data.acOnMap && data.hpTrackerActive;
-    const visible = data.canPlayersSee && token.visible;
+    const visible = !!data.playerMap?.ac && token.visible;
     if (!show) {
         await deleteAttachments(acAttachment);
     } else {
-        const characters = await OBR.scene.items.getItems([token.id]);
-        if (characters.length > 0) {
-            const character = characters[0];
-            const changes = new Map<string, ACItemChanges>();
-            await saveOrChangeAC(character, data, acAttachment, changes, visible);
-            await updateAcChanges(changes);
-        }
+        const changes = new Map<string, ACItemChanges>();
+        await saveOrChangeAC(token, data, acAttachment, changes, visible);
+        await updateAcChanges(changes);
     }
 };
 

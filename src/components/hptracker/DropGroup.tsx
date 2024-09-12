@@ -1,40 +1,62 @@
 import { Droppable } from "react-beautiful-dnd";
 import { DraggableTokenList } from "./TokenList.tsx";
-import OBR, { Item, Metadata } from "@owlbear-rodeo/sdk";
+import OBR, { Image, Metadata } from "@owlbear-rodeo/sdk";
 import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
 import { itemMetadataKey, metadataKey } from "../../helper/variables.ts";
 import {
+    getAcForPlayers,
     getAcOnMap,
-    getCanPlayersSee,
-    getHpBar,
+    getHpForPlayers,
     getHpOnMap,
+    getTokenInPlayerList,
+    rest,
+    toggleAcForPlayers,
     toggleAcOnMap,
-    toggleCanPlayerSee,
-    toggleHpBar,
+    toggleHpForPlayers,
     toggleHpOnMap,
+    toggleTokenInPlayerList,
 } from "../../helper/multiTokenHelper.ts";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { useDiceRoller } from "../../context/DDDiceContext.tsx";
-import { IDiceRoll, Operator } from "dddice-js";
+import { IDiceRoll, Operator, parseRollEquation } from "dddice-js";
 import { diceToRoll, getUserUuid, localRoll } from "../../helper/diceHelper.ts";
-import { getRoomDiceUser } from "../../helper/helpers.ts";
+import { getRoomDiceUser, getTokenName } from "../../helper/helpers.ts";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import { useRollLogContext } from "../../context/RollLogContext.tsx";
 import { useRef, useState } from "react";
+import { getDiceImage, getSvgForDiceType } from "../../helper/previewHelpers.tsx";
+import { D20 } from "../svgs/dice/D20.tsx";
+import "./drop-group.scss";
+import { MapButton } from "./Token/MapButton.tsx";
+import { PlayerButton } from "./Token/PlayerButton.tsx";
+import { HPSvg } from "../svgs/HPSvg.tsx";
+import { ACSvg } from "../svgs/ACSvg.tsx";
+import { InitiativeSvg } from "../svgs/InitiativeSvg.tsx";
+import { RestSvg } from "../svgs/RestSvg.tsx";
+import Tippy from "@tippyjs/react";
+import { useBattleContext } from "../../context/BattleContext.tsx";
+import { FlagSvg } from "../svgs/FlagSvg.tsx";
+import { BattleSvg } from "../svgs/BattleSvg.tsx";
 
 type DropGroupProps = {
     title: string;
-    list: Array<Item>;
+    list: Array<Image>;
     selected: Array<string>;
-    tokenLists: Map<string, Array<Item>>;
+    tokenLists: Map<string, Array<Image>>;
 };
 
 export const DropGroup = (props: DropGroupProps) => {
-    const [room, scene] = useMetadataContext((state) => [state.room, state.scene]);
+    const [room, scene, taSettings] = useMetadataContext((state) => [state.room, state.scene, state.taSettings]);
     const [rollerApi, initialized, theme] = useDiceRoller((state) => [state.rollerApi, state.initialized, state.theme]);
+    const [groups, addGroup, removeGroup] = useBattleContext((state) => [
+        state.groups,
+        state.addGroup,
+        state.removeGroup,
+    ]);
     const addRoll = useRollLogContext((state) => state.addRoll);
     const playerContext = usePlayerContext();
     const initButtonRef = useRef<HTMLButtonElement>(null);
+    const defaultHidden = playerContext.role === "GM" && !!taSettings.gm_rolls_hidden;
 
     const [initHover, setInitHover] = useState<boolean>(false);
 
@@ -49,6 +71,29 @@ export const DropGroup = (props: DropGroupProps) => {
         const ownMetadata: Metadata = {};
         ownMetadata[metadataKey] = hpTrackerSceneMetadata;
         await OBR.scene.setMetadata(ownMetadata);
+    };
+
+    const getDicePreview = () => {
+        try {
+            const parsed = parseRollEquation(`1d${room?.initiativeDice}`, "dddice-bees");
+            const die = parsed.dice.find((d) => d.type !== "mod");
+            if (die) {
+                if (room?.disableDiceRoller) {
+                    return getSvgForDiceType(`d${room.initiativeDice}`);
+                } else {
+                    if (theme) {
+                        const image = getDiceImage(theme, die, 0);
+                        return image ?? <D20 />;
+                    } else {
+                        return <D20 />;
+                    }
+                }
+            } else {
+                return <D20 />;
+            }
+        } catch {
+            return <D20 />;
+        }
     };
 
     const roll = async (dice: string, statblock: string, hidden: boolean, id: string) => {
@@ -85,9 +130,9 @@ export const DropGroup = (props: DropGroupProps) => {
             const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
             const dice = `1d${room?.initiativeDice ?? 20}+${data.stats.initiativeBonus}`;
             if (getRoomDiceUser(room, OBR.player.id)?.diceRendering && !room?.disableDiceRoller) {
-                promises.push(roll(dice, data.name, hidden, item.id));
+                promises.push(roll(dice, getTokenName(item), hidden, item.id));
             } else {
-                promises.push(diceLessRoll(dice, data.name, hidden, item.id));
+                promises.push(diceLessRoll(dice, getTokenName(item), hidden, item.id));
             }
         }
 
@@ -117,73 +162,122 @@ export const DropGroup = (props: DropGroupProps) => {
             }`}
         >
             <div className={"group-title"}>
-                <div className={"group-name"}>
-                    <span>{props.title}</span>
+                <div className={"group-general"}>
+                    <Tippy content={props.title}>
+                        <div className={"group-name"}>
+                            <span>{props.title}</span>
+                        </div>
+                    </Tippy>
+                    <Tippy content={groups.includes(props.title) ? "Remove from Battle" : "Add to Battle"}>
+                        <button
+                            className={`button battle-state ${groups.includes(props.title) ? "active" : ""}`}
+                            onClick={() => {
+                                if (groups.includes(props.title)) {
+                                    removeGroup(props.title);
+                                } else {
+                                    addGroup(props.title);
+                                }
+                            }}
+                        >
+                            {groups.includes(props.title) ? <BattleSvg /> : <FlagSvg />}
+                        </button>
+                    </Tippy>
                 </div>
                 <div className={"settings"}>
-                    <button
-                        title={"Toggle HP Bar visibility for GM and Players"}
-                        className={`toggle-button hp ${getHpBar(props.list) ? "on" : "off"}`}
-                        onClick={() => {
-                            toggleHpBar(props.list);
-                        }}
-                    />
-                    <button
-                        title={"Toggle HP displayed on Map"}
-                        className={`toggle-button map ${getHpOnMap(props.list) ? "on" : "off"}`}
-                        onClick={() => {
-                            toggleHpOnMap(props.list);
-                        }}
-                    />
-                    <button
-                        title={"Toggle AC displayed on Map"}
-                        className={`toggle-button ac ${getAcOnMap(props.list) ? "on" : "off"}`}
-                        onClick={async () => {
-                            toggleAcOnMap(props.list);
-                        }}
-                    />
-                    <button
-                        title={"Toggle HP/AC visibility for players"}
-                        className={`toggle-button players ${getCanPlayersSee(props.list) ? "on" : "off"}`}
-                        onClick={() => {
-                            toggleCanPlayerSee(props.list);
-                        }}
-                    />
+                    <div className={"setting"}>
+                        <HPSvg percent={100} name={"hp"} color={"#888888"} />
+                        <MapButton
+                            onClick={async () => {
+                                await toggleHpOnMap(props.list);
+                            }}
+                            onContextMenu={async () => {
+                                await toggleHpForPlayers(props.list);
+                            }}
+                            active={getHpOnMap(props.list)}
+                            players={getHpForPlayers(props.list)}
+                            tooltip={"Show HP on map (right click for players)"}
+                        />
+                    </div>
+                    <div className={"setting"}>
+                        <ACSvg />
+                        <MapButton
+                            onClick={async () => {
+                                await toggleAcOnMap(props.list);
+                            }}
+                            onContextMenu={async () => {
+                                await toggleAcForPlayers(props.list);
+                            }}
+                            active={getAcOnMap(props.list)}
+                            players={getAcForPlayers(props.list)}
+                            tooltip={"Show AC on map (right click for players)"}
+                        />
+                    </div>
+                    <div className={"setting"}>
+                        <InitiativeSvg />
+                        <PlayerButton
+                            active={getTokenInPlayerList(props.list)}
+                            onClick={() => {
+                                toggleTokenInPlayerList(props.list);
+                            }}
+                        />
+                        <div
+                            className={"init-wrapper button-wrapper"}
+                            onMouseEnter={() => {
+                                setInitHover(true);
+                            }}
+                            onMouseLeave={() => setInitHover(false)}
+                        >
+                            <button
+                                ref={initButtonRef}
+                                title={"Roll Initiative (including initiative modifier from statblock)"}
+                                className={`dice-button button`}
+                                disabled={
+                                    getRoomDiceUser(room, playerContext.id)?.diceRendering &&
+                                    !initialized &&
+                                    !room?.disableDiceRoller
+                                }
+                                onClick={async () => {
+                                    await setInitiative(defaultHidden);
+                                }}
+                            >
+                                <div className={"dice-preview"}>{getDicePreview()}</div>
+                            </button>
+                            <button
+                                className={`self ${initHover ? "visible" : "hidden"}`}
+                                disabled={
+                                    getRoomDiceUser(room, playerContext.id)?.diceRendering &&
+                                    !initialized &&
+                                    !room?.disableDiceRoller
+                                }
+                                onClick={async () => {
+                                    await setInitiative(!defaultHidden);
+                                }}
+                            >
+                                {defaultHidden ? "SHOW" : "HIDE"}
+                            </button>
+                        </div>
+                    </div>
+                    <div className={"setting"}>
+                        <RestSvg color={"#888888"} />
+                        <button
+                            className={"button short"}
+                            onClick={() => {
+                                rest(props.list, "Short Rest");
+                            }}
+                        >
+                            short
+                        </button>
+                        <button
+                            className={"button long"}
+                            onClick={() => {
+                                rest(props.list, "Long Rest");
+                            }}
+                        >
+                            long
+                        </button>
+                    </div>
                 </div>
-                <div
-                    className={"init-wrapper"}
-                    onMouseEnter={() => {
-                        setInitHover(true);
-                    }}
-                    onMouseLeave={() => setInitHover(false)}
-                >
-                    <button
-                        ref={initButtonRef}
-                        title={"Roll Initiative (including initiative modifier from statblock)"}
-                        className={`toggle-button initiative-button`}
-                        disabled={
-                            getRoomDiceUser(room, playerContext.id)?.diceRendering &&
-                            !initialized &&
-                            !room?.disableDiceRoller
-                        }
-                        onClick={async () => {
-                            await setInitiative(false);
-                        }}
-                    />
-                    <button
-                        className={`self ${initHover ? "visible" : "hidden"}`}
-                        disabled={
-                            getRoomDiceUser(room, playerContext.id)?.diceRendering &&
-                            !initialized &&
-                            !room?.disableDiceRoller
-                        }
-                        onClick={async () => {
-                            await setInitiative(true);
-                        }}
-                    >
-                        HIDE
-                    </button>
-                </div>
+
                 <button
                     className={"hide-group"}
                     onClick={async () => {

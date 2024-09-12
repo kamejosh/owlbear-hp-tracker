@@ -1,0 +1,57 @@
+.token-hp {
+    display: grid;
+    position: relative;
+    grid-template-areas:
+        "title hp"
+        "temp-icon temp";
+    column-gap: 0.5ch;
+    row-gap: 0.2ch;
+    grid-area: hp;
+    justify-content: start;
+    align-items: flex-start;
+    height: 46px;
+
+    input[type="text"],
+    input[type="number"] {
+        padding-inline: 4px;
+        padding-block: 0;
+        width: 25px;
+        height: 18px;
+        text-align: right;
+    }
+
+    .hp-icon {
+        grid-area: title;
+        width: 20px;
+        height: 20px;
+    }
+
+    .temp-hp-icon {
+        grid-area: temp-icon;
+        align-self: center;
+        height: 15px;
+    }
+
+    .current-hp {
+        display: flex;
+        grid-area: hp;
+        align-items: center;
+        gap: 0.5ch;
+
+        .divider {
+            rotate: 15deg;
+            background-color: var(--text-color);
+            width: 1px;
+            height: 15px;
+        }
+    }
+
+    .bottom-row {
+        display: flex;
+        grid-area: temp;
+        justify-content: space-between;
+        align-self: start;
+        justify-self: start;
+        width: 100%;
+    }
+}

@@ -3,7 +3,7 @@ import OBR, { Item } from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../helper/types.ts";
 import { Draggable } from "react-beautiful-dnd";
-import { Token } from "./Token.tsx";
+import { Token } from "./Token/Token.tsx";
 
 type TokenListProps = {
     tokens: Item[];
@@ -45,8 +45,7 @@ export const DraggableTokenList = React.memo(function DraggableTokenList(props: 
                                                     {...provided.dragHandleProps}
                                                 >
                                                     <Token
-                                                        item={token}
-                                                        data={data}
+                                                        id={token.id}
                                                         popover={false}
                                                         selected={props.selected.includes(token.id)}
                                                         tokenLists={props.tokenLists}
@@ -72,15 +71,14 @@ export const DraggableTokenList = React.memo(function DraggableTokenList(props: 
 
 export const PlayerTokenList = (props: TokenListProps) => {
     return (
-        <>
+        <div className={"player-token-list"}>
             {props.tokens.map((token) => {
                 const data = token.metadata[itemMetadataKey] as HpTrackerMetadata;
                 if (data) {
                     return (
                         <Token
                             key={token.id}
-                            item={token}
-                            data={data}
+                            id={token.id}
                             popover={false}
                             selected={props.selected.includes(token.id)}
                             tokenLists={props.tokenLists}
@@ -88,6 +86,6 @@ export const PlayerTokenList = (props: TokenListProps) => {
                     );
                 }
             })}
-        </>
+        </div>
     );
 };

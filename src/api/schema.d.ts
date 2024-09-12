@@ -756,6 +756,11 @@ export interface components {
        * @default false
        */
       death_saves?: boolean;
+      /**
+       * Gm Rolls Hidden
+       * @default false
+       */
+      gm_rolls_hidden?: boolean;
     };
     /** Skill */
     Skill: {

@@ -1,6 +1,6 @@
-import { components } from "../../../api/schema";
+import { components } from "../../../../api/schema";
 import { useState } from "react";
-import { DiceButtonWrapper } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { DiceButtonWrapper } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { capitalize, isString } from "lodash";
 
 type Action = components["schemas"]["ActionOut"];

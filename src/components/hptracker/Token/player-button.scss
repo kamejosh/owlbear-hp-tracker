@@ -1,0 +1,27 @@
+.player-button {
+    height: 20px;
+
+    &.active {
+        .player-default {
+            .player-icon {
+                fill: white;
+            }
+        }
+    }
+
+    .player-default {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-color: grey;
+        width: 35px;
+        height: 20px;
+        overflow: hidden;
+
+        .player-icon {
+            fill: grey;
+            width: 23px;
+            height: 23px;
+        }
+    }
+}

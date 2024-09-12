@@ -1,4 +1,4 @@
-import OBR, { Metadata } from "@owlbear-rodeo/sdk";
+import OBR, { Image, Metadata } from "@owlbear-rodeo/sdk";
 import { ID, itemMetadataKey, metadataKey, version } from "../helper/variables.ts";
 import { migrate102To103 } from "../migrations/v103.ts";
 import { migrate105To106 } from "../migrations/v106.ts";
@@ -29,6 +29,7 @@ import { attachmentFilter, getAttachedItems, getInitialValues } from "../helper/
 import { migrateTo160 } from "../migrations/v160.ts";
 import { migrateTo200 } from "../migrations/v200.ts";
 import { setupDddice } from "./dddice.ts";
+import { migrateTo300 } from "../migrations/v300.ts";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -57,14 +58,14 @@ const initItems = async () => {
             await saveOrChangeText(token, data, textAttachments, textChanges);
         }
         if (data.acOnMap) {
-            await saveOrChangeAC(token, data, acAttachments, acChanges, token.visible && data.canPlayersSee);
+            await saveOrChangeAC(token, data, acAttachments, acChanges, token.visible && !!data.playerMap?.ac);
         }
     }
 
     await updateAcChanges(acChanges);
     await updateBarChanges(barChanges);
     await updateTextChanges(textChanges);
-    console.info("HP Tracker - Token initialization done");
+    console.info("GM's Grimoire - Token initialization done");
 };
 
 const initRoom = async () => {
@@ -103,6 +104,7 @@ const initScene = async () => {
             id: uuidv4(),
             groups: ["Default"],
             openGroups: ["Default"],
+            collapsedStatblocks: [],
         };
 
         ownMetadata[metadataKey] = sceneData;
@@ -119,6 +121,12 @@ const initScene = async () => {
         if (sceneData.openGroups === undefined) {
             sceneData.openGroups = ["Default"];
         }
+        if (!sceneData.collapsedStatblocks) {
+            sceneData.collapsedStatblocks = [];
+        }
+        if (!!sceneData?.statblockPopoverOpen) {
+            sceneData.statblockPopoverOpen = false;
+        }
 
         ownMetadata[metadataKey] = sceneData;
     }
@@ -131,25 +139,15 @@ const setupContextMenu = async () => {
         icons: [
             {
                 icon: "/iconPopover.svg",
-                label: "HP Tracker",
+                label: "GM's Grimoire",
                 filter: {
-                    every: [{ key: ["metadata", `${itemMetadataKey}`, "hpTrackerActive"], value: true }],
+                    some: [{ key: ["metadata", `${itemMetadataKey}`, "hpTrackerActive"], value: true }],
                     roles: ["GM"],
                 },
             },
-        ],
-        embed: {
-            url: "/popover.html",
-            height: 100,
-        },
-    });
-
-    await OBR.contextMenu.create({
-        id: `${ID}/popoverPlayer`,
-        icons: [
             {
                 icon: "/iconPopover.svg",
-                label: "HP Tracker",
+                label: "GM's Grimoire",
                 filter: {
                     every: [{ key: ["metadata", `${itemMetadataKey}`, "hpTrackerActive"], value: true }],
                     some: [
@@ -166,7 +164,7 @@ const setupContextMenu = async () => {
         ],
         embed: {
             url: "/popover.html",
-            height: 90,
+            height: 100,
         },
     });
 
@@ -175,12 +173,9 @@ const setupContextMenu = async () => {
         icons: [
             {
                 icon: "/icon.svg",
-                label: "Activate HP Tracker",
+                label: "Add to Grimoire",
                 filter: {
-                    every: [
-                        { key: "type", value: "IMAGE", coordinator: "||" },
-                        { key: "type", value: "SHAPE" },
-                    ],
+                    every: [{ key: "type", value: "IMAGE" }],
                     some: [
                         { key: ["metadata", `${itemMetadataKey}`], value: undefined, coordinator: "||" },
                         {
@@ -193,7 +188,7 @@ const setupContextMenu = async () => {
             },
             {
                 icon: "/iconOff.svg",
-                label: "Deactivate HP Tracker",
+                label: "Remove from Grimoire",
                 filter: {
                     every: [{ key: ["metadata", `${itemMetadataKey}`, "hpTrackerActive"], value: true }],
                     roles: ["GM"],
@@ -203,7 +198,7 @@ const setupContextMenu = async () => {
         onClick: async (context) => {
             const tokenIds: Array<string> = [];
             const initTokens = async () => {
-                const itemStatblocks = await getInitialValues(context.items);
+                const itemStatblocks = await getInitialValues(context.items as Array<Image>);
                 await OBR.scene.items.updateItems(context.items, (items) => {
                     items.forEach((item) => {
                         tokenIds.push(item.id);
@@ -214,12 +209,10 @@ const setupContextMenu = async () => {
                         } else {
                             // variable allows us to be typesafe
                             const defaultMetadata: HpTrackerMetadata = {
-                                name: item.name,
                                 hp: 0,
                                 maxHp: 0,
                                 armorClass: 0,
                                 hpTrackerActive: true,
-                                canPlayersSee: false,
                                 hpOnMap: false,
                                 acOnMap: false,
                                 hpBar: false,
@@ -228,6 +221,10 @@ const setupContextMenu = async () => {
                                 stats: {
                                     initiativeBonus: 0,
                                     initial: true,
+                                },
+                                playerMap: {
+                                    hp: false,
+                                    ac: false,
                                 },
                             };
                             if (item.id in itemStatblocks) {
@@ -288,6 +285,9 @@ const migrations = async () => {
             if (compare(data.version, "2.0.0", "<")) {
                 await migrateTo200();
             }
+            if (compare(data.version, "3.0.0", "<")) {
+                await migrateTo300();
+            }
         }
     }
 };
@@ -296,17 +296,17 @@ const sceneReady = async () => {
     try {
         await migrations();
     } catch (e) {
-        console.warn("HP Tracker - Error while running migrations", e);
+        console.warn("GM's Grimoire - Error while running migrations", e);
     }
     try {
         await initItems();
     } catch (e) {
-        console.warn("HP Tracker - Error while initializing items", e);
+        console.warn("GM's Grimoire - Error while initializing items", e);
     }
     try {
         await initScene();
     } catch (e) {
-        console.warn("HP Tracker - Error while initializing Scene", e);
+        console.warn("GM's Grimoire - Error while initializing Scene", e);
     }
 };
 
@@ -325,19 +325,18 @@ const initTokens = async () => {
 };
 
 OBR.onReady(async () => {
-    console.info(`HP Tracker - version ${version} initializing`);
-
+    console.info(`GM's Grimoire - version ${version} initializing`);
     try {
         await setupContextMenu();
     } catch (e) {
-        console.warn("HP Tracker - error while setting up context menu");
+        console.warn("GM's Grimoire - error while setting up context menu");
     }
 
     if ((await OBR.player.getRole()) === "GM") {
         try {
             await initRoom();
         } catch (e) {
-            console.warn("HP Tracker - Error while initializing Room", e);
+            console.warn("GM's Grimoire - Error while initializing Room", e);
         }
 
         OBR.scene.onReadyChange(async (isReady) => {
@@ -354,17 +353,17 @@ OBR.onReady(async () => {
         try {
             await initTokens();
         } catch (e) {
-            console.warn("HP Tracker - error while initializing Token event handler", e);
+            console.warn("GM's Grimoire - error while initializing Token event handler", e);
         }
     }
     try {
         await setupDddice();
     } catch (e) {
         await OBR.notification.show(
-            "HP Tracker dice roller initialization error. Check browser logs for more info.",
+            "GM's Grimoire dice roller initialization error. Check browser logs for more info.",
             "ERROR"
         );
-        console.warn("HP Tracker - error while intializing dddice", e);
+        console.warn("GM's Grimoire - error while intializing dddice", e);
     }
-    console.info(`HP Tracker - initialization done`);
+    console.info(`GM's Grimoire - initialization done`);
 });

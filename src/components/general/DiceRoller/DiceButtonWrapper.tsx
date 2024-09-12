@@ -1,12 +1,13 @@
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
-import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
-import tippy, { Instance } from "tippy.js";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { parseRollEquation } from "dddice-js";
 import { getDiceImage, getSvgForDiceType } from "../../../helper/previewHelpers.tsx";
+import { D20 } from "../../svgs/dice/D20.tsx";
+import Tippy from "@tippyjs/react";
+import { usePlayerContext } from "../../../context/PlayerContext.ts";
 
 type DiceButtonProps = {
     dice: string;
@@ -22,39 +23,9 @@ export const DiceButton = (props: DiceButtonProps) => {
     const addRoll = useRollLogContext((state) => state.addRoll);
     const [rollerApi, initialized, theme] = useDiceRoller((state) => [state.rollerApi, state.initialized, state.theme]);
     const [context, setContext] = useState<boolean>(false);
-    const [tooltip, setTooltip] = useState<Instance>();
     const rollButton = useRef<HTMLButtonElement>(null);
-    const buttonWrapper = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        if (buttonWrapper.current) {
-            if (!tooltip) {
-                if (!initialized && !room?.disableDiceRoller) {
-                    setTooltip(
-                        tippy(buttonWrapper.current, {
-                            content: "Dice Roller is not initialized",
-                        })
-                    );
-                } else if (props.limitReached) {
-                    setTooltip(
-                        tippy(buttonWrapper.current, {
-                            content: "You have reached your limits for this ability",
-                        })
-                    );
-                }
-            } else {
-                if (!initialized && !room?.disableDiceRoller) {
-                    tooltip.enable();
-                    tooltip.setContent("Dice Roller is not initialized");
-                } else if (props.limitReached) {
-                    tooltip.enable();
-                    tooltip.setContent("You have reached your limits for this ability");
-                } else {
-                    tooltip.disable();
-                }
-            }
-        }
-    }, [initialized, room?.disableDiceRoller, props.limitReached]);
+    const playerContext = usePlayerContext();
+    const defaultHidden = playerContext.role === "GM" && !!taSettings.gm_rolls_hidden;
 
     const addModifier = (originalDie: string, baseDie: string) => {
         if (originalDie.includes("+")) {
@@ -157,16 +128,16 @@ export const DiceButton = (props: DiceButtonProps) => {
                 } else {
                     if (theme) {
                         const image = getDiceImage(theme, die, 0);
-                        return image ?? <DiceSvg />;
+                        return image ?? <D20 />;
                     } else {
-                        return <DiceSvg />;
+                        return <D20 />;
                     }
                 }
             } else {
-                return <DiceSvg />;
+                return <D20 />;
             }
         } catch {
-            return <DiceSvg />;
+            return <D20 />;
         }
     };
 
@@ -175,84 +146,94 @@ export const DiceButton = (props: DiceButtonProps) => {
     }, [initialized, room?.disableDiceRoller]);
 
     return (
-        <div
-            className={`button-wrapper ${isEnabled() ? "enabled" : "disabled"} ${
-                room?.disableDiceRoller ? "calculated" : "three-d-dice"
-            }`}
-            onMouseEnter={() => {
-                setContext(true);
-            }}
-            onMouseLeave={() => setContext(false)}
-            ref={buttonWrapper}
+        <Tippy
+            content={
+                !initialized && !room?.disableDiceRoller
+                    ? "Dice Roller is not initialized"
+                    : props.limitReached
+                    ? "You have reached your limits for this ability"
+                    : ""
+            }
+            disabled={!(!initialized && !room?.disableDiceRoller) && !props.limitReached}
         >
-            <button
-                ref={rollButton}
-                disabled={!isEnabled()}
-                className={`dice-button button ${props.limitReached ? "limit" : ""}`}
-                onClick={async () => {
-                    await roll();
-                }}
-            >
-                <div className={"dice-preview"}>{getDicePreview()}</div>
-                {props.text.replace(/\s/g, "").replace("&nbsp", " ")}
-            </button>
             <div
-                className={`dice-context-button ${context && isEnabled() ? "visible" : ""} ${
-                    props.dice.startsWith("1d20") ||
-                    props.dice.startsWith("d20") ||
-                    props.dice.startsWith("+") ||
-                    props.dice.startsWith("-")
-                        ? "full"
-                        : "reduced"
+                className={`button-wrapper ${isEnabled() ? "enabled" : "disabled"} ${
+                    room?.disableDiceRoller ? "calculated" : "three-d-dice"
                 }`}
+                onMouseEnter={() => {
+                    setContext(true);
+                }}
+                onMouseLeave={() => setContext(false)}
             >
-                {props.dice.startsWith("1d20") ||
-                props.dice.startsWith("d20") ||
-                props.dice.startsWith("+") ||
-                props.dice.startsWith("-") ? (
-                    <>
-                        <button
-                            className={"advantage"}
-                            disabled={!isEnabled()}
-                            onClick={async () => {
-                                await roll("ADV");
-                            }}
-                        >
-                            ADV
-                        </button>
-                        <button
-                            className={"disadvantage"}
-                            disabled={!isEnabled()}
-                            onClick={async () => {
-                                await roll("DIS");
-                            }}
-                        >
-                            DIS
-                        </button>
-                    </>
-                ) : null}
-                {props.damageDie && taSettings.crit_rules !== "none" ? (
-                    <button
-                        className={"crit"}
-                        disabled={!isEnabled()}
-                        onClick={async () => {
-                            await roll("CRIT");
-                        }}
-                    >
-                        CRIT
-                    </button>
-                ) : null}
                 <button
-                    className={"self"}
+                    ref={rollButton}
                     disabled={!isEnabled()}
+                    className={`dice-button button ${props.limitReached ? "limit" : ""}`}
                     onClick={async () => {
-                        await roll("SELF");
+                        await roll(defaultHidden ? "SELF" : undefined);
                     }}
                 >
-                    HIDE
+                    <div className={"dice-preview"}>{getDicePreview()}</div>
+                    {props.text.replace(/\s/g, "").replace("&nbsp", " ")}
                 </button>
+                <div
+                    className={`dice-context-button ${context && isEnabled() ? "visible" : ""} ${
+                        props.dice.startsWith("1d20") ||
+                        props.dice.startsWith("d20") ||
+                        props.dice.startsWith("+") ||
+                        props.dice.startsWith("-")
+                            ? "full"
+                            : "reduced"
+                    }`}
+                >
+                    {props.dice.startsWith("1d20") ||
+                    props.dice.startsWith("d20") ||
+                    props.dice.startsWith("+") ||
+                    props.dice.startsWith("-") ? (
+                        <>
+                            <button
+                                className={"advantage"}
+                                disabled={!isEnabled()}
+                                onClick={async () => {
+                                    await roll("ADV");
+                                }}
+                            >
+                                ADV
+                            </button>
+                            <button
+                                className={"disadvantage"}
+                                disabled={!isEnabled()}
+                                onClick={async () => {
+                                    await roll("DIS");
+                                }}
+                            >
+                                DIS
+                            </button>
+                        </>
+                    ) : null}
+                    {props.damageDie && taSettings.crit_rules !== "none" ? (
+                        <button
+                            className={"crit"}
+                            disabled={!isEnabled()}
+                            onClick={async () => {
+                                await roll("CRIT");
+                            }}
+                        >
+                            CRIT
+                        </button>
+                    ) : null}
+                    <button
+                        className={"self"}
+                        disabled={!isEnabled()}
+                        onClick={async () => {
+                            await roll(defaultHidden ? undefined : "SELF");
+                        }}
+                    >
+                        {defaultHidden ? "SHOW" : "HIDE"}
+                    </button>
+                </div>
             </div>
-        </div>
+        </Tippy>
     );
 };
 

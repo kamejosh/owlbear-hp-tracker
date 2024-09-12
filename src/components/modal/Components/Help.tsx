@@ -17,7 +17,7 @@ export const Help = () => {
             <button className={"close-button"} onClick={async () => await OBR.modal.close(modalId)}>
                 X
             </button>
-            <div className={"patreon"}>
+            <div className={"patreon"} style={{fontSize: "0.8rem"}}>
                 Consider supporting me on{" "}
                 <a href={"https://www.patreon.com/TTRPGAPI"} target={"_blank"}>
                     Patreon

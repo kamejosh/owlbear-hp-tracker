@@ -15,6 +15,15 @@
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
+
+    @-moz-document url-prefix() {
+        scrollbar-color: rgba(255, 255, 255, 0.5) rgba(55, 55, 55, 0.1);
+        scrollbar-width: thin;
+    }
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 body {
@@ -22,6 +31,7 @@ body {
     position: relative;
     margin: 0;
     background: transparent;
+
     user-select: none;
 
     &::-webkit-scrollbar {

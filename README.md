@@ -1,8 +1,8 @@
-# HP Tracker - Owlbear Plugin
+# Game Master's Grimoire - Owlbear Plugin
 
 This Repository contains an Extension for Owlbear Rodeo 2.0. This extension allows for tracking HP of characters and handling who can view this information.
 
-![hp-tracker example](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/HP_Tracker.png)
+![hp-tracker example](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/GameMastersGrimoire.png)
 
 ## Installing
 

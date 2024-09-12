@@ -3,6 +3,10 @@ body:has(.statblock-app) {
 }
 
 .statblock-app {
+    &:not(:has(.minimized)) {
+        margin-bottom: 40px;
+    }
+
     .statblock-popover {
         position: relative;
 
@@ -25,14 +29,18 @@ body:has(.statblock-app) {
         }
 
         .help-buttons {
+            position: fixed;
+            top: 1rem;
             z-index: 200;
+            margin-top: 0;
         }
 
         .statblock-list {
             position: sticky;
             top: calc(30px + 1rem);
+            z-index: 3;
             margin-top: calc(10px + 1rem);
-            background: linear-gradient(to top, #ffffff00, var(--bg-color) 20px);
+            background-color: var(--bg-color);
             padding: 0 0 20px;
             overflow: hidden;
             list-style: none;
@@ -54,6 +62,9 @@ body:has(.statblock-app) {
             }
 
             .statblock-name {
+                display: flex;
+                justify-content: space-between;
+                gap: 0.5ch;
                 transition: all 0.25s ease-in-out;
                 cursor: pointer;
                 border-top-right-radius: 5px;
@@ -81,9 +92,6 @@ body:has(.statblock-app) {
                 }
 
                 &.active {
-                    display: flex;
-                    justify-content: space-between;
-                    gap: 1ch;
                     border: 1px solid white;
                     border-bottom: none;
                     color: white;
@@ -94,10 +102,40 @@ body:has(.statblock-app) {
                     }
                 }
 
+                &.collapsed {
+                    transition: all 0.25s ease;
+                    border-top: 1px solid white;
+                    border-right: 1px solid white;
+                    border-bottom: none;
+                    border-left: 1px solid white;
+                    width: 0;
+                    height: 23px;
+
+                    &:hover,
+                    &:focus-visible {
+                        width: 100px;
+
+                        .name,
+                        .hp {
+                            display: initial;
+                        }
+                    }
+
+                    .name,
+                    .hp {
+                        display: none;
+                    }
+                }
+
                 .name {
                     overflow: hidden;
                     text-overflow: ellipsis;
                     white-space: nowrap;
+                }
+
+                .hp {
+                    font-size: 0.5rem;
+                    text-align: right;
                 }
 
                 .pin {
@@ -121,6 +159,10 @@ body:has(.statblock-app) {
                     }
                 }
             }
+        }
+
+        .spell-slots {
+            top: calc(32px + var(--sticky-height));
         }
     }
 }

@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { DiceButton, DiceButtonWrapper } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
-import { getDamage } from "../../../helper/helpers.ts";
-import { PfSpell, usePfGetSpell } from "../../../api/pf/usePfApi.ts";
-import { components } from "../../../api/schema";
-import { SpellFilter } from "./SpellFilter.tsx";
+import { DiceButton, DiceButtonWrapper } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { getDamage } from "../../../../helper/helpers.ts";
+import { PfSpell, usePfGetSpell } from "../../../../api/pf/usePfApi.ts";
+import { components } from "../../../../api/schema";
+import { SpellFilter } from "../SpellFilter.tsx";
 import { capitalize } from "lodash";
-import { useMetadataContext } from "../../../context/MetadataContext.ts";
+import { useMetadataContext } from "../../../../context/MetadataContext.ts";
 
 export type PfSpellCategory = components["schemas"]["SpellCategoryOut"];
 export type PfSpellList = components["schemas"]["SpelllistOut"];

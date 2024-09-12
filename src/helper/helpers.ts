@@ -17,7 +17,7 @@ import diff_match_patch from "./diff/diff_match_patch.ts";
 import { E5Statblock } from "../api/e5/useE5Api.ts";
 import { PfStatblock } from "../api/pf/usePfApi.ts";
 import axiosRetry from "axios-retry";
-import { Ability } from "../components/hptracker/charactersheet/E5Ability.tsx";
+import { Ability } from "../components/hptracker/charactersheet/e5/E5Ability.tsx";
 
 export const getYOffset = async (height: number) => {
     const metadata = (await OBR.room.getMetadata()) as Metadata;
@@ -340,7 +340,16 @@ export const updateTokenSheet = (statblock: E5Statblock | PfStatblock, character
     });
 };
 
-export const getInitialValues = async (items: Array<Item>) => {
+export const getSearchString = (name: string): string => {
+    const nameParts = name.split(" ");
+    const lastToken = nameParts[nameParts.length - 1];
+    if (lastToken.length < 3 || /^\d+$/.test(lastToken) || /\d/.test(lastToken)) {
+        return nameParts.slice(0, nameParts.length - 1).join(" ");
+    }
+    return name;
+};
+
+export const getInitialValues = async (items: Array<Image>) => {
     const roomData = await OBR.room.getMetadata();
     let ruleset = "e5";
     let apiKey = undefined;
@@ -360,6 +369,7 @@ export const getInitialValues = async (items: Array<Item>) => {
 
     for (const item of items) {
         try {
+            const name = getSearchString(getTokenName(item));
             if (!(itemMetadataKey in item.metadata)) {
                 if (ruleset === "e5") {
                     const statblocks = await axios.request({
@@ -367,7 +377,7 @@ export const getInitialValues = async (items: Array<Item>) => {
                         method: "GET",
                         headers: headers,
                         params: {
-                            name: item.name,
+                            name: name,
                             take: 20,
                             skip: 0,
                         },
@@ -375,7 +385,7 @@ export const getInitialValues = async (items: Array<Item>) => {
                     let bestMatch: { distance: number; statblock: InitialStatblockData } | undefined = undefined;
                     const diff = new diff_match_patch();
                     statblocks.data.forEach((statblock: E5Statblock) => {
-                        const d = diff.diff_main(statblock.name, item.name);
+                        const d = diff.diff_main(statblock.name, name);
                         const dist = diff.diff_levenshtein(d);
                         if (
                             bestMatch === undefined ||
@@ -405,7 +415,7 @@ export const getInitialValues = async (items: Array<Item>) => {
                         method: "GET",
                         headers: headers,
                         params: {
-                            name: item.name,
+                            name: name,
                             take: 10,
                             skip: 0,
                         },
@@ -413,7 +423,7 @@ export const getInitialValues = async (items: Array<Item>) => {
                     let bestMatch: { distance: number; statblock: InitialStatblockData } | undefined = undefined;
                     const diff = new diff_match_patch();
                     statblocks.data.forEach((statblock: PfStatblock) => {
-                        const d = diff.diff_main(statblock.name, item.name);
+                        const d = diff.diff_main(statblock.name, name);
                         const dist = diff.diff_levenshtein(d);
                         if (bestMatch === undefined || dist < bestMatch.distance) {
                             bestMatch = {
@@ -466,5 +476,17 @@ export const updateLimit = async (itemId: string, limitValues: Limit) => {
                 }
             });
         });
+    }
+};
+
+export const getTokenName = (token: Image) => {
+    try {
+        if (token.text && token.text.plainText && token.text.plainText.replaceAll(" ", "").length > 0) {
+            return token.text.plainText;
+        } else {
+            return token.name;
+        }
+    } catch {
+        return "";
     }
 };

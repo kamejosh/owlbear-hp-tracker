@@ -6,12 +6,11 @@ export type Limit = {
 };
 
 export type HpTrackerMetadata = {
-    name: string;
     hp: number;
     maxHp: number;
     armorClass: number;
     hpTrackerActive: boolean;
-    canPlayersSee: boolean;
+    canPlayersSee?: boolean;
     hpOnMap: boolean;
     acOnMap: boolean;
     hpBar: boolean;
@@ -23,9 +22,14 @@ export type HpTrackerMetadata = {
         initial?: boolean;
         limits?: Array<Limit>;
     };
+    playerMap?: {
+        hp: boolean;
+        ac: boolean;
+    };
     ruleset?: Ruleset;
     index?: number;
     group?: string;
+    playerList?: boolean;
 };
 
 /**
@@ -53,6 +57,8 @@ export type SceneMetadata = {
     id?: string;
     groups?: Array<string>;
     openGroups?: Array<string>;
+    collapsedStatblocks?: Array<string>;
+    statblockPopoverOpen?: boolean;
 };
 
 export type DiceUser = {
@@ -78,6 +84,7 @@ export type RoomMetadata = {
     diceUser?: Array<DiceUser>;
     disableDiceRoller?: boolean;
     tabletopAlmanacAPIKey?: string;
+    disableHpBar?: boolean;
 };
 
 export type AttachmentMetadata = {

@@ -14,7 +14,7 @@ export type MetadataContextType = {
 export const useMetadataContext = create<MetadataContextType>()((set) => ({
     scene: null,
     room: null,
-    taSettings: { crit_rules: "double_role", death_saves: false },
+    taSettings: { crit_rules: "double_role", death_saves: false, gm_rolls_hidden: false },
     setSceneMetadata: (data) =>
         set((state) => {
             return { scene: { ...state.scene, ...data } };
@@ -25,6 +25,6 @@ export const useMetadataContext = create<MetadataContextType>()((set) => ({
         }),
     setTaSettings: (settings) =>
         set(() => {
-            return { taSettings: settings };
+            return { taSettings: { ...settings } };
         }),
 }));

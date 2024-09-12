@@ -34,6 +34,7 @@ export const useGetSettings = (apiKey?: string) => {
         refetchOnReconnect: false,
         refetchOnWindowFocus: false,
         refetchOnMount: false,
+        retry: 1,
         enabled: !!apiKey,
     });
 };

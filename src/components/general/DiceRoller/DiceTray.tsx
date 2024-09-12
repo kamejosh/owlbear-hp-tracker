@@ -8,7 +8,6 @@ import {
     dddiceApiLogin,
     getDiceUser,
     updateRoomMetadataDiceUser,
-    validateTheme,
 } from "../../../helper/diceHelper.ts";
 import { IRoom, ITheme, IUser, ThreeDDiceAPI } from "dddice-js";
 import { DiceUser } from "../../../helper/types.ts";
@@ -66,7 +65,7 @@ export const DiceTray = (props: DiceTrayProps) => {
                 diceThemeQuery.fetchNextPage();
             } else if (!diceThemeQuery.hasNextPage && diceThemeQuery.isSuccess) {
                 const diceThemes: Array<ITheme> = diceThemeQuery.isSuccess
-                    ? diceThemeQuery.data.pages.flatMap((theme) => theme.data).filter((t: ITheme) => validateTheme(t))
+                    ? diceThemeQuery.data.pages.flatMap((theme) => theme.data)
                     : [];
                 setThemes(diceThemes);
             }

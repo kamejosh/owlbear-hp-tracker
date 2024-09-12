@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
-import OBR, { Item } from "@owlbear-rodeo/sdk";
+import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
 import { changelogModal, itemMetadataKey, version } from "../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../helper/types.ts";
 import { DragDropContext, DraggableLocation, DropResult } from "react-beautiful-dnd";
@@ -16,39 +16,45 @@ import { Helpbuttons } from "../general/Helpbuttons/Helpbuttons.tsx";
 import { DiceTray } from "../general/DiceRoller/DiceTray.tsx";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { uniq } from "lodash";
+import { TokenContextWrapper } from "../TokenContextWrapper.tsx";
+import { useTokenListContext } from "../../context/TokenContext.tsx";
+import { PlayerSvg } from "../svgs/PlayerSvg.tsx";
+import { InitiativeSvg } from "../svgs/InitiativeSvg.tsx";
+import { ArrowSvg } from "../svgs/ArrowSvg.tsx";
+import { useUISettingsContext } from "../../context/UISettingsContext.ts";
+import Tippy from "@tippyjs/react";
+import { BattleRounds } from "./Token/BattleRounds.tsx";
 
-export const HPTracker = () => {
+export const GMGrimoire = () => {
     return (
         <ContextWrapper component={"action_window"}>
-            <Content />
-            <DiceTray classes={"hp-tracker-dice-tray"} />
+            <TokenContextWrapper>
+                <Content />
+                <DiceTray classes={"hp-tracker-dice-tray"} />
+            </TokenContextWrapper>
         </ContextWrapper>
     );
 };
 
 const Content = () => {
     const playerContext = usePlayerContext();
-    const [tokens, setTokens] = useState<Item[] | undefined>(undefined);
-    const [playerTokens, setPlayerTokens] = useState<Array<Item>>([]);
+    const tokens = useTokenListContext((state) => state.tokens);
+    const items = tokens ? [...tokens].map((t) => t[1].item) : [];
     const [selectedTokens, setSelectedTokens] = useState<Array<string>>([]);
-    const [tokenLists, setTokenLists] = useState<Map<string, Array<Item>>>(new Map());
     const [ignoredChanges, setIgnoredChanges] = useState<boolean>(false);
     const [scene, room] = useMetadataContext((state) => [state.scene, state.room]);
     const [reverseInitiativeOrder, setReverseInitiativeOrder] = useState<boolean>(false);
     const { isReady } = SceneReadyContext();
     const characterId = useCharSheet((state) => state.characterId);
+    const [playerPreview, setPlayerPreview] = useUISettingsContext((state) => [
+        state.playerPreview,
+        state.setPlayerPreview,
+    ]);
 
-    const initHpTracker = async () => {
-        const initialItems = await OBR.scene.items.getItems(
-            (item) =>
-                itemMetadataKey in item.metadata &&
-                (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpTrackerActive
-        );
-        setTokens(initialItems);
-
+    const initGrimoire = async () => {
         if (
             playerContext.role === "GM" &&
-            !room?.ignoreUpdateNotification &&
+            (!room?.ignoreUpdateNotification || compare(version, "3.0.0", "=")) &&
             scene?.version &&
             compare(scene.version, version, "<")
         ) {
@@ -61,36 +67,40 @@ const Content = () => {
             });
         } else if (playerContext.role === "GM" && scene?.version && compare(scene.version, version, "<")) {
             setIgnoredChanges(true);
-            await OBR.notification.show(`HP Tracker has been updated to version ${version}`, "SUCCESS");
+            await OBR.notification.show(`GM's Grimoire has been updated to version ${version}`, "SUCCESS");
         }
     };
 
     useEffect(() => {
         if (isReady) {
-            initHpTracker();
-
-            return OBR.scene.items.onChange(async (items) => {
-                const filteredItems = items.filter(
-                    (item) =>
-                        itemMetadataKey in item.metadata &&
-                        (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpTrackerActive
-                );
-                setTokens(Array.from(filteredItems));
-            });
+            initGrimoire();
         }
     }, [isReady]);
 
     useEffect(() => {
-        OBR.player.onChange((player) => {
+        return OBR.player.onChange((player) => {
             setSelectedTokens(player.selection ?? []);
         });
     }, []);
 
-    useEffect(() => {
-        const tokenMap = new Map<string, Array<Item>>();
+    const reorderMetadataIndex = (list: Array<Image>, group?: string) => {
+        OBR.scene.items.updateItems(list, (items) => {
+            items.forEach((item, index) => {
+                const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+                data.index = index;
+                if (group) {
+                    data.group = group;
+                }
+                item.metadata[itemMetadataKey] = { ...data };
+            });
+        });
+    };
+
+    const tokenLists = useCallback(() => {
+        const tokenMap = new Map<string, Array<Image>>();
 
         scene?.groups?.forEach((group) => {
-            const groupItems = tokens?.filter((item) => {
+            const groupItems = items?.filter((item) => {
                 const metadata = item.metadata[itemMetadataKey] as HpTrackerMetadata;
                 return (
                     (!metadata.group && group === "Default") ||
@@ -106,18 +116,10 @@ const Content = () => {
                 tokenMap.set(group, groupItems ?? []);
             }
         });
+        return tokenMap;
+    }, [scene?.groups, items])();
 
-        setTokenLists(tokenMap);
-    }, [scene?.groups, tokens]);
-
-    useEffect(() => {
-        if (room?.playerSort && tokens) {
-            const localTokens = [...tokens];
-            setPlayerTokens(localTokens.sort(sortItemsInitiative));
-        } else {
-            setPlayerTokens(tokens ?? []);
-        }
-    }, [room?.playerSort, tokens]);
+    const playerTokens = room?.playerSort && items ? items.sort(sortItemsInitiative) : (items ?? []);
 
     const reorderMetadataIndexMulti = (destList: Array<Item>, group: string, sourceList: Array<Item>) => {
         const combinedList = destList.concat(sourceList);
@@ -140,44 +142,31 @@ const Content = () => {
         });
     };
 
-    const reorderMetadataIndex = (list: Array<Item>, group?: string) => {
-        OBR.scene.items.updateItems(list, (items) => {
-            items.forEach((item, index) => {
-                const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
-                data.index = index;
-                if (group) {
-                    data.group = group;
-                }
-                item.metadata[itemMetadataKey] = { ...data };
-            });
-        });
-    };
-
     const reorder = (
-        list: Item[],
+        list: Array<Image>,
         startIndex: number,
         endIndex: number,
         dragItem: DropResult,
-        multiMove: boolean = false
+        multiMove: boolean = false,
     ) => {
         const result = Array.from(list);
         result.sort(sortItems);
         const [removed] = result.splice(startIndex, 1);
-        const multiRemove: Array<Item> = [removed];
+        const multiRemove: Array<Image> = [removed];
 
         if (multiMove) {
             const alsoSelected = result.filter(
-                (item) => selectedTokens.includes(item.id) && item.id != dragItem.draggableId
+                (item) => selectedTokens.includes(item.id) && item.id != dragItem.draggableId,
             );
 
-            let localRemove: Array<Item> = [];
+            let localRemove: Array<Image> = [];
 
             alsoSelected.forEach((item) => {
                 localRemove = localRemove.concat(
                     result.splice(
                         result.findIndex((sourceItem) => sourceItem.id === item.id),
-                        1
-                    )
+                        1,
+                    ),
                 );
             });
 
@@ -199,7 +188,7 @@ const Content = () => {
         droppableSource: DraggableLocation,
         droppableDestination: DraggableLocation,
         result: DropResult,
-        multiMove: boolean = false
+        multiMove: boolean = false,
     ) => {
         const sourceClone = Array.from(source);
         const destClone = Array.from(destination);
@@ -208,7 +197,7 @@ const Content = () => {
 
         if (multiMove) {
             const alsoSelected = source.filter(
-                (item) => selectedTokens.includes(item.id) && item.id != result.draggableId
+                (item) => selectedTokens.includes(item.id) && item.id != result.draggableId,
             );
 
             let localRemove: Array<Item> = [];
@@ -217,8 +206,8 @@ const Content = () => {
                 localRemove = localRemove.concat(
                     sourceClone.splice(
                         sourceClone.findIndex((sourceItem) => sourceItem.id === item.id),
-                        1
-                    )
+                        1,
+                    ),
                 );
             });
 
@@ -246,7 +235,7 @@ const Content = () => {
                 result.source,
                 result.destination,
                 result,
-                selectedTokens.includes(result.draggableId)
+                selectedTokens.includes(result.draggableId),
             );
             return;
         }
@@ -260,7 +249,7 @@ const Content = () => {
             result.source.index,
             result.destination.index,
             result,
-            selectedTokens.includes(result.draggableId)
+            selectedTokens.includes(result.draggableId),
         );
     };
 
@@ -290,61 +279,80 @@ const Content = () => {
         characterId ? (
             <CharacterSheet itemId={characterId} />
         ) : (
-            <div className={"hp-tracker"}>
+            <div className={`gm-grimoire ${playerContext.role === "PLAYER" ? "player" : ""}`}>
                 <Helpbuttons ignoredChanges={ignoredChanges} setIgnoredChange={setIgnoredChanges} />
-                <h1 className={"title"}>
-                    HP Tracker<span className={"small"}>{version}</span>
-                </h1>
-                <div className={`player-wrapper headings ${playerContext.role === "PLAYER" ? "player" : ""}`}>
-                    <span>Name</span>
-                    {playerContext.role === "GM" ? <span>Settings</span> : null}
-                    <span className={"current-hp"}>HP / MAX</span>
-                    <span className={"temp-hp"}>TMP</span>
-                    <span className={"armor-class"}>AC</span>
-                    <span className={"initiative-wrapper"}>
-                        INIT
-                        {playerContext.role === "GM" ? (
-                            <button
-                                className={`sort-button ${reverseInitiativeOrder ? "reverse" : ""}`}
-                                title={"Order By Initiative"}
-                                onClick={() => {
-                                    orderByInitiative(reverseInitiativeOrder);
-                                    setReverseInitiativeOrder(!reverseInitiativeOrder);
-                                }}
-                            >
-                                ↓
-                            </button>
-                        ) : null}
-                    </span>
-                    <span className={"statblock-heading"}>INFO</span>
-                </div>
+                {playerContext.role === "PLAYER" ? (
+                    <h1 className={"title"}>
+                        GM's Grimoire <span className={"small"}>{version}</span>
+                    </h1>
+                ) : null}
                 {playerContext.role === "GM" ? (
-                    <DragDropContext onDragEnd={onDragEnd}>
-                        {scene && scene.groups && scene.groups?.length > 0 ? (
-                            scene.groups?.map((group) => {
-                                const list = tokenLists.get(group) || [];
-                                return (
+                    <div className={`headings`}>
+                        <>
+                            <Tippy content={"Toggle Player Preview Mode"}>
+                                <button
+                                    className={`toggle-preview ${playerPreview ? "active" : ""}`}
+                                    onClick={() => {
+                                        setPlayerPreview(!playerPreview);
+                                    }}
+                                >
+                                    <PlayerSvg />
+                                </button>
+                            </Tippy>
+                            <span className={"initiative-order"}>
+                                <InitiativeSvg />
+                                <Tippy content={"Sort tokens by initiative"}>
+                                    <button
+                                        className={`sort-button button ${reverseInitiativeOrder ? "reverse" : ""}`}
+                                        title={"Order By Initiative"}
+                                        onClick={() => {
+                                            orderByInitiative(reverseInitiativeOrder);
+                                            setReverseInitiativeOrder(!reverseInitiativeOrder);
+                                        }}
+                                    >
+                                        <ArrowSvg />
+                                    </button>
+                                </Tippy>
+                            </span>
+                            <BattleRounds />
+                        </>
+                    </div>
+                ) : null}
+                <div className={"grimoire-content"}>
+                    {playerContext.role === "GM" ? (
+                        <>
+                            <div className={"gmg-name"}>
+                                <span>Game Master's Grimoire </span>
+                                <span className={"small"}>{version}</span>
+                            </div>
+                            <DragDropContext onDragEnd={onDragEnd}>
+                                {scene && scene.groups && scene.groups?.length > 0 ? (
+                                    scene.groups?.map((group) => {
+                                        const list = tokenLists.get(group) || [];
+                                        return (
+                                            <DropGroup
+                                                key={group}
+                                                title={group}
+                                                list={list.sort(sortItems)}
+                                                selected={selectedTokens}
+                                                tokenLists={tokenLists}
+                                            />
+                                        );
+                                    })
+                                ) : (
                                     <DropGroup
-                                        key={group}
-                                        title={group}
-                                        list={list.sort(sortItems)}
+                                        title={"Default"}
+                                        list={Array.from(items ?? []).sort(sortItems)}
                                         selected={selectedTokens}
                                         tokenLists={tokenLists}
                                     />
-                                );
-                            })
-                        ) : (
-                            <DropGroup
-                                title={"Default"}
-                                list={Array.from(tokens ?? []).sort(sortItems)}
-                                selected={selectedTokens}
-                                tokenLists={tokenLists}
-                            />
-                        )}
-                    </DragDropContext>
-                ) : (
-                    <PlayerTokenList tokens={playerTokens} selected={selectedTokens} tokenLists={tokenLists} />
-                )}
+                                )}
+                            </DragDropContext>
+                        </>
+                    ) : (
+                        <PlayerTokenList tokens={playerTokens} selected={selectedTokens} tokenLists={tokenLists} />
+                    )}
+                </div>
             </div>
         )
     ) : (

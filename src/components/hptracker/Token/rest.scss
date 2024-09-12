@@ -1,0 +1,26 @@
+.token-rest {
+    display: grid;
+    grid-template-areas: "icon short" ". long";
+    column-gap: 0.5ch;
+    row-gap: 0.2ch;
+    grid-area: rest;
+
+    .rest-icon {
+        grid-area: icon;
+        opacity: 0.8;
+        width: 20px;
+        height: 20px;
+    }
+
+    .button {
+        height: 20px;
+
+        &.short {
+            grid-area: short;
+        }
+
+        &.long {
+            grid-area: long;
+        }
+    }
+}

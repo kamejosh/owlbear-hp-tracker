@@ -32,6 +32,7 @@ export const createBar = async (percentage: number, tempHpPercentage: number, to
         .attachedTo(token.id)
         .layer("ATTACHMENT")
         .locked(true)
+        .disableHit(true)
         .disableAttachmentBehavior(["ROTATION"])
         .visible(token.visible)
         .build();
@@ -48,6 +49,7 @@ export const createBar = async (percentage: number, tempHpPercentage: number, to
         .attachedTo(token.id)
         .layer("ATTACHMENT")
         .locked(true)
+        .disableHit(true)
         .name("hp")
         .disableAttachmentBehavior(["ROTATION"])
         .visible(token.visible)
@@ -65,6 +67,7 @@ export const createBar = async (percentage: number, tempHpPercentage: number, to
         .attachedTo(token.id)
         .layer("ATTACHMENT")
         .locked(true)
+        .disableHit(true)
         .name("temp-hp")
         .disableAttachmentBehavior(["ROTATION"])
         .visible(token.visible)
@@ -88,18 +91,20 @@ const createText = async (text: string, token: Image) => {
     const textItem = buildText()
         .textType("PLAIN")
         .width(width)
-        .height(height * 0.8) // because of text lines leaving space below we have to move it to the middle manually
-        .position({ ...position, y: position.y + height * 0.2 })
+        .height(height)
+        .position({ ...position, y: position.y + height * 0.1 }) // remove the height * 0.1 modifier once the new rendering engine is released
         .attachedTo(token.id)
         .plainText(text)
         .locked(true)
         .textAlign("CENTER")
-        .textAlignVertical("MIDDLE")
+        .textAlignVertical("BOTTOM")
         .fontWeight(600)
         .fillColor("white")
         .strokeColor("black")
         .strokeWidth(height / 30)
-        .fontSize(height * 0.8)
+        .fontSize(height)
+        .lineHeight(1)
+        .disableHit(true)
         .disableAttachmentBehavior(["ROTATION", "VISIBLE"])
         .visible(token.visible)
         .name("hp-text")
@@ -131,7 +136,7 @@ const handleHpOffsetUpdate = async (offset: number, hp: Item) => {
             } else if (hp.name === "hp-text") {
                 change.position = {
                     x: x + 2,
-                    y: bounds.position.y + bounds.height - height + offset + height * 0.2,
+                    y: bounds.position.y + bounds.height - height + offset + height * 0.1,
                 };
             } else {
                 change.position = {
@@ -296,8 +301,8 @@ export const saveOrChangeText = async (
             if ((a as Text).text.plainText !== hpText) {
                 change.text = hpText;
             }
-            if (a.visible !== (character.visible && data.canPlayersSee)) {
-                change.visible = character.visible && data.canPlayersSee;
+            if (a.visible !== (character.visible && !!data.playerMap?.hp)) {
+                change.visible = character.visible && !!data.playerMap?.hp;
             }
             if (!!change.text || change.visible !== undefined) {
                 textChanges.set(a.id, change);
@@ -305,7 +310,7 @@ export const saveOrChangeText = async (
         }
     } else {
         const text = await createText(hpText, character as Image);
-        text.visible = character.visible && data.canPlayersSee;
+        text.visible = character.visible && !!data.playerMap?.hp;
         await OBR.scene.items.addItems([text]);
     }
 };

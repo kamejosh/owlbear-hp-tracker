@@ -1,0 +1,159 @@
+@use "../utilities/breakpoint";
+
+.gm-grimoire {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 36px;
+
+    &.player {
+        .help-buttons {
+            margin-top: 0;
+        }
+    }
+
+    .title {
+        display: none;
+        position: absolute;
+        top: 1rem;
+        margin: 0;
+
+        @include breakpoint.laptop {
+            display: initial;
+        }
+
+        .small {
+            font-size: 10px;
+        }
+    }
+
+    .headings {
+        display: flex;
+        position: fixed;
+        top: calc(1rem - 6px);
+        align-items: center;
+        gap: 1ch;
+        z-index: 200;
+        box-shadow: 0 0 10px var(--bg-color);
+        border-radius: 4px;
+        background-color: var(--bg-color);
+        padding: 4px 8px;
+        width: min-content;
+        height: 25px;
+
+        @include breakpoint.laptop {
+            //margin-left: 3px;
+        }
+
+        .toggle-preview {
+            opacity: 0.8;
+            height: 20px;
+
+            &.active {
+                .player-icon {
+                    fill: white;
+                }
+            }
+
+            .player-icon {
+                fill: grey;
+                height: 19px;
+            }
+        }
+
+        .initiative-order {
+            display: flex;
+            gap: 0.5ch;
+
+            .initiative-icon {
+                fill: green;
+            }
+
+            .sort-button {
+                padding-inline: 0;
+                width: 25px;
+                height: 20px;
+
+                &.reverse {
+                    .arrow-icon {
+                        scale: 1;
+                    }
+                }
+
+                .arrow-icon {
+                    scale: -1;
+                    transition: all 0.25s ease;
+                    width: 100%;
+                    height: 17px;
+                    fill: white;
+                    object-position: center;
+                }
+            }
+        }
+
+        .battle-rounds {
+            display: flex;
+            align-items: center;
+            gap: 0.5ch;
+            border-radius: 4px;
+            height: 20px;
+
+            &::before {
+                margin-right: 4px;
+                background-color: white;
+                width: 2px;
+                height: 100%;
+                content: "";
+            }
+
+            button {
+                height: 20px;
+                white-space: nowrap;
+            }
+
+            .battle-round {
+                box-shadow: 0 0 -4px var(--bg-color);
+                color: red;
+                font-weight: bold;
+                line-height: 1;
+            }
+        }
+    }
+
+    .grimoire-content {
+        margin-top: 10px;
+
+        @include breakpoint.laptop {
+            margin-top: 60px;
+        }
+
+        .player-token-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+    }
+
+    .gmg-name {
+        display: flex;
+        grid-row: 3/3;
+        grid-column-start: 1;
+        align-items: flex-end;
+        gap: 1ch;
+        translate: 0 -170%;
+        margin-left: 7px;
+        font-weight: 800;
+        line-height: 1;
+        white-space: nowrap;
+
+        @include breakpoint.laptop {
+            translate: 0 -130%;
+        }
+
+        .small {
+            padding-bottom: 1px;
+            font-size: 0.6rem;
+        }
+    }
+}

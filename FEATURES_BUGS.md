@@ -6,11 +6,7 @@
 
 ## Feature Ideas
 
-+ Battleround and Effect tracking
-+ Handle Token Ownership
-+ Allow statblocks to be hidden from statblock popover
-+ Allow dddice user to switch rooms
-+ Add customization to HP Bar settings
++ Effect tracking
 + Pagination for statblocks
 + add Items to statblocks
 + Add default settings for Visibility Buttons

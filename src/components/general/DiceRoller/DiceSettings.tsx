@@ -10,6 +10,7 @@ import { Select } from "../Select.tsx";
 import { getThemePreview } from "../../../helper/previewHelpers.tsx";
 import { Loader } from "../Loader.tsx";
 import { isNull } from "lodash";
+import { ITheme } from "dddice-js";
 
 export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean) => void }) => {
     const room = useMetadataContext((state) => state.room);
@@ -84,9 +85,11 @@ export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean)
                     <Select
                         options={
                             !isNull(themes)
-                                ? themes.map((t) => {
-                                      return { value: t.id, name: t.name || t.id, icon: getThemePreview(t) };
-                                  })
+                                ? themes
+                                      .filter((t: ITheme) => validateTheme(t))
+                                      .map((t) => {
+                                          return { value: t.id, name: t.name || t.id, icon: getThemePreview(t) };
+                                      })
                                 : []
                         }
                         current={{
@@ -133,10 +136,19 @@ export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean)
                     onChange={async () => {
                         if (room) {
                             const id = OBR.player.id;
-                            const diceRendering = getRoomDiceUser(room, id)?.diceRendering;
-                            await updateRoomMetadataDiceUser(room, id, { diceRendering: !diceRendering });
-                            if (!diceRendering) {
-                                await OBR.modal.open(diceTrayModal);
+                            const diceRoomUser = getRoomDiceUser(room, id);
+                            if (diceRoomUser) {
+                                await updateRoomMetadataDiceUser(room, id, {
+                                    diceRendering: !diceRoomUser.diceRendering,
+                                });
+                                if (!diceRoomUser.diceRendering) {
+                                    await OBR.modal.open({
+                                        ...diceTrayModal,
+                                        url: `https://dddice.com/room/${room.diceRoom!.slug}/stream?key=${
+                                            diceRoomUser.apiKey
+                                        }`,
+                                    });
+                                }
                             }
                         }
                     }}

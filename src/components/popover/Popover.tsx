@@ -1,25 +1,34 @@
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import { useEffect, useRef, useState } from "react";
-import { Token } from "../hptracker/Token.tsx";
-import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
+import { Token } from "../hptracker/Token/Token.tsx";
+import OBR, { Image } from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../helper/types.ts";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { Loader } from "../general/Loader.tsx";
 import { updateHp } from "../../helper/hpHelpers.ts";
-import { getBgColor } from "../../helper/helpers.ts";
+import { getBgColor, getTokenName } from "../../helper/helpers.ts";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import {
+    getAcForPlayers,
     getAcOnMap,
-    getCanPlayersSee,
-    getHpBar,
+    getHpForPlayers,
     getHpOnMap,
+    getTokenInPlayerList,
+    toggleAcForPlayers,
     toggleAcOnMap,
-    toggleCanPlayerSee,
-    toggleHpBar,
+    toggleHpForPlayers,
     toggleHpOnMap,
+    toggleTokenInPlayerList,
 } from "../../helper/multiTokenHelper.ts";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
+import { useTokenListContext } from "../../context/TokenContext.tsx";
+import { TokenContextWrapper } from "../TokenContextWrapper.tsx";
+import { MapButton } from "../hptracker/Token/MapButton.tsx";
+import { PlayerButton } from "../hptracker/Token/PlayerButton.tsx";
+import { HPSvg } from "../svgs/HPSvg.tsx";
+import { ACSvg } from "../svgs/ACSvg.tsx";
+import { InitiativeSvg } from "../svgs/InitiativeSvg.tsx";
 
 export const Popover = () => {
     const [ids, setIds] = useState<Array<string>>([]);
@@ -27,10 +36,7 @@ export const Popover = () => {
 
     const initPopover = async () => {
         const selection = await OBR.player.getSelection();
-        if (selection) {
-            const items = await OBR.scene.items.getItems<Image>(selection);
-            setIds(items.map((item) => item.id));
-        }
+        setIds(selection ?? []);
     };
 
     useEffect(() => {
@@ -41,27 +47,25 @@ export const Popover = () => {
 
     return (
         <ContextWrapper component={"popover"}>
-            {ids.length === 1 ? (
-                <Content id={ids[0]} />
-            ) : ids.length > 1 ? (
-                <MultiContent ids={ids} />
-            ) : (
-                <Loader className={"popover-spinner"} />
-            )}
+            <TokenContextWrapper>
+                {ids.length === 1 ? (
+                    <Content id={ids[0]} />
+                ) : ids.length > 1 ? (
+                    <MultiContent ids={ids} />
+                ) : (
+                    <Loader className={"popover-spinner"} />
+                )}
+            </TokenContextWrapper>
         </ContextWrapper>
     );
 };
 
 const MultiContent = ({ ids }: { ids: Array<string> }) => {
-    const [items, setItems] = useState<Array<Item>>([]);
+    const tokens = useTokenListContext((state) => state.tokens);
     const inputRef = useRef<HTMLInputElement>(null);
     const { room } = useMetadataContext();
-    const { isReady } = SceneReadyContext();
     const playerContext = usePlayerContext();
-
-    const initPopover = async () => {
-        setItems(await OBR.scene.items.getItems(ids));
-    };
+    const items = tokens ? [...tokens.values()].filter((v) => ids.includes(v.item.id)).map((v) => v.item) : [];
 
     const changeHP = async (value: number) => {
         await OBR.scene.items.updateItems(items, (uItems) => {
@@ -91,31 +95,6 @@ const MultiContent = ({ ids }: { ids: Array<string> }) => {
         });
     };
 
-    useEffect(() => {
-        OBR.scene.items.onChange(async (cItems) => {
-            const filteredItems = cItems.filter((item) => ids.includes(item.id));
-            let localItems = Array.from(items);
-
-            if (filteredItems.length > 0) {
-                filteredItems.forEach((item) => {
-                    const index = localItems.findIndex((lItem) => lItem.id === item.id);
-                    if (index >= 0) {
-                        localItems.splice(index, 1, item);
-                    } else {
-                        localItems.push(item);
-                    }
-                });
-            }
-            setItems(localItems);
-        });
-    }, []);
-
-    useEffect(() => {
-        if (isReady) {
-            initPopover();
-        }
-    }, [isReady]);
-
     return (
         <div className={"popover multi-selection"}>
             <ul className={"token-names"}>
@@ -133,7 +112,7 @@ const MultiContent = ({ ids }: { ids: Array<string> }) => {
                                     )}, #1C1B22 90%, #1C1B22 )`,
                                 }}
                             >
-                                {d.name}
+                                {getTokenName(item)}
                             </li>
                         );
                     }
@@ -167,34 +146,43 @@ const MultiContent = ({ ids }: { ids: Array<string> }) => {
                 </div>
                 {playerContext.role === "GM" ? (
                     <div className={"settings"}>
-                        <button
-                            title={"Toggle HP Bar visibility for GM and Players"}
-                            className={`toggle-button hp ${getHpBar(items) ? "on" : "off"}`}
-                            onClick={() => {
-                                toggleHpBar(items);
-                            }}
-                        />
-                        <button
-                            title={"Toggle HP displayed on Map"}
-                            className={`toggle-button map ${getHpOnMap(items) ? "on" : "off"}`}
-                            onClick={() => {
-                                toggleHpOnMap(items);
-                            }}
-                        />
-                        <button
-                            title={"Toggle AC displayed on Map"}
-                            className={`toggle-button ac ${getAcOnMap(items) ? "on" : "off"}`}
-                            onClick={async () => {
-                                toggleAcOnMap(items);
-                            }}
-                        />
-                        <button
-                            title={"Toggle HP/AC visibility for players"}
-                            className={`toggle-button players ${getCanPlayersSee(items) ? "on" : "off"}`}
-                            onClick={() => {
-                                toggleCanPlayerSee(items);
-                            }}
-                        />{" "}
+                        <div className={"setting"}>
+                            <HPSvg percent={100} name={"hp"} color={"#888888"} />
+                            <MapButton
+                                onClick={async () => {
+                                    await toggleHpOnMap(items);
+                                }}
+                                onContextMenu={async () => {
+                                    await toggleHpForPlayers(items);
+                                }}
+                                active={getHpOnMap(items)}
+                                players={getHpForPlayers(items)}
+                                tooltip={"Show HP on map (right click for players)"}
+                            />
+                        </div>
+                        <div className={"setting"}>
+                            <ACSvg />
+                            <MapButton
+                                onClick={async () => {
+                                    await toggleAcOnMap(items);
+                                }}
+                                onContextMenu={async () => {
+                                    await toggleAcForPlayers(items);
+                                }}
+                                active={getAcOnMap(items)}
+                                players={getAcForPlayers(items)}
+                                tooltip={"Show AC on map (right click for players)"}
+                            />
+                        </div>
+                        <div className={"setting"}>
+                            <InitiativeSvg />
+                            <PlayerButton
+                                active={getTokenInPlayerList(items)}
+                                onClick={() => {
+                                    toggleTokenInPlayerList(items);
+                                }}
+                            />
+                        </div>
                     </div>
                 ) : null}
             </div>
@@ -204,50 +192,13 @@ const MultiContent = ({ ids }: { ids: Array<string> }) => {
 
 const Content = (props: { id: string }) => {
     const id = props.id;
-    const [data, setData] = useState<HpTrackerMetadata | null>(null);
-    const [item, setItem] = useState<Item | null>(null);
-    const { isReady } = SceneReadyContext();
-
-    const getData = async () => {
-        if (id) {
-            const items = await OBR.scene.items.getItems([id]);
-            if (items.length > 0) {
-                const item = items[0];
-                if (itemMetadataKey in item.metadata) {
-                    setData(item.metadata[itemMetadataKey] as HpTrackerMetadata);
-                    setItem(item);
-                }
-            }
-        }
-
-        return null;
-    };
-
-    const initPopover = async () => {
-        await getData();
-    };
-
-    useEffect(() => {
-        OBR.scene.items.onChange(async (items) => {
-            const filteredItems = items.filter((item) => item.id === id);
-            if (filteredItems.length > 0) {
-                const item = filteredItems[0];
-                if (itemMetadataKey in item.metadata) {
-                    setData(item.metadata[itemMetadataKey] as HpTrackerMetadata);
-                }
-            }
-        });
-    }, []);
-
-    useEffect(() => {
-        if (isReady) {
-            initPopover();
-        }
-    }, [isReady]);
+    const token = useTokenListContext((state) => state.tokens?.get(props.id));
+    const data = token?.data as HpTrackerMetadata;
+    const item = token?.item as Image;
 
     return id && data && item ? (
         <div className={"popover"}>
-            <Token item={item} data={data} popover={true} selected={false} />
+            <Token id={id} popover={true} selected={false} />
         </div>
     ) : null;
 };
