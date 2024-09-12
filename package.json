@@ -1,7 +1,7 @@
 {
-    "name": "hp-tracker",
+    "name": "game-masters-grimoire",
     "private": true,
-    "version": "2.3.1",
+    "version": "3.0.0",
     "type": "module",
     "scripts": {
         "dev": "vite",

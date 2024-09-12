@@ -8,6 +8,8 @@
 
 There is so much more than just HP Tracking going on. It's a complete toolkit for Dungeon and Game Masters so the renaming was something that had to be done to reflect the state of the extension
 
+[Check out the Tutorial](https://youtu.be/uEWr6qooAK8)
+
 + There is a completely new Design for the token list 
   + It aims to simplify the core functionality and make everything accessible with a click
   + It comes with lots of tooltips to make it easier to know what things do and a lot more visual feedback what the current state is

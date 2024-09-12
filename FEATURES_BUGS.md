@@ -6,7 +6,7 @@
 
 ## Feature Ideas
 
-+ Battleround and Effect tracking
++ Effect tracking
 + Pagination for statblocks
 + add Items to statblocks
 + Add default settings for Visibility Buttons

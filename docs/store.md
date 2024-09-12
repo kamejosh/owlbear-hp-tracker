@@ -75,7 +75,9 @@ learn-more: https://github.com/kamejosh/owlbear-hp-tracker
 
 Designed for DnD 5e and PF2e this extension allows tracking and changing Players and Creatures' settings and statblocks while dynamically hiding and showing this information to players.
 
-![hp-tracker example](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/HP_Tracker.png)
+[Check out the Tutorial](https://youtu.be/uEWr6qooAK8)
+
+![hp-tracker example](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/GameMastersGrimoire.png)
 
 <h1 id="quickstart">Quickstart</h1>
 
