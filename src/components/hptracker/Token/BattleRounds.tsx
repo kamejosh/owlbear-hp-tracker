@@ -43,7 +43,7 @@ export const BattleRounds = () => {
         destroyIndicator();
         rest(
             battleTokens.map((b) => b.item),
-            "Round"
+            "Round",
         );
     };
 
@@ -66,7 +66,7 @@ export const BattleRounds = () => {
             setBattleRound(battleRound + mod);
             await rest(
                 battleTokens.map((b) => b.item),
-                "Round"
+                "Round",
             );
         }
         setCurrent(newCurrent.id);
@@ -87,7 +87,7 @@ export const BattleRounds = () => {
             {!battle ? (
                 <Tippy
                     content={"no groups or tokens selected for battle"}
-                    disabled={groups.length > 0 && battleTokens.length > 0}
+                    disabled={groups.length > 0 || battleTokens.length > 0}
                 >
                     <button
                         disabled={groups.length === 0 || battleTokens.length === 0}
