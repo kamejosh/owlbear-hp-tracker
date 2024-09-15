@@ -68,28 +68,6 @@
                 }
             }
         }
-
-        .self {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            translate: -50% -100%;
-            z-index: 1;
-            transition: all 0.25s ease;
-
-            &.hidden {
-                display: none;
-            }
-
-            &.visible {
-                display: block;
-            }
-
-            &:hover {
-                background-color: lightgrey;
-                color: var(--bg-color);
-            }
-        }
     }
 
     .initiative-bonus {

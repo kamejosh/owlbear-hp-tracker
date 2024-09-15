@@ -86,8 +86,8 @@ export const Settings = () => {
                             <input
                                 type={"checkbox"}
                                 checked={!!room?.disableHpBar}
-                                onChange={() => {
-                                    updateRoomMetadata(room, { disableHpBar: !room?.disableHpBar });
+                                onChange={async () => {
+                                    await updateRoomMetadata(room, { disableHpBar: !room?.disableHpBar });
                                     tokens?.forEach((token) => {
                                         const data = {
                                             ...token.data,
@@ -188,7 +188,7 @@ export const Settings = () => {
                         />
                     </div>
                     <div className={"player-sort setting"}>
-                        Sort Tokens in Player View:
+                        Sort Tokens by Initiative for Players:
                         <input
                             type={"checkbox"}
                             checked={room?.playerSort || false}

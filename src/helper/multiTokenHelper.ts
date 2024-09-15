@@ -1,5 +1,5 @@
 import { itemMetadataKey } from "./variables.ts";
-import { HpTrackerMetadata } from "./types.ts";
+import { HpTrackerMetadata, RoomMetadata } from "./types.ts";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
 import { updateHp } from "./hpHelpers.ts";
 import { updateAc } from "./acHelper.ts";
@@ -28,17 +28,18 @@ export const getAcForPlayers = (list: Array<Item>) => {
     return acPlayers.some((map) => map);
 };
 
-export const toggleHpOnMap = async (list: Array<Item>) => {
+export const toggleHpOnMap = async (list: Array<Item>, room: RoomMetadata | null) => {
     const current = getHpOnMap(list);
+    console.log(room?.disableHpBar, !current && !room?.disableHpBar);
     await OBR.scene.items.updateItems(list, (items) => {
         items.forEach((item) => {
             (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpOnMap = !current;
-            (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpBar = !current;
+            (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpBar = !current && !room?.disableHpBar;
         });
     });
     for (const item of list) {
         const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
-        await updateHp(item, { ...data, hpOnMap: !current, hpBar: !current });
+        await updateHp(item, { ...data, hpOnMap: !current, hpBar: !current && !room?.disableHpBar });
     }
 };
 

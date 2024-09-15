@@ -46,7 +46,7 @@ export const Initiative = ({ id }: { id: string }) => {
         try {
             const parsed = parseRollEquation(
                 `1d${room?.initiativeDice}${data.stats.initiativeBonus ? "+" + data.stats.initiativeBonus : ""}`,
-                "dddice-bees"
+                "dddice-bees",
             );
             const die = parsed.dice.find((d) => d.type !== "mod");
             if (die) {
@@ -68,10 +68,17 @@ export const Initiative = ({ id }: { id: string }) => {
         }
     };
 
-    const rollInitiative = async (hidden: boolean) => {
+    const rollInitiative = async (hidden: boolean, advantage?: boolean, disadvantage?: boolean) => {
         initButtonRef.current?.classList.add("rolling");
         let initiativeValue = 0;
-        const dice = `1d${room?.initiativeDice ?? 20}+${data.stats.initiativeBonus}`;
+        let dice;
+        if (advantage) {
+            dice = `2d${room?.initiativeDice ?? 20}kh1+${data.stats.initiativeBonus}`;
+        } else if (disadvantage) {
+            dice = `2d${room?.initiativeDice ?? 20}kl1+${data.stats.initiativeBonus}`;
+        } else {
+            dice = `1d${room?.initiativeDice ?? 20}+${data.stats.initiativeBonus}`;
+        }
         if (room && !room?.disableDiceRoller && theme && rollerApi) {
             const parsed = diceToRoll(dice, theme.id);
             if (parsed) {
@@ -136,16 +143,38 @@ export const Initiative = ({ id }: { id: string }) => {
                     {data.stats.initiativeBonus >= 0 ? "+" : ""}
                     {data.stats.initiativeBonus ?? 0}
                 </button>
-                <button
-                    className={`self ${initHover ? "visible" : "hidden"}`}
-                    onClick={async () => {
-                        const value = await rollInitiative(!defaultHidden);
-                        const newData = { ...data, initiative: value };
-                        updateTokenMetadata(newData, [id]);
-                    }}
-                >
-                    {defaultHidden ? "SHOW" : "HIDE"}
-                </button>
+                <div className={`dice-context-button ${initHover ? "visible" : "hidden"}`}>
+                    <button
+                        className={`advantage`}
+                        onClick={async () => {
+                            const value = await rollInitiative(!defaultHidden, true);
+                            const newData = { ...data, initiative: value };
+                            updateTokenMetadata(newData, [id]);
+                        }}
+                    >
+                        {"ADV"}
+                    </button>
+                    <button
+                        className={`disadvantage`}
+                        onClick={async () => {
+                            const value = await rollInitiative(!defaultHidden, false, true);
+                            const newData = { ...data, initiative: value };
+                            updateTokenMetadata(newData, [id]);
+                        }}
+                    >
+                        DIS
+                    </button>
+                    <button
+                        className={`self`}
+                        onClick={async () => {
+                            const value = await rollInitiative(!defaultHidden);
+                            const newData = { ...data, initiative: value };
+                            updateTokenMetadata(newData, [id]);
+                        }}
+                    >
+                        {defaultHidden ? "SHOW" : "HIDE"}
+                    </button>
+                </div>
             </div>
 
             <Tippy content={"Set initiative bonus"}>

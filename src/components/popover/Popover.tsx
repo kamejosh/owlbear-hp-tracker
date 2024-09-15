@@ -78,7 +78,7 @@ const MultiContent = ({ ids }: { ids: Array<string> }) => {
                     }
                     itemData.hp = Math.min(
                         room?.allowNegativeNumbers ? newHp : Math.max(newHp, 0),
-                        itemData.maxHp + (itemData.stats.tempHp || 0)
+                        itemData.maxHp + (itemData.stats.tempHp || 0),
                     );
                     const uItem = items.find((i) => i.id === item.id);
                     if (uItem && itemMetadataKey in uItem.metadata) {
@@ -108,7 +108,7 @@ const MultiContent = ({ ids }: { ids: Array<string> }) => {
                                 style={{
                                     background: `linear-gradient(to right, ${getBgColor(
                                         d,
-                                        "0.4"
+                                        "0.4",
                                     )}, #1C1B22 90%, #1C1B22 )`,
                                 }}
                             >
@@ -150,7 +150,7 @@ const MultiContent = ({ ids }: { ids: Array<string> }) => {
                             <HPSvg percent={100} name={"hp"} color={"#888888"} />
                             <MapButton
                                 onClick={async () => {
-                                    await toggleHpOnMap(items);
+                                    await toggleHpOnMap(items, room);
                                 }}
                                 onContextMenu={async () => {
                                     await toggleHpForPlayers(items);

@@ -167,6 +167,35 @@ const setupContextMenu = async () => {
     });
 
     await OBR.contextMenu.create({
+        id: `${ID}/remove`,
+        icons: [
+            {
+                icon: "/iconOff.svg",
+                label: "Remove from Grimoire",
+                filter: {
+                    some: [{ key: ["metadata", `${itemMetadataKey}`, "hpTrackerActive"], value: true }],
+                    roles: ["GM"],
+                },
+            },
+        ],
+        onClick: async (context) => {
+            const contextItems = context.items.filter(
+                (i) =>
+                    itemMetadataKey in i.metadata && (i.metadata[itemMetadataKey] as HpTrackerMetadata).hpTrackerActive,
+            );
+            console.log(contextItems);
+            await OBR.scene.items.updateItems(contextItems, (items) => {
+                items.forEach((item) => {
+                    if (itemMetadataKey in item.metadata) {
+                        const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+                        item.metadata[itemMetadataKey] = { ...data, hpTrackerActive: false };
+                    }
+                });
+            });
+        },
+    });
+
+    await OBR.contextMenu.create({
         id: `${ID}/tool`,
         icons: [
             {
@@ -184,25 +213,18 @@ const setupContextMenu = async () => {
                     roles: ["GM"],
                 },
             },
-            {
-                icon: "/iconOff.svg",
-                label: "Remove from Grimoire",
-                filter: {
-                    every: [{ key: ["metadata", `${itemMetadataKey}`, "hpTrackerActive"], value: true }],
-                    roles: ["GM"],
-                },
-            },
         ],
         onClick: async (context) => {
             const tokenIds: Array<string> = [];
+            const contextItems = context.items.filter((i) => i.layer === "CHARACTER");
             const initTokens = async () => {
-                const itemStatblocks = await getInitialValues(context.items as Array<Image>);
-                await OBR.scene.items.updateItems(context.items, (items) => {
+                const itemStatblocks = await getInitialValues(contextItems as Array<Image>);
+                await OBR.scene.items.updateItems(contextItems, (items) => {
                     items.forEach((item) => {
                         tokenIds.push(item.id);
                         if (itemMetadataKey in item.metadata) {
                             const metadata = item.metadata[itemMetadataKey] as HpTrackerMetadata;
-                            metadata.hpTrackerActive = !metadata.hpTrackerActive;
+                            metadata.hpTrackerActive = true;
                             item.metadata[itemMetadataKey] = metadata;
                         } else {
                             // variable allows us to be typesafe

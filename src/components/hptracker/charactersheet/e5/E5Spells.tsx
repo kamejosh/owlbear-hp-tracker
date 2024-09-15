@@ -116,11 +116,6 @@ const Spell = ({
                                 text={damage}
                                 context={`${capitalize(spell.name)}: Damage`}
                                 statblock={statblock}
-                                onRoll={async () => {
-                                    if (itemId && limitValues && !spell.is_attack) {
-                                        await updateLimit(itemId, limitValues);
-                                    }
-                                }}
                                 limitReached={limitReached}
                                 damageDie={true}
                             />
@@ -233,7 +228,7 @@ export const E5Spells = (props: {
                 } else {
                     return `${spell.level}th`;
                 }
-            })
+            }),
         )
         .filter((value, index, self) => {
             return self.indexOf(value) === index;

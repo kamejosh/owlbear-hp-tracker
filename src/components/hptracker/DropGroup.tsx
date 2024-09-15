@@ -188,7 +188,7 @@ export const DropGroup = (props: DropGroupProps) => {
                         <HPSvg percent={100} name={"hp"} color={"#888888"} />
                         <MapButton
                             onClick={async () => {
-                                await toggleHpOnMap(props.list);
+                                await toggleHpOnMap(props.list, room);
                             }}
                             onContextMenu={async () => {
                                 await toggleHpForPlayers(props.list);

@@ -24,4 +24,4 @@ MIT
 
 I'm not sure how to handle contributions yet, Bug fixes are always welcome but features depend on backwards compatibility and maintaining a simple enough extension to use. But feel free to fork and open PRs.
 
-Copyright (C) 2023 Joshua Hercher
+Copyright (C) 2024 Joshua Hercher
