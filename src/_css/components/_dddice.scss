@@ -65,7 +65,10 @@
 
             .custom-dice {
                 translate: 0 1px;
-                transition: all 0.25s ease, --bg3 0.25s ease, --bg4 0.25s ease;
+                transition:
+                    all 0.25s ease,
+                    --bg3 0.25s ease,
+                    --bg4 0.25s ease;
                 border-bottom: none;
                 border-bottom-right-radius: 0;
                 border-bottom-left-radius: 0;
@@ -195,6 +198,7 @@
 
                         .select-current {
                             max-width: 178px;
+                            background: var(--bg-color);
 
                             .current {
                                 width: 100%;
@@ -277,7 +281,10 @@
             align-self: flex-end;
             order: 2;
             translate: 0 1px;
-            transition: all 0.25s ease, --bg3 0.25s ease, --bg4 0.25s ease;
+            transition:
+                all 0.25s ease,
+                --bg3 0.25s ease,
+                --bg4 0.25s ease;
             border-bottom-right-radius: 0;
             border-bottom-left-radius: 0;
             width: 45px;
@@ -505,7 +512,9 @@
         gap: 0.5ch;
         translate: 0 100%;
         z-index: 200;
-        box-shadow: -5px 5px 5px #111, 5px 5px 5px #111;
+        box-shadow:
+            -5px 5px 5px #111,
+            5px 5px 5px #111;
         border: 1px solid lightgrey;
         border-radius: 5px;
         background-color: #2b2a33;

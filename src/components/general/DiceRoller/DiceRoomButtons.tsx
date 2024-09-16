@@ -135,7 +135,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
         if (!room?.disableDiceRoller && rollerApi && theme && props.customDice) {
             let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined = diceToRoll(
                 props.customDice.dice,
-                props.customDice.theme ?? theme.id
+                props.customDice.theme ?? theme.id,
             );
             if (parsed) {
                 await rollWrapper(rollerApi, parsed.dice, {
@@ -186,27 +186,29 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
             </Tippy>
             {addCustom ? (
                 <div className={"add-custom-dice"}>
-                    <div className={`setting dice-theme valid searching`}>
-                        <Select
-                            options={
-                                !isNull(themes)
-                                    ? themes.map((t) => {
-                                          return { value: t.id, name: t.name || t.id, icon: getThemePreview(t) };
-                                      })
-                                    : []
-                            }
-                            current={{
-                                value: currentCustomTheme?.id || theme?.id || "",
-                                name: currentCustomTheme?.name || theme?.name || "",
-                                icon: currentCustomTheme
-                                    ? getThemePreview(currentCustomTheme)
-                                    : theme
-                                    ? getThemePreview(theme)
-                                    : undefined,
-                            }}
-                            setTheme={setCustomTheme}
-                        />
-                    </div>
+                    {!room?.disableDiceRoller ? (
+                        <div className={`setting dice-theme valid searching`}>
+                            <Select
+                                options={
+                                    !isNull(themes)
+                                        ? themes.map((t) => {
+                                              return { value: t.id, name: t.name || t.id, icon: getThemePreview(t) };
+                                          })
+                                        : []
+                                }
+                                current={{
+                                    value: currentCustomTheme?.id || theme?.id || "",
+                                    name: currentCustomTheme?.name || theme?.name || "",
+                                    icon: currentCustomTheme
+                                        ? getThemePreview(currentCustomTheme)
+                                        : theme
+                                          ? getThemePreview(theme)
+                                          : undefined,
+                                }}
+                                setTheme={setCustomTheme}
+                            />
+                        </div>
+                    ) : null}
                     <div className={"dice-equation"}>
                         <input
                             ref={inputRef}
@@ -214,7 +216,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                             onChange={(e) => {
                                 const value = e.currentTarget.value;
                                 try {
-                                    if (currentCustomTheme) {
+                                    if (currentCustomTheme && !room?.disableDiceRoller) {
                                         const parsed = parseRollEquation(value, currentCustomTheme);
                                         if (parsed) {
                                             setValidCustom(true);
@@ -243,8 +245,8 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                                             theme: currentCustomTheme
                                                 ? currentCustomTheme.id
                                                 : theme
-                                                ? theme.id
-                                                : "dddice-bees",
+                                                  ? theme.id
+                                                  : "dddice-bees",
                                         },
                                     };
                                     setButtons(newButton);
@@ -266,8 +268,8 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                                             theme: currentCustomTheme
                                                 ? currentCustomTheme.id
                                                 : theme
-                                                ? theme.id
-                                                : "dddice-bees",
+                                                  ? theme.id
+                                                  : "dddice-bees",
                                         },
                                     };
                                     setButtons(newButton);
@@ -439,7 +441,7 @@ const QuickButtons = ({ open }: { open: boolean }) => {
                                 return;
                             }
                             try {
-                                if (theme) {
+                                if (theme && !room?.disableDiceRoller) {
                                     const parsed = parseRollEquation(e.currentTarget.value, theme.id);
                                     if (parsed) {
                                         setValidCustom(true);
