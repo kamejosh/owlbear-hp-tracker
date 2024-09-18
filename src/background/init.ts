@@ -25,7 +25,7 @@ import { v4 as uuidv4 } from "uuid";
 import { migrateTo140 } from "../migrations/v140.ts";
 import { saveOrChangeAC, updateAc, updateAcChanges, updateAcVisibility } from "../helper/acHelper.ts";
 import { migrateTo141 } from "../migrations/v141.ts";
-import { attachmentFilter, getAttachedItems, getInitialValues } from "../helper/helpers.ts";
+import { attachmentFilter, getAttachedItems, prepareTokenForGrimoire } from "../helper/helpers.ts";
 import { migrateTo160 } from "../migrations/v160.ts";
 import { migrateTo200 } from "../migrations/v200.ts";
 import { setupDddice } from "./dddice.ts";
@@ -196,74 +196,69 @@ const setupContextMenu = async () => {
     });
 
     await OBR.contextMenu.create({
-        id: `${ID}/tool`,
+        id: `${ID}/add-to-grimoire`,
         icons: [
             {
                 icon: "/icon.svg",
                 label: "Add to Grimoire",
                 filter: {
-                    every: [{ key: "type", value: "IMAGE" }],
-                    some: [
+                    every: [
                         { key: ["metadata", `${itemMetadataKey}`], value: undefined, coordinator: "||" },
                         {
                             key: ["metadata", `${itemMetadataKey}`, "hpTrackerActive"],
                             value: false,
                         },
                     ],
+                    some: [
+                        { key: "type", value: "IMAGE", coordinator: "&&" },
+                        { key: "layer", value: "CHARACTER", coordinator: "||" },
+                        { key: "layer", value: "MOUNT", coordinator: "||" },
+                    ],
                     roles: ["GM"],
                 },
             },
         ],
         onClick: async (context) => {
-            const tokenIds: Array<string> = [];
-            const contextItems = context.items.filter((i) => i.layer === "CHARACTER");
-            const initTokens = async () => {
-                const itemStatblocks = await getInitialValues(contextItems as Array<Image>);
-                await OBR.scene.items.updateItems(contextItems, (items) => {
-                    items.forEach((item) => {
-                        tokenIds.push(item.id);
-                        if (itemMetadataKey in item.metadata) {
-                            const metadata = item.metadata[itemMetadataKey] as HpTrackerMetadata;
-                            metadata.hpTrackerActive = true;
-                            item.metadata[itemMetadataKey] = metadata;
-                        } else {
-                            // variable allows us to be typesafe
-                            const defaultMetadata: HpTrackerMetadata = {
-                                hp: 0,
-                                maxHp: 0,
-                                armorClass: 0,
-                                hpTrackerActive: true,
-                                hpOnMap: false,
-                                acOnMap: false,
-                                hpBar: false,
-                                initiative: 0,
-                                sheet: "",
-                                stats: {
-                                    initiativeBonus: 0,
-                                    initial: true,
-                                },
-                                playerMap: {
-                                    hp: false,
-                                    ac: false,
-                                },
-                            };
-                            if (item.id in itemStatblocks) {
-                                defaultMetadata.sheet = itemStatblocks[item.id].slug;
-                                defaultMetadata.ruleset = itemStatblocks[item.id].ruleset;
-                                defaultMetadata.maxHp = itemStatblocks[item.id].hp;
-                                defaultMetadata.hp = itemStatblocks[item.id].hp;
-                                defaultMetadata.armorClass = itemStatblocks[item.id].ac;
-                                defaultMetadata.stats.initiativeBonus = itemStatblocks[item.id].bonus;
-                                defaultMetadata.stats.initial = true;
-                                defaultMetadata.stats.limits = itemStatblocks[item.id].limits;
-                            }
-                            item.metadata[itemMetadataKey] = defaultMetadata;
-                        }
-                    });
-                });
-            };
+            const contextItems = context.items.filter(
+                (i) => (i.layer === "CHARACTER" || i.layer === "MOUNT") && i.type === "IMAGE",
+            );
 
-            await initTokens();
+            const tokenIds = await prepareTokenForGrimoire(contextItems as Array<Image>);
+            const tokens = await OBR.scene.items.getItems(tokenIds);
+            tokens.forEach((token) => {
+                if (itemMetadataKey in token.metadata) {
+                    const metadata = token.metadata[itemMetadataKey] as HpTrackerMetadata;
+                    updateHp(token, metadata);
+                    updateAc(token, metadata);
+                }
+            });
+        },
+    });
+
+    await OBR.contextMenu.create({
+        id: `${ID}/add-prop-to-grimoire`,
+        icons: [
+            {
+                icon: "/icon.svg",
+                label: "Add to Grimoire",
+                filter: {
+                    every: [
+                        { key: ["metadata", `${itemMetadataKey}`], value: undefined, coordinator: "||" },
+                        {
+                            key: ["metadata", `${itemMetadataKey}`, "hpTrackerActive"],
+                            value: false,
+                        },
+                        { key: "type", value: "IMAGE", coordinator: "&&" },
+                        { key: "layer", value: "PROP" },
+                    ],
+                    roles: ["GM"],
+                },
+            },
+        ],
+        onClick: async (context) => {
+            const contextItems = context.items.filter((i) => i.layer === "PROP" && i.type === "IMAGE");
+
+            const tokenIds = await prepareTokenForGrimoire(contextItems as Array<Image>);
             const tokens = await OBR.scene.items.getItems(tokenIds);
             tokens.forEach((token) => {
                 if (itemMetadataKey in token.metadata) {

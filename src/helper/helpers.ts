@@ -22,7 +22,7 @@ import { Ability } from "../components/hptracker/charactersheet/e5/E5Ability.tsx
 export const getYOffset = async (height: number) => {
     const metadata = (await OBR.room.getMetadata()) as Metadata;
     const roomMetadata = metadata[metadataKey] as RoomMetadata;
-    let offset = roomMetadata ? roomMetadata.hpBarOffset ?? 0 : 0;
+    let offset = roomMetadata ? (roomMetadata.hpBarOffset ?? 0) : 0;
     const offsetFactor = height / 150;
     offset *= offsetFactor;
     return offset;
@@ -31,7 +31,7 @@ export const getYOffset = async (height: number) => {
 export const getACOffset = async (height: number, width: number) => {
     const metadata = (await OBR.room.getMetadata()) as Metadata;
     const roomMetadata = metadata[metadataKey] as RoomMetadata;
-    let offset = roomMetadata ? roomMetadata.acOffset ?? { x: 0, y: 0 } : { x: 0, y: 0 };
+    let offset = roomMetadata ? (roomMetadata.acOffset ?? { x: 0, y: 0 }) : { x: 0, y: 0 };
     offset.x = offset.x * (width / 150);
     offset.y = offset.y * (height / 150);
     return offset;
@@ -53,7 +53,7 @@ export const getAttachedItems = async (id: string, itemTypes: Array<string>) => 
 export const calculatePercentage = async (data: HpTrackerMetadata) => {
     const metadata = (await OBR.room.getMetadata()) as Metadata;
     const roomMetadata = metadata[metadataKey] as RoomMetadata;
-    const segments = roomMetadata ? roomMetadata.hpBarSegments ?? 0 : 0;
+    const segments = roomMetadata ? (roomMetadata.hpBarSegments ?? 0) : 0;
 
     const tempHp = data.stats.tempHp ?? 0;
 
@@ -205,7 +205,7 @@ export const updateSceneMetadata = async (scene: SceneMetadata | null, data: Par
 export const updateRoomMetadata = async (
     room: RoomMetadata | null,
     data: Partial<RoomMetadata>,
-    additionalData?: Metadata
+    additionalData?: Metadata,
 ) => {
     const ownMetadata: Metadata = additionalData ?? {};
     ownMetadata[metadataKey] = { ...room, ...data };
@@ -217,7 +217,7 @@ export const updateRoomMetadata = async (
 
 export const dddiceRollToRollLog = async (
     roll: IRoll,
-    options?: { participant?: IRoomParticipant; owlbear_user_id?: string }
+    options?: { participant?: IRoomParticipant; owlbear_user_id?: string },
 ): Promise<RollLogEntryType> => {
     let username = roll.external_id ?? roll.user.username;
     let participantName = "";
@@ -434,8 +434,8 @@ export const getInitialValues = async (items: Array<Image>) => {
                                     bonus: statblock.perception
                                         ? parseInt(statblock.perception)
                                         : statblock.skills && "perception" in statblock.skills
-                                        ? parseInt(statblock.skills["perception"] as string)
-                                        : 0,
+                                          ? parseInt(statblock.skills["perception"] as string)
+                                          : 0,
                                     slug: statblock.slug,
                                     ruleset: "pf",
                                     limits: getLimitsPf(statblock),
@@ -469,7 +469,7 @@ export const updateLimit = async (itemId: string, limitValues: Limit) => {
                             // @ts-ignore
                             item.metadata[itemMetadataKey]["stats"]["limits"][index]["used"] = Math.min(
                                 limitValues.used + 1,
-                                limitValues.max
+                                limitValues.max,
                             );
                         }
                     }
@@ -489,4 +489,52 @@ export const getTokenName = (token: Image) => {
     } catch {
         return "";
     }
+};
+
+export const prepareTokenForGrimoire = async (contextItems: Array<Image>) => {
+    const tokenIds: Array<string> = [];
+    const itemStatblocks = await getInitialValues(contextItems as Array<Image>);
+    await OBR.scene.items.updateItems(contextItems, (items) => {
+        items.forEach((item) => {
+            tokenIds.push(item.id);
+            if (itemMetadataKey in item.metadata) {
+                const metadata = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+                metadata.hpTrackerActive = true;
+                item.metadata[itemMetadataKey] = metadata;
+            } else {
+                // variable allows us to be typesafe
+                const defaultMetadata: HpTrackerMetadata = {
+                    hp: 0,
+                    maxHp: 0,
+                    armorClass: 0,
+                    hpTrackerActive: true,
+                    hpOnMap: false,
+                    acOnMap: false,
+                    hpBar: false,
+                    initiative: 0,
+                    sheet: "",
+                    stats: {
+                        initiativeBonus: 0,
+                        initial: true,
+                    },
+                    playerMap: {
+                        hp: false,
+                        ac: false,
+                    },
+                };
+                if (item.id in itemStatblocks) {
+                    defaultMetadata.sheet = itemStatblocks[item.id].slug;
+                    defaultMetadata.ruleset = itemStatblocks[item.id].ruleset;
+                    defaultMetadata.maxHp = itemStatblocks[item.id].hp;
+                    defaultMetadata.hp = itemStatblocks[item.id].hp;
+                    defaultMetadata.armorClass = itemStatblocks[item.id].ac;
+                    defaultMetadata.stats.initiativeBonus = itemStatblocks[item.id].bonus;
+                    defaultMetadata.stats.initial = true;
+                    defaultMetadata.stats.limits = itemStatblocks[item.id].limits;
+                }
+                item.metadata[itemMetadataKey] = defaultMetadata;
+            }
+        });
+    });
+    return tokenIds;
 };
