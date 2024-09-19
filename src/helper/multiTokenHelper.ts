@@ -30,7 +30,6 @@ export const getAcForPlayers = (list: Array<Item>) => {
 
 export const toggleHpOnMap = async (list: Array<Item>, room: RoomMetadata | null) => {
     const current = getHpOnMap(list);
-    console.log(room?.disableHpBar, !current && !room?.disableHpBar);
     await OBR.scene.items.updateItems(list, (items) => {
         items.forEach((item) => {
             (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpOnMap = !current;

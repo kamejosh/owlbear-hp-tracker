@@ -183,7 +183,6 @@ const setupContextMenu = async () => {
                 (i) =>
                     itemMetadataKey in i.metadata && (i.metadata[itemMetadataKey] as HpTrackerMetadata).hpTrackerActive,
             );
-            console.log(contextItems);
             await OBR.scene.items.updateItems(contextItems, (items) => {
                 items.forEach((item) => {
                     if (itemMetadataKey in item.metadata) {

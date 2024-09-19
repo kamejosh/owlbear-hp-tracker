@@ -43,6 +43,7 @@ export const setIndicator = async (current: Image) => {
                 item.width = width;
                 item.height = height;
                 item.position = position;
+                item.visible = current.visible;
             }
         });
     } else {
