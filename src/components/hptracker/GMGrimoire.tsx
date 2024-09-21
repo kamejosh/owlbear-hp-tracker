@@ -99,25 +99,27 @@ const Content = () => {
     const tokenLists = useCallback(() => {
         const tokenMap = new Map<string, Array<Image>>();
 
-        scene?.groups?.forEach((group) => {
-            const groupItems = items?.filter((item) => {
-                const metadata = item.metadata[itemMetadataKey] as HpTrackerMetadata;
-                return (
-                    (!metadata.group && group === "Default") ||
-                    metadata.group === group ||
-                    (!scene?.groups?.includes(metadata.group ?? "") && group === "Default")
-                );
-            });
-            const indices = groupItems?.map((gi) => (gi.metadata[itemMetadataKey] as HpTrackerMetadata).index);
+        if (isReady && scene?.groups) {
+            scene?.groups?.forEach((group) => {
+                const groupItems = items?.filter((item) => {
+                    const metadata = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+                    return (
+                        (!metadata.group && group === "Default") ||
+                        metadata.group === group ||
+                        (!scene?.groups?.includes(metadata.group ?? "") && group === "Default")
+                    );
+                });
+                const indices = groupItems?.map((gi) => (gi.metadata[itemMetadataKey] as HpTrackerMetadata).index);
 
-            if (groupItems && indices && (indices.includes(undefined) || uniq(indices).length !== indices.length)) {
-                reorderMetadataIndex(groupItems, group);
-            } else {
-                tokenMap.set(group, groupItems ?? []);
-            }
-        });
+                if (groupItems && indices && (indices.includes(undefined) || uniq(indices).length !== indices.length)) {
+                    reorderMetadataIndex(groupItems, group);
+                } else {
+                    tokenMap.set(group, groupItems ?? []);
+                }
+            });
+        }
         return tokenMap;
-    }, [scene?.groups, items])();
+    }, [scene?.groups, items, isReady])();
 
     const playerTokens = room?.playerSort && items ? items.sort(sortItemsInitiative) : (items ?? []);
 

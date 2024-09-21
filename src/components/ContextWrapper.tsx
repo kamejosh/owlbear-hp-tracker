@@ -106,6 +106,10 @@ export const ContextWrapper = (props: ContextWrapperProps) => {
                     }
                 }
             });
+        } else {
+            // while switching scenes the old scene groups are still cached and lead to tokens of the new scene to be
+            // reassigned to the default group so we need to set groups to undefined while no scene is available
+            setSceneMetadata({ groups: undefined });
         }
     }, [isReady]);
 

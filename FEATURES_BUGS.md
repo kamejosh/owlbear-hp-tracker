@@ -3,7 +3,8 @@
 ## Bugs
 
 + When flipping a Token the Shapes and Texts need to be toggled to be in the right position
-qq
++ Token names with ":" (like Bear:3) return a wrong statblock list
+
 ## Feature Ideas
 
 + Effect tracking
