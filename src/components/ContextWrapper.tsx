@@ -7,11 +7,12 @@ import { metadataKey } from "../helper/variables.ts";
 import { useMetadataContext } from "../context/MetadataContext.ts";
 import { RoomMetadata, SceneMetadata } from "../helper/types.ts";
 import { Loader } from "./general/Loader.tsx";
-import { objectsEqual } from "../helper/helpers.ts";
+import { objectsEqual, updateSceneMetadata } from "../helper/helpers.ts";
 import { SceneReadyContext } from "../context/SceneReadyContext.ts";
 import { useComponentContext } from "../context/ComponentContext.tsx";
 import "tippy.js/dist/tippy.css";
 import { useGetSettings } from "../api/tabletop-almanac/useUser.ts";
+import { uniq } from "lodash";
 
 type ContextWrapperProps = PropsWithChildren & {
     component: string;
@@ -35,10 +36,12 @@ export const ContextWrapper = (props: ContextWrapperProps) => {
     const [playerId, setPlayerId] = useState<string | null>(null);
     const [playerName, setPlayerName] = useState<string | null>(null);
     const [ready, setReady] = useState<boolean>(false);
-    const [room, setSceneMetadata, setRoomMetadata] = useMetadataContext((state) => [
+    const [room, scene, setSceneMetadata, setRoomMetadata, taSettings] = useMetadataContext((state) => [
         state.room,
+        state.scene,
         state.setSceneMetadata,
         state.setRoomMetadata,
+        state.taSettings,
     ]);
     const { component, setComponent } = useComponentContext();
     const queryClient = new QueryClient();
@@ -112,6 +115,19 @@ export const ContextWrapper = (props: ContextWrapperProps) => {
             setSceneMetadata({ groups: undefined });
         }
     }, [isReady]);
+
+    useEffect(() => {
+        if (
+            isReady &&
+            scene &&
+            scene.groups &&
+            !scene.groups.every((element) => taSettings.default_groups.includes(element))
+        ) {
+            const currentGroups = scene.groups ?? [];
+            const newGroups = currentGroups.concat(taSettings.default_groups);
+            updateSceneMetadata(scene, { groups: uniq(newGroups) });
+        }
+    }, [isReady, taSettings, scene]);
 
     const playerContext: PlayerContextType = { role: role, id: playerId, name: playerName };
 

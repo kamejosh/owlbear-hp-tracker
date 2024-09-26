@@ -3,2343 +3,3192 @@
  * Do not make direct changes to the file.
  */
 
-
 export interface paths {
-  "/token": {
-    /** Login For Access Token */
-    post: operations["login_for_access_token_token_post"];
-  };
-  "/refresh": {
-    /** Refresh Access Token */
-    get: operations["refresh_access_token_refresh_get"];
-  };
-  "/password-reset": {
-    /** Reset Password */
-    post: operations["reset_password_password_reset_post"];
-  };
-  "/activation-link": {
-    /** Get Activation Mail */
-    post: operations["get_activation_mail_activation_link_post"];
-  };
-  "/stats/": {
-    /** Get Stats */
-    get: operations["get_stats_stats__get"];
-  };
-  "/api/v1/users/": {
-    /** Create User */
-    post: operations["create_user_api_v1_users__post"];
-  };
-  "/api/v1/users/{user_id}/roles": {
-    /** Update User Roles */
-    patch: operations["update_user_roles_api_v1_users__user_id__roles_patch"];
-  };
-  "/api/v1/users/me/": {
-    /** Get Users Me */
-    get: operations["get_users_me_api_v1_users_me__get"];
-    /** Update User */
-    patch: operations["update_user_api_v1_users_me__patch"];
-  };
-  "/api/v1/users/me/api_keys": {
-    /** List Api Keys */
-    get: operations["list_api_keys_api_v1_users_me_api_keys_get"];
-    /** Update Api Keys */
-    put: operations["update_api_keys_api_v1_users_me_api_keys_put"];
-    /** Update Api Keys */
-    delete: operations["update_api_keys_api_v1_users_me_api_keys_delete"];
-  };
-  "/api/v1/users/me/statblocks": {
-    /** List Statblocks */
-    get: operations["list_statblocks_api_v1_users_me_statblocks_get"];
-  };
-  "/api/v1/users/me/spells": {
-    /** List Spells */
-    get: operations["list_spells_api_v1_users_me_spells_get"];
-  };
-  "/api/v1/users/change-password": {
-    /** Change Password */
-    post: operations["change_password_api_v1_users_change_password_post"];
-  };
-  "/api/v1/users/activate": {
-    /** Activate User */
-    post: operations["activate_user_api_v1_users_activate_post"];
-  };
-  "/api/v1/users/me/settings": {
-    /** Get User Settings */
-    get: operations["get_user_settings_api_v1_users_me_settings_get"];
-    /** Put User Settings */
-    put: operations["put_user_settings_api_v1_users_me_settings_put"];
-  };
-  "/api/v1/pf/statblock/": {
-    /** List Pf Statblocks */
-    get: operations["list_pf_statblocks_api_v1_pf_statblock__get"];
-    /** Create Pf Statblock */
-    post: operations["create_pf_statblock_api_v1_pf_statblock__post"];
-  };
-  "/api/v1/pf/statblock/search/": {
-    /** Search Pf Statblock */
-    get: operations["search_pf_statblock_api_v1_pf_statblock_search__get"];
-  };
-  "/api/v1/pf/statblock/{slug}": {
-    /** Get Pf Statblock Slug */
-    get: operations["get_pf_statblock_slug_api_v1_pf_statblock__slug__get"];
-    /** Edit Pf Statblock */
-    put: operations["edit_pf_statblock_api_v1_pf_statblock__slug__put"];
-    /** Delete Pf Statblock */
-    delete: operations["delete_pf_statblock_api_v1_pf_statblock__slug__delete"];
-  };
-  "/api/v1/pf/statblock/{slug}/active": {
-    /** Set Active Pf Statblock */
-    put: operations["set_active_pf_statblock_api_v1_pf_statblock__slug__active_put"];
-  };
-  "/api/v1/pf/spell/": {
-    /** List Pf Spells */
-    get: operations["list_pf_spells_api_v1_pf_spell__get"];
-    /** Create Spell */
-    post: operations["create_spell_api_v1_pf_spell__post"];
-  };
-  "/api/v1/pf/spell/search": {
-    /** Search Pf Spell */
-    get: operations["search_pf_spell_api_v1_pf_spell_search_get"];
-  };
-  "/api/v1/pf/spell/{slug}": {
-    /** Get Pf Spells Slug */
-    get: operations["get_pf_spells_slug_api_v1_pf_spell__slug__get"];
-    /** Update Pf Spell */
-    put: operations["update_pf_spell_api_v1_pf_spell__slug__put"];
-    /** Delete Pf Spell */
-    delete: operations["delete_pf_spell_api_v1_pf_spell__slug__delete"];
-  };
-  "/api/v1/e5/statblock/": {
-    /** List E5 Statblocks */
-    get: operations["list_e5_statblocks_api_v1_e5_statblock__get"];
-    /** Create E5 Statblock */
-    post: operations["create_e5_statblock_api_v1_e5_statblock__post"];
-  };
-  "/api/v1/e5/statblock/search/": {
-    /** Search E5 Creature */
-    get: operations["search_e5_creature_api_v1_e5_statblock_search__get"];
-  };
-  "/api/v1/e5/statblock/{slug}": {
-    /** Get E5 Statblock Slug */
-    get: operations["get_e5_statblock_slug_api_v1_e5_statblock__slug__get"];
-    /** Edit E5 Statblock */
-    put: operations["edit_e5_statblock_api_v1_e5_statblock__slug__put"];
-    /** Delete E5 Statblock */
-    delete: operations["delete_e5_statblock_api_v1_e5_statblock__slug__delete"];
-  };
-  "/api/v1/e5/statblock/{slug}/active": {
-    /** Set Active E5 Statblock */
-    put: operations["set_active_e5_statblock_api_v1_e5_statblock__slug__active_put"];
-  };
-  "/api/v1/e5/statblock/external": {
-    /** Create Statblock From External Source */
-    post: operations["create_statblock_from_external_source_api_v1_e5_statblock_external_post"];
-  };
-  "/api/v1/e5/spell/": {
-    /** List E5 Spells */
-    get: operations["list_e5_spells_api_v1_e5_spell__get"];
-    /** Create Spell */
-    post: operations["create_spell_api_v1_e5_spell__post"];
-  };
-  "/api/v1/e5/spell/search": {
-    /** Search E5 Spell */
-    get: operations["search_e5_spell_api_v1_e5_spell_search_get"];
-  };
-  "/api/v1/e5/spell/{slug}": {
-    /** Get E5 Spells Slug */
-    get: operations["get_e5_spells_slug_api_v1_e5_spell__slug__get"];
-    /** Update E5 Spell */
-    put: operations["update_e5_spell_api_v1_e5_spell__slug__put"];
-    /** Delete E5 Spell */
-    delete: operations["delete_e5_spell_api_v1_e5_spell__slug__delete"];
-  };
-  "/legal/": {
-    /** Get Legal */
-    get: operations["get_legal_legal__get"];
-  };
+    "/token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Login For Access Token */
+        post: operations["login_for_access_token_token_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Refresh Access Token */
+        get: operations["refresh_access_token_refresh_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/password-reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reset Password */
+        post: operations["reset_password_password_reset_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/activation-link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Get Activation Mail */
+        post: operations["get_activation_mail_activation_link_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stats/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Stats */
+        get: operations["get_stats_stats__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create User */
+        post: operations["create_user_api_v1_users__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{user_id}/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update User Roles */
+        patch: operations["update_user_roles_api_v1_users__user_id__roles_patch"];
+        trace?: never;
+    };
+    "/api/v1/users/me/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Users Me */
+        get: operations["get_users_me_api_v1_users_me__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update User */
+        patch: operations["update_user_api_v1_users_me__patch"];
+        trace?: never;
+    };
+    "/api/v1/users/me/api_keys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Api Keys */
+        get: operations["list_api_keys_api_v1_users_me_api_keys_get"];
+        /** Update Api Keys */
+        put: operations["update_api_keys_api_v1_users_me_api_keys_put"];
+        post?: never;
+        /** Update Api Keys */
+        delete: operations["update_api_keys_api_v1_users_me_api_keys_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/me/statblocks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Statblocks */
+        get: operations["list_statblocks_api_v1_users_me_statblocks_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/me/spells": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Spells */
+        get: operations["list_spells_api_v1_users_me_spells_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/change-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Change Password */
+        post: operations["change_password_api_v1_users_change_password_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Activate User */
+        post: operations["activate_user_api_v1_users_activate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/me/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get User Settings */
+        get: operations["get_user_settings_api_v1_users_me_settings_get"];
+        /** Put User Settings */
+        put: operations["put_user_settings_api_v1_users_me_settings_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pf/statblock/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Pf Statblocks */
+        get: operations["list_pf_statblocks_api_v1_pf_statblock__get"];
+        put?: never;
+        /** Create Pf Statblock */
+        post: operations["create_pf_statblock_api_v1_pf_statblock__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pf/statblock/search/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search Pf Statblock */
+        get: operations["search_pf_statblock_api_v1_pf_statblock_search__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pf/statblock/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Pf Statblock Slug */
+        get: operations["get_pf_statblock_slug_api_v1_pf_statblock__slug__get"];
+        /** Edit Pf Statblock */
+        put: operations["edit_pf_statblock_api_v1_pf_statblock__slug__put"];
+        post?: never;
+        /** Delete Pf Statblock */
+        delete: operations["delete_pf_statblock_api_v1_pf_statblock__slug__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pf/statblock/{slug}/active": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set Active Pf Statblock */
+        put: operations["set_active_pf_statblock_api_v1_pf_statblock__slug__active_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pf/spell/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Pf Spells */
+        get: operations["list_pf_spells_api_v1_pf_spell__get"];
+        put?: never;
+        /** Create Spell */
+        post: operations["create_spell_api_v1_pf_spell__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pf/spell/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search Pf Spell */
+        get: operations["search_pf_spell_api_v1_pf_spell_search_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pf/spell/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Pf Spells Slug */
+        get: operations["get_pf_spells_slug_api_v1_pf_spell__slug__get"];
+        /** Update Pf Spell */
+        put: operations["update_pf_spell_api_v1_pf_spell__slug__put"];
+        post?: never;
+        /** Delete Pf Spell */
+        delete: operations["delete_pf_spell_api_v1_pf_spell__slug__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/e5/statblock/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List E5 Statblocks */
+        get: operations["list_e5_statblocks_api_v1_e5_statblock__get"];
+        put?: never;
+        /** Create E5 Statblock */
+        post: operations["create_e5_statblock_api_v1_e5_statblock__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/e5/statblock/search/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search E5 Creature */
+        get: operations["search_e5_creature_api_v1_e5_statblock_search__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/e5/statblock/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get E5 Statblock Slug */
+        get: operations["get_e5_statblock_slug_api_v1_e5_statblock__slug__get"];
+        /** Edit E5 Statblock */
+        put: operations["edit_e5_statblock_api_v1_e5_statblock__slug__put"];
+        post?: never;
+        /** Delete E5 Statblock */
+        delete: operations["delete_e5_statblock_api_v1_e5_statblock__slug__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/e5/statblock/{slug}/active": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set Active E5 Statblock */
+        put: operations["set_active_e5_statblock_api_v1_e5_statblock__slug__active_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/e5/statblock/external": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Statblock From External Source */
+        post: operations["create_statblock_from_external_source_api_v1_e5_statblock_external_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/e5/spell/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List E5 Spells */
+        get: operations["list_e5_spells_api_v1_e5_spell__get"];
+        put?: never;
+        /** Create Spell */
+        post: operations["create_spell_api_v1_e5_spell__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/e5/spell/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search E5 Spell */
+        get: operations["search_e5_spell_api_v1_e5_spell_search_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/e5/spell/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get E5 Spells Slug */
+        get: operations["get_e5_spells_slug_api_v1_e5_spell__slug__get"];
+        /** Update E5 Spell */
+        put: operations["update_e5_spell_api_v1_e5_spell__slug__put"];
+        post?: never;
+        /** Delete E5 Spell */
+        delete: operations["delete_e5_spell_api_v1_e5_spell__slug__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/e5/encounter/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get E5 Encounters */
+        get: operations["get_e5_encounters_api_v1_e5_encounter__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/legal/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Legal */
+        get: operations["get_legal_legal__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
-
 export type webhooks = Record<string, never>;
-
 export interface components {
-  schemas: {
-    /** Action */
-    "Action-Output": {
-      /** Name */
-      name: string;
-      /** Desc */
-      desc: string;
-      /** Attack Bonus */
-      attack_bonus?: number | null;
-      /** Damage Dice */
-      damage_dice?: string | null;
-      limit?: components["schemas"]["LimitedUse"] | null;
-    };
-    /** ActionOut */
-    ActionOut: {
-      /** Name */
-      name: string;
-      type: components["schemas"]["ActionTypeEnumOut"];
-      /** Description */
-      description?: string | null;
-      /** Damage */
-      damage?: string | null;
-      /** Trigger */
-      trigger?: string | null;
-      /** Requirements */
-      requirements?: string | null;
-      /** Effect */
-      effect?: string | null;
-      /** Frequency */
-      frequency?: string | null;
-      /** Success */
-      success?: string | null;
-      /** Critical Success */
-      critical_success?: string | null;
-      /** Failure */
-      failure?: string | null;
-      /** Critical Failure */
-      critical_failure?: string | null;
-      /** Constant */
-      constant?: string | null;
-      limit?: components["schemas"]["LimitedUse"] | null;
-    };
-    /**
-     * ActionTypeEnum
-     * @enum {string}
-     */
-    ActionTypeEnum: "free-action" | "one-action" | "two-actions" | "three-actions";
-    /**
-     * ActionTypeEnumOut
-     * @enum {string}
-     */
-    ActionTypeEnumOut: "FREE" | "ONE" | "TWO" | "THREE";
-    /** ArmorClass */
-    ArmorClass: {
-      /** Value */
-      value: number;
-      /** Special */
-      special?: string | null;
-    };
-    /** Bloodline */
-    Bloodline: {
-      /** Name */
-      name: string;
-    };
-    /** Body_login_for_access_token_token_post */
-    Body_login_for_access_token_token_post: {
-      /** Grant Type */
-      grant_type?: string | null;
-      /** Username */
-      username: string;
-      /** Password */
-      password: string;
-      /**
-       * Scope
-       * @default
-       */
-      scope?: string;
-      /** Client Id */
-      client_id?: string | null;
-      /** Client Secret */
-      client_secret?: string | null;
-    };
-    /** Cast */
-    Cast: {
-      /** Type */
-      type: string;
-      /** Somatic */
-      somatic: boolean;
-      /** Verbal */
-      verbal: boolean;
-      /** Material */
-      material: boolean;
-      /** Cost */
-      cost?: string | null;
-    };
-    /** Deity */
-    Deity: {
-      /** Name */
-      name: string;
-    };
-    /** Description */
-    Description: {
-      /** Text */
-      text: string;
-      /**
-       * Details
-       * @default []
-       */
-      details?: components["schemas"]["Detail"][];
-    };
-    /** Detail */
-    Detail: {
-      /** Title */
-      title?: string | null;
-      /** Text */
-      text: string;
-    };
-    /** Domain */
-    Domain: {
-      /** Name */
-      name: string;
-    };
-    /** E5StatblockIn */
-    E5StatblockIn: {
-      /** Name */
-      name: string;
-      /** About */
-      about?: string | null;
-      /** Size */
-      size: string;
-      /** Type */
-      type: string;
-      /** Subtype */
-      subtype?: string | null;
-      /** Group */
-      group?: string | null;
-      /**
-       * Alignment
-       * @default
-       */
-      alignment?: string;
-      armor_class: components["schemas"]["ArmorClass"];
-      hp: components["schemas"]["src__types__e5__Hitpoints"];
-      speed: components["schemas"]["Speed"];
-      stats: components["schemas"]["Stats-Input"];
-      saving_throws: components["schemas"]["src__types__e5__SavingThrows"];
-      /** Perception */
-      perception?: number | null;
-      skills?: components["schemas"]["Skills"] | null;
-      /** Damage Vulnerabilities */
-      damage_vulnerabilities?: string | null;
-      /** Damage Resistances */
-      damage_resistances?: string | null;
-      /** Damage Immunities */
-      damage_immunities?: string | null;
-      /** Condition Immunities */
-      condition_immunities?: string | null;
-      /**
-       * Senses
-       * @default []
-       */
-      senses?: string[];
-      /**
-       * Languages
-       * @default []
-       */
-      languages?: string[];
-      /**
-       * Items
-       * @default []
-       */
-      items?: string[];
-      /** Challenge Rating */
-      challenge_rating?: string | null;
-      /** Cr */
-      cr?: number | null;
-      /**
-       * Actions
-       * @default []
-       */
-      actions?: components["schemas"]["src__types__e5__Action"][];
-      /**
-       * Bonus Actions
-       * @default []
-       */
-      bonus_actions?: components["schemas"]["src__types__e5__Action"][];
-      /**
-       * Lair Actions
-       * @default []
-       */
-      lair_actions?: components["schemas"]["src__types__e5__Action"][];
-      /**
-       * Mythic Actions
-       * @default []
-       */
-      mythic_actions?: components["schemas"]["src__types__e5__Action"][];
-      /**
-       * Reactions
-       * @default []
-       */
-      reactions?: components["schemas"]["src__types__e5__Action"][];
-      /** Legendary Desc */
-      legendary_desc?: string | null;
-      /**
-       * Legendary Actions
-       * @default []
-       */
-      legendary_actions?: components["schemas"]["src__types__e5__Action"][];
-      /**
-       * Special Abilities
-       * @default []
-       */
-      special_abilities?: components["schemas"]["src__types__e5__Action"][];
-      /**
-       * Spell Slots
-       * @default []
-       */
-      spell_slots?: components["schemas"]["SpellSlots"][] | null;
-      /**
-       * Spells
-       * @default []
-       */
-      spells?: string[];
-      /** Spell Dc */
-      spell_dc?: string | null;
-      /** Spell Attack */
-      spell_attack?: string | null;
-      /**
-       * Limits
-       * @default []
-       */
-      limits?: components["schemas"]["LimitedUse"][] | null;
-      /** Source */
-      source?: string | null;
-    };
-    /** E5StatblockOut */
-    E5StatblockOut: {
-      /** Name */
-      name: string;
-      /** About */
-      about?: string | null;
-      /** Size */
-      size: string;
-      /** Type */
-      type: string;
-      /** Subtype */
-      subtype?: string | null;
-      /** Group */
-      group?: string | null;
-      /**
-       * Alignment
-       * @default
-       */
-      alignment?: string;
-      armor_class: components["schemas"]["ArmorClass"];
-      hp: components["schemas"]["src__types__e5__Hitpoints"];
-      speed: components["schemas"]["Speed"];
-      stats: components["schemas"]["src__types__e5__Stats"];
-      saving_throws: components["schemas"]["src__types__e5__SavingThrows"];
-      /** Perception */
-      perception?: number | null;
-      skills?: components["schemas"]["Skills"] | null;
-      /** Damage Vulnerabilities */
-      damage_vulnerabilities?: string | null;
-      /** Damage Resistances */
-      damage_resistances?: string | null;
-      /** Damage Immunities */
-      damage_immunities?: string | null;
-      /** Condition Immunities */
-      condition_immunities?: string | null;
-      /**
-       * Senses
-       * @default []
-       */
-      senses?: string[];
-      /**
-       * Languages
-       * @default []
-       */
-      languages?: string[];
-      /**
-       * Items
-       * @default []
-       */
-      items?: string[];
-      /** Challenge Rating */
-      challenge_rating?: string | null;
-      /** Cr */
-      cr?: number | null;
-      /**
-       * Actions
-       * @default []
-       */
-      actions?: components["schemas"]["Action-Output"][];
-      /**
-       * Bonus Actions
-       * @default []
-       */
-      bonus_actions?: components["schemas"]["Action-Output"][];
-      /**
-       * Lair Actions
-       * @default []
-       */
-      lair_actions?: components["schemas"]["Action-Output"][];
-      /**
-       * Mythic Actions
-       * @default []
-       */
-      mythic_actions?: components["schemas"]["Action-Output"][];
-      /**
-       * Reactions
-       * @default []
-       */
-      reactions?: components["schemas"]["Action-Output"][];
-      /** Legendary Desc */
-      legendary_desc?: string | null;
-      /**
-       * Legendary Actions
-       * @default []
-       */
-      legendary_actions?: components["schemas"]["Action-Output"][];
-      /**
-       * Special Abilities
-       * @default []
-       */
-      special_abilities?: components["schemas"]["Action-Output"][];
-      /**
-       * Spell Slots
-       * @default []
-       */
-      spell_slots?: components["schemas"]["SpellSlots"][] | null;
-      /**
-       * Spells
-       * @default []
-       */
-      spells?: components["schemas"]["src__types__e5__Spell"][];
-      /** Spell Dc */
-      spell_dc?: string | null;
-      /** Spell Attack */
-      spell_attack?: string | null;
-      /**
-       * Limits
-       * @default []
-       */
-      limits?: components["schemas"]["LimitedUse"][] | null;
-      /** Source */
-      source?: string | null;
-      /** Slug */
-      slug: string;
-      /** License */
-      license?: string | null;
-      /**
-       * Active
-       * @default false
-       */
-      active?: boolean;
-    };
-    /** ExternalIn */
-    ExternalIn: {
-      /** Id */
-      id: string;
-    };
-    /** HTTPValidationError */
-    HTTPValidationError: {
-      /** Detail */
-      detail?: components["schemas"]["ValidationError"][];
-    };
-    /** Heightened */
-    Heightened: {
-      /** Modifier */
-      modifier: string;
-      /** Description */
-      description: string;
-    };
-    /** Info */
-    Info: {
-      /**
-       * Type
-       * @enum {string}
-       */
-      type: "Cantrip" | "Focus" | "Spell";
-      /** Level */
-      level: number;
-    };
-    /** LimitedUse */
-    LimitedUse: {
-      /** Name */
-      name: string;
-      /** Description */
-      description?: string | null;
-      /** Uses */
-      uses: number;
-      /**
-       * Resets
-       * @default []
-       */
-      resets?: string[];
-    };
-    /** Mystery */
-    Mystery: {
-      /** Name */
-      name: string;
-    };
-    /** PFStatblockIn */
-    PFStatblockIn: {
-      /** Name */
-      name: string;
-      /** Type */
-      type: string;
-      /** Level */
-      level: number;
-      /** Traits */
-      traits: components["schemas"]["Trait"][];
-      /** Senses */
-      senses?: string[] | null;
-      /** Perception */
-      perception?: string | null;
-      /** Languages */
-      languages?: string[] | null;
-      /** Skills */
-      skills?: components["schemas"]["Skill"][] | null;
-      stats: components["schemas"]["Stats-Input"];
-      /**
-       * Items
-       * @default []
-       */
-      items?: string[];
-      armor_class: components["schemas"]["ArmorClass"];
-      saving_throws: components["schemas"]["src__types__pf__SavingThrows"];
-      hp: components["schemas"]["src__types__pf__Hitpoints"];
-      /**
-       * Immunities
-       * @default []
-       */
-      immunities?: string[];
-      /**
-       * Weaknesses
-       * @default []
-       */
-      weaknesses?: string[];
-      /**
-       * Resistances
-       * @default []
-       */
-      resistances?: string[];
-      /** Speed */
-      speed: string;
-      /**
-       * Actions
-       * @default []
-       */
-      actions?: components["schemas"]["src__types__pf__Action"][];
-      /**
-       * Reactions
-       * @default []
-       */
-      reactions?: components["schemas"]["Reaction"][];
-      /**
-       * Spells
-       * @default []
-       */
-      spells?: components["schemas"]["SpellCategory"][];
-      /** About */
-      about?: string | null;
-      /**
-       * Limits
-       * @default []
-       */
-      limits?: components["schemas"]["LimitedUse"][] | null;
-      /**
-       * Special Abilities
-       * @default []
-       */
-      special_abilities?: components["schemas"]["SpecialAbility"][];
-    };
-    /** PFStatblockOut */
-    PFStatblockOut: {
-      /** Name */
-      name: string;
-      /** Type */
-      type: string;
-      /** Level */
-      level: number;
-      /** Traits */
-      traits: components["schemas"]["Trait"][];
-      /** Senses */
-      senses?: string[] | null;
-      /** Perception */
-      perception?: string | null;
-      /** Languages */
-      languages?: string[] | null;
-      /** Skills */
-      skills?: components["schemas"]["Skill"][] | null;
-      stats: components["schemas"]["src__types__pf__Stats"];
-      /**
-       * Items
-       * @default []
-       */
-      items?: string[];
-      armor_class: components["schemas"]["ArmorClass"];
-      saving_throws: components["schemas"]["src__types__pf__SavingThrows"];
-      hp: components["schemas"]["src__types__pf__Hitpoints"];
-      /**
-       * Immunities
-       * @default []
-       */
-      immunities?: string[];
-      /**
-       * Weaknesses
-       * @default []
-       */
-      weaknesses?: string[];
-      /**
-       * Resistances
-       * @default []
-       */
-      resistances?: string[];
-      /** Speed */
-      speed: string;
-      /** Actions */
-      actions: components["schemas"]["ActionOut"][];
-      /**
-       * Reactions
-       * @default []
-       */
-      reactions?: components["schemas"]["Reaction"][];
-      /**
-       * Spells
-       * @default []
-       */
-      spells?: components["schemas"]["SpellCategoryOut"][];
-      /** About */
-      about?: string | null;
-      /**
-       * Limits
-       * @default []
-       */
-      limits?: components["schemas"]["LimitedUse"][] | null;
-      /**
-       * Special Abilities
-       * @default []
-       */
-      special_abilities?: components["schemas"]["SpecialAbility"][];
-      /** Slug */
-      slug: string;
-      /** Active */
-      active: boolean;
-      /** Source */
-      source?: string | null;
-    };
-    /** PasswordResetIn */
-    PasswordResetIn: {
-      /** Token */
-      token: string;
-      /** Password */
-      password: string;
-    };
-    /** Reaction */
-    Reaction: {
-      /** Name */
-      name: string;
-      /** Trigger */
-      trigger?: string | null;
-      /** Frequency */
-      frequency?: string | null;
-      /** Requirements */
-      requirements?: string | null;
-      /** Effect */
-      effect?: string | null;
-      /** Damage */
-      damage?: string | null;
-      /** Success */
-      success?: string | null;
-      /** Critical Success */
-      critical_success?: string | null;
-      /** Failure */
-      failure?: string | null;
-      /** Critical Failure */
-      critical_failure?: string | null;
-      limit?: components["schemas"]["LimitedUse"] | null;
-    };
-    /** Settings */
-    Settings: {
-      /**
-       * Crit Rules
-       * @default none
-       * @enum {string}
-       */
-      crit_rules?: "none" | "double_dice" | "double_role" | "max_roll";
-      /**
-       * Death Saves
-       * @default false
-       */
-      death_saves?: boolean;
-      /**
-       * Gm Rolls Hidden
-       * @default false
-       */
-      gm_rolls_hidden?: boolean;
-    };
-    /** Skill */
-    Skill: {
-      /** Name */
-      name: string;
-      /** Value */
-      value: string;
-    };
-    /** Skills */
-    Skills: {
-      /** Acrobatics */
-      acrobatics?: number | null;
-      /** Animal Handling */
-      animal_handling?: number | null;
-      /** Arcana */
-      arcana?: number | null;
-      /** Athletics */
-      athletics?: number | null;
-      /** Deception */
-      deception?: number | null;
-      /** History */
-      history?: number | null;
-      /** Insight */
-      insight?: number | null;
-      /** Intimidation */
-      intimidation?: number | null;
-      /** Investigation */
-      investigation?: number | null;
-      /** Medicine */
-      medicine?: number | null;
-      /** Nature */
-      nature?: number | null;
-      /** Perception */
-      perception?: number | null;
-      /** Performance */
-      performance?: number | null;
-      /** Persuasion */
-      persuasion?: number | null;
-      /** Religion */
-      religion?: number | null;
-      /** Sleight Of Hand */
-      sleight_of_hand?: number | null;
-      /** Stealth */
-      stealth?: number | null;
-      /** Survival */
-      survival?: number | null;
-    };
-    /** SpecialAbility */
-    SpecialAbility: {
-      /** Name */
-      name: string;
-      /** Description */
-      description: string;
-      limit?: components["schemas"]["LimitedUse"] | null;
-    };
-    /** Speed */
-    Speed: {
-      /** Walk */
-      walk?: number | null;
-      /** Fly */
-      fly?: number | null;
-      /** Swim */
-      swim?: number | null;
-      /** Climb */
-      climb?: number | null;
-      /** Burrow */
-      burrow?: number | null;
-      /** Hover */
-      hover?: number | null;
-      /** Lightwalking */
-      lightwalking?: number | null;
-      /** Notes */
-      notes?: string | null;
-    };
-    /** SpellArchetype */
-    SpellArchetype: {
-      /** Name */
-      name: string;
-    };
-    /** SpellCategory */
-    SpellCategory: {
-      /** Name */
-      name: string;
-      /** Dc */
-      dc: number;
-      /** Attack */
-      attack?: number | null;
-      /**
-       * Spell Lists
-       * @default []
-       */
-      spell_lists?: components["schemas"]["Spelllist"][] | null;
-    };
-    /** SpellCategoryOut */
-    SpellCategoryOut: {
-      /** Name */
-      name: string;
-      /** Dc */
-      dc: number;
-      /** Attack */
-      attack?: number | null;
-      /**
-       * Spell Lists
-       * @default []
-       */
-      spell_lists?: components["schemas"]["SpelllistOut"][] | null;
-    };
-    /** SpellCircle */
-    SpellCircle: {
-      /** Name */
-      name: string;
-    };
-    /** SpellClass */
-    SpellClass: {
-      /** Name */
-      name: string;
-    };
-    /** SpellInfo */
-    SpellInfo: {
-      /** Name */
-      name: string;
-    };
-    /** SpellOut */
-    SpellOut: {
-      /** Name */
-      name: string;
-      /** Slug */
-      slug: string;
-      /** Active */
-      active: boolean;
-      /** License */
-      license?: string | null;
-    };
-    /** SpellSchool */
-    SpellSchool: {
-      /** Name */
-      name: string;
-    };
-    /** SpellSlots */
-    SpellSlots: {
-      /** Level */
-      level: number;
-      limit: components["schemas"]["LimitedUse"];
-    };
-    /** SpellTrait */
-    SpellTrait: {
-      /** Name */
-      name: string;
-    };
-    /** Spelllist */
-    Spelllist: {
-      /** Type */
-      type: string;
-      /** Level */
-      level: string;
-      /** Spells */
-      spells: components["schemas"]["SpellInfo"][];
-      limit?: components["schemas"]["LimitedUse"] | null;
-    };
-    /** SpelllistOut */
-    SpelllistOut: {
-      /** Type */
-      type: string;
-      /** Level */
-      level: string;
-      /**
-       * Spells
-       * @default []
-       */
-      spells?: components["schemas"]["SpellOut"][] | null;
-      limit?: components["schemas"]["LimitedUse"] | null;
-    };
-    /** Stats */
-    "Stats-Input": {
-      /** Strength */
-      strength: number;
-      /** Dexterity */
-      dexterity: number;
-      /** Constitution */
-      constitution: number;
-      /** Intelligence */
-      intelligence: number;
-      /** Wisdom */
-      wisdom: number;
-      /** Charisma */
-      charisma: number;
-    };
-    /** Tradition */
-    Tradition: {
-      /** Name */
-      name: string;
-    };
-    /** Trait */
-    Trait: {
-      /** Name */
-      name: string;
-      /** Value */
-      value: string;
-    };
-    /** UpdateUserIn */
-    UpdateUserIn: {
-      /** Email */
-      email?: string | null;
-      /** Password */
-      password?: string | null;
-    };
-    /** UserIn */
-    UserIn: {
-      /** Username */
-      username: string;
-      /** Email */
-      email: string;
-      /** Password */
-      password: string;
-    };
-    /** UserOut */
-    UserOut: {
-      /** Username */
-      username: string;
-      /** Email */
-      email: string;
-    };
-    /** UserPartial */
-    UserPartial: {
-      /** Username */
-      username: string;
-    };
-    /** UserSpells */
-    UserSpells: {
-      /** E5 */
-      e5: components["schemas"]["src__types__e5__Spell"][];
-      /** Pf */
-      pf: components["schemas"]["SpellOut"][];
-    };
-    /** UserStatblocks */
-    UserStatblocks: {
-      /** E5 */
-      e5: components["schemas"]["E5StatblockOut"][];
-      /** Pf */
-      pf: components["schemas"]["PFStatblockOut"][];
-    };
-    /** UserWithApiKey */
-    UserWithApiKey: {
-      /** Username */
-      username: string;
-      /** Email */
-      email: string;
-      /** Api Keys */
-      api_keys: string[];
-    };
-    /** UserWithScopes */
-    UserWithScopes: {
-      /** Username */
-      username: string;
-      /** Email */
-      email: string;
-      /** Scopes */
-      scopes: string[];
-    };
-    /** ValidationError */
-    ValidationError: {
-      /** Location */
-      loc: (string | number)[];
-      /** Message */
-      msg: string;
-      /** Error Type */
-      type: string;
-    };
-    /** Action */
-    src__types__e5__Action: {
-      /** Name */
-      name: string;
-      /** Desc */
-      desc: string;
-      /** Attack Bonus */
-      attack_bonus?: number | null;
-      /** Damage Dice */
-      damage_dice?: string | null;
-      limit?: components["schemas"]["LimitedUse"] | null;
-    };
-    /** Hitpoints */
-    src__types__e5__Hitpoints: {
-      /** Value */
-      value: number;
-      /** Hit Dice */
-      hit_dice: string;
-    };
-    /** SavingThrows */
-    src__types__e5__SavingThrows: {
-      /** Strength Save */
-      strength_save?: number | null;
-      /** Dexterity Save */
-      dexterity_save?: number | null;
-      /** Constitution Save */
-      constitution_save?: number | null;
-      /** Intelligence Save */
-      intelligence_save?: number | null;
-      /** Wisdom Save */
-      wisdom_save?: number | null;
-      /** Charisma Save */
-      charisma_save?: number | null;
-    };
-    /** Spell */
-    src__types__e5__Spell: {
-      /** Name */
-      name: string;
-      /**
-       * Desc
-       * @default
-       */
-      desc?: string | null;
-      /**
-       * Higher Level
-       * @default
-       */
-      higher_level?: string | null;
-      /** Range */
-      range: string;
-      /** Verbal */
-      verbal: boolean;
-      /** Somatic */
-      somatic: boolean;
-      /** Material */
-      material: boolean;
-      /** Materials */
-      materials?: string | null;
-      /** Ritual */
-      ritual: boolean;
-      /** Duration */
-      duration: string;
-      /** Concentration */
-      concentration: boolean;
-      /** Casting Time */
-      casting_time: string;
-      /** Level */
-      level: number;
-      /** Is Attack */
-      is_attack?: boolean | null;
-      /** Dc */
-      dc?: string | null;
-      school: components["schemas"]["SpellSchool"];
-      /**
-       * Classes
-       * @default []
-       */
-      classes?: components["schemas"]["SpellClass"][] | null;
-      /**
-       * Archetypes
-       * @default []
-       */
-      archetypes?: components["schemas"]["SpellArchetype"][] | null;
-      /**
-       * Circles
-       * @default []
-       */
-      circles?: components["schemas"]["SpellCircle"][] | null;
-      /** Slug */
-      slug: string;
-      /** Active */
-      active: boolean;
-      /** Source */
-      source?: string | null;
-    };
-    /** SpellIn */
-    src__types__e5__SpellIn: {
-      /** Name */
-      name: string;
-      /**
-       * Desc
-       * @default
-       */
-      desc?: string | null;
-      /**
-       * Higher Level
-       * @default
-       */
-      higher_level?: string | null;
-      /** Range */
-      range: string;
-      /** Verbal */
-      verbal: boolean;
-      /** Somatic */
-      somatic: boolean;
-      /** Material */
-      material: boolean;
-      /** Materials */
-      materials?: string | null;
-      /** Ritual */
-      ritual: boolean;
-      /** Duration */
-      duration: string;
-      /** Concentration */
-      concentration: boolean;
-      /** Casting Time */
-      casting_time: string;
-      /** Level */
-      level: number;
-      /** Is Attack */
-      is_attack?: boolean | null;
-      /** Dc */
-      dc?: string | null;
-      /** School */
-      school: string;
-      /**
-       * Classes
-       * @default []
-       */
-      classes?: string[] | null;
-      /**
-       * Archetypes
-       * @default []
-       */
-      archetypes?: string[] | null;
-      /**
-       * Circles
-       * @default []
-       */
-      circles?: string[] | null;
-    };
-    /** Stats */
-    src__types__e5__Stats: {
-      /** Strength */
-      strength: number;
-      /** Dexterity */
-      dexterity: number;
-      /** Constitution */
-      constitution: number;
-      /** Intelligence */
-      intelligence: number;
-      /** Wisdom */
-      wisdom: number;
-      /** Charisma */
-      charisma: number;
-    };
-    /** Action */
-    src__types__pf__Action: {
-      /** Name */
-      name: string;
-      type: components["schemas"]["ActionTypeEnum"];
-      /** Description */
-      description?: string | null;
-      /** Damage */
-      damage?: string | null;
-      /** Trigger */
-      trigger?: string | null;
-      /** Requirements */
-      requirements?: string | null;
-      /** Effect */
-      effect?: string | null;
-      /** Frequency */
-      frequency?: string | null;
-      /** Success */
-      success?: string | null;
-      /** Critical Success */
-      critical_success?: string | null;
-      /** Failure */
-      failure?: string | null;
-      /** Critical Failure */
-      critical_failure?: string | null;
-      /** Constant */
-      constant?: string | null;
-      limit?: components["schemas"]["LimitedUse"] | null;
-    };
-    /** Hitpoints */
-    src__types__pf__Hitpoints: {
-      /** Value */
-      value: number;
-      /** Special */
-      special?: string | null;
-    };
-    /** SavingThrows */
-    src__types__pf__SavingThrows: {
-      /** Fortitude */
-      fortitude: number;
-      /** Reflex */
-      reflex: number;
-      /** Will */
-      will: number;
-      /** Special */
-      special?: string | null;
-    };
-    /** Spell */
-    src__types__pf__Spell: {
-      /** Name */
-      name: string;
-      info: components["schemas"]["Info"];
-      /**
-       * Traits
-       * @default []
-       */
-      traits?: components["schemas"]["SpellTrait"][];
-      /**
-       * Traditions
-       * @default []
-       */
-      traditions?: components["schemas"]["Tradition"][];
-      /**
-       * Bloodlines
-       * @default []
-       */
-      bloodlines?: components["schemas"]["Bloodline"][];
-      /**
-       * Deities
-       * @default []
-       */
-      deities?: components["schemas"]["Deity"][];
-      /**
-       * Domains
-       * @default []
-       */
-      domains?: components["schemas"]["Domain"][];
-      /**
-       * Mysteries
-       * @default []
-       */
-      mysteries?: components["schemas"]["Mystery"][];
-      /** Range */
-      range?: string | null;
-      /** Area */
-      area?: string | null;
-      /** Targets */
-      targets?: string | null;
-      /** Duration */
-      duration?: string | null;
-      /** Saving Throws */
-      saving_throws?: string | null;
-      /** Trigger */
-      trigger?: string | null;
-      cast: components["schemas"]["Cast"];
-      description?: components["schemas"]["Description"] | null;
-      /** Heightened */
-      heightened?: components["schemas"]["Heightened"][] | null;
-      /** Slug */
-      slug: string;
-      /** License */
-      license?: string | null;
-      /** Active */
-      active: boolean;
-      /** Source */
-      source?: string | null;
-    };
-    /** SpellIn */
-    src__types__pf__SpellIn: {
-      /** Name */
-      name: string;
-      info: components["schemas"]["Info"];
-      /**
-       * Traits
-       * @default []
-       */
-      traits?: string[];
-      /**
-       * Traditions
-       * @default []
-       */
-      traditions?: string[];
-      /**
-       * Bloodlines
-       * @default []
-       */
-      bloodlines?: string[];
-      /**
-       * Deities
-       * @default []
-       */
-      deities?: string[];
-      /**
-       * Domains
-       * @default []
-       */
-      domains?: string[];
-      /**
-       * Mysteries
-       * @default []
-       */
-      mysteries?: string[];
-      /** Range */
-      range?: string | null;
-      /** Area */
-      area?: string | null;
-      /** Targets */
-      targets?: string | null;
-      /** Duration */
-      duration?: string | null;
-      /** Saving Throws */
-      saving_throws?: string | null;
-      /** Trigger */
-      trigger?: string | null;
-      cast: components["schemas"]["Cast"];
-      description?: components["schemas"]["Description"] | null;
-      /** Heightened */
-      heightened?: components["schemas"]["Heightened"][] | null;
-    };
-    /** Stats */
-    src__types__pf__Stats: {
-      /** Strength */
-      strength: number;
-      /** Dexterity */
-      dexterity: number;
-      /** Constitution */
-      constitution: number;
-      /** Intelligence */
-      intelligence: number;
-      /** Wisdom */
-      wisdom: number;
-      /** Charisma */
-      charisma: number;
-    };
-    /** Stats */
-    src__types__types__Stats: {
-      /** Users */
-      users: number;
-      /** Statblocks */
-      statblocks: number;
-      /** Spells */
-      spells: number;
-      /** Patreon */
-      patreon?: number | null;
-    };
-  };
-  responses: never;
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+    schemas: {
+        /** Action */
+        "Action-Output": {
+            /** Name */
+            name: string;
+            /** Desc */
+            desc: string;
+            /** Attack Bonus */
+            attack_bonus?: number | null;
+            /** Damage Dice */
+            damage_dice?: string | null;
+            limit?: components["schemas"]["LimitedUse"] | null;
+        };
+        /** ActionOut */
+        ActionOut: {
+            /** Name */
+            name: string;
+            type: components["schemas"]["ActionTypeEnumOut"];
+            /** Description */
+            description?: string | null;
+            /** Damage */
+            damage?: string | null;
+            /** Trigger */
+            trigger?: string | null;
+            /** Requirements */
+            requirements?: string | null;
+            /** Effect */
+            effect?: string | null;
+            /** Frequency */
+            frequency?: string | null;
+            /** Success */
+            success?: string | null;
+            /** Critical Success */
+            critical_success?: string | null;
+            /** Failure */
+            failure?: string | null;
+            /** Critical Failure */
+            critical_failure?: string | null;
+            /** Constant */
+            constant?: string | null;
+            limit?: components["schemas"]["LimitedUse"] | null;
+        };
+        /**
+         * ActionTypeEnum
+         * @enum {string}
+         */
+        ActionTypeEnum: "free-action" | "one-action" | "two-actions" | "three-actions";
+        /**
+         * ActionTypeEnumOut
+         * @enum {string}
+         */
+        ActionTypeEnumOut: "FREE" | "ONE" | "TWO" | "THREE";
+        /** ArmorClass */
+        ArmorClass: {
+            /** Value */
+            value: number;
+            /** Special */
+            special?: string | null;
+        };
+        /** Bloodline */
+        Bloodline: {
+            /** Name */
+            name: string;
+        };
+        /** Body_login_for_access_token_token_post */
+        Body_login_for_access_token_token_post: {
+            /** Grant Type */
+            grant_type?: string | null;
+            /** Username */
+            username: string;
+            /** Password */
+            password: string;
+            /**
+             * Scope
+             * @default
+             */
+            scope: string;
+            /** Client Id */
+            client_id?: string | null;
+            /** Client Secret */
+            client_secret?: string | null;
+        };
+        /** Cast */
+        Cast: {
+            /** Type */
+            type: string;
+            /** Somatic */
+            somatic: boolean;
+            /** Verbal */
+            verbal: boolean;
+            /** Material */
+            material: boolean;
+            /** Cost */
+            cost?: string | null;
+        };
+        /** Deity */
+        Deity: {
+            /** Name */
+            name: string;
+        };
+        /** Description */
+        Description: {
+            /** Text */
+            text: string;
+            /**
+             * Details
+             * @default []
+             */
+            details: components["schemas"]["Detail"][];
+        };
+        /** Detail */
+        Detail: {
+            /** Title */
+            title?: string | null;
+            /** Text */
+            text: string;
+        };
+        /** Domain */
+        Domain: {
+            /** Name */
+            name: string;
+        };
+        /** E5StatblockIn */
+        E5StatblockIn: {
+            /** Name */
+            name: string;
+            /** About */
+            about?: string | null;
+            /** Size */
+            size: string;
+            /** Type */
+            type: string;
+            /** Subtype */
+            subtype?: string | null;
+            /** Group */
+            group?: string | null;
+            /**
+             * Alignment
+             * @default
+             */
+            alignment: string;
+            armor_class: components["schemas"]["ArmorClass"];
+            hp: components["schemas"]["src__types__e5__Hitpoints"];
+            speed: components["schemas"]["Speed"];
+            stats: components["schemas"]["Stats-Input"];
+            saving_throws: components["schemas"]["src__types__e5__SavingThrows"];
+            /** Perception */
+            perception?: number | null;
+            skills?: components["schemas"]["Skills"] | null;
+            /** Damage Vulnerabilities */
+            damage_vulnerabilities?: string | null;
+            /** Damage Resistances */
+            damage_resistances?: string | null;
+            /** Damage Immunities */
+            damage_immunities?: string | null;
+            /** Condition Immunities */
+            condition_immunities?: string | null;
+            /**
+             * Senses
+             * @default []
+             */
+            senses: string[];
+            /**
+             * Languages
+             * @default []
+             */
+            languages: string[];
+            /**
+             * Items
+             * @default []
+             */
+            items: string[];
+            /** Challenge Rating */
+            challenge_rating?: string | null;
+            /** Cr */
+            cr?: number | null;
+            /**
+             * Actions
+             * @default []
+             */
+            actions: components["schemas"]["src__types__e5__Action"][];
+            /**
+             * Bonus Actions
+             * @default []
+             */
+            bonus_actions: components["schemas"]["src__types__e5__Action"][];
+            /**
+             * Lair Actions
+             * @default []
+             */
+            lair_actions: components["schemas"]["src__types__e5__Action"][];
+            /**
+             * Mythic Actions
+             * @default []
+             */
+            mythic_actions: components["schemas"]["src__types__e5__Action"][];
+            /**
+             * Reactions
+             * @default []
+             */
+            reactions: components["schemas"]["src__types__e5__Action"][];
+            /** Legendary Desc */
+            legendary_desc?: string | null;
+            /**
+             * Legendary Actions
+             * @default []
+             */
+            legendary_actions: components["schemas"]["src__types__e5__Action"][];
+            /**
+             * Special Abilities
+             * @default []
+             */
+            special_abilities: components["schemas"]["src__types__e5__Action"][];
+            /**
+             * Spell Slots
+             * @default []
+             */
+            spell_slots: components["schemas"]["SpellSlots"][] | null;
+            /**
+             * Spells
+             * @default []
+             */
+            spells: string[];
+            /** Spell Dc */
+            spell_dc?: string | null;
+            /** Spell Attack */
+            spell_attack?: string | null;
+            /**
+             * Limits
+             * @default []
+             */
+            limits: components["schemas"]["LimitedUse"][] | null;
+            /** Source */
+            source?: string | null;
+        };
+        /** E5StatblockOut */
+        E5StatblockOut: {
+            /** Name */
+            name: string;
+            /** About */
+            about?: string | null;
+            /** Size */
+            size: string;
+            /** Type */
+            type: string;
+            /** Subtype */
+            subtype?: string | null;
+            /** Group */
+            group?: string | null;
+            /**
+             * Alignment
+             * @default
+             */
+            alignment: string;
+            armor_class: components["schemas"]["ArmorClass"];
+            hp: components["schemas"]["src__types__e5__Hitpoints"];
+            speed: components["schemas"]["Speed"];
+            stats: components["schemas"]["src__types__e5__Stats"];
+            saving_throws: components["schemas"]["src__types__e5__SavingThrows"];
+            /** Perception */
+            perception?: number | null;
+            skills?: components["schemas"]["Skills"] | null;
+            /** Damage Vulnerabilities */
+            damage_vulnerabilities?: string | null;
+            /** Damage Resistances */
+            damage_resistances?: string | null;
+            /** Damage Immunities */
+            damage_immunities?: string | null;
+            /** Condition Immunities */
+            condition_immunities?: string | null;
+            /**
+             * Senses
+             * @default []
+             */
+            senses: string[];
+            /**
+             * Languages
+             * @default []
+             */
+            languages: string[];
+            /**
+             * Items
+             * @default []
+             */
+            items: string[];
+            /** Challenge Rating */
+            challenge_rating?: string | null;
+            /** Cr */
+            cr?: number | null;
+            /**
+             * Actions
+             * @default []
+             */
+            actions: components["schemas"]["Action-Output"][];
+            /**
+             * Bonus Actions
+             * @default []
+             */
+            bonus_actions: components["schemas"]["Action-Output"][];
+            /**
+             * Lair Actions
+             * @default []
+             */
+            lair_actions: components["schemas"]["Action-Output"][];
+            /**
+             * Mythic Actions
+             * @default []
+             */
+            mythic_actions: components["schemas"]["Action-Output"][];
+            /**
+             * Reactions
+             * @default []
+             */
+            reactions: components["schemas"]["Action-Output"][];
+            /** Legendary Desc */
+            legendary_desc?: string | null;
+            /**
+             * Legendary Actions
+             * @default []
+             */
+            legendary_actions: components["schemas"]["Action-Output"][];
+            /**
+             * Special Abilities
+             * @default []
+             */
+            special_abilities: components["schemas"]["Action-Output"][];
+            /**
+             * Spell Slots
+             * @default []
+             */
+            spell_slots: components["schemas"]["SpellSlots"][] | null;
+            /**
+             * Spells
+             * @default []
+             */
+            spells: components["schemas"]["src__types__e5__Spell"][];
+            /** Spell Dc */
+            spell_dc?: string | null;
+            /** Spell Attack */
+            spell_attack?: string | null;
+            /**
+             * Limits
+             * @default []
+             */
+            limits: components["schemas"]["LimitedUse"][] | null;
+            /** Source */
+            source?: string | null;
+            /** Slug */
+            slug: string;
+            /** License */
+            license?: string | null;
+            /**
+             * Active
+             * @default false
+             */
+            active: boolean;
+        };
+        /** ExternalIn */
+        ExternalIn: {
+            /** Id */
+            id: string;
+        };
+        /** HTTPValidationError */
+        HTTPValidationError: {
+            /** Detail */
+            detail?: components["schemas"]["ValidationError"][];
+        };
+        /** Heightened */
+        Heightened: {
+            /** Modifier */
+            modifier: string;
+            /** Description */
+            description: string;
+        };
+        /** Info */
+        Info: {
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "Cantrip" | "Focus" | "Spell";
+            /** Level */
+            level: number;
+        };
+        /** LimitedUse */
+        LimitedUse: {
+            /** Name */
+            name: string;
+            /** Description */
+            description?: string | null;
+            /** Uses */
+            uses: number;
+            /**
+             * Resets
+             * @default []
+             */
+            resets: string[];
+        };
+        /** Mystery */
+        Mystery: {
+            /** Name */
+            name: string;
+        };
+        /** PFStatblockIn */
+        PFStatblockIn: {
+            /** Name */
+            name: string;
+            /** Type */
+            type: string;
+            /** Level */
+            level: number;
+            /** Traits */
+            traits: components["schemas"]["Trait"][];
+            /** Senses */
+            senses?: string[] | null;
+            /** Perception */
+            perception?: string | null;
+            /** Languages */
+            languages?: string[] | null;
+            /** Skills */
+            skills?: components["schemas"]["Skill"][] | null;
+            stats: components["schemas"]["Stats-Input"];
+            /**
+             * Items
+             * @default []
+             */
+            items: string[];
+            armor_class: components["schemas"]["ArmorClass"];
+            saving_throws: components["schemas"]["src__types__pf__SavingThrows"];
+            hp: components["schemas"]["src__types__pf__Hitpoints"];
+            /**
+             * Immunities
+             * @default []
+             */
+            immunities: string[];
+            /**
+             * Weaknesses
+             * @default []
+             */
+            weaknesses: string[];
+            /**
+             * Resistances
+             * @default []
+             */
+            resistances: string[];
+            /** Speed */
+            speed: string;
+            /**
+             * Actions
+             * @default []
+             */
+            actions: components["schemas"]["src__types__pf__Action"][];
+            /**
+             * Reactions
+             * @default []
+             */
+            reactions: components["schemas"]["Reaction"][];
+            /**
+             * Spells
+             * @default []
+             */
+            spells: components["schemas"]["SpellCategory"][];
+            /** About */
+            about?: string | null;
+            /**
+             * Limits
+             * @default []
+             */
+            limits: components["schemas"]["LimitedUse"][] | null;
+            /**
+             * Special Abilities
+             * @default []
+             */
+            special_abilities: components["schemas"]["SpecialAbility"][];
+        };
+        /** PFStatblockOut */
+        PFStatblockOut: {
+            /** Name */
+            name: string;
+            /** Type */
+            type: string;
+            /** Level */
+            level: number;
+            /** Traits */
+            traits: components["schemas"]["Trait"][];
+            /** Senses */
+            senses?: string[] | null;
+            /** Perception */
+            perception?: string | null;
+            /** Languages */
+            languages?: string[] | null;
+            /** Skills */
+            skills?: components["schemas"]["Skill"][] | null;
+            stats: components["schemas"]["src__types__pf__Stats"];
+            /**
+             * Items
+             * @default []
+             */
+            items: string[];
+            armor_class: components["schemas"]["ArmorClass"];
+            saving_throws: components["schemas"]["src__types__pf__SavingThrows"];
+            hp: components["schemas"]["src__types__pf__Hitpoints"];
+            /**
+             * Immunities
+             * @default []
+             */
+            immunities: string[];
+            /**
+             * Weaknesses
+             * @default []
+             */
+            weaknesses: string[];
+            /**
+             * Resistances
+             * @default []
+             */
+            resistances: string[];
+            /** Speed */
+            speed: string;
+            /** Actions */
+            actions: components["schemas"]["ActionOut"][];
+            /**
+             * Reactions
+             * @default []
+             */
+            reactions: components["schemas"]["Reaction"][];
+            /**
+             * Spells
+             * @default []
+             */
+            spells: components["schemas"]["SpellCategoryOut"][];
+            /** About */
+            about?: string | null;
+            /**
+             * Limits
+             * @default []
+             */
+            limits: components["schemas"]["LimitedUse"][] | null;
+            /**
+             * Special Abilities
+             * @default []
+             */
+            special_abilities: components["schemas"]["SpecialAbility"][];
+            /** Slug */
+            slug: string;
+            /** Active */
+            active: boolean;
+            /** Source */
+            source?: string | null;
+        };
+        /** PasswordResetIn */
+        PasswordResetIn: {
+            /** Token */
+            token: string;
+            /** Password */
+            password: string;
+        };
+        /** Reaction */
+        Reaction: {
+            /** Name */
+            name: string;
+            /** Trigger */
+            trigger?: string | null;
+            /** Frequency */
+            frequency?: string | null;
+            /** Requirements */
+            requirements?: string | null;
+            /** Effect */
+            effect?: string | null;
+            /** Damage */
+            damage?: string | null;
+            /** Success */
+            success?: string | null;
+            /** Critical Success */
+            critical_success?: string | null;
+            /** Failure */
+            failure?: string | null;
+            /** Critical Failure */
+            critical_failure?: string | null;
+            limit?: components["schemas"]["LimitedUse"] | null;
+        };
+        /** Settings */
+        Settings: {
+            /**
+             * Crit Rules
+             * @default none
+             * @enum {string}
+             */
+            crit_rules: "none" | "double_dice" | "double_role" | "max_roll";
+            /**
+             * Death Saves
+             * @default false
+             */
+            death_saves: boolean;
+            /**
+             * Gm Rolls Hidden
+             * @default false
+             */
+            gm_rolls_hidden: boolean;
+            /**
+             * Default Groups
+             * @default []
+             */
+            default_groups: string[];
+        };
+        /** Skill */
+        Skill: {
+            /** Name */
+            name: string;
+            /** Value */
+            value: string;
+        };
+        /** Skills */
+        Skills: {
+            /** Acrobatics */
+            acrobatics?: number | null;
+            /** Animal Handling */
+            animal_handling?: number | null;
+            /** Arcana */
+            arcana?: number | null;
+            /** Athletics */
+            athletics?: number | null;
+            /** Deception */
+            deception?: number | null;
+            /** History */
+            history?: number | null;
+            /** Insight */
+            insight?: number | null;
+            /** Intimidation */
+            intimidation?: number | null;
+            /** Investigation */
+            investigation?: number | null;
+            /** Medicine */
+            medicine?: number | null;
+            /** Nature */
+            nature?: number | null;
+            /** Perception */
+            perception?: number | null;
+            /** Performance */
+            performance?: number | null;
+            /** Persuasion */
+            persuasion?: number | null;
+            /** Religion */
+            religion?: number | null;
+            /** Sleight Of Hand */
+            sleight_of_hand?: number | null;
+            /** Stealth */
+            stealth?: number | null;
+            /** Survival */
+            survival?: number | null;
+        };
+        /** SpecialAbility */
+        SpecialAbility: {
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            limit?: components["schemas"]["LimitedUse"] | null;
+        };
+        /** Speed */
+        Speed: {
+            /** Walk */
+            walk?: number | null;
+            /** Fly */
+            fly?: number | null;
+            /** Swim */
+            swim?: number | null;
+            /** Climb */
+            climb?: number | null;
+            /** Burrow */
+            burrow?: number | null;
+            /** Hover */
+            hover?: number | null;
+            /** Lightwalking */
+            lightwalking?: number | null;
+            /** Notes */
+            notes?: string | null;
+        };
+        /** SpellArchetype */
+        SpellArchetype: {
+            /** Name */
+            name: string;
+        };
+        /** SpellCategory */
+        SpellCategory: {
+            /** Name */
+            name: string;
+            /** Dc */
+            dc: number;
+            /** Attack */
+            attack?: number | null;
+            /**
+             * Spell Lists
+             * @default []
+             */
+            spell_lists: components["schemas"]["Spelllist"][] | null;
+        };
+        /** SpellCategoryOut */
+        SpellCategoryOut: {
+            /** Name */
+            name: string;
+            /** Dc */
+            dc: number;
+            /** Attack */
+            attack?: number | null;
+            /**
+             * Spell Lists
+             * @default []
+             */
+            spell_lists: components["schemas"]["SpelllistOut"][] | null;
+        };
+        /** SpellCircle */
+        SpellCircle: {
+            /** Name */
+            name: string;
+        };
+        /** SpellClass */
+        SpellClass: {
+            /** Name */
+            name: string;
+        };
+        /** SpellInfo */
+        SpellInfo: {
+            /** Name */
+            name: string;
+        };
+        /** SpellOut */
+        SpellOut: {
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+            /** Active */
+            active: boolean;
+            /** License */
+            license?: string | null;
+        };
+        /** SpellSchool */
+        SpellSchool: {
+            /** Name */
+            name: string;
+        };
+        /** SpellSlots */
+        SpellSlots: {
+            /** Level */
+            level: number;
+            limit: components["schemas"]["LimitedUse"];
+        };
+        /** SpellTrait */
+        SpellTrait: {
+            /** Name */
+            name: string;
+        };
+        /** Spelllist */
+        Spelllist: {
+            /** Type */
+            type: string;
+            /** Level */
+            level: string;
+            /** Spells */
+            spells: components["schemas"]["SpellInfo"][];
+            limit?: components["schemas"]["LimitedUse"] | null;
+        };
+        /** SpelllistOut */
+        SpelllistOut: {
+            /** Type */
+            type: string;
+            /** Level */
+            level: string;
+            /**
+             * Spells
+             * @default []
+             */
+            spells: components["schemas"]["SpellOut"][] | null;
+            limit?: components["schemas"]["LimitedUse"] | null;
+        };
+        /** Stats */
+        "Stats-Input": {
+            /** Strength */
+            strength: number;
+            /** Dexterity */
+            dexterity: number;
+            /** Constitution */
+            constitution: number;
+            /** Intelligence */
+            intelligence: number;
+            /** Wisdom */
+            wisdom: number;
+            /** Charisma */
+            charisma: number;
+        };
+        /** Tradition */
+        Tradition: {
+            /** Name */
+            name: string;
+        };
+        /** Trait */
+        Trait: {
+            /** Name */
+            name: string;
+            /** Value */
+            value: string;
+        };
+        /** UpdateUserIn */
+        UpdateUserIn: {
+            /** Email */
+            email?: string | null;
+            /** Password */
+            password?: string | null;
+        };
+        /** UserIn */
+        UserIn: {
+            /** Username */
+            username: string;
+            /** Email */
+            email: string;
+            /** Password */
+            password: string;
+        };
+        /** UserOut */
+        UserOut: {
+            /** Username */
+            username: string;
+            /** Email */
+            email: string;
+        };
+        /** UserPartial */
+        UserPartial: {
+            /** Username */
+            username: string;
+        };
+        /** UserSpells */
+        UserSpells: {
+            /** E5 */
+            e5: components["schemas"]["src__types__e5__Spell"][];
+            /** Pf */
+            pf: components["schemas"]["SpellOut"][];
+        };
+        /** UserStatblocks */
+        UserStatblocks: {
+            /** E5 */
+            e5: components["schemas"]["E5StatblockOut"][];
+            /** Pf */
+            pf: components["schemas"]["PFStatblockOut"][];
+        };
+        /** UserWithApiKey */
+        UserWithApiKey: {
+            /** Username */
+            username: string;
+            /** Email */
+            email: string;
+            /** Api Keys */
+            api_keys: string[];
+        };
+        /** UserWithScopes */
+        UserWithScopes: {
+            /** Username */
+            username: string;
+            /** Email */
+            email: string;
+            /** Scopes */
+            scopes: string[];
+        };
+        /** ValidationError */
+        ValidationError: {
+            /** Location */
+            loc: (string | number)[];
+            /** Message */
+            msg: string;
+            /** Error Type */
+            type: string;
+        };
+        /** Action */
+        src__types__e5__Action: {
+            /** Name */
+            name: string;
+            /** Desc */
+            desc: string;
+            /** Attack Bonus */
+            attack_bonus?: number | null;
+            /** Damage Dice */
+            damage_dice?: string | null;
+            limit?: components["schemas"]["LimitedUse"] | null;
+        };
+        /** Hitpoints */
+        src__types__e5__Hitpoints: {
+            /** Value */
+            value: number;
+            /** Hit Dice */
+            hit_dice: string;
+        };
+        /** SavingThrows */
+        src__types__e5__SavingThrows: {
+            /** Strength Save */
+            strength_save?: number | null;
+            /** Dexterity Save */
+            dexterity_save?: number | null;
+            /** Constitution Save */
+            constitution_save?: number | null;
+            /** Intelligence Save */
+            intelligence_save?: number | null;
+            /** Wisdom Save */
+            wisdom_save?: number | null;
+            /** Charisma Save */
+            charisma_save?: number | null;
+        };
+        /** Spell */
+        src__types__e5__Spell: {
+            /** Name */
+            name: string;
+            /**
+             * Desc
+             * @default
+             */
+            desc: string | null;
+            /**
+             * Higher Level
+             * @default
+             */
+            higher_level: string | null;
+            /** Range */
+            range: string;
+            /** Verbal */
+            verbal: boolean;
+            /** Somatic */
+            somatic: boolean;
+            /** Material */
+            material: boolean;
+            /** Materials */
+            materials?: string | null;
+            /** Ritual */
+            ritual: boolean;
+            /** Duration */
+            duration: string;
+            /** Concentration */
+            concentration: boolean;
+            /** Casting Time */
+            casting_time: string;
+            /** Level */
+            level: number;
+            /** Is Attack */
+            is_attack?: boolean | null;
+            /** Dc */
+            dc?: string | null;
+            school: components["schemas"]["SpellSchool"];
+            /**
+             * Classes
+             * @default []
+             */
+            classes: components["schemas"]["SpellClass"][] | null;
+            /**
+             * Archetypes
+             * @default []
+             */
+            archetypes: components["schemas"]["SpellArchetype"][] | null;
+            /**
+             * Circles
+             * @default []
+             */
+            circles: components["schemas"]["SpellCircle"][] | null;
+            /** Slug */
+            slug: string;
+            /** Active */
+            active: boolean;
+            /** Source */
+            source?: string | null;
+        };
+        /** SpellIn */
+        src__types__e5__SpellIn: {
+            /** Name */
+            name: string;
+            /**
+             * Desc
+             * @default
+             */
+            desc: string | null;
+            /**
+             * Higher Level
+             * @default
+             */
+            higher_level: string | null;
+            /** Range */
+            range: string;
+            /** Verbal */
+            verbal: boolean;
+            /** Somatic */
+            somatic: boolean;
+            /** Material */
+            material: boolean;
+            /** Materials */
+            materials?: string | null;
+            /** Ritual */
+            ritual: boolean;
+            /** Duration */
+            duration: string;
+            /** Concentration */
+            concentration: boolean;
+            /** Casting Time */
+            casting_time: string;
+            /** Level */
+            level: number;
+            /** Is Attack */
+            is_attack?: boolean | null;
+            /** Dc */
+            dc?: string | null;
+            /** School */
+            school: string;
+            /**
+             * Classes
+             * @default []
+             */
+            classes: string[] | null;
+            /**
+             * Archetypes
+             * @default []
+             */
+            archetypes: string[] | null;
+            /**
+             * Circles
+             * @default []
+             */
+            circles: string[] | null;
+        };
+        /** Stats */
+        src__types__e5__Stats: {
+            /** Strength */
+            strength: number;
+            /** Dexterity */
+            dexterity: number;
+            /** Constitution */
+            constitution: number;
+            /** Intelligence */
+            intelligence: number;
+            /** Wisdom */
+            wisdom: number;
+            /** Charisma */
+            charisma: number;
+        };
+        /** Action */
+        src__types__pf__Action: {
+            /** Name */
+            name: string;
+            type: components["schemas"]["ActionTypeEnum"];
+            /** Description */
+            description?: string | null;
+            /** Damage */
+            damage?: string | null;
+            /** Trigger */
+            trigger?: string | null;
+            /** Requirements */
+            requirements?: string | null;
+            /** Effect */
+            effect?: string | null;
+            /** Frequency */
+            frequency?: string | null;
+            /** Success */
+            success?: string | null;
+            /** Critical Success */
+            critical_success?: string | null;
+            /** Failure */
+            failure?: string | null;
+            /** Critical Failure */
+            critical_failure?: string | null;
+            /** Constant */
+            constant?: string | null;
+            limit?: components["schemas"]["LimitedUse"] | null;
+        };
+        /** Hitpoints */
+        src__types__pf__Hitpoints: {
+            /** Value */
+            value: number;
+            /** Special */
+            special?: string | null;
+        };
+        /** SavingThrows */
+        src__types__pf__SavingThrows: {
+            /** Fortitude */
+            fortitude: number;
+            /** Reflex */
+            reflex: number;
+            /** Will */
+            will: number;
+            /** Special */
+            special?: string | null;
+        };
+        /** Spell */
+        src__types__pf__Spell: {
+            /** Name */
+            name: string;
+            info: components["schemas"]["Info"];
+            /**
+             * Traits
+             * @default []
+             */
+            traits: components["schemas"]["SpellTrait"][];
+            /**
+             * Traditions
+             * @default []
+             */
+            traditions: components["schemas"]["Tradition"][];
+            /**
+             * Bloodlines
+             * @default []
+             */
+            bloodlines: components["schemas"]["Bloodline"][];
+            /**
+             * Deities
+             * @default []
+             */
+            deities: components["schemas"]["Deity"][];
+            /**
+             * Domains
+             * @default []
+             */
+            domains: components["schemas"]["Domain"][];
+            /**
+             * Mysteries
+             * @default []
+             */
+            mysteries: components["schemas"]["Mystery"][];
+            /** Range */
+            range?: string | null;
+            /** Area */
+            area?: string | null;
+            /** Targets */
+            targets?: string | null;
+            /** Duration */
+            duration?: string | null;
+            /** Saving Throws */
+            saving_throws?: string | null;
+            /** Trigger */
+            trigger?: string | null;
+            cast: components["schemas"]["Cast"];
+            description?: components["schemas"]["Description"] | null;
+            /** Heightened */
+            heightened?: components["schemas"]["Heightened"][] | null;
+            /** Slug */
+            slug: string;
+            /** License */
+            license?: string | null;
+            /** Active */
+            active: boolean;
+            /** Source */
+            source?: string | null;
+        };
+        /** SpellIn */
+        src__types__pf__SpellIn: {
+            /** Name */
+            name: string;
+            info: components["schemas"]["Info"];
+            /**
+             * Traits
+             * @default []
+             */
+            traits: string[];
+            /**
+             * Traditions
+             * @default []
+             */
+            traditions: string[];
+            /**
+             * Bloodlines
+             * @default []
+             */
+            bloodlines: string[];
+            /**
+             * Deities
+             * @default []
+             */
+            deities: string[];
+            /**
+             * Domains
+             * @default []
+             */
+            domains: string[];
+            /**
+             * Mysteries
+             * @default []
+             */
+            mysteries: string[];
+            /** Range */
+            range?: string | null;
+            /** Area */
+            area?: string | null;
+            /** Targets */
+            targets?: string | null;
+            /** Duration */
+            duration?: string | null;
+            /** Saving Throws */
+            saving_throws?: string | null;
+            /** Trigger */
+            trigger?: string | null;
+            cast: components["schemas"]["Cast"];
+            description?: components["schemas"]["Description"] | null;
+            /** Heightened */
+            heightened?: components["schemas"]["Heightened"][] | null;
+        };
+        /** Stats */
+        src__types__pf__Stats: {
+            /** Strength */
+            strength: number;
+            /** Dexterity */
+            dexterity: number;
+            /** Constitution */
+            constitution: number;
+            /** Intelligence */
+            intelligence: number;
+            /** Wisdom */
+            wisdom: number;
+            /** Charisma */
+            charisma: number;
+        };
+        /** Stats */
+        src__types__types__Stats: {
+            /** Users */
+            users: number;
+            /** Statblocks */
+            statblocks: number;
+            /** Spells */
+            spells: number;
+            /** Patreon */
+            patreon?: number | null;
+        };
+    };
+    responses: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
-
 export type $defs = Record<string, never>;
-
-export type external = Record<string, never>;
-
 export interface operations {
-
-  /** Login For Access Token */
-  login_for_access_token_token_post: {
-    requestBody: {
-      content: {
-        "application/x-www-form-urlencoded": components["schemas"]["Body_login_for_access_token_token_post"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Refresh Access Token */
-  refresh_access_token_refresh_get: {
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
-  /** Reset Password */
-  reset_password_password_reset_post: {
-    parameters: {
-      query: {
-        email: string;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Get Activation Mail */
-  get_activation_mail_activation_link_post: {
-    parameters: {
-      query: {
-        username: string;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Get Stats */
-  get_stats_stats__get: {
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["src__types__types__Stats"];
-        };
-      };
-    };
-  };
-  /** Create User */
-  create_user_api_v1_users__post: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["UserIn"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["UserPartial"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Update User Roles */
-  update_user_roles_api_v1_users__user_id__roles_patch: {
-    parameters: {
-      path: {
-        user_id: string;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": string[];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Get Users Me */
-  get_users_me_api_v1_users_me__get: {
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["UserWithScopes"];
-        };
-      };
-    };
-  };
-  /** Update User */
-  update_user_api_v1_users_me__patch: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["UpdateUserIn"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["UserOut"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** List Api Keys */
-  list_api_keys_api_v1_users_me_api_keys_get: {
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["UserWithApiKey"];
-        };
-      };
-    };
-  };
-  /** Update Api Keys */
-  update_api_keys_api_v1_users_me_api_keys_put: {
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["UserWithApiKey"];
-        };
-      };
-    };
-  };
-  /** Update Api Keys */
-  update_api_keys_api_v1_users_me_api_keys_delete: {
-    parameters: {
-      query: {
-        api_key: string;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["UserWithApiKey"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** List Statblocks */
-  list_statblocks_api_v1_users_me_statblocks_get: {
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["UserStatblocks"];
-        };
-      };
-    };
-  };
-  /** List Spells */
-  list_spells_api_v1_users_me_spells_get: {
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["UserSpells"];
-        };
-      };
-    };
-  };
-  /** Change Password */
-  change_password_api_v1_users_change_password_post: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PasswordResetIn"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Activate User */
-  activate_user_api_v1_users_activate_post: {
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
-  /** Get User Settings */
-  get_user_settings_api_v1_users_me_settings_get: {
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
-  /** Put User Settings */
-  put_user_settings_api_v1_users_me_settings_put: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["Settings"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** List Pf Statblocks */
-  list_pf_statblocks_api_v1_pf_statblock__get: {
-    parameters: {
-      query?: {
-        take?: number | null;
-        skip?: number | null;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["PFStatblockOut"][];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Create Pf Statblock */
-  create_pf_statblock_api_v1_pf_statblock__post: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PFStatblockIn"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["PFStatblockOut"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Search Pf Statblock */
-  search_pf_statblock_api_v1_pf_statblock_search__get: {
-    parameters: {
-      query?: {
-        name?: string;
-        type?: string;
-        take?: number;
-        skip?: number;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["PFStatblockOut"][];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Get Pf Statblock Slug */
-  get_pf_statblock_slug_api_v1_pf_statblock__slug__get: {
-    parameters: {
-      path: {
-        slug: string;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["PFStatblockOut"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Edit Pf Statblock */
-  edit_pf_statblock_api_v1_pf_statblock__slug__put: {
-    parameters: {
-      path: {
-        slug: string;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PFStatblockIn"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Delete Pf Statblock */
-  delete_pf_statblock_api_v1_pf_statblock__slug__delete: {
-    parameters: {
-      path: {
-        slug: string;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Set Active Pf Statblock */
-  set_active_pf_statblock_api_v1_pf_statblock__slug__active_put: {
-    parameters: {
-      query: {
-        active: boolean;
-      };
-      path: {
-        slug: string;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** List Pf Spells */
-  list_pf_spells_api_v1_pf_spell__get: {
-    parameters: {
-      query?: {
-        take?: number;
-        skip?: number;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["src__types__pf__Spell"][];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Create Spell */
-  create_spell_api_v1_pf_spell__post: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["src__types__pf__SpellIn"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["src__types__pf__Spell"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Search Pf Spell */
-  search_pf_spell_api_v1_pf_spell_search_get: {
-    parameters: {
-      query?: {
-        name?: string;
-        take?: number;
-        skip?: number;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["src__types__pf__Spell"][];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Get Pf Spells Slug */
-  get_pf_spells_slug_api_v1_pf_spell__slug__get: {
-    parameters: {
-      path: {
-        slug: string;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["src__types__pf__Spell"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Update Pf Spell */
-  update_pf_spell_api_v1_pf_spell__slug__put: {
-    parameters: {
-      path: {
-        slug: string;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["src__types__pf__SpellIn"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Delete Pf Spell */
-  delete_pf_spell_api_v1_pf_spell__slug__delete: {
-    parameters: {
-      path: {
-        slug: string;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** List E5 Statblocks */
-  list_e5_statblocks_api_v1_e5_statblock__get: {
-    parameters: {
-      query?: {
-        take?: number | null;
-        skip?: number | null;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["E5StatblockOut"][];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Create E5 Statblock */
-  create_e5_statblock_api_v1_e5_statblock__post: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["E5StatblockIn"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["E5StatblockOut"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Search E5 Creature */
-  search_e5_creature_api_v1_e5_statblock_search__get: {
-    parameters: {
-      query?: {
-        name?: string;
-        type?: string;
-        cr?: number | null;
-        take?: number;
-        skip?: number;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["E5StatblockOut"][];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Get E5 Statblock Slug */
-  get_e5_statblock_slug_api_v1_e5_statblock__slug__get: {
-    parameters: {
-      path: {
-        slug: string;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["E5StatblockOut"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Edit E5 Statblock */
-  edit_e5_statblock_api_v1_e5_statblock__slug__put: {
-    parameters: {
-      path: {
-        slug: string;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["E5StatblockIn"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Delete E5 Statblock */
-  delete_e5_statblock_api_v1_e5_statblock__slug__delete: {
-    parameters: {
-      path: {
-        slug: string;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Set Active E5 Statblock */
-  set_active_e5_statblock_api_v1_e5_statblock__slug__active_put: {
-    parameters: {
-      query: {
-        active: boolean;
-      };
-      path: {
-        slug: string;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Create Statblock From External Source */
-  create_statblock_from_external_source_api_v1_e5_statblock_external_post: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ExternalIn"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** List E5 Spells */
-  list_e5_spells_api_v1_e5_spell__get: {
-    parameters: {
-      query?: {
-        take?: number;
-        skip?: number;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["src__types__e5__Spell"][];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Create Spell */
-  create_spell_api_v1_e5_spell__post: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["src__types__e5__SpellIn"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["src__types__e5__Spell"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Search E5 Spell */
-  search_e5_spell_api_v1_e5_spell_search_get: {
-    parameters: {
-      query?: {
-        name?: string;
-        take?: number;
-        skip?: number;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["src__types__e5__Spell"][];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Get E5 Spells Slug */
-  get_e5_spells_slug_api_v1_e5_spell__slug__get: {
-    parameters: {
-      path: {
-        slug: string;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["src__types__e5__Spell"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Update E5 Spell */
-  update_e5_spell_api_v1_e5_spell__slug__put: {
-    parameters: {
-      path: {
-        slug: string;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["src__types__e5__SpellIn"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Delete E5 Spell */
-  delete_e5_spell_api_v1_e5_spell__slug__delete: {
-    parameters: {
-      path: {
-        slug: string;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  /** Get Legal */
-  get_legal_legal__get: {
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
+    login_for_access_token_token_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/x-www-form-urlencoded": components["schemas"]["Body_login_for_access_token_token_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    refresh_access_token_refresh_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    reset_password_password_reset_post: {
+        parameters: {
+            query: {
+                email: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_activation_mail_activation_link_post: {
+        parameters: {
+            query: {
+                username: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_stats_stats__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["src__types__types__Stats"];
+                };
+            };
+        };
+    };
+    create_user_api_v1_users__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserPartial"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_user_roles_api_v1_users__user_id__roles_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": string[];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_users_me_api_v1_users_me__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserWithScopes"];
+                };
+            };
+        };
+    };
+    update_user_api_v1_users_me__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateUserIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_api_keys_api_v1_users_me_api_keys_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserWithApiKey"];
+                };
+            };
+        };
+    };
+    update_api_keys_api_v1_users_me_api_keys_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserWithApiKey"];
+                };
+            };
+        };
+    };
+    update_api_keys_api_v1_users_me_api_keys_delete: {
+        parameters: {
+            query: {
+                api_key: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserWithApiKey"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_statblocks_api_v1_users_me_statblocks_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserStatblocks"];
+                };
+            };
+        };
+    };
+    list_spells_api_v1_users_me_spells_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserSpells"];
+                };
+            };
+        };
+    };
+    change_password_api_v1_users_change_password_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasswordResetIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    activate_user_api_v1_users_activate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    get_user_settings_api_v1_users_me_settings_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    put_user_settings_api_v1_users_me_settings_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Settings"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_pf_statblocks_api_v1_pf_statblock__get: {
+        parameters: {
+            query?: {
+                take?: number | null;
+                skip?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PFStatblockOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_pf_statblock_api_v1_pf_statblock__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PFStatblockIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PFStatblockOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search_pf_statblock_api_v1_pf_statblock_search__get: {
+        parameters: {
+            query?: {
+                name?: string;
+                type?: string;
+                take?: number;
+                skip?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PFStatblockOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_pf_statblock_slug_api_v1_pf_statblock__slug__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PFStatblockOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_pf_statblock_api_v1_pf_statblock__slug__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PFStatblockIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_pf_statblock_api_v1_pf_statblock__slug__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_active_pf_statblock_api_v1_pf_statblock__slug__active_put: {
+        parameters: {
+            query: {
+                active: boolean;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_pf_spells_api_v1_pf_spell__get: {
+        parameters: {
+            query?: {
+                take?: number;
+                skip?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["src__types__pf__Spell"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_spell_api_v1_pf_spell__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["src__types__pf__SpellIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["src__types__pf__Spell"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search_pf_spell_api_v1_pf_spell_search_get: {
+        parameters: {
+            query?: {
+                name?: string;
+                take?: number;
+                skip?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["src__types__pf__Spell"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_pf_spells_slug_api_v1_pf_spell__slug__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["src__types__pf__Spell"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_pf_spell_api_v1_pf_spell__slug__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["src__types__pf__SpellIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_pf_spell_api_v1_pf_spell__slug__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_e5_statblocks_api_v1_e5_statblock__get: {
+        parameters: {
+            query?: {
+                take?: number | null;
+                skip?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["E5StatblockOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_e5_statblock_api_v1_e5_statblock__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["E5StatblockIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["E5StatblockOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search_e5_creature_api_v1_e5_statblock_search__get: {
+        parameters: {
+            query?: {
+                name?: string;
+                type?: string;
+                cr?: number | null;
+                take?: number;
+                skip?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["E5StatblockOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_e5_statblock_slug_api_v1_e5_statblock__slug__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["E5StatblockOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_e5_statblock_api_v1_e5_statblock__slug__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["E5StatblockIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_e5_statblock_api_v1_e5_statblock__slug__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_active_e5_statblock_api_v1_e5_statblock__slug__active_put: {
+        parameters: {
+            query: {
+                active: boolean;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_statblock_from_external_source_api_v1_e5_statblock_external_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExternalIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_e5_spells_api_v1_e5_spell__get: {
+        parameters: {
+            query?: {
+                take?: number;
+                skip?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["src__types__e5__Spell"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_spell_api_v1_e5_spell__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["src__types__e5__SpellIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["src__types__e5__Spell"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search_e5_spell_api_v1_e5_spell_search_get: {
+        parameters: {
+            query?: {
+                name?: string;
+                take?: number;
+                skip?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["src__types__e5__Spell"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_e5_spells_slug_api_v1_e5_spell__slug__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["src__types__e5__Spell"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_e5_spell_api_v1_e5_spell__slug__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["src__types__e5__SpellIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_e5_spell_api_v1_e5_spell__slug__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_e5_encounters_api_v1_e5_encounter__get: {
+        parameters: {
+            query: {
+                rooms: number;
+                creature_type: string;
+                challenge_rating: number;
+                include_boss?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["E5StatblockOut"][][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_legal_legal__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
 }
