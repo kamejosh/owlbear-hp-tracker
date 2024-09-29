@@ -37,7 +37,12 @@ export const TokenIcon = ({
     return (
         <Tippy content={getTokenName(item)} className={"token-name-tooltip"}>
             <div className={"token-icon"} onDoubleClick={handleOnPlayerDoubleClick} onClick={onClick}>
-                <img src={item.image.url} alt={""} />
+                <img
+                    src={item.image.url}
+                    alt={""}
+                    className={`${item.scale.x < 0 ? "flipped" : ""}`}
+                    style={{ rotate: `${item.rotation}deg` }}
+                />
                 {playerContext.role === "GM" && playerPreview ? (
                     <>
                         {data.hpOnMap && !room?.disableHpBar ? (

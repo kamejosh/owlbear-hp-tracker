@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
@@ -121,7 +121,9 @@ const Content = () => {
         return tokenMap;
     }, [scene?.groups, items, isReady])();
 
-    const playerTokens = room?.playerSort && items ? items.sort(sortItemsInitiative) : (items ?? []);
+    const playerTokens = useMemo(() => {
+        return room?.playerSort && items ? items.sort(sortItemsInitiative) : (items ?? []);
+    }, [room?.playerSort, items]);
 
     const reorderMetadataIndexMulti = (destList: Array<Item>, group: string, sourceList: Array<Item>) => {
         const combinedList = destList.concat(sourceList);
@@ -258,18 +260,7 @@ const Content = () => {
     const orderByInitiative = (reverse: boolean = false) => {
         tokenLists.forEach((tokenList) => {
             const reordered = Array.from(tokenList);
-            reordered.sort((a, b) => {
-                const aData = a.metadata[itemMetadataKey] as HpTrackerMetadata;
-                const bData = b.metadata[itemMetadataKey] as HpTrackerMetadata;
-                if (bData.initiative === aData.initiative) {
-                    return (
-                        bData.stats.initiativeBonus +
-                        bData.initiative -
-                        (aData.stats.initiativeBonus + aData.initiative)
-                    );
-                }
-                return bData.initiative - aData.initiative;
-            });
+            reordered.sort(sortItemsInitiative);
             if (reverse) {
                 reordered.reverse();
             }

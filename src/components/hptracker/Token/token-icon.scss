@@ -12,6 +12,10 @@
         object-position: center;
     }
 
+    .flipped {
+        scale: -1 1;
+    }
+
     .preview-hp {
         position: absolute;
         bottom: 0;

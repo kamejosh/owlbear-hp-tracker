@@ -8,7 +8,7 @@ import {
     RoomMetadata,
     SceneMetadata,
 } from "./types.ts";
-import { isObject } from "lodash";
+import { isObject, isUndefined } from "lodash";
 import { IRoll, IRoomParticipant } from "dddice-js";
 import { RollLogEntryType } from "../context/RollLogContext.tsx";
 import { TTRPG_URL } from "../config.ts";
@@ -119,16 +119,21 @@ export const sortItems = (a: Item, b: Item) => {
 export const sortItemsInitiative = (a: Item, b: Item) => {
     const aData = a.metadata[itemMetadataKey] as HpTrackerMetadata;
     const bData = b.metadata[itemMetadataKey] as HpTrackerMetadata;
-    if (aData && bData && aData.initiative !== undefined && bData.initiative !== undefined) {
-        if (aData.initiative < bData.initiative) {
-            return 1;
-        } else if (aData.initiative > bData.initiative) {
-            return -1;
-        } else {
-            return 0;
+    if (
+        bData.initiative === aData.initiative &&
+        !isUndefined(bData.stats.initiativeBonus) &&
+        !isUndefined(aData.stats.initiativeBonus)
+    ) {
+        if (
+            bData.stats.initiativeBonus === aData.stats.initiativeBonus &&
+            !isUndefined(bData.index) &&
+            !isUndefined(aData.index)
+        ) {
+            return aData.index - bData.index;
         }
+        return bData.stats.initiativeBonus - aData.stats.initiativeBonus;
     }
-    return 0;
+    return bData.initiative - bData.initiative;
 };
 
 export const generateSlug = (string: string) => {

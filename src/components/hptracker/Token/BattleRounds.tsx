@@ -30,9 +30,16 @@ export const BattleRounds = () => {
                 !isUndefined(b.data.stats.initiativeBonus) &&
                 !isUndefined(a.data.stats.initiativeBonus)
             ) {
+                if (
+                    b.data.stats.initiativeBonus === a.data.stats.initiativeBonus &&
+                    !isUndefined(b.data.index) &&
+                    !isUndefined(a.data.index)
+                ) {
+                    return a.data.index - b.data.index;
+                }
                 return b.data.stats.initiativeBonus - a.data.stats.initiativeBonus;
             }
-            return b.data.initiative - a.data.initiative;
+            return b.data.initiative - b.data.initiative;
         });
     const [battleRound, setBattleRound] = useState<number>(1);
 
