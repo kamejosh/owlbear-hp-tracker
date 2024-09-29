@@ -5,8 +5,8 @@ const indicatorName = "GM's Grimoire - Indicator";
 
 export const createIndicator = async (token: Image) => {
     const bounds = await getImageBounds(token);
-    const width = bounds.width * 1.3;
-    const height = bounds.height * 1.3;
+    const width = Math.abs(bounds.width) * 1.3;
+    const height = Math.abs(bounds.height) * 1.3;
     const position = { x: bounds.position.x + bounds.width / 2, y: bounds.position.y + bounds.height / 2 };
 
     const indicator = buildShape()
