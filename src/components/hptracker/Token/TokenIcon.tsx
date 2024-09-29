@@ -40,8 +40,8 @@ export const TokenIcon = ({
                 <img
                     src={item.image.url}
                     alt={""}
-                    className={`${item.scale.x < 0 ? "flipped" : ""}`}
-                    style={{ rotate: `${item.rotation}deg` }}
+                    className={`${item.scale.x < 0 && playerPreview ? "flipped" : ""}`}
+                    style={{ rotate: `${playerPreview ? item.rotation + "deg" : 0 + "deg"}` }}
                 />
                 {playerContext.role === "GM" && playerPreview ? (
                     <>

@@ -1,3 +1,16 @@
+# 3.1.0
+
++ Fix Old Scenes are not able to toggle player visibility for texts
++ Add ADV and DIS to initiative buttons
++ Fix When not using dddice the custom dice still require a dice theme
++ Add mounts (groups select) and Props (single select) to be added to GMG
++ Change Current Turn indicator switches visibility based on Token visibility
++ Fix Tokens get reassigned to default group when switching a scene
++ Add setting for default groups to TA and GMG (Patreon subscribers only)
++ Fix issue where the current indicator crashed a scene on a reversed Token
++ Fix issue where GM and Players were presented a different initiative order
++ Add scaling and rotation to Player preview
+
 # 3.0.0
 
 ## HP Tracker is now Game Masters's Grimoire
