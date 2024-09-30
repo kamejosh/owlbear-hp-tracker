@@ -133,7 +133,7 @@ export const sortItemsInitiative = (a: Item, b: Item) => {
         }
         return bData.stats.initiativeBonus - aData.stats.initiativeBonus;
     }
-    return bData.initiative - bData.initiative;
+    return bData.initiative - aData.initiative;
 };
 
 export const generateSlug = (string: string) => {

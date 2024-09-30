@@ -39,7 +39,7 @@ export const BattleRounds = () => {
                 }
                 return b.data.stats.initiativeBonus - a.data.stats.initiativeBonus;
             }
-            return b.data.initiative - b.data.initiative;
+            return b.data.initiative - a.data.initiative;
         });
     const [battleRound, setBattleRound] = useState<number>(1);
 

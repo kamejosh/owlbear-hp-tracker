@@ -14,8 +14,8 @@ export const HPSvg = ({
             <defs>
                 <linearGradient id={name} x1="0" x2="0" y1="1" y2="0">
                     <stop stopColor={color ?? "#AA1404"} offset="0%" />
-                    <stop stopColor={color ?? "#AA1404"} offset={`${percent}%`} />
-                    <stop stopColor={"black"} offset={`${Math.min(100, percent + 40)}%`} />
+                    <stop stopColor={color ?? "#AA1404"} offset={`${isNaN(percent) ? 0 : percent}%`} />
+                    <stop stopColor={"black"} offset={`${Math.min(100, isNaN(percent) ? 0 : percent + 40)}%`} />
                     <stop stopColor="black" offset="100%" />
                 </linearGradient>
             </defs>
