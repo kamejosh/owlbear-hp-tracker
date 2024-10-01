@@ -33,8 +33,8 @@ export const setIndicator = async (current: Image) => {
     if (items.length > 0) {
         const indicator = items[0];
         const bounds = await getImageBounds(current);
-        const width = bounds.width * 1.3;
-        const height = bounds.height * 1.3;
+        const width = Math.abs(bounds.width) * 1.3;
+        const height = Math.abs(bounds.height) * 1.3;
         const position = { x: bounds.position.x + bounds.width / 2, y: bounds.position.y + bounds.height / 2 };
         await OBR.scene.items.updateItems([indicator], (items) => {
             if (items.length > 0) {
