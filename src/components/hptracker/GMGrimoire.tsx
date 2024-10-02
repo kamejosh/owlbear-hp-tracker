@@ -4,7 +4,6 @@ import { usePlayerContext } from "../../context/PlayerContext.ts";
 import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
 import { changelogModal, itemMetadataKey, version } from "../../helper/variables.ts";
 import { HpTrackerMetadata } from "../../helper/types.ts";
-import { DragDropContext, DraggableLocation, DropResult } from "react-beautiful-dnd";
 import { PlayerTokenList } from "./TokenList.tsx";
 import { useCharSheet } from "../../context/CharacterContext.ts";
 import { CharacterSheet } from "./charactersheet/CharacterSheet.tsx";
@@ -22,8 +21,9 @@ import { PlayerSvg } from "../svgs/PlayerSvg.tsx";
 import { InitiativeSvg } from "../svgs/InitiativeSvg.tsx";
 import { ArrowSvg } from "../svgs/ArrowSvg.tsx";
 import { useUISettingsContext } from "../../context/UISettingsContext.ts";
-import Tippy from "@tippyjs/react";
 import { BattleRounds } from "./Token/BattleRounds.tsx";
+import { DraggableLocation, DropResult, DragDropContext } from "@hello-pangea/dnd";
+import Tippy from "@tippyjs/react";
 
 export const GMGrimoire = () => {
     return (
@@ -84,6 +84,7 @@ const Content = () => {
     }, []);
 
     const reorderMetadataIndex = (list: Array<Image>, group?: string) => {
+        console.log(list.length);
         OBR.scene.items.updateItems(list, (items) => {
             items.forEach((item, index) => {
                 const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;

@@ -1,4 +1,4 @@
-import { Droppable } from "react-beautiful-dnd";
+import { Droppable } from "@hello-pangea/dnd";
 import { DraggableTokenList } from "./TokenList.tsx";
 import OBR, { Image, Metadata } from "@owlbear-rodeo/sdk";
 import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
@@ -26,7 +26,6 @@ import { useRollLogContext } from "../../context/RollLogContext.tsx";
 import { useRef, useState } from "react";
 import { getDiceImage, getSvgForDiceType } from "../../helper/previewHelpers.tsx";
 import { D20 } from "../svgs/dice/D20.tsx";
-import "./drop-group.scss";
 import { MapButton } from "./Token/MapButton.tsx";
 import { PlayerButton } from "./Token/PlayerButton.tsx";
 import { HPSvg } from "../svgs/HPSvg.tsx";
@@ -37,6 +36,7 @@ import Tippy from "@tippyjs/react";
 import { useBattleContext } from "../../context/BattleContext.tsx";
 import { FlagSvg } from "../svgs/FlagSvg.tsx";
 import { BattleSvg } from "../svgs/BattleSvg.tsx";
+import "./drop-group.scss";
 
 type DropGroupProps = {
     title: string;

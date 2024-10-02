@@ -2,7 +2,7 @@ import React from "react";
 
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { updateSceneMetadata } from "../../../helper/helpers.ts";
-import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
+import { DragDropContext, Draggable, Droppable, DropResult } from "@hello-pangea/dnd";
 
 const updateGroups = (value: string, groups: Array<string>) => {
     if (value !== "") {
