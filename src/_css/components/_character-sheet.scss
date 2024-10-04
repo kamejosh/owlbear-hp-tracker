@@ -370,7 +370,7 @@
         }
 
         .ac {
-            white-space: nowrap;
+            white-space: wrap;
         }
 
         .speed {
@@ -725,7 +725,7 @@ b {
 
 .spell-slots {
     position: sticky;
-    top: calc( 16px + var(--sticky-height));
+    top: calc(16px + var(--sticky-height));
     z-index: 2;
     border-bottom: none;
     transition: all 0.25s ease;

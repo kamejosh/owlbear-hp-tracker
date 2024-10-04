@@ -121,3 +121,9 @@ export type InitialStatblockData = {
     ruleset: Ruleset;
     limits: Array<Limit>;
 };
+
+export type BestMatch = {
+    distance: number;
+    source: string | undefined | null;
+    statblock: InitialStatblockData;
+};

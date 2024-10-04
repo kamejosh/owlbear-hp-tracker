@@ -2,6 +2,7 @@ import OBR, { Image, Item, Metadata } from "@owlbear-rodeo/sdk";
 import { infoMetadataKey, itemMetadataKey, metadataKey } from "./variables.ts";
 import {
     AttachmentMetadata,
+    BestMatch,
     HpTrackerMetadata,
     InitialStatblockData,
     Limit,
@@ -365,6 +366,33 @@ export const getInitialValues = async (items: Array<Image>) => {
     }
     const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
     const itemInitValues: Record<string, InitialStatblockData> = {};
+    const srdSources = ["cc", "menagerie", "ta", "tob", "tob3", "wotc-srd"];
+
+    const isBestMatch = (dist: number, statblock: E5Statblock, bestMatch?: BestMatch): boolean => {
+        if (bestMatch === undefined) {
+            return true;
+        } else if (dist < bestMatch.distance) {
+            return true;
+        } else if (dist === bestMatch.distance) {
+            if (statblock.source) {
+                if (!srdSources.includes(statblock.source)) {
+                    return true;
+                } else if (
+                    bestMatch.source &&
+                    srdSources.includes(bestMatch.source) &&
+                    statblock.source === "wotc-srd"
+                ) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    };
 
     axiosRetry(axios, {
         retries: 2,
@@ -387,17 +415,14 @@ export const getInitialValues = async (items: Array<Image>) => {
                             skip: 0,
                         },
                     });
-                    let bestMatch: { distance: number; statblock: InitialStatblockData } | undefined = undefined;
+                    let bestMatch: BestMatch | undefined = undefined;
                     const diff = new diff_match_patch();
                     statblocks.data.forEach((statblock: E5Statblock) => {
                         const d = diff.diff_main(statblock.name, name);
                         const dist = diff.diff_levenshtein(d);
-                        if (
-                            bestMatch === undefined ||
-                            dist < bestMatch.distance ||
-                            (dist === bestMatch.distance && statblock.source === "wotc-srd")
-                        ) {
+                        if (isBestMatch(dist, statblock, bestMatch)) {
                             bestMatch = {
+                                source: statblock.source,
                                 distance: dist,
                                 statblock: {
                                     hp: statblock.hp.value,
@@ -430,7 +455,11 @@ export const getInitialValues = async (items: Array<Image>) => {
                     statblocks.data.forEach((statblock: PfStatblock) => {
                         const d = diff.diff_main(statblock.name, name);
                         const dist = diff.diff_levenshtein(d);
-                        if (bestMatch === undefined || dist < bestMatch.distance) {
+                        if (
+                            bestMatch === undefined ||
+                            dist < bestMatch.distance ||
+                            (dist === bestMatch.distance && statblock.source !== null)
+                        ) {
                             bestMatch = {
                                 distance: dist,
                                 statblock: {
