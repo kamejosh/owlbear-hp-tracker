@@ -147,7 +147,7 @@ export const Initiative = ({ id }: { id: string }) => {
                     <button
                         className={`advantage`}
                         onClick={async () => {
-                            const value = await rollInitiative(!defaultHidden, true);
+                            const value = await rollInitiative(defaultHidden, true);
                             const newData = { ...data, initiative: value };
                             updateTokenMetadata(newData, [id]);
                         }}
@@ -157,7 +157,7 @@ export const Initiative = ({ id }: { id: string }) => {
                     <button
                         className={`disadvantage`}
                         onClick={async () => {
-                            const value = await rollInitiative(!defaultHidden, false, true);
+                            const value = await rollInitiative(defaultHidden, false, true);
                             const newData = { ...data, initiative: value };
                             updateTokenMetadata(newData, [id]);
                         }}
