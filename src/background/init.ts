@@ -105,6 +105,7 @@ const initScene = async () => {
             groups: ["Default"],
             openGroups: ["Default"],
             collapsedStatblocks: [],
+            statblockPopoverOpen: {},
         };
 
         ownMetadata[metadataKey] = sceneData;
@@ -124,9 +125,8 @@ const initScene = async () => {
         if (!sceneData.collapsedStatblocks) {
             sceneData.collapsedStatblocks = [];
         }
-        if (!!sceneData?.statblockPopoverOpen) {
-            sceneData.statblockPopoverOpen = false;
-        }
+
+        sceneData.statblockPopoverOpen = {};
 
         ownMetadata[metadataKey] = sceneData;
     }

@@ -84,7 +84,6 @@ const Content = () => {
     }, []);
 
     const reorderMetadataIndex = (list: Array<Image>, group?: string) => {
-        console.log(list.length);
         OBR.scene.items.updateItems(list, (items) => {
             items.forEach((item, index) => {
                 const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;

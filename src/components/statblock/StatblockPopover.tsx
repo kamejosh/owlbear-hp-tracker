@@ -76,7 +76,12 @@ const Content = () => {
                     <button
                         className={"top-button"}
                         onClick={async () => {
-                            await updateSceneMetadata(scene, { statblockPopoverOpen: false });
+                            const playerId = OBR.player.id;
+                            const statblockPopoverOpen: { [key: string]: boolean } = scene?.statblockPopoverOpen
+                                ? { ...scene.statblockPopoverOpen }
+                                : {};
+                            statblockPopoverOpen[playerId] = false;
+                            await updateSceneMetadata(scene, { statblockPopoverOpen: statblockPopoverOpen });
                             await OBR.popover.close(statblockPopoverId);
                         }}
                         title={"close"}

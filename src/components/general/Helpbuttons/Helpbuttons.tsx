@@ -13,6 +13,7 @@ import Tippy from "@tippyjs/react";
 import { SettingsSvg } from "../../svgs/SettingsSvg.tsx";
 import { StatblockSvg } from "../../svgs/StatblockSvg.tsx";
 import { updateSceneMetadata } from "../../../helper/helpers.ts";
+import { useMemo } from "react";
 
 type HelpButtonsProps = {
     ignoredChanges?: boolean;
@@ -22,6 +23,14 @@ type HelpButtonsProps = {
 export const Helpbuttons = (props: HelpButtonsProps) => {
     const [room, scene] = useMetadataContext((state) => [state.room, state.scene]);
     const playerContext = usePlayerContext();
+
+    const playerStatblockPopoverOpen = useMemo(() => {
+        return (
+            scene?.statblockPopoverOpen &&
+            OBR.player.id in scene.statblockPopoverOpen &&
+            scene.statblockPopoverOpen[OBR.player.id]
+        );
+    }, [scene?.statblockPopoverOpen]);
 
     return (
         <div className={"help-buttons"}>
@@ -35,12 +44,17 @@ export const Helpbuttons = (props: HelpButtonsProps) => {
                     <TabletopAlmanacSvg />
                 </a>
             </Tippy>
-            <Tippy content={!!scene?.statblockPopoverOpen ? "Close Statblock Popover" : "Open Statblock Popover"}>
+            <Tippy content={playerStatblockPopoverOpen ? "Close Statblock Popover" : "Open Statblock Popover"}>
                 <button
-                    className={`statblock-button top-button ${!!scene?.statblockPopoverOpen ? "open" : ""}`}
+                    className={`statblock-button top-button ${playerStatblockPopoverOpen ? "open" : ""}`}
                     onClick={async () => {
-                        if (!!scene?.statblockPopoverOpen) {
-                            await updateSceneMetadata(scene, { statblockPopoverOpen: false });
+                        const playerId = OBR.player.id;
+                        if (playerStatblockPopoverOpen) {
+                            const statblockPopoverOpen: { [key: string]: boolean } = scene?.statblockPopoverOpen
+                                ? { ...scene.statblockPopoverOpen }
+                                : {};
+                            statblockPopoverOpen[playerId] = false;
+                            await updateSceneMetadata(scene, { statblockPopoverOpen: statblockPopoverOpen });
                             await OBR.popover.close(statblockPopoverId);
                         } else {
                             // width needs to be big, to position statblock popover to the right
@@ -51,7 +65,11 @@ export const Helpbuttons = (props: HelpButtonsProps) => {
                                 height = await OBR.viewport.getHeight();
                             } catch {}
 
-                            await updateSceneMetadata(scene, { statblockPopoverOpen: true });
+                            const statblockPopoverOpen: { [key: string]: boolean } = scene?.statblockPopoverOpen
+                                ? { ...scene.statblockPopoverOpen }
+                                : {};
+                            statblockPopoverOpen[playerId] = true;
+                            await updateSceneMetadata(scene, { statblockPopoverOpen: statblockPopoverOpen });
 
                             await OBR.popover.open({
                                 ...statblockPopover,
