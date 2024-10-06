@@ -1,4 +1,4 @@
-import { HpTrackerMetadata } from "../helper/types.ts";
+import { GMGMetadata } from "../helper/types.ts";
 import { Image, Item } from "@owlbear-rodeo/sdk";
 import { create } from "zustand";
 import { itemMetadataKey } from "../helper/variables.ts";
@@ -7,11 +7,11 @@ import { objectsEqual } from "../helper/helpers.ts";
 type TokenChange = {
     changeType: string;
     id: string;
-    oldData: HpTrackerMetadata | null;
-    newData: HpTrackerMetadata | null;
+    oldData: GMGMetadata | null;
+    newData: GMGMetadata | null;
 };
 
-export type TokenMap = Map<string, { data: HpTrackerMetadata; item: Image }>;
+export type TokenMap = Map<string, { data: GMGMetadata; item: Image }>;
 
 export type TokenListContextType = {
     tokens: TokenMap | null;
@@ -28,7 +28,7 @@ export const useTokenListContext = create<TokenListContextType>()((set) => ({
             const changes: Array<TokenChange> = [];
             list.forEach((item) => {
                 if (itemMetadataKey in item.metadata) {
-                    const metadata = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+                    const metadata = item.metadata[itemMetadataKey] as GMGMetadata;
                     if (state.tokens && state.tokens.has(item.id)) {
                         newTokens.set(item.id, { data: metadata, item: item as Image });
                         if (!objectsEqual(metadata, state.tokens.get(item.id)!.data)) {

@@ -4,9 +4,9 @@ import { FreeMode, Mousewheel } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/mousewheel";
-import {useCallback, useEffect, useRef, useState} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { itemMetadataKey } from "../../helper/variables.ts";
-import { HpTrackerMetadata } from "../../helper/types.ts";
+import { GMGMetadata } from "../../helper/types.ts";
 import SwiperClass from "swiper/types/swiper-class";
 import { getBgColor, getTokenName, sortItems, updateSceneMetadata } from "../../helper/helpers.ts";
 import { useTokenListContext } from "../../context/TokenContext.tsx";
@@ -43,12 +43,11 @@ export const StatblockList = (props: StatblockListProps) => {
     const jumpLinksRef = useRef<HTMLUListElement>(null);
 
     useEffect(() => {
-        if(jumpLinksRef.current){
+        if (jumpLinksRef.current) {
             setTimeout(() => {
                 setStickyHeight(jumpLinksRef.current?.getBoundingClientRect().height);
-            }, 1000)
+            }, 1000);
         }
-
     }, [jumpLinksRef.current, id]);
 
     useEffect(() => {
@@ -90,7 +89,7 @@ export const StatblockList = (props: StatblockListProps) => {
             >
                 <SwiperSlide className={"pre"}> </SwiperSlide>
                 {items.map((item) => {
-                    const tokenData = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+                    const tokenData = item.metadata[itemMetadataKey] as GMGMetadata;
                     const collapsed = collapsedStatblocks?.includes(item.id);
 
                     return (
@@ -109,7 +108,7 @@ export const StatblockList = (props: StatblockListProps) => {
                                     if (newCollapse.includes(item.id)) {
                                         newCollapse.splice(
                                             newCollapse.findIndex((c) => c === item.id),
-                                            1
+                                            1,
                                         );
                                     } else {
                                         newCollapse.push(item.id);
@@ -125,7 +124,7 @@ export const StatblockList = (props: StatblockListProps) => {
                             title={getTokenName(item)}
                             style={{
                                 background: `linear-gradient(to right, ${getBgColor(
-                                    tokenData
+                                    tokenData,
                                 )}, #1C1B22 100%, #1C1B22 )`,
                             }}
                         >
@@ -158,7 +157,7 @@ export const StatblockList = (props: StatblockListProps) => {
                 <SwiperSlide className={"post"}> </SwiperSlide>
             </Swiper>
             {props.minimized ? null : (
-                <div className={"statblock-sheet"} style={{['--sticky-height' as string]: `${stickHeight}px` }}>
+                <div className={"statblock-sheet"} style={{ ["--sticky-height" as string]: `${stickHeight}px` }}>
                     <ul className={"jump-links fixed"} ref={jumpLinksRef}>
                         {scrollTargets.map((t) => {
                             return (

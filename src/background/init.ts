@@ -6,7 +6,7 @@ import { compare } from "compare-versions";
 import {
     ACItemChanges,
     BarItemChanges,
-    HpTrackerMetadata,
+    GMGMetadata,
     RoomMetadata,
     SceneMetadata,
     TextItemChanges,
@@ -37,8 +37,7 @@ import { migrateTo300 } from "../migrations/v300.ts";
  */
 const initItems = async () => {
     const tokens = await OBR.scene.items.getItems(
-        (item) =>
-            itemMetadataKey in item.metadata && (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpTrackerActive,
+        (item) => itemMetadataKey in item.metadata && (item.metadata[itemMetadataKey] as GMGMetadata).hpTrackerActive,
     );
 
     const barChanges = new Map<string, BarItemChanges>();
@@ -46,7 +45,7 @@ const initItems = async () => {
     const acChanges = new Map<string, ACItemChanges>();
 
     for (const token of tokens) {
-        const data = token.metadata[itemMetadataKey] as HpTrackerMetadata;
+        const data = token.metadata[itemMetadataKey] as GMGMetadata;
         const barAttachments = (await getAttachedItems(token.id, ["SHAPE"])).filter((a) => attachmentFilter(a, "BAR"));
         const textAttachments = (await getAttachedItems(token.id, ["TEXT"])).filter((a) => attachmentFilter(a, "HP"));
         const acAttachments = (await getAttachedItems(token.id, ["CURVE"])).filter((a) => attachmentFilter(a, "AC"));
@@ -180,13 +179,12 @@ const setupContextMenu = async () => {
         ],
         onClick: async (context) => {
             const contextItems = context.items.filter(
-                (i) =>
-                    itemMetadataKey in i.metadata && (i.metadata[itemMetadataKey] as HpTrackerMetadata).hpTrackerActive,
+                (i) => itemMetadataKey in i.metadata && (i.metadata[itemMetadataKey] as GMGMetadata).hpTrackerActive,
             );
             await OBR.scene.items.updateItems(contextItems, (items) => {
                 items.forEach((item) => {
                     if (itemMetadataKey in item.metadata) {
-                        const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+                        const data = item.metadata[itemMetadataKey] as GMGMetadata;
                         item.metadata[itemMetadataKey] = { ...data, hpTrackerActive: false };
                     }
                 });
@@ -226,7 +224,7 @@ const setupContextMenu = async () => {
             const tokens = await OBR.scene.items.getItems(tokenIds);
             tokens.forEach((token) => {
                 if (itemMetadataKey in token.metadata) {
-                    const metadata = token.metadata[itemMetadataKey] as HpTrackerMetadata;
+                    const metadata = token.metadata[itemMetadataKey] as GMGMetadata;
                     updateHp(token, metadata);
                     updateAc(token, metadata);
                 }
@@ -261,7 +259,7 @@ const setupContextMenu = async () => {
             const tokens = await OBR.scene.items.getItems(tokenIds);
             tokens.forEach((token) => {
                 if (itemMetadataKey in token.metadata) {
-                    const metadata = token.metadata[itemMetadataKey] as HpTrackerMetadata;
+                    const metadata = token.metadata[itemMetadataKey] as GMGMetadata;
                     updateHp(token, metadata);
                     updateAc(token, metadata);
                 }
@@ -328,10 +326,7 @@ const initTokens = async () => {
     // Triggers everytime any item is changed
     OBR.scene.items.onChange(async (items) => {
         const tokens = items.filter((item) => {
-            return (
-                itemMetadataKey in item.metadata &&
-                (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpTrackerActive
-            );
+            return itemMetadataKey in item.metadata && (item.metadata[itemMetadataKey] as GMGMetadata).hpTrackerActive;
         });
         await updateTextVisibility(tokens);
         await updateAcVisibility(tokens);

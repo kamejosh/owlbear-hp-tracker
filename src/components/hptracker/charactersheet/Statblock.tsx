@@ -1,4 +1,4 @@
-import { HpTrackerMetadata } from "../../../helper/types.ts";
+import { GMGMetadata } from "../../../helper/types.ts";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
 import { E5StatBlock } from "./e5/E5Statblock.tsx";
@@ -15,7 +15,7 @@ export const Statblock = ({
 }) => {
     const room = useMetadataContext((state) => state.room);
     const token = useTokenListContext((state) => state.tokens?.get(id));
-    const data = token?.data as HpTrackerMetadata;
+    const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
 
     return token ? (

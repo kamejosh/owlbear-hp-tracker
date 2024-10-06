@@ -1,4 +1,4 @@
-import { HpTrackerMetadata } from "../../../helper/types.ts";
+import { GMGMetadata } from "../../../helper/types.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import React, { useEffect, useRef } from "react";
 import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
@@ -30,7 +30,7 @@ export const Token = (props: TokenProps) => {
     const room = useMetadataContext((state) => state.room);
     const containerRef = useRef<HTMLDivElement>(null);
     const token = useTokenListContext((state) => state.tokens?.get(props.id));
-    const data = token?.data as HpTrackerMetadata;
+    const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
     const current = useBattleContext((state) => state.current);
     const start = useRef<number>(0);
@@ -63,8 +63,8 @@ export const Token = (props: TokenProps) => {
                 const selectedGroupItems = groupItems.filter((item) => currentSelection.includes(item.id));
 
                 const sortedByDistance = selectedGroupItems.sort((a, b) => {
-                    const aData = a.metadata[itemMetadataKey] as HpTrackerMetadata;
-                    const bData = b.metadata[itemMetadataKey] as HpTrackerMetadata;
+                    const aData = a.metadata[itemMetadataKey] as GMGMetadata;
+                    const bData = b.metadata[itemMetadataKey] as GMGMetadata;
                     const aDelta = Math.abs(index - aData.index!);
                     const bDelta = Math.abs(index - bData.index!);
                     if (aDelta < bDelta) {
@@ -78,7 +78,7 @@ export const Token = (props: TokenProps) => {
 
                 if (sortedByDistance.length > 0) {
                     const closestDistance = sortedByDistance[0];
-                    const cdData = closestDistance.metadata[itemMetadataKey] as HpTrackerMetadata;
+                    const cdData = closestDistance.metadata[itemMetadataKey] as GMGMetadata;
 
                     let indices: Array<number> = [];
                     if (cdData.index! < index) {
@@ -87,7 +87,7 @@ export const Token = (props: TokenProps) => {
                         indices = _.range(index, cdData.index);
                     }
                     const toSelect = groupItems.map((item) => {
-                        const itemData = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+                        const itemData = item.metadata[itemMetadataKey] as GMGMetadata;
                         if (itemData.index) {
                             if (indices.includes(itemData.index)) {
                                 return item.id;
@@ -136,7 +136,7 @@ export const Token = (props: TokenProps) => {
     };
 
     const handleOnPlayerDoubleClick = async (
-        e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>
+        e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>,
     ) => {
         if ((e.target as HTMLElement).tagName !== "DIV") {
             // we prevent subcomponent clicking triggering this function

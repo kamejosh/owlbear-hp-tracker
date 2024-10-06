@@ -3,7 +3,7 @@ import { ContextWrapper } from "../ContextWrapper.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
 import { changelogModal, itemMetadataKey, version } from "../../helper/variables.ts";
-import { HpTrackerMetadata } from "../../helper/types.ts";
+import { GMGMetadata } from "../../helper/types.ts";
 import { PlayerTokenList } from "./TokenList.tsx";
 import { useCharSheet } from "../../context/CharacterContext.ts";
 import { CharacterSheet } from "./charactersheet/CharacterSheet.tsx";
@@ -86,7 +86,7 @@ const Content = () => {
     const reorderMetadataIndex = (list: Array<Image>, group?: string) => {
         OBR.scene.items.updateItems(list, (items) => {
             items.forEach((item, index) => {
-                const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+                const data = item.metadata[itemMetadataKey] as GMGMetadata;
                 data.index = index;
                 if (group) {
                     data.group = group;
@@ -102,14 +102,14 @@ const Content = () => {
         if (isReady && scene?.groups) {
             scene?.groups?.forEach((group) => {
                 const groupItems = items?.filter((item) => {
-                    const metadata = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+                    const metadata = item.metadata[itemMetadataKey] as GMGMetadata;
                     return (
                         (!metadata.group && group === "Default") ||
                         metadata.group === group ||
                         (!scene?.groups?.includes(metadata.group ?? "") && group === "Default")
                     );
                 });
-                const indices = groupItems?.map((gi) => (gi.metadata[itemMetadataKey] as HpTrackerMetadata).index);
+                const indices = groupItems?.map((gi) => (gi.metadata[itemMetadataKey] as GMGMetadata).index);
 
                 if (groupItems && indices && (indices.includes(undefined) || uniq(indices).length !== indices.length)) {
                     reorderMetadataIndex(groupItems, group);
@@ -132,7 +132,7 @@ const Content = () => {
             let destIndex = 0;
             let sourceIndex = 0;
             items.forEach((item) => {
-                const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+                const data = item.metadata[itemMetadataKey] as GMGMetadata;
                 if (destinationIds.includes(item.id)) {
                     data.index = destIndex;
                     destIndex += 1;

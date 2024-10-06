@@ -1,5 +1,5 @@
 import OBR, { buildShape, buildText, Image, isShape, Item, Text, Shape, isText } from "@owlbear-rodeo/sdk";
-import { HpTrackerMetadata, BarItemChanges, TextItemChanges, AttachmentMetadata } from "./types.ts";
+import { GMGMetadata, BarItemChanges, TextItemChanges, AttachmentMetadata } from "./types.ts";
 import {
     attachmentFilter,
     calculatePercentage,
@@ -178,7 +178,7 @@ export const updateHpOffset = async (offset: number) => {
     await updateTextChanges(textChanges);
 };
 
-export const updateHp = async (token: Item, data: HpTrackerMetadata) => {
+export const updateHp = async (token: Item, data: GMGMetadata) => {
     const barAttachments = (await getAttachedItems(token.id, ["SHAPE"])).filter((a) => attachmentFilter(a, "BAR"));
     const textAttachments = (await getAttachedItems(token.id, ["TEXT"])).filter((a) => attachmentFilter(a, "HP"));
 
@@ -270,7 +270,7 @@ export const updateTextChanges = async (changes: Map<string, TextItemChanges>) =
 
 export const saveOrChangeBar = async (
     character: Item,
-    data: HpTrackerMetadata,
+    data: GMGMetadata,
     attachments: Item[],
     shapeChanges: Map<string, BarItemChanges>,
 ) => {
@@ -290,7 +290,7 @@ export const saveOrChangeBar = async (
 
 export const saveOrChangeText = async (
     character: Item,
-    data: HpTrackerMetadata,
+    data: GMGMetadata,
     attachments: Array<Item>,
     textChanges: Map<string, TextItemChanges>,
 ) => {
@@ -319,7 +319,7 @@ const handleBarAttachment = async (
     attachment: Item,
     character: Image,
     changeMap: Map<string, BarItemChanges>,
-    data: HpTrackerMetadata,
+    data: GMGMetadata,
 ): Promise<BarItemChanges> => {
     const shape = attachment as Shape;
     const bounds = await getImageBounds(character);
@@ -373,7 +373,7 @@ export const updateTextVisibility = async (tokens: Array<Item>) => {
     const textChanges = new Map<string, TextItemChanges>();
     for (const token of tokens) {
         const textAttachments = (await getAttachedItems(token.id, ["TEXT"])).filter((a) => attachmentFilter(a, "HP"));
-        const data = token.metadata[itemMetadataKey] as HpTrackerMetadata;
+        const data = token.metadata[itemMetadataKey] as GMGMetadata;
 
         textAttachments.forEach((text) => {
             const change = textChanges.get(text.id) ?? {};

@@ -6,7 +6,7 @@ import {
     updateTokenMetadata,
 } from "../../../helper/tokenHelper.ts";
 import { useEffect, useRef } from "react";
-import { HpTrackerMetadata } from "../../../helper/types.ts";
+import { GMGMetadata } from "../../../helper/types.ts";
 import { Image } from "@owlbear-rodeo/sdk";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
@@ -25,7 +25,7 @@ export const HP = ({ id }: { id: string }) => {
     const tempHpRef = useRef<HTMLInputElement>(null);
     const room = useMetadataContext((state) => state.room);
     const token = useTokenListContext((state) => state.tokens?.get(id));
-    const data = token?.data as HpTrackerMetadata;
+    const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
 
     useEffect(() => {
@@ -73,14 +73,14 @@ export const HP = ({ id }: { id: string }) => {
                             if (e.key === "ArrowUp") {
                                 const hp = Math.min(
                                     data.hp + 1,
-                                    data.stats.tempHp ? data.maxHp + data.stats.tempHp : data.maxHp
+                                    data.stats.tempHp ? data.maxHp + data.stats.tempHp : data.maxHp,
                                 );
                                 changeHp(hp, data, item, hpRef, tempHpRef, room);
                                 e.currentTarget.value = String(hp);
                             } else if (e.key === "ArrowDown") {
                                 const hp = Math.min(
                                     data.hp - 1,
-                                    data.stats.tempHp ? data.maxHp + data.stats.tempHp : data.maxHp
+                                    data.stats.tempHp ? data.maxHp + data.stats.tempHp : data.maxHp,
                                 );
                                 changeHp(hp, data, item, hpRef, tempHpRef, room);
                                 e.currentTarget.value = String(hp);

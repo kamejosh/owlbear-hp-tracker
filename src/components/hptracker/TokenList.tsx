@@ -1,7 +1,7 @@
 import React from "react";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "../../helper/variables.ts";
-import { HpTrackerMetadata } from "../../helper/types.ts";
+import { GMGMetadata } from "../../helper/types.ts";
 import { Draggable } from "@hello-pangea/dnd";
 import { Token } from "./Token/Token.tsx";
 
@@ -15,7 +15,7 @@ export const DraggableTokenList = React.memo(function DraggableTokenList(props: 
     const updateTokenIndex = (id: string, index: number) => {
         OBR.scene.items.updateItems([id], (items) => {
             items.forEach((item) => {
-                const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+                const data = item.metadata[itemMetadataKey] as GMGMetadata;
 
                 data.index = index;
 
@@ -31,7 +31,7 @@ export const DraggableTokenList = React.memo(function DraggableTokenList(props: 
                     <div className={"draggable-token-list-wrapper"}>
                         <div className={"draggable-token-list-wrapper"}>
                             {props.tokens?.map((token, index) => {
-                                const data = token.metadata[itemMetadataKey] as HpTrackerMetadata;
+                                const data = token.metadata[itemMetadataKey] as GMGMetadata;
                                 if (data) {
                                     if (data.index === undefined) {
                                         updateTokenIndex(token.id, index);
@@ -73,7 +73,7 @@ export const PlayerTokenList = (props: TokenListProps) => {
     return (
         <div className={"player-token-list"}>
             {props.tokens.map((token) => {
-                const data = token.metadata[itemMetadataKey] as HpTrackerMetadata;
+                const data = token.metadata[itemMetadataKey] as GMGMetadata;
                 if (data) {
                     return (
                         <Token

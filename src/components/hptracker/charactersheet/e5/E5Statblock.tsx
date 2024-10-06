@@ -1,7 +1,7 @@
 import { useMetadataContext } from "../../../../context/MetadataContext.ts";
 import { useE5GetStatblock } from "../../../../api/e5/useE5Api.ts";
 import { useTokenListContext } from "../../../../context/TokenContext.tsx";
-import { HpTrackerMetadata } from "../../../../helper/types.ts";
+import { GMGMetadata } from "../../../../helper/types.ts";
 import { DiceButton } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { capitalize, isNull } from "lodash";
 import { About } from "../About.tsx";
@@ -29,7 +29,7 @@ export const E5StatBlock = ({
     const statblockQuery = useE5GetStatblock(slug, room?.tabletopAlmanacAPIKey);
     const statblock = statblockQuery.isSuccess && statblockQuery.data ? statblockQuery.data : null;
     const token = useTokenListContext((state) => state.tokens?.get(itemId));
-    const data = token?.data as HpTrackerMetadata;
+    const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
 
     useEffect(() => {
@@ -123,10 +123,10 @@ export const E5StatBlock = ({
                                 {value}
                                 <DiceButton
                                     dice={`d20${Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
-                                        Math.floor((value - 10) / 2)
+                                        Math.floor((value - 10) / 2),
                                     )}`}
                                     text={Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
-                                        Math.floor((value - 10) / 2)
+                                        Math.floor((value - 10) / 2),
                                     )}
                                     context={`${capitalize(stat)}: Check`}
                                     statblock={getTokenName(item)}
@@ -185,10 +185,10 @@ export const E5StatBlock = ({
                                         <b>{key}</b>:{" "}
                                         <DiceButton
                                             dice={`d20${Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
-                                                Math.floor(value)
+                                                Math.floor(value),
                                             )}`}
                                             text={Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
-                                                Math.floor(value)
+                                                Math.floor(value),
                                             )}
                                             context={`${capitalize(key)}: Check`}
                                             statblock={getTokenName(item)}

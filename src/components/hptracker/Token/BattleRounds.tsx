@@ -2,7 +2,7 @@ import { useTokenListContext } from "../../../context/TokenContext.tsx";
 import { useState } from "react";
 import { useBattleContext } from "../../../context/BattleContext.tsx";
 import Tippy from "@tippyjs/react";
-import { HpTrackerMetadata } from "../../../helper/types.ts";
+import { GMGMetadata } from "../../../helper/types.ts";
 import OBR, { Image } from "@owlbear-rodeo/sdk";
 import { isUndefined } from "lodash";
 import { destroyIndicator, setIndicator } from "../../../helper/currentHelper.ts";
@@ -17,7 +17,7 @@ export const BattleRounds = () => {
         state.battle,
         state.setBattle,
     ]);
-    const tokensData: Array<{ data: HpTrackerMetadata; item: Image }> = tokens
+    const tokensData: Array<{ data: GMGMetadata; item: Image }> = tokens
         ? [...tokens].map((t) => {
               return { data: t[1].data, item: t[1].item };
           })

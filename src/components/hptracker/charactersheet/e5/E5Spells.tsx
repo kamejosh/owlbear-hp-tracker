@@ -5,7 +5,7 @@ import { getDamage, updateLimit } from "../../../../helper/helpers.ts";
 import { SpellFilter } from "../SpellFilter.tsx";
 import { capitalize } from "lodash";
 import { E5SpellSlot } from "../../../../api/e5/useE5Api.ts";
-import { HpTrackerMetadata } from "../../../../helper/types.ts";
+import { GMGMetadata } from "../../../../helper/types.ts";
 import { useMetadataContext } from "../../../../context/MetadataContext.ts";
 import Tippy from "@tippyjs/react";
 
@@ -23,7 +23,7 @@ const Spell = ({
     spell: Spell;
     statblock: string;
     spellSlots?: Array<E5SpellSlot> | null;
-    tokenData?: HpTrackerMetadata;
+    tokenData?: GMGMetadata;
     itemId?: string;
     dc?: string | null;
     attack?: string | null;
@@ -207,7 +207,7 @@ export const E5Spells = (props: {
     spells: Array<Spell>;
     statblock: string;
     spellSlots?: Array<E5SpellSlot> | null;
-    tokenData?: HpTrackerMetadata;
+    tokenData?: GMGMetadata;
     itemId?: string;
     dc?: string | null;
     attack?: string | null;

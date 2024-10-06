@@ -2,7 +2,7 @@ import React, { CSSProperties } from "react";
 import { ShieldSvg } from "../../svgs/ShieldSvg.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
-import { HpTrackerMetadata } from "../../../helper/types.ts";
+import { GMGMetadata } from "../../../helper/types.ts";
 import OBR, { Image } from "@owlbear-rodeo/sdk";
 import "./token-icon.scss";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
@@ -21,7 +21,7 @@ export const TokenIcon = ({
     const playerContext = usePlayerContext();
     const room = useMetadataContext((state) => state.room);
     const token = useTokenListContext((state) => state.tokens?.get(id));
-    const data = token?.data as HpTrackerMetadata;
+    const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
 
     const handleOnPlayerDoubleClick = async () => {

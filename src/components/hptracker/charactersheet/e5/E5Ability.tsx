@@ -2,7 +2,7 @@ import { components } from "../../../../api/schema";
 import { DiceButton, DiceButtonWrapper } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { capitalize } from "lodash";
 import { LimitComponent } from "../LimitComponent.tsx";
-import { HpTrackerMetadata } from "../../../../helper/types.ts";
+import { GMGMetadata } from "../../../../helper/types.ts";
 import { updateLimit } from "../../../../helper/helpers.ts";
 
 export type Ability = components["schemas"]["Action-Output"];
@@ -15,7 +15,7 @@ export const E5Ability = ({
 }: {
     ability: Ability;
     statblock: string;
-    tokenData: HpTrackerMetadata;
+    tokenData: GMGMetadata;
     itemId: string;
 }) => {
     const limitValues = tokenData.stats.limits?.find((l) => l.id === ability.limit?.name)!;

@@ -3,7 +3,7 @@ import { infoMetadataKey, itemMetadataKey, metadataKey } from "./variables.ts";
 import {
     AttachmentMetadata,
     BestMatch,
-    HpTrackerMetadata,
+    GMGMetadata,
     InitialStatblockData,
     Limit,
     RoomMetadata,
@@ -51,7 +51,7 @@ export const getAttachedItems = async (id: string, itemTypes: Array<string>) => 
     return attachments;
 };
 
-export const calculatePercentage = async (data: HpTrackerMetadata) => {
+export const calculatePercentage = async (data: GMGMetadata) => {
     const metadata = (await OBR.room.getMetadata()) as Metadata;
     const roomMetadata = metadata[metadataKey] as RoomMetadata;
     const segments = roomMetadata ? (roomMetadata.hpBarSegments ?? 0) : 0;
@@ -103,8 +103,8 @@ export const evalString = (s: string) => {
 };
 
 export const sortItems = (a: Item, b: Item) => {
-    const aData = a.metadata[itemMetadataKey] as HpTrackerMetadata;
-    const bData = b.metadata[itemMetadataKey] as HpTrackerMetadata;
+    const aData = a.metadata[itemMetadataKey] as GMGMetadata;
+    const bData = b.metadata[itemMetadataKey] as GMGMetadata;
     if (aData && bData && aData.index !== undefined && bData.index !== undefined) {
         if (aData.index < bData.index) {
             return -1;
@@ -118,8 +118,8 @@ export const sortItems = (a: Item, b: Item) => {
 };
 
 export const sortItemsInitiative = (a: Item, b: Item) => {
-    const aData = a.metadata[itemMetadataKey] as HpTrackerMetadata;
-    const bData = b.metadata[itemMetadataKey] as HpTrackerMetadata;
+    const aData = a.metadata[itemMetadataKey] as GMGMetadata;
+    const bData = b.metadata[itemMetadataKey] as GMGMetadata;
     if (
         bData.initiative === aData.initiative &&
         !isUndefined(bData.stats.initiativeBonus) &&
@@ -163,7 +163,7 @@ export const attachmentFilter = (attachment: Item, attachmentType: "BAR" | "HP" 
     return false;
 };
 
-export const getBgColor = (data: HpTrackerMetadata, opacity: string = "0.2") => {
+export const getBgColor = (data: GMGMetadata, opacity: string = "0.2") => {
     if (data.hp === 0 && data.maxHp === 0) {
         return "#1C1B22";
     }
@@ -318,7 +318,7 @@ const getLimitsPf = (statblock: PfStatblock) => {
 export const updateTokenSheet = (statblock: E5Statblock | PfStatblock, characterId: string, ruleset: "e5" | "pf") => {
     OBR.scene.items.updateItems([characterId], (items) => {
         items.forEach((item) => {
-            const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+            const data = item.metadata[itemMetadataKey] as GMGMetadata;
             const newValues =
                 (data.stats.initial && data.sheet !== statblock.slug) ||
                 (data.hp === 0 && data.maxHp === 0 && data.armorClass === 0);
@@ -494,7 +494,7 @@ export const updateLimit = async (itemId: string, limitValues: Limit) => {
         await OBR.scene.items.updateItems([itemId], (items) => {
             items.forEach((item) => {
                 if (item) {
-                    const metadata = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+                    const metadata = item.metadata[itemMetadataKey] as GMGMetadata;
                     if (metadata) {
                         const index = metadata.stats.limits?.findIndex((l) => {
                             return l.id === limitValues.id;
@@ -532,12 +532,12 @@ export const prepareTokenForGrimoire = async (contextItems: Array<Image>) => {
         items.forEach((item) => {
             tokenIds.push(item.id);
             if (itemMetadataKey in item.metadata) {
-                const metadata = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+                const metadata = item.metadata[itemMetadataKey] as GMGMetadata;
                 metadata.hpTrackerActive = true;
                 item.metadata[itemMetadataKey] = metadata;
             } else {
                 // variable allows us to be typesafe
-                const defaultMetadata: HpTrackerMetadata = {
+                const defaultMetadata: GMGMetadata = {
                     hp: 0,
                     maxHp: 0,
                     armorClass: 0,

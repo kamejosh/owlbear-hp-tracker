@@ -5,7 +5,7 @@ export type Limit = {
     resets: Array<string>;
 };
 
-export type HpTrackerMetadata = {
+export type GMGMetadata = {
     hp: number;
     maxHp: number;
     armorClass: number;

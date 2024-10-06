@@ -1,4 +1,4 @@
-import { HpTrackerMetadata, RoomMetadata } from "./types.ts";
+import { GMGMetadata, RoomMetadata } from "./types.ts";
 import OBR, { Image } from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "./variables.ts";
 import { evalString } from "./helpers.ts";
@@ -6,7 +6,7 @@ import { updateHp } from "./hpHelpers.ts";
 import { RefObject } from "react";
 import { updateAc } from "./acHelper.ts";
 
-export const updateTokenMetadata = async (tokenData: HpTrackerMetadata, ids: Array<string>) => {
+export const updateTokenMetadata = async (tokenData: GMGMetadata, ids: Array<string>) => {
     await OBR.scene.items.updateItems(ids, (items) => {
         items.forEach((item) => {
             item.metadata[itemMetadataKey] = { ...tokenData };
@@ -16,11 +16,11 @@ export const updateTokenMetadata = async (tokenData: HpTrackerMetadata, ids: Arr
 
 export const changeHp = async (
     newHp: number,
-    data: HpTrackerMetadata,
+    data: GMGMetadata,
     item: Image,
     hpRef?: RefObject<HTMLInputElement>,
     tempHpRef?: RefObject<HTMLInputElement>,
-    room?: RoomMetadata | null
+    room?: RoomMetadata | null,
 ) => {
     const newData = { ...data };
     if (newHp < data.hp && data.stats.tempHp && data.stats.tempHp > 0) {
@@ -39,10 +39,10 @@ export const changeHp = async (
 
 export const getNewHpValue = (
     input: string,
-    data: HpTrackerMetadata,
+    data: GMGMetadata,
     item: Image,
     maxHpRef?: RefObject<HTMLInputElement>,
-    room?: RoomMetadata | null
+    room?: RoomMetadata | null,
 ) => {
     let value: number;
     let factor = 1;
@@ -70,12 +70,7 @@ export const getNewHpValue = (
     return room?.allowNegativeNumbers ? hp : Math.max(hp, 0);
 };
 
-export const changeMaxHp = (
-    newMax: number,
-    data: HpTrackerMetadata,
-    item: Image,
-    maxHpRef?: RefObject<HTMLInputElement>
-) => {
+export const changeMaxHp = (newMax: number, data: GMGMetadata, item: Image, maxHpRef?: RefObject<HTMLInputElement>) => {
     const newData = { ...data };
     newData.maxHp = Math.max(newMax, 0);
     let maxHp = newData.maxHp;
@@ -94,10 +89,10 @@ export const changeMaxHp = (
 
 export const changeTempHp = (
     newTempHp: number,
-    data: HpTrackerMetadata,
+    data: GMGMetadata,
     item: Image,
     hpRef?: RefObject<HTMLInputElement>,
-    tempHpRef?: RefObject<HTMLInputElement>
+    tempHpRef?: RefObject<HTMLInputElement>,
 ) => {
     // temporary hitpoints can't be negative
     newTempHp = Math.max(newTempHp, 0);
@@ -120,7 +115,7 @@ export const changeTempHp = (
     }
 };
 
-export const changeArmorClass = (newAc: number, data: HpTrackerMetadata, item: Image, room?: RoomMetadata | null) => {
+export const changeArmorClass = (newAc: number, data: GMGMetadata, item: Image, room?: RoomMetadata | null) => {
     if (!room?.allowNegativeNumbers) {
         newAc = Math.max(newAc, 0);
     }

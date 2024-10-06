@@ -1,7 +1,7 @@
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { changeArmorClass, updateTokenMetadata } from "../../../helper/tokenHelper.ts";
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
-import { HpTrackerMetadata } from "../../../helper/types.ts";
+import { GMGMetadata } from "../../../helper/types.ts";
 import { Image } from "@owlbear-rodeo/sdk";
 import { useEffect, useRef } from "react";
 import { ACSvg } from "../../svgs/ACSvg.tsx";
@@ -16,7 +16,7 @@ export const AC = ({ id }: { id: string }) => {
     const room = useMetadataContext((state) => state.room);
     const acRef = useRef<HTMLInputElement>(null);
     const token = useTokenListContext((state) => state.tokens?.get(id));
-    const data = token?.data as HpTrackerMetadata;
+    const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
 
     useEffect(() => {

@@ -1,5 +1,5 @@
 import { components } from "../../../api/schema";
-import { HpTrackerMetadata, Limit } from "../../../helper/types.ts";
+import { GMGMetadata, Limit } from "../../../helper/types.ts";
 import OBR from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "../../../helper/variables.ts";
 
@@ -43,9 +43,7 @@ export const LimitComponent = ({
                                         OBR.scene.items.updateItems([itemId], (items) => {
                                             items.forEach((item) => {
                                                 if (item) {
-                                                    const metadata = item.metadata[
-                                                        itemMetadataKey
-                                                    ] as HpTrackerMetadata;
+                                                    const metadata = item.metadata[itemMetadataKey] as GMGMetadata;
                                                     if (metadata) {
                                                         const index = metadata.stats.limits?.findIndex((l) => {
                                                             return l.id === limitValues.id;

@@ -1,7 +1,7 @@
 import { Droppable } from "@hello-pangea/dnd";
 import { DraggableTokenList } from "./TokenList.tsx";
 import OBR, { Image, Metadata } from "@owlbear-rodeo/sdk";
-import { HpTrackerMetadata, SceneMetadata } from "../../helper/types.ts";
+import { GMGMetadata, SceneMetadata } from "../../helper/types.ts";
 import { itemMetadataKey, metadataKey } from "../../helper/variables.ts";
 import {
     getAcForPlayers,
@@ -127,7 +127,7 @@ export const DropGroup = (props: DropGroupProps) => {
         const promises: Array<Promise<{ value: number; id: string } | undefined>> = [];
 
         for (const item of props.list) {
-            const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+            const data = item.metadata[itemMetadataKey] as GMGMetadata;
             const dice = `1d${room?.initiativeDice ?? 20}+${data.stats.initiativeBonus}`;
             if (getRoomDiceUser(room, OBR.player.id)?.diceRendering && !room?.disableDiceRoller) {
                 promises.push(roll(dice, getTokenName(item), hidden, item.id));
@@ -145,8 +145,8 @@ export const DropGroup = (props: DropGroupProps) => {
 
         await OBR.scene.items.updateItems(props.list, (items) => {
             items.forEach((item) => {
-                const bonus = (item.metadata[itemMetadataKey] as HpTrackerMetadata).stats.initiativeBonus;
-                (item.metadata[itemMetadataKey] as HpTrackerMetadata).initiative =
+                const bonus = (item.metadata[itemMetadataKey] as GMGMetadata).stats.initiativeBonus;
+                (item.metadata[itemMetadataKey] as GMGMetadata).initiative =
                     newInitiativeValues.get(item.id) ??
                     Math.floor(Math.random() * (room?.initiativeDice ?? 20)) + 1 + bonus;
             });

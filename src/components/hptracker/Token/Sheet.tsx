@@ -1,5 +1,5 @@
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
-import { HpTrackerMetadata } from "../../../helper/types.ts";
+import { GMGMetadata } from "../../../helper/types.ts";
 import { useCharSheet } from "../../../context/CharacterContext.ts";
 import { SheetSvg } from "../../svgs/SheetSvg.tsx";
 import { DeleteSvg } from "../../svgs/DeleteSvg.tsx";
@@ -17,7 +17,7 @@ export const Sheet = ({ id }: { id: string }) => {
     const playerContext = usePlayerContext();
     const token = useTokenListContext((state) => state.tokens?.get(id));
     const setId = useCharSheet((state) => state.setId);
-    const data = token?.data as HpTrackerMetadata;
+    const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
     const [players, setPlayers] = useState<Array<Player>>([]);
     const owner = players.find((p) => p.id === item.createdUserId)?.id ?? playerContext.id ?? "";

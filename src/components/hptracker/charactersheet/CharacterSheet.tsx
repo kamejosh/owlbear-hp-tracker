@@ -2,7 +2,7 @@ import { ReactElement, useEffect, useRef, useState } from "react";
 import { useCharSheet } from "../../../context/CharacterContext.ts";
 import OBR, { Image } from "@owlbear-rodeo/sdk";
 import { settingsModal } from "../../../helper/variables.ts";
-import { HpTrackerMetadata, Ruleset } from "../../../helper/types.ts";
+import { GMGMetadata, Ruleset } from "../../../helper/types.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { SearchResult5e, SearchResultPf } from "./SearchResult.tsx";
 import { Statblock } from "./Statblock.tsx";
@@ -18,7 +18,7 @@ type SearchWrapperProps = {
 };
 
 type StatblockWrapperProps = {
-    data: HpTrackerMetadata;
+    data: GMGMetadata;
     forceSearch: boolean;
     setForceSearch: (forceSearch: boolean) => void;
     search: string;
@@ -130,7 +130,7 @@ export const CharacterSheet = (props: { itemId: string }) => {
     const room = useMetadataContext((state) => state.room);
     const token = useTokenListContext((state) => state.tokens?.get(props.itemId));
     const item = token?.item as Image;
-    const data = token?.data as HpTrackerMetadata;
+    const data = token?.data as GMGMetadata;
     const [search, setSearch] = useState<string>("");
     const [forceSearch, setForceSearch] = useState<boolean>(false);
     const [emptySearch, setEmptySearch] = useState<boolean>(false);
@@ -162,16 +162,15 @@ export const CharacterSheet = (props: { itemId: string }) => {
     }, [data?.sheet]);
 
     useEffect(() => {
-        if(jumpLinksRef.current){
+        if (jumpLinksRef.current) {
             setTimeout(() => {
                 setStickyHeight(jumpLinksRef.current?.clientHeight);
-            }, 1000)
+            }, 1000);
         }
-
     }, [jumpLinksRef.current]);
 
     return (
-        <div className={`character-sheet`} style={{['--sticky-height' as string]: `${stickHeight}px` }}>
+        <div className={`character-sheet`} style={{ ["--sticky-height" as string]: `${stickHeight}px` }}>
             {backgroundColor ? (
                 <div className={"background"} style={{ borderLeft: `5px solid ${backgroundColor}` }}></div>
             ) : null}

@@ -1,6 +1,6 @@
 import OBR from "@owlbear-rodeo/sdk";
 import { itemMetadataKey, metadataKey } from "../helper/variables.ts";
-import { HpTrackerMetadata, SceneMetadata } from "../helper/types.ts";
+import { GMGMetadata, SceneMetadata } from "../helper/types.ts";
 import { updateSceneMetadata } from "../helper/helpers.ts";
 
 export const migrateTo300 = async () => {
@@ -17,8 +17,8 @@ export const migrateTo300 = async () => {
         (item) => itemMetadataKey in item.metadata,
         (items) => {
             items.forEach((item) => {
-                const data = item.metadata[itemMetadataKey] as HpTrackerMetadata;
-                const newMetadata: HpTrackerMetadata = {
+                const data = item.metadata[itemMetadataKey] as GMGMetadata;
+                const newMetadata: GMGMetadata = {
                     hp: data.hp,
                     maxHp: data.maxHp,
                     armorClass: data.armorClass,
@@ -41,6 +41,6 @@ export const migrateTo300 = async () => {
                 };
                 item.metadata[itemMetadataKey] = newMetadata;
             });
-        }
+        },
     );
 };

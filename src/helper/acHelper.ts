@@ -1,5 +1,5 @@
 import OBR, { buildCurve, buildText, Curve, Image, isCurve, isText, Item, Text } from "@owlbear-rodeo/sdk";
-import { ACItemChanges, HpTrackerMetadata } from "./types.ts";
+import { ACItemChanges, GMGMetadata } from "./types.ts";
 import { attachmentFilter, deleteAttachments, getACOffset, getAttachedItems, getImageBounds } from "./helpers.ts";
 import { itemMetadataKey, infoMetadataKey } from "./variables.ts";
 
@@ -92,7 +92,7 @@ export const updateAcOffset = async (offset: { x: number; y: number }) => {
     await updateAcChanges(changeMap);
 };
 
-export const updateAc = async (token: Item, data: HpTrackerMetadata) => {
+export const updateAc = async (token: Item, data: GMGMetadata) => {
     const acAttachment = (await getAttachedItems(token.id, ["CURVE"])).filter((a) => attachmentFilter(a, "AC"));
 
     const show = data.acOnMap && data.hpTrackerActive;
@@ -144,7 +144,7 @@ export const updateAcChanges = async (changes: Map<string, ACItemChanges>) => {
 
 export const saveOrChangeAC = async (
     character: Item,
-    data: HpTrackerMetadata,
+    data: GMGMetadata,
     attachments: Item[],
     changeMap: Map<string, ACItemChanges>,
     visible: boolean,
@@ -179,7 +179,7 @@ export const updateAcVisibility = async (tokens: Array<Item>) => {
     const acChanges = new Map<string, ACItemChanges>();
     for (const token of tokens) {
         const acAttachments = (await getAttachedItems(token.id, ["CURVE"])).filter((a) => attachmentFilter(a, "AC"));
-        const data = token.metadata[itemMetadataKey] as HpTrackerMetadata;
+        const data = token.metadata[itemMetadataKey] as GMGMetadata;
 
         acAttachments.forEach((curve) => {
             const change = acChanges.get(curve.id) ?? {};

@@ -1,7 +1,7 @@
 import { PropsWithChildren, useEffect } from "react";
 import OBR from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "../helper/variables.ts";
-import { HpTrackerMetadata } from "../helper/types.ts";
+import { GMGMetadata } from "../helper/types.ts";
 import { SceneReadyContext } from "../context/SceneReadyContext.ts";
 import { useTokenListContext } from "../context/TokenContext.tsx";
 
@@ -11,8 +11,7 @@ export const TokenContextWrapper = (props: PropsWithChildren) => {
     const initTokens = async () => {
         const initialItems = await OBR.scene.items.getItems(
             (item) =>
-                itemMetadataKey in item.metadata &&
-                (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpTrackerActive
+                itemMetadataKey in item.metadata && (item.metadata[itemMetadataKey] as GMGMetadata).hpTrackerActive,
         );
         setTokens(initialItems);
     };
@@ -25,7 +24,7 @@ export const TokenContextWrapper = (props: PropsWithChildren) => {
                 const filteredItems = items.filter(
                     (item) =>
                         itemMetadataKey in item.metadata &&
-                        (item.metadata[itemMetadataKey] as HpTrackerMetadata).hpTrackerActive
+                        (item.metadata[itemMetadataKey] as GMGMetadata).hpTrackerActive,
                 );
                 setTokens(Array.from(filteredItems));
             });

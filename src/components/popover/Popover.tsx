@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Token } from "../hptracker/Token/Token.tsx";
 import OBR, { Image } from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "../../helper/variables.ts";
-import { HpTrackerMetadata } from "../../helper/types.ts";
+import { GMGMetadata } from "../../helper/types.ts";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { Loader } from "../general/Loader.tsx";
 import { updateHp } from "../../helper/hpHelpers.ts";
@@ -71,7 +71,7 @@ const MultiContent = ({ ids }: { ids: Array<string> }) => {
         await OBR.scene.items.updateItems(items, (uItems) => {
             uItems.forEach((item) => {
                 if (itemMetadataKey in item.metadata) {
-                    const itemData = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+                    const itemData = item.metadata[itemMetadataKey] as GMGMetadata;
                     const newHp = itemData.hp + value;
                     if (newHp < itemData.hp && itemData.stats.tempHp && itemData.stats.tempHp > 0) {
                         itemData.stats.tempHp = Math.max(itemData.stats.tempHp - (itemData.hp - newHp), 0);
@@ -82,7 +82,7 @@ const MultiContent = ({ ids }: { ids: Array<string> }) => {
                     );
                     const uItem = items.find((i) => i.id === item.id);
                     if (uItem && itemMetadataKey in uItem.metadata) {
-                        const uItemData = uItem.metadata[itemMetadataKey] as HpTrackerMetadata;
+                        const uItemData = uItem.metadata[itemMetadataKey] as GMGMetadata;
                         updateHp(uItem, {
                             ...uItemData,
                             hp: itemData.hp,
@@ -100,7 +100,7 @@ const MultiContent = ({ ids }: { ids: Array<string> }) => {
             <ul className={"token-names"}>
                 {items?.map((item, index) => {
                     if (itemMetadataKey in item.metadata) {
-                        const d = item.metadata[itemMetadataKey] as HpTrackerMetadata;
+                        const d = item.metadata[itemMetadataKey] as GMGMetadata;
                         return (
                             <li
                                 className={"token-entry"}
@@ -193,7 +193,7 @@ const MultiContent = ({ ids }: { ids: Array<string> }) => {
 const Content = (props: { id: string }) => {
     const id = props.id;
     const token = useTokenListContext((state) => state.tokens?.get(props.id));
-    const data = token?.data as HpTrackerMetadata;
+    const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
 
     return id && data && item ? (

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
-import { HpTrackerMetadata } from "../../../helper/types.ts";
+import { GMGMetadata } from "../../../helper/types.ts";
 import { diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
@@ -26,7 +26,7 @@ export const Initiative = ({ id }: { id: string }) => {
     const addRoll = useRollLogContext((state) => state.addRoll);
     const initButtonRef = useRef<HTMLButtonElement>(null);
     const token = useTokenListContext((state) => state.tokens?.get(id));
-    const data = token?.data as HpTrackerMetadata;
+    const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
     const defaultHidden = playerContext.role === "GM" && !!taSettings.gm_rolls_hidden;
 
