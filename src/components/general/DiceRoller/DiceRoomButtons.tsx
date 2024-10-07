@@ -64,7 +64,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                     <div className={"custom-dice-preview-wrapper"}>
                         {parsed.dice.map((die, index) => {
                             if (die.type !== "mod") {
-                                const preview = getDiceImage(theme, die, index, props.customDice?.theme, themes);
+                                const preview = getDiceImage(theme, die.type, index, props.customDice?.theme, themes);
                                 if (preview) {
                                     return preview;
                                 }

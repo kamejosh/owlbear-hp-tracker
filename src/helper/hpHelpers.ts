@@ -204,11 +204,6 @@ export const updateHp = async (token: Item, data: GMGMetadata) => {
             }
         }
     }
-
-    if ((data.hpBar || data.hpOnMap) && data.hpTrackerActive) {
-    } else {
-        await deleteAttachments(barAttachments);
-    }
 };
 
 export const updateBarChanges = async (changes: Map<string, BarItemChanges>) => {

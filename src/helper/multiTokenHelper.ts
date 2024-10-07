@@ -3,6 +3,8 @@ import { GMGMetadata, RoomMetadata } from "./types.ts";
 import OBR, { Item } from "@owlbear-rodeo/sdk";
 import { updateHp } from "./hpHelpers.ts";
 import { updateAc } from "./acHelper.ts";
+import { chunk } from "lodash";
+import { delay } from "./helpers.ts";
 
 export const getHpOnMap = (list: Array<Item>) => {
     const hpMap = list.map((token) => {
@@ -28,18 +30,41 @@ export const getAcForPlayers = (list: Array<Item>) => {
     return acPlayers.some((map) => map);
 };
 
+export const updateList = async (
+    list: Array<Item>,
+    chunkSize: number,
+    update: (list: Array<Item>) => Promise<void>,
+) => {
+    const chunks = chunk(list, chunkSize);
+
+    for (const subList of chunks) {
+        const start = new Date();
+        await update(subList);
+        const end = new Date();
+        const delta = end.getTime() - start.getTime();
+        if (delta < 1000) {
+            await delay(1000 - delta);
+        }
+    }
+};
+
 export const toggleHpOnMap = async (list: Array<Item>, room: RoomMetadata | null) => {
     const current = getHpOnMap(list);
-    await OBR.scene.items.updateItems(list, (items) => {
-        items.forEach((item) => {
-            (item.metadata[itemMetadataKey] as GMGMetadata).hpOnMap = !current;
-            (item.metadata[itemMetadataKey] as GMGMetadata).hpBar = !current && !room?.disableHpBar;
+    const chunks = chunk(list, 4);
+    for (const subList of chunks) {
+        await OBR.scene.items.updateItems(subList, (items) => {
+            items.forEach((item) => {
+                (item.metadata[itemMetadataKey] as GMGMetadata).hpOnMap = !current;
+                (item.metadata[itemMetadataKey] as GMGMetadata).hpBar = !current && !room?.disableHpBar;
+            });
         });
-    });
-    for (const item of list) {
-        const data = item.metadata[itemMetadataKey] as GMGMetadata;
-        await updateHp(item, { ...data, hpOnMap: !current, hpBar: !current && !room?.disableHpBar });
     }
+    await updateList(list, current ? 4 : 2, async (subList) => {
+        for (const item of subList) {
+            const data = item.metadata[itemMetadataKey] as GMGMetadata;
+            await updateHp(item, { ...data, hpOnMap: !current, hpBar: !current && !room?.disableHpBar });
+        }
+    });
 };
 
 export const toggleHpForPlayers = async (list: Array<Item>) => {
@@ -53,10 +78,12 @@ export const toggleHpForPlayers = async (list: Array<Item>) => {
             };
         });
     });
-    for (const item of list) {
-        const data = item.metadata[itemMetadataKey] as GMGMetadata;
-        await updateHp(item, { ...data, playerMap: { ac: !!data.playerMap?.ac, hp: !current } });
-    }
+    await updateList(list, current ? 4 : 2, async (subList) => {
+        for (const item of subList) {
+            const data = item.metadata[itemMetadataKey] as GMGMetadata;
+            await updateHp(item, { ...data, playerMap: { ac: !!data.playerMap?.ac, hp: !current } });
+        }
+    });
 };
 
 export const toggleAcForPlayers = async (list: Array<Item>) => {
@@ -70,10 +97,12 @@ export const toggleAcForPlayers = async (list: Array<Item>) => {
             };
         });
     });
-    for (const item of list) {
-        const data = item.metadata[itemMetadataKey] as GMGMetadata;
-        await updateAc(item, { ...data, playerMap: { hp: !!data.playerMap?.hp, ac: !current } });
-    }
+    await updateList(list, current ? 4 : 2, async (subList) => {
+        for (const item of subList) {
+            const data = item.metadata[itemMetadataKey] as GMGMetadata;
+            await updateAc(item, { ...data, playerMap: { hp: !!data.playerMap?.hp, ac: !current } });
+        }
+    });
 };
 
 export const getAcOnMap = (list: Array<Item>) => {
@@ -91,10 +120,12 @@ export const toggleAcOnMap = async (list: Array<Item>) => {
             (item.metadata[itemMetadataKey] as GMGMetadata).acOnMap = !current;
         });
     });
-    for (const item of list) {
-        const data = item.metadata[itemMetadataKey] as GMGMetadata;
-        await updateAc(item, { ...data, acOnMap: !current });
-    }
+    await updateList(list, current ? 4 : 2, async (subList) => {
+        for (const item of subList) {
+            const data = item.metadata[itemMetadataKey] as GMGMetadata;
+            await updateAc(item, { ...data, acOnMap: !current });
+        }
+    });
 };
 
 export const getTokenInPlayerList = (list: Array<Item>) => {

@@ -1,15 +1,17 @@
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useBattleContext } from "../../../context/BattleContext.tsx";
 import Tippy from "@tippyjs/react";
-import { GMGMetadata } from "../../../helper/types.ts";
+import { GMGMetadata, SORT } from "../../../helper/types.ts";
 import OBR, { Image } from "@owlbear-rodeo/sdk";
 import { isUndefined } from "lodash";
 import { destroyIndicator, setIndicator } from "../../../helper/currentHelper.ts";
 import { rest } from "../../../helper/multiTokenHelper.ts";
+import { useMetadataContext } from "../../../context/MetadataContext.ts";
 
 export const BattleRounds = () => {
     const tokens = useTokenListContext((state) => state.tokens);
+    const scene = useMetadataContext((state) => state.scene);
     const [groups, current, setCurrent, battle, setBattle] = useBattleContext((state) => [
         state.groups,
         state.current,
@@ -22,25 +24,41 @@ export const BattleRounds = () => {
               return { data: t[1].data, item: t[1].item };
           })
         : [];
-    const battleTokens = tokensData
-        .filter((td) => groups.includes(td.data.group ?? ""))
-        .sort((a, b) => {
-            if (
-                b.data.initiative === a.data.initiative &&
-                !isUndefined(b.data.stats.initiativeBonus) &&
-                !isUndefined(a.data.stats.initiativeBonus)
-            ) {
-                if (
-                    b.data.stats.initiativeBonus === a.data.stats.initiativeBonus &&
-                    !isUndefined(b.data.index) &&
-                    !isUndefined(a.data.index)
-                ) {
-                    return a.data.index - b.data.index;
+
+    const battleTokens = useMemo(() => {
+        const tokens = tokensData
+            .filter((td) => {
+                if (groups.includes(td.data.group ?? "")) {
+                    return true;
+                } else if (groups.includes("Default") && isUndefined(td.data.group)) {
+                    return true;
+                } else {
+                    return false;
                 }
-                return b.data.stats.initiativeBonus - a.data.stats.initiativeBonus;
-            }
-            return b.data.initiative - a.data.initiative;
-        });
+            })
+            .sort((a, b) => {
+                if (
+                    b.data.initiative === a.data.initiative &&
+                    !isUndefined(b.data.stats.initiativeBonus) &&
+                    !isUndefined(a.data.stats.initiativeBonus)
+                ) {
+                    if (
+                        b.data.stats.initiativeBonus === a.data.stats.initiativeBonus &&
+                        !isUndefined(b.data.index) &&
+                        !isUndefined(a.data.index)
+                    ) {
+                        return a.data.index - b.data.index;
+                    }
+                    return b.data.stats.initiativeBonus - a.data.stats.initiativeBonus;
+                }
+                return b.data.initiative - a.data.initiative;
+            });
+        if (scene?.enableAutoSort && scene?.sortMethod === SORT.ASC) {
+            return tokens.reverse();
+        } else {
+            return tokens;
+        }
+    }, [tokensData, groups]);
     const [battleRound, setBattleRound] = useState<number>(1);
 
     const stopBattle = () => {

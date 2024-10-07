@@ -1,20 +1,27 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
 import { changelogModal, itemMetadataKey, version } from "../../helper/variables.ts";
-import { GMGMetadata } from "../../helper/types.ts";
+import { GMGMetadata, SORT } from "../../helper/types.ts";
 import { PlayerTokenList } from "./TokenList.tsx";
 import { useCharSheet } from "../../context/CharacterContext.ts";
 import { CharacterSheet } from "./charactersheet/CharacterSheet.tsx";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { DropGroup } from "./DropGroup.tsx";
-import { sortItems, sortItemsInitiative } from "../../helper/helpers.ts";
+import {
+    modulo,
+    orderByInitiative,
+    reorderMetadataIndex,
+    sortItems,
+    sortItemsInitiative,
+    updateSceneMetadata,
+} from "../../helper/helpers.ts";
 import { compare } from "compare-versions";
 import { Helpbuttons } from "../general/Helpbuttons/Helpbuttons.tsx";
 import { DiceTray } from "../general/DiceRoller/DiceTray.tsx";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
-import { uniq } from "lodash";
+import { isUndefined } from "lodash";
 import { TokenContextWrapper } from "../TokenContextWrapper.tsx";
 import { useTokenListContext } from "../../context/TokenContext.tsx";
 import { PlayerSvg } from "../svgs/PlayerSvg.tsx";
@@ -39,11 +46,12 @@ export const GMGrimoire = () => {
 const Content = () => {
     const playerContext = usePlayerContext();
     const tokens = useTokenListContext((state) => state.tokens);
-    const items = tokens ? [...tokens].map((t) => t[1].item) : [];
+
     const [selectedTokens, setSelectedTokens] = useState<Array<string>>([]);
     const [ignoredChanges, setIgnoredChanges] = useState<boolean>(false);
     const [scene, room] = useMetadataContext((state) => [state.scene, state.room]);
-    const [reverseInitiativeOrder, setReverseInitiativeOrder] = useState<boolean>(false);
+    const sortInitiative = scene?.sortMethod ?? SORT.DESC;
+    const enableAutoSort = !!scene?.enableAutoSort;
     const { isReady } = SceneReadyContext();
     const characterId = useCharSheet((state) => state.characterId);
     const [playerPreview, setPlayerPreview] = useUISettingsContext((state) => [
@@ -51,27 +59,27 @@ const Content = () => {
         state.setPlayerPreview,
     ]);
 
-    const initGrimoire = async () => {
-        if (
-            playerContext.role === "GM" &&
-            (!room?.ignoreUpdateNotification || compare(version, "3.0.0", "=")) &&
-            scene?.version &&
-            compare(scene.version, version, "<")
-        ) {
-            const width = await OBR.viewport.getWidth();
-            await OBR.modal.open({
-                ...changelogModal,
-                fullScreen: false,
-                height: 600,
-                width: Math.min(width * 0.9, 600),
-            });
-        } else if (playerContext.role === "GM" && scene?.version && compare(scene.version, version, "<")) {
-            setIgnoredChanges(true);
-            await OBR.notification.show(`GM's Grimoire has been updated to version ${version}`, "SUCCESS");
-        }
-    };
-
     useEffect(() => {
+        const initGrimoire = async () => {
+            if (
+                playerContext.role === "GM" &&
+                (!room?.ignoreUpdateNotification || compare(version, "3.0.0", "=")) &&
+                scene?.version &&
+                compare(scene.version, version, "<")
+            ) {
+                const width = await OBR.viewport.getWidth();
+                await OBR.modal.open({
+                    ...changelogModal,
+                    fullScreen: false,
+                    height: 600,
+                    width: Math.min(width * 0.9, 600),
+                });
+            } else if (playerContext.role === "GM" && scene?.version && compare(scene.version, version, "<")) {
+                setIgnoredChanges(true);
+                await OBR.notification.show(`GM's Grimoire has been updated to version ${version}`, "SUCCESS");
+            }
+        };
+
         if (isReady) {
             initGrimoire();
         }
@@ -83,24 +91,13 @@ const Content = () => {
         });
     }, []);
 
-    const reorderMetadataIndex = (list: Array<Image>, group?: string) => {
-        OBR.scene.items.updateItems(list, (items) => {
-            items.forEach((item, index) => {
-                const data = item.metadata[itemMetadataKey] as GMGMetadata;
-                data.index = index;
-                if (group) {
-                    data.group = group;
-                }
-                item.metadata[itemMetadataKey] = { ...data };
-            });
-        });
-    };
+    const items = useMemo(() => (tokens ? [...tokens].map((t) => t[1].item) : []), [tokens]);
 
-    const tokenLists = useCallback(() => {
+    const tokenLists = useMemo(() => {
         const tokenMap = new Map<string, Array<Image>>();
 
         if (isReady && scene?.groups) {
-            scene?.groups?.forEach((group) => {
+            for (const group of scene?.groups) {
                 const groupItems = items?.filter((item) => {
                     const metadata = item.metadata[itemMetadataKey] as GMGMetadata;
                     return (
@@ -109,26 +106,35 @@ const Content = () => {
                         (!scene?.groups?.includes(metadata.group ?? "") && group === "Default")
                     );
                 });
-                const indices = groupItems?.map((gi) => (gi.metadata[itemMetadataKey] as GMGMetadata).index);
-
-                if (groupItems && indices && (indices.includes(undefined) || uniq(indices).length !== indices.length)) {
-                    reorderMetadataIndex(groupItems, group);
-                } else {
-                    tokenMap.set(group, groupItems ?? []);
-                }
-            });
+                tokenMap.set(group, groupItems ?? []);
+            }
         }
         return tokenMap;
-    }, [scene?.groups, items, isReady])();
+    }, [scene?.groups, items, isReady]);
+
+    useEffect(() => {
+        if (enableAutoSort) {
+            orderByInitiative(tokenLists, sortInitiative === SORT.ASC);
+        }
+    }, [enableAutoSort, sortInitiative, tokenLists]);
 
     const playerTokens = useMemo(() => {
-        return room?.playerSort && items ? items.sort(sortItemsInitiative) : (items ?? []);
-    }, [room?.playerSort, items]);
+        const playerItems = Array.from(items);
+        if (room?.playerSort && playerItems) {
+            if (sortInitiative === SORT.ASC) {
+                return playerItems.sort(sortItemsInitiative).reverse();
+            } else {
+                return playerItems.sort(sortItemsInitiative);
+            }
+        } else {
+            return playerItems ?? [];
+        }
+    }, [room?.playerSort, items, sortInitiative]);
 
-    const reorderMetadataIndexMulti = (destList: Array<Item>, group: string, sourceList: Array<Item>) => {
+    const reorderMetadataIndexMulti = async (destList: Array<Item>, group: string, sourceList: Array<Item>) => {
         const combinedList = destList.concat(sourceList);
         const destinationIds = destList.map((d) => d.id);
-        OBR.scene.items.updateItems(combinedList, (items) => {
+        await OBR.scene.items.updateItems(combinedList, (items) => {
             let destIndex = 0;
             let sourceIndex = 0;
             items.forEach((item) => {
@@ -146,7 +152,7 @@ const Content = () => {
         });
     };
 
-    const reorder = (
+    const reorder = async (
         list: Array<Image>,
         startIndex: number,
         endIndex: number,
@@ -183,10 +189,10 @@ const Content = () => {
         }
         const tokens = result.filter((item) => item !== undefined);
 
-        reorderMetadataIndex(tokens);
+        await reorderMetadataIndex(tokens);
     };
 
-    const move = (
+    const move = async (
         source: Array<Item>,
         destination: Array<Item>,
         droppableSource: DraggableLocation,
@@ -224,16 +230,16 @@ const Content = () => {
             destClone.splice(droppableDestination.index, 0, removed);
         }
 
-        reorderMetadataIndexMulti(destClone, droppableDestination.droppableId, sourceClone);
+        await reorderMetadataIndexMulti(destClone, droppableDestination.droppableId, sourceClone);
     };
 
-    const onDragEnd = (result: DropResult) => {
+    const onDragEnd = async (result: DropResult) => {
         if (!result.destination) {
             return;
         }
 
         if (result.source.droppableId != result.destination.droppableId) {
-            move(
+            await move(
                 tokenLists.get(result.source.droppableId) || [],
                 tokenLists.get(result.destination.droppableId) || [],
                 result.source,
@@ -248,24 +254,13 @@ const Content = () => {
             return;
         }
 
-        reorder(
+        await reorder(
             tokenLists.get(result.destination.droppableId) ?? [],
             result.source.index,
             result.destination.index,
             result,
             selectedTokens.includes(result.draggableId),
         );
-    };
-
-    const orderByInitiative = (reverse: boolean = false) => {
-        tokenLists.forEach((tokenList) => {
-            const reordered = Array.from(tokenList);
-            reordered.sort(sortItemsInitiative);
-            if (reverse) {
-                reordered.reverse();
-            }
-            reorderMetadataIndex(reordered);
-        });
     };
 
     return playerContext.role ? (
@@ -294,13 +289,27 @@ const Content = () => {
                             </Tippy>
                             <span className={"initiative-order"}>
                                 <InitiativeSvg />
-                                <Tippy content={"Sort tokens by initiative"}>
+                                <Tippy content={"Toggle Initiative Auto Sorting"}>
                                     <button
-                                        className={`sort-button button ${reverseInitiativeOrder ? "reverse" : ""}`}
+                                        className={`sort-toggle button ${enableAutoSort ? "active" : ""}`}
+                                        onClick={async () => {
+                                            const autoSort = !scene?.enableAutoSort;
+                                            await updateSceneMetadata(scene, { enableAutoSort: autoSort });
+                                        }}
+                                    ></button>
+                                </Tippy>
+                                <Tippy content={"Initiative Order"}>
+                                    <button
+                                        className={`sort-button button ${sortInitiative == SORT.DESC ? "reverse" : ""}`}
+                                        disabled={!enableAutoSort}
                                         title={"Order By Initiative"}
-                                        onClick={() => {
-                                            orderByInitiative(reverseInitiativeOrder);
-                                            setReverseInitiativeOrder(!reverseInitiativeOrder);
+                                        onClick={async () => {
+                                            const newOrder = !isUndefined(sortInitiative)
+                                                ? modulo(sortInitiative + 1, 2)
+                                                : SORT.DESC;
+                                            await updateSceneMetadata(scene, {
+                                                sortMethod: newOrder,
+                                            });
                                         }}
                                     >
                                         <ArrowSvg />

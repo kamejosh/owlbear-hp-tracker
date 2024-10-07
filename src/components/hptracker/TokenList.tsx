@@ -1,5 +1,5 @@
 import React from "react";
-import OBR, { Item } from "@owlbear-rodeo/sdk";
+import { Item } from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "../../helper/variables.ts";
 import { GMGMetadata } from "../../helper/types.ts";
 import { Draggable } from "@hello-pangea/dnd";
@@ -12,18 +12,6 @@ type TokenListProps = {
 };
 
 export const DraggableTokenList = React.memo(function DraggableTokenList(props: TokenListProps) {
-    const updateTokenIndex = (id: string, index: number) => {
-        OBR.scene.items.updateItems([id], (items) => {
-            items.forEach((item) => {
-                const data = item.metadata[itemMetadataKey] as GMGMetadata;
-
-                data.index = index;
-
-                item.metadata[itemMetadataKey] = { ...data };
-            });
-        });
-    };
-
     return (
         <>
             {props.tokens.length > 0 ? (
@@ -31,32 +19,24 @@ export const DraggableTokenList = React.memo(function DraggableTokenList(props: 
                     <div className={"draggable-token-list-wrapper"}>
                         <div className={"draggable-token-list-wrapper"}>
                             {props.tokens?.map((token, index) => {
-                                const data = token.metadata[itemMetadataKey] as GMGMetadata;
-                                if (data) {
-                                    if (data.index === undefined) {
-                                        updateTokenIndex(token.id, index);
-                                    }
-                                    return (
-                                        <Draggable key={token.id} draggableId={token.id} index={index}>
-                                            {(provided) => (
-                                                <div
-                                                    ref={provided.innerRef}
-                                                    {...provided.draggableProps}
-                                                    {...provided.dragHandleProps}
-                                                >
-                                                    <Token
-                                                        id={token.id}
-                                                        popover={false}
-                                                        selected={props.selected.includes(token.id)}
-                                                        tokenLists={props.tokenLists}
-                                                    />
-                                                </div>
-                                            )}
-                                        </Draggable>
-                                    );
-                                }
-
-                                return null;
+                                return (
+                                    <Draggable key={token.id} draggableId={token.id} index={index}>
+                                        {(provided) => (
+                                            <div
+                                                ref={provided.innerRef}
+                                                {...provided.draggableProps}
+                                                {...provided.dragHandleProps}
+                                            >
+                                                <Token
+                                                    id={token.id}
+                                                    popover={false}
+                                                    selected={props.selected.includes(token.id)}
+                                                    tokenLists={props.tokenLists}
+                                                />
+                                            </div>
+                                        )}
+                                    </Draggable>
+                                );
                             })}
                         </div>
                     </div>

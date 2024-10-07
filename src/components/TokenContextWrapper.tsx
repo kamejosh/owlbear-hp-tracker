@@ -8,6 +8,7 @@ import { useTokenListContext } from "../context/TokenContext.tsx";
 export const TokenContextWrapper = (props: PropsWithChildren) => {
     const { isReady } = SceneReadyContext();
     const setTokens = useTokenListContext((state) => state.setTokens);
+
     const initTokens = async () => {
         const initialItems = await OBR.scene.items.getItems(
             (item) =>

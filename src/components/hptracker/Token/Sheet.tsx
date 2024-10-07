@@ -11,9 +11,10 @@ import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import Tippy from "@tippyjs/react";
 import { statblockPopover } from "../../../helper/variables.ts";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
+import { updateSceneMetadata } from "../../../helper/helpers.ts";
 
 export const Sheet = ({ id }: { id: string }) => {
-    const room = useMetadataContext((state) => state.room);
+    const [room, scene] = useMetadataContext((state) => [state.room, state.scene]);
     const playerContext = usePlayerContext();
     const token = useTokenListContext((state) => state.tokens?.get(id));
     const setId = useCharSheet((state) => state.setId);
@@ -50,6 +51,11 @@ export const Sheet = ({ id }: { id: string }) => {
                                     height = await OBR.viewport.getHeight();
                                 } catch {}
 
+                                const statblockPopoverOpen: { [key: string]: boolean } = scene?.statblockPopoverOpen
+                                    ? { ...scene.statblockPopoverOpen }
+                                    : {};
+                                statblockPopoverOpen[OBR.player.id] = true;
+                                await updateSceneMetadata(scene, { statblockPopoverOpen: statblockPopoverOpen });
                                 await OBR.player.select([id]);
                                 await OBR.popover.open({
                                     ...statblockPopover,
@@ -65,9 +71,9 @@ export const Sheet = ({ id }: { id: string }) => {
                     <Tippy content={"Remove statblock"}>
                         <button
                             className={"remove-statblock"}
-                            onClick={() => {
+                            onClick={async () => {
                                 const newData = { ...data, sheet: "" };
-                                updateTokenMetadata(newData, [id]);
+                                await updateTokenMetadata(newData, [id]);
                             }}
                         >
                             <DeleteSvg />

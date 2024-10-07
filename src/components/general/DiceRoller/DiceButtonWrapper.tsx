@@ -127,7 +127,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                     return getSvgForDiceType(die.type);
                 } else {
                     if (theme) {
-                        const image = getDiceImage(theme, die, 0);
+                        const image = getDiceImage(theme, die.type, 0);
                         return image ?? <D20 />;
                     } else {
                         return <D20 />;
@@ -151,8 +151,8 @@ export const DiceButton = (props: DiceButtonProps) => {
                 !initialized && !room?.disableDiceRoller
                     ? "Dice Roller is not initialized"
                     : props.limitReached
-                    ? "You have reached your limits for this ability"
-                    : ""
+                      ? "You have reached your limits for this ability"
+                      : ""
             }
             disabled={!(!initialized && !room?.disableDiceRoller) && !props.limitReached}
         >

@@ -1,4 +1,4 @@
-import { IAvailableDie, IDiceRoll, ITheme } from "dddice-js";
+import { IAvailableDie, ITheme } from "dddice-js";
 import { D4 } from "../components/svgs/dice/D4.tsx";
 import { D6 } from "../components/svgs/dice/D6.tsx";
 import { D8 } from "../components/svgs/dice/D8.tsx";
@@ -8,10 +8,10 @@ import { D20 } from "../components/svgs/dice/D20.tsx";
 
 export const getDiceImage = (
     theme: ITheme,
-    die: IDiceRoll,
+    dieType: string,
     index: number,
     customTheme?: string,
-    themes?: Array<ITheme> | null
+    themes?: Array<ITheme> | null,
 ) => {
     if (customTheme && themes) {
         const t = themes.find((th) => th.id === customTheme);
@@ -20,7 +20,7 @@ export const getDiceImage = (
         }
     }
     const themeDie = theme.available_dice.find(
-        (d) => d.hasOwnProperty("type") && (d as IAvailableDie).type === die.type
+        (d) => d.hasOwnProperty("type") && (d as IAvailableDie).type === dieType,
     );
     if (themeDie) {
         let preview = "";
@@ -32,10 +32,10 @@ export const getDiceImage = (
             preview = theme.preview[notation];
         }
         if (preview) {
-            return <img key={index} className={"preview-image"} src={preview} alt={die.type} />;
+            return <img key={index} className={"preview-image"} src={preview} alt={dieType} />;
         }
-    } else if (theme.preview.hasOwnProperty(die.type)) {
-        return <img key={index} className={"preview-image"} src={theme.preview[die.type]} alt={die.type} />;
+    } else if (theme.preview.hasOwnProperty(dieType)) {
+        return <img key={index} className={"preview-image"} src={theme.preview[dieType]} alt={dieType} />;
     }
 };
 

@@ -55,12 +55,12 @@ export const AC = ({ id }: { id: string }) => {
                 <MapButton
                     onClick={async () => {
                         const newData = { ...data, acOnMap: !data.acOnMap };
-                        updateTokenMetadata(newData, [id]);
+                        await updateTokenMetadata(newData, [id]);
                         await updateAc(item, newData);
                     }}
                     onContextMenu={async () => {
                         const newData = { ...data, playerMap: { hp: !!data.playerMap?.hp, ac: !data.playerMap?.ac } };
-                        updateTokenMetadata(newData, [id]);
+                        await updateTokenMetadata(newData, [id]);
                         await updateAc(item, newData);
                     }}
                     active={data.acOnMap}

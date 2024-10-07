@@ -18,7 +18,7 @@ import {
 } from "../../helper/multiTokenHelper.ts";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { useDiceRoller } from "../../context/DDDiceContext.tsx";
-import { IDiceRoll, Operator, parseRollEquation } from "dddice-js";
+import { IDiceRoll, Operator } from "dddice-js";
 import { diceToRoll, getUserUuid, localRoll } from "../../helper/diceHelper.ts";
 import { getRoomDiceUser, getTokenName } from "../../helper/helpers.ts";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
@@ -75,21 +75,17 @@ export const DropGroup = (props: DropGroupProps) => {
 
     const getDicePreview = () => {
         try {
-            const parsed = parseRollEquation(`1d${room?.initiativeDice}`, "dddice-bees");
-            const die = parsed.dice.find((d) => d.type !== "mod");
-            if (die) {
-                if (room?.disableDiceRoller) {
-                    return getSvgForDiceType(`d${room.initiativeDice}`);
-                } else {
-                    if (theme) {
-                        const image = getDiceImage(theme, die, 0);
-                        return image ?? <D20 />;
-                    } else {
-                        return <D20 />;
-                    }
-                }
+            const initiativeDice = room?.initiativeDice ?? 20;
+            const dieType = `d${initiativeDice}`;
+            if (room?.disableDiceRoller) {
+                return getSvgForDiceType(`d${room.initiativeDice}`);
             } else {
-                return <D20 />;
+                if (theme) {
+                    const image = getDiceImage(theme, dieType, 0);
+                    return image ?? <D20 />;
+                } else {
+                    return <D20 />;
+                }
             }
         } catch {
             return <D20 />;

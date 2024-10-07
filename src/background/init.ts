@@ -1,7 +1,5 @@
 import OBR, { Image, Metadata } from "@owlbear-rodeo/sdk";
 import { ID, itemMetadataKey, metadataKey, version } from "../helper/variables.ts";
-import { migrate102To103 } from "../migrations/v103.ts";
-import { migrate105To106 } from "../migrations/v106.ts";
 import { compare } from "compare-versions";
 import {
     ACItemChanges,
@@ -11,8 +9,6 @@ import {
     SceneMetadata,
     TextItemChanges,
 } from "../helper/types.ts";
-import { migrate111To112 } from "../migrations/v112.ts";
-import { migrate112To113 } from "../migrations/v113.ts";
 import {
     saveOrChangeBar,
     saveOrChangeText,
@@ -22,13 +18,17 @@ import {
     updateTextVisibility,
 } from "../helper/hpHelpers.ts";
 import { v4 as uuidv4 } from "uuid";
-import { migrateTo140 } from "../migrations/v140.ts";
 import { saveOrChangeAC, updateAc, updateAcChanges, updateAcVisibility } from "../helper/acHelper.ts";
-import { migrateTo141 } from "../migrations/v141.ts";
 import { attachmentFilter, getAttachedItems, prepareTokenForGrimoire } from "../helper/helpers.ts";
+import { setupDddice } from "./dddice.ts";
+import { migrate102To103 } from "../migrations/v103.ts";
+import { migrate105To106 } from "../migrations/v106.ts";
+import { migrate111To112 } from "../migrations/v112.ts";
+import { migrate112To113 } from "../migrations/v113.ts";
+import { migrateTo140 } from "../migrations/v140.ts";
+import { migrateTo141 } from "../migrations/v141.ts";
 import { migrateTo160 } from "../migrations/v160.ts";
 import { migrateTo200 } from "../migrations/v200.ts";
-import { setupDddice } from "./dddice.ts";
 import { migrateTo300 } from "../migrations/v300.ts";
 
 /**

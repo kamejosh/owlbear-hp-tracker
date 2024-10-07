@@ -75,19 +75,6 @@ export const PfStatBlock = ({
                     <b>Initiative</b>
                     <Initiative id={itemId} />
                 </span>
-                {statblock.perception ? (
-                    <span className={"perception"}>
-                        <div>
-                            <b>Perception</b>
-                        </div>
-                        <DiceButton
-                            dice={`d20${statblock.perception}`}
-                            text={statblock.perception}
-                            context={`Perception: Check`}
-                            statblock={name}
-                        />
-                    </span>
-                ) : null}
                 <span className={"hp"}>
                     <b>Hit Points</b> <HP id={itemId} /> {statblock.hp.special ? `(${statblock.hp.special})` : null}
                 </span>
@@ -104,10 +91,10 @@ export const PfStatBlock = ({
                             <div className={"stat-value"}>
                                 <DiceButton
                                     dice={`d20${Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
-                                        Math.floor(value)
+                                        Math.floor(value),
                                     )}`}
                                     text={Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
-                                        Math.floor(value)
+                                        Math.floor(value),
                                     )}
                                     context={`${capitalize(stat)}: Check`}
                                     statblock={name}
