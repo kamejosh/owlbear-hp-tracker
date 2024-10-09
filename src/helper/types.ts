@@ -35,6 +35,7 @@ export type GMGMetadata = {
     index?: number;
     group?: string;
     playerList?: boolean;
+    isCurrent?: boolean;
 };
 
 /**

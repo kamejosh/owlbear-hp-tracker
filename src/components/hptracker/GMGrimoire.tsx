@@ -113,7 +113,7 @@ const Content = () => {
     }, [scene?.groups, items, isReady]);
 
     useEffect(() => {
-        if (enableAutoSort) {
+        if (playerContext.role === "GM" && enableAutoSort) {
             orderByInitiative(tokenLists, sortInitiative === SORT.ASC);
         }
     }, [enableAutoSort, sortInitiative, tokenLists]);

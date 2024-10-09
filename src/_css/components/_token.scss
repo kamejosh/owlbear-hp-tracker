@@ -54,12 +54,16 @@
         width: 0;
         height: 100%;
         content: "";
+        visibility: hidden;
+        opacity: 0;
     }
 
     &:hover,
     &:focus-visible {
         &::before {
             width: 20px;
+            visibility: visible;
+            opacity: 1;
         }
     }
 

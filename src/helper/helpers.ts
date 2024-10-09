@@ -612,7 +612,7 @@ export const prepareTokenForGrimoire = async (contextItems: Array<Image>) => {
 };
 
 export const reorderMetadataIndex = async (list: Array<Image>, group?: string) => {
-    const chunks = chunk(list, 20);
+    const chunks = chunk(list, 12);
     let index = 0;
     for (const subList of chunks) {
         await OBR.scene.items.updateItems(subList, (items) => {

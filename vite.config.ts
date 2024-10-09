@@ -36,4 +36,11 @@ export default defineConfig({
             hook: "writeBundle",
         }),
     ],
+    css: {
+        preprocessorOptions: {
+            scss: {
+                api: "modern-compiler", // or "modern", "legacy"
+            },
+        },
+    },
 });

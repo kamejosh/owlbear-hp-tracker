@@ -7,7 +7,7 @@ import { getBgColor } from "../../../helper/helpers.ts";
 import _ from "lodash";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
-import { changeArmorClass, changeHp } from "../../../helper/tokenHelper.ts";
+import { changeArmorClass, changeHp, updateTokenMetadata } from "../../../helper/tokenHelper.ts";
 import { HP } from "./HP.tsx";
 import { AC } from "./AC.tsx";
 import { Initiative } from "./Initiative.tsx";
@@ -48,10 +48,16 @@ export const Token = (props: TokenProps) => {
     }, [room?.allowNegativeNumbers]);
 
     useEffect(() => {
-        if (current === item.id && containerRef.current) {
+        if (playerContext.role === "GM" && data.isCurrent !== (current === item.id)) {
+            updateTokenMetadata({ ...data, isCurrent: current === item.id }, [props.id]);
+        }
+    }, [current, playerContext]);
+
+    useEffect(() => {
+        if (data.isCurrent && containerRef.current) {
             containerRef.current.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
         }
-    }, [current]);
+    }, [data.isCurrent]);
 
     const getGroupSelectRange = (currentSelection: Array<string>): Array<string> | null => {
         const currentGroup = data.group;
@@ -165,7 +171,7 @@ export const Token = (props: TokenProps) => {
             ref={containerRef}
             className={`token ${playerContext.role === "PLAYER" ? "player" : ""} ${
                 props.selected ? "selected" : ""
-            } ${component} ${current === item.id ? "current" : ""}`}
+            } ${component} ${data.isCurrent ? "current" : ""}`}
             style={{
                 background: `linear-gradient(to right, ${getBgColor(data)}, #1C1B22 50%, #1C1B22 )`,
             }}
@@ -202,7 +208,8 @@ export const Token = (props: TokenProps) => {
         </div>
     ) : data.playerList && item.visible ? (
         <div
-            className={"token"}
+            ref={containerRef}
+            className={`token ${data.isCurrent ? "current" : ""}`}
             style={{ background: `linear-gradient(to right, ${getBgColor(data)}, #242424 50%, #242424 )` }}
         >
             <TokenIcon id={props.id} />
