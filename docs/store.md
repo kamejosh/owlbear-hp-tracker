@@ -165,7 +165,11 @@ The Token List Buttons are always visible and stick to the upper left corner, ev
 + The Token List Settings
 + The Battle Buttons
 
-The Token List Settings consist of the "Player Preview Toggle"-Button and the "Sort by Initiative"-Button. When the "Player Preview" is active, the Token Images in the Token List display an approximation of what players will see (HP Bar, HP Text, AC). When sorting by initiative Token Groups are not changed but each group will be sorted by initiative value. In case of the same initiative value the initiative bonus is the tiebreaker.
+The Token List Settings consist of the "Player Preview Toggle"-Button and the "Sort by Initiative"-Section. When the "Player Preview" is active, the Token Images in the Token List display an approximation of what players will see (HP Bar, HP Text, AC).
+
+When the Sort by Initiative Checkbox is active you can choose between ascending and descending to automatically sort all tokens in all groups by initiative. New Tokens added to a group will also automatically be sorted by initiative. You will still be able to sort Tokens manually if they have the same initiative value and the same initiative bonus.
+
+When the auto sorting toggle is deactivated you can sort the Tokens in any order you want by manually dragging them into their position.
 
 The Battle Buttons come in two versions:
 
