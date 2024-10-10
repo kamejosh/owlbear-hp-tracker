@@ -38,6 +38,13 @@ export const useTokenListContext = create<TokenListContextType>()((set) => ({
                                 oldData: state.tokens.get(item.id)!.data,
                                 newData: metadata,
                             });
+                        } else if (item.createdUserId !== state.tokens.get(item.id)!.item.createdUserId) {
+                            changes.push({
+                                changeType: "owner-changed",
+                                id: item.id,
+                                oldData: null,
+                                newData: null,
+                            });
                         }
                     } else {
                         changes.push({ changeType: "new", id: item.id, oldData: null, newData: metadata });
@@ -52,6 +59,9 @@ export const useTokenListContext = create<TokenListContextType>()((set) => ({
                         changes.push({ changeType: "delete", id: e[0], oldData: e[1].data, newData: null });
                     });
             }
-            return { changeList: changes, tokens: newTokens };
+            if (changes.length > 0) {
+                return { changeList: changes, tokens: newTokens };
+            }
+            return state;
         }),
 }));

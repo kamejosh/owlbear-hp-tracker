@@ -41,7 +41,7 @@ export const createAC = async (ac: number, token: Image) => {
         .textType("PLAIN")
         .width(width)
         .height(height * 0.8)
-        .position({ x: position.x, y: position.y + height * 0.2 })
+        .position({ x: position.x, y: position.y + height * 0.15 })
         .attachedTo(acShape.id)
         .locked(true)
         .plainText(String(ac))

@@ -1,3 +1,12 @@
+# 3.2.0
+
++ Improve GMG performance and multi token updates
++ Add Sort by Initiative Toggle to automatically sort tokens
++ Add better handling of rate limit exceptions
++ Sort order for players follows GMs sort order
++ Add indicator to player view which tokens turn it currently is
++ Bug fixes
+
 # 3.1.0
 
 + Fix Old Scenes are not able to toggle player visibility for texts

@@ -47,6 +47,6 @@ export const useBattleContext = create<BattleContextType & BattleContextActions>
                     return { battle: battle };
                 }),
         }),
-        { name: `${ID}.battle-context`, storage: createJSONStorage(() => localStorage) }
-    )
+        { name: `${ID}.battle-context`, storage: createJSONStorage(() => localStorage) },
+    ),
 );

@@ -9,7 +9,7 @@ import {
     RoomMetadata,
     SceneMetadata,
 } from "./types.ts";
-import { isObject, isUndefined } from "lodash";
+import { isEqual, isObject, isUndefined } from "lodash";
 import { IRoll, IRoomParticipant } from "dddice-js";
 import { RollLogEntryType } from "../context/RollLogContext.tsx";
 import { TTRPG_URL } from "../config.ts";
@@ -19,6 +19,7 @@ import { E5Statblock } from "../api/e5/useE5Api.ts";
 import { PfStatblock } from "../api/pf/usePfApi.ts";
 import axiosRetry from "axios-retry";
 import { Ability } from "../components/hptracker/charactersheet/e5/E5Ability.tsx";
+import { chunk } from "lodash";
 
 export const getYOffset = async (height: number) => {
     const metadata = (await OBR.room.getMetadata()) as Metadata;
@@ -117,6 +118,14 @@ export const sortItems = (a: Item, b: Item) => {
     return 0;
 };
 
+/**
+ * This function is used to determine the order of Items in the player view and in the Battle Tracker
+ * It compares the index of the tokens to match the current order in the GM View.
+ *
+ * This function must not be used to order the Tokens in the GM view because in case Initiative order is reversed the index compare will always trigger a reorder
+ * @param a
+ * @param b
+ */
 export const sortItemsInitiative = (a: Item, b: Item) => {
     const aData = a.metadata[itemMetadataKey] as GMGMetadata;
     const bData = b.metadata[itemMetadataKey] as GMGMetadata;
@@ -135,6 +144,35 @@ export const sortItemsInitiative = (a: Item, b: Item) => {
         return bData.stats.initiativeBonus - aData.stats.initiativeBonus;
     }
     return bData.initiative - aData.initiative;
+};
+
+/**
+ * This function is used to determine the order of Items in the GM view it compares initiative and initiative bonus but doesn't look at the index because in case to items have the same value the index in the GM view does not matter.
+ *
+ * This function must not be used to order the Tokens in the player view or the battle tracker because it might lead to a reverse order of tokens based on index
+ * @param a
+ * @param b
+ * @param reverse
+ */
+export const sortByInitiative = (a: Item, b: Item, reverse: boolean) => {
+    const aData = a.metadata[itemMetadataKey] as GMGMetadata;
+    const bData = b.metadata[itemMetadataKey] as GMGMetadata;
+    if (
+        bData.initiative === aData.initiative &&
+        !isUndefined(bData.stats.initiativeBonus) &&
+        !isUndefined(aData.stats.initiativeBonus)
+    ) {
+        if (reverse) {
+            return aData.stats.initiativeBonus - bData.stats.initiativeBonus;
+        } else {
+            return bData.stats.initiativeBonus - aData.stats.initiativeBonus;
+        }
+    }
+    if (reverse) {
+        return aData.initiative - bData.initiative;
+    } else {
+        return bData.initiative - aData.initiative;
+    }
 };
 
 export const generateSlug = (string: string) => {
@@ -571,4 +609,41 @@ export const prepareTokenForGrimoire = async (contextItems: Array<Image>) => {
         });
     });
     return tokenIds;
+};
+
+export const reorderMetadataIndex = async (list: Array<Image>, group?: string) => {
+    const chunks = chunk(list, 12);
+    let index = 0;
+    for (const subList of chunks) {
+        await OBR.scene.items.updateItems(subList, (items) => {
+            items.forEach((item) => {
+                const data = item.metadata[itemMetadataKey] as GMGMetadata;
+                data.index = index;
+                if (group) {
+                    data.group = group;
+                }
+                index++;
+                item.metadata[itemMetadataKey] = { ...data };
+            });
+        });
+    }
+};
+
+export const orderByInitiative = async (tokenMap: Map<string, Array<Image>>, reverse: boolean = false) => {
+    const groups = tokenMap.values();
+
+    for (const group of groups) {
+        const reordered = Array.from(group);
+        reordered.sort((a, b) => sortByInitiative(a, b, reverse));
+        if (!isEqual(group, reordered)) {
+            await reorderMetadataIndex(reordered);
+        }
+    }
+};
+export const modulo = (n: number, m: number) => {
+    return ((n % m) + m) % m;
+};
+
+export const delay = (ms: number) => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
 };

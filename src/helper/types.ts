@@ -1,3 +1,8 @@
+export enum SORT {
+    DESC,
+    ASC,
+}
+
 export type Limit = {
     id: string;
     max: number;
@@ -30,6 +35,7 @@ export type GMGMetadata = {
     index?: number;
     group?: string;
     playerList?: boolean;
+    isCurrent?: boolean;
 };
 
 /**
@@ -59,6 +65,8 @@ export type SceneMetadata = {
     openGroups?: Array<string>;
     collapsedStatblocks?: Array<string>;
     statblockPopoverOpen?: { [key: string]: boolean };
+    sortMethod?: SORT;
+    enableAutoSort?: boolean;
 };
 
 export type DiceUser = {

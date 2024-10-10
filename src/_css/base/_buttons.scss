@@ -338,3 +338,34 @@ button,
         }
     }
 }
+
+.sort-toggle {
+    position: relative;
+    width: 20px;
+    border-width: 2px;
+    outline: 3px solid transparent;
+
+    &:hover,
+    &:focus-visible {
+        outline: 3px solid lightgrey;
+    }
+
+    &.active {
+        &::after,
+        &::before {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            translate: -50% -49%;
+            rotate: 40deg;
+            background-color: lightgrey;
+            width: 3px;
+            height: 80%;
+            content: "";
+        }
+
+        &::before {
+            rotate: -40deg;
+        }
+    }
+}

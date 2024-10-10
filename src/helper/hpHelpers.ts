@@ -92,16 +92,15 @@ const createText = async (text: string, token: Image) => {
         .textType("PLAIN")
         .width(width)
         .height(height)
-        .position({ ...position, y: position.y + height * 0.1 }) // remove the height * 0.1 modifier once the new rendering engine is released
+        .position({ ...position, y: position.y })
         .attachedTo(token.id)
         .plainText(text)
         .locked(true)
         .textAlign("CENTER")
         .textAlignVertical("BOTTOM")
         .fontWeight(600)
-        .fillColor("white")
         .strokeColor("black")
-        .strokeWidth(height / 30)
+        .strokeWidth(2)
         .fontSize(height)
         .lineHeight(1)
         .disableHit(true)
@@ -136,7 +135,7 @@ const handleHpOffsetUpdate = async (offset: number, hp: Item) => {
             } else if (hp.name === "hp-text") {
                 change.position = {
                     x: x + 2,
-                    y: bounds.position.y + bounds.height - height + offset + height * 0.1,
+                    y: bounds.position.y + bounds.height - height + offset,
                 };
             } else {
                 change.position = {
@@ -203,11 +202,6 @@ export const updateHp = async (token: Item, data: GMGMetadata) => {
                 await updateTextChanges(textChanges);
             }
         }
-    }
-
-    if ((data.hpBar || data.hpOnMap) && data.hpTrackerActive) {
-    } else {
-        await deleteAttachments(barAttachments);
     }
 };
 

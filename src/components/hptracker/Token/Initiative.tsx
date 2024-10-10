@@ -7,7 +7,6 @@ import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { updateTokenMetadata } from "../../../helper/tokenHelper.ts";
 import { D20 } from "../../svgs/dice/D20.tsx";
-import { parseRollEquation } from "dddice-js";
 import { getDiceImage, getSvgForDiceType } from "../../../helper/previewHelpers.tsx";
 import { InitiativeSvg } from "../../svgs/InitiativeSvg.tsx";
 import "./initiative.scss";
@@ -44,24 +43,17 @@ export const Initiative = ({ id }: { id: string }) => {
 
     const getDicePreview = () => {
         try {
-            const parsed = parseRollEquation(
-                `1d${room?.initiativeDice}${data.stats.initiativeBonus ? "+" + data.stats.initiativeBonus : ""}`,
-                "dddice-bees",
-            );
-            const die = parsed.dice.find((d) => d.type !== "mod");
-            if (die) {
-                if (room?.disableDiceRoller) {
-                    return getSvgForDiceType(die.type);
-                } else {
-                    if (theme) {
-                        const image = getDiceImage(theme, die, 0);
-                        return image ?? <D20 />;
-                    } else {
-                        return <D20 />;
-                    }
-                }
+            const initiativeDice = room?.initiativeDice ?? 20;
+            const dieType = `d${initiativeDice}`;
+            if (room?.disableDiceRoller) {
+                return getSvgForDiceType(dieType);
             } else {
-                return <D20 />;
+                if (theme) {
+                    const image = getDiceImage(theme, dieType, 0);
+                    return image ?? <D20 />;
+                } else {
+                    return <D20 />;
+                }
             }
         } catch {
             return <D20 />;

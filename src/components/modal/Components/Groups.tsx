@@ -42,14 +42,13 @@ const DraggableGroupList = React.memo(function DraggableGroupList() {
                                       {group !== "Default" ? (
                                           <button
                                               className={"remove"}
-                                              onClick={() => {
+                                              onClick={async () => {
                                                   const groups = Array.from(scene.groups || []);
                                                   groups.splice(groups.indexOf(group), 1);
                                                   if (!groups.includes("Default")) {
                                                       groups.splice(0, 0, "Default");
                                                   }
-
-                                                  updateSceneMetadata(scene, { groups: groups });
+                                                  await updateSceneMetadata(scene, { groups: groups });
                                               }}
                                           >
                                               X
