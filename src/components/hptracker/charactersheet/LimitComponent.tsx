@@ -1,6 +1,5 @@
 import { components } from "../../../api/schema";
 import { GMGMetadata, Limit } from "../../../helper/types.ts";
-import OBR from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "../../../helper/variables.ts";
 import { updateItems } from "../../../helper/obrHelper.ts";
 
