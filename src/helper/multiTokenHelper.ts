@@ -1,10 +1,10 @@
 import { itemMetadataKey } from "./variables.ts";
 import { GMGMetadata, RoomMetadata } from "./types.ts";
-import OBR, { Item } from "@owlbear-rodeo/sdk";
+import { Item } from "@owlbear-rodeo/sdk";
 import { updateHp } from "./hpHelpers.ts";
 import { updateAc } from "./acHelper.ts";
 import { chunk } from "lodash";
-import { delay } from "./helpers.ts";
+import { updateItems, updateList } from "./obrHelper.ts";
 
 export const getHpOnMap = (list: Array<Item>) => {
     const hpMap = list.map((token) => {
@@ -30,29 +30,11 @@ export const getAcForPlayers = (list: Array<Item>) => {
     return acPlayers.some((map) => map);
 };
 
-export const updateList = async (
-    list: Array<Item>,
-    chunkSize: number,
-    update: (list: Array<Item>) => Promise<void>,
-) => {
-    const chunks = chunk(list, chunkSize);
-
-    for (const subList of chunks) {
-        const start = new Date();
-        await update(subList);
-        const end = new Date();
-        const delta = end.getTime() - start.getTime();
-        if (delta < 1000) {
-            await delay(1000 - delta);
-        }
-    }
-};
-
 export const toggleHpOnMap = async (list: Array<Item>, room: RoomMetadata | null) => {
     const current = getHpOnMap(list);
     const chunks = chunk(list, 4);
     for (const subList of chunks) {
-        await OBR.scene.items.updateItems(subList, (items) => {
+        await updateItems(subList, (items) => {
             items.forEach((item) => {
                 (item.metadata[itemMetadataKey] as GMGMetadata).hpOnMap = !current;
                 (item.metadata[itemMetadataKey] as GMGMetadata).hpBar = !current && !room?.disableHpBar;
@@ -69,7 +51,7 @@ export const toggleHpOnMap = async (list: Array<Item>, room: RoomMetadata | null
 
 export const toggleHpForPlayers = async (list: Array<Item>) => {
     const current = getHpForPlayers(list);
-    await OBR.scene.items.updateItems(list, (items) => {
+    await updateItems(list, (items) => {
         items.forEach((item) => {
             const data = item.metadata[itemMetadataKey] as GMGMetadata;
             (item.metadata[itemMetadataKey] as GMGMetadata).playerMap = {
@@ -88,7 +70,7 @@ export const toggleHpForPlayers = async (list: Array<Item>) => {
 
 export const toggleAcForPlayers = async (list: Array<Item>) => {
     const current = getAcForPlayers(list);
-    await OBR.scene.items.updateItems(list, (items) => {
+    await updateItems(list, (items) => {
         items.forEach((item) => {
             const data = item.metadata[itemMetadataKey] as GMGMetadata;
             (item.metadata[itemMetadataKey] as GMGMetadata).playerMap = {
@@ -115,7 +97,7 @@ export const getAcOnMap = (list: Array<Item>) => {
 
 export const toggleAcOnMap = async (list: Array<Item>) => {
     const current = getAcOnMap(list);
-    await OBR.scene.items.updateItems(list, (items) => {
+    await updateItems(list, (items) => {
         items.forEach((item) => {
             (item.metadata[itemMetadataKey] as GMGMetadata).acOnMap = !current;
         });
@@ -138,7 +120,7 @@ export const getTokenInPlayerList = (list: Array<Item>) => {
 
 export const toggleTokenInPlayerList = async (list: Array<Item>) => {
     const current = getTokenInPlayerList(list);
-    await OBR.scene.items.updateItems(list, (items) => {
+    await updateItems(list, (items) => {
         items.forEach((item) => {
             (item.metadata[itemMetadataKey] as GMGMetadata).playerList = !current;
         });
@@ -148,7 +130,7 @@ export const toggleTokenInPlayerList = async (list: Array<Item>) => {
 export const rest = async (list: Array<Item>, restType: string) => {
     const hpUpdated: Array<string> = [];
 
-    await OBR.scene.items.updateItems(list, (items) => {
+    await updateItems(list, (items) => {
         items.forEach((item) => {
             const data = item.metadata[itemMetadataKey] as GMGMetadata;
             const newLimits = data.stats.limits?.map((limit) => {

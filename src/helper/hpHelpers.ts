@@ -9,6 +9,7 @@ import {
     getYOffset,
 } from "./helpers.ts";
 import { itemMetadataKey, infoMetadataKey } from "./variables.ts";
+import { addItems, updateItems } from "./obrHelper.ts";
 
 export const createBar = async (percentage: number, tempHpPercentage: number, token: Image) => {
     const bounds = await getImageBounds(token);
@@ -207,10 +208,11 @@ export const updateHp = async (token: Item, data: GMGMetadata) => {
 
 export const updateBarChanges = async (changes: Map<string, BarItemChanges>) => {
     if (changes.size > 0) {
-        await OBR.scene.items.updateItems(
+        await updateItems(
             (item): item is Shape => isShape(item) && changes.has(item.id),
-            (shapes) => {
-                shapes.forEach((shape) => {
+            (items) => {
+                items.forEach((item) => {
+                    const shape = item as Shape;
                     if (changes.has(shape.id)) {
                         const change = changes.get(shape.id);
                         if (change) {
@@ -238,10 +240,11 @@ export const updateBarChanges = async (changes: Map<string, BarItemChanges>) => 
 
 export const updateTextChanges = async (changes: Map<string, TextItemChanges>) => {
     if (changes.size > 0) {
-        await OBR.scene.items.updateItems(
+        await updateItems(
             (item): item is Text => isText(item) && changes.has(item.id),
-            (texts) => {
-                texts.forEach((text) => {
+            (items) => {
+                items.forEach((item) => {
+                    const text = item as Text;
                     if (changes.has(text.id)) {
                         const change = changes.get(text.id);
                         if (change) {
@@ -278,7 +281,7 @@ export const saveOrChangeBar = async (
     } else {
         const { hpPercentage, tempHpPercentage } = await calculatePercentage(data);
         const bar = await createBar(hpPercentage, tempHpPercentage, character as Image);
-        await OBR.scene.items.addItems(bar);
+        await addItems(bar);
     }
 };
 
@@ -305,7 +308,7 @@ export const saveOrChangeText = async (
     } else {
         const text = await createText(hpText, character as Image);
         text.visible = character.visible && !!data.playerMap?.hp;
-        await OBR.scene.items.addItems([text]);
+        await addItems([text]);
     }
 };
 

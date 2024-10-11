@@ -62,7 +62,7 @@
         position: absolute;
         right: 0;
         bottom: 10px;
-        opacity: 0.8;
+        opacity: 0.9;
         width: 20px;
         height: 24px;
 
@@ -76,8 +76,10 @@
         }
 
         .preview-value {
+            text-align: center;
             position: absolute;
             top: 3px;
+            width: 15px;
             left: 2px;
             font-weight: 600;
             font-size: 0.8rem;

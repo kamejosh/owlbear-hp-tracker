@@ -2,6 +2,7 @@ import OBR from "@owlbear-rodeo/sdk";
 import { itemMetadataKey, metadataKey } from "../helper/variables.ts";
 import { GMGMetadata, SceneMetadata } from "../helper/types.ts";
 import { updateSceneMetadata } from "../helper/helpers.ts";
+import { updateItems } from "../helper/obrHelper.ts";
 
 export const migrateTo300 = async () => {
     console.log("Migration to 3.0.0 running");
@@ -13,7 +14,7 @@ export const migrateTo300 = async () => {
         await updateSceneMetadata(data, { collapsedStatblocks: [] });
     }
 
-    await OBR.scene.items.updateItems(
+    await updateItems(
         (item) => itemMetadataKey in item.metadata,
         (items) => {
             items.forEach((item) => {

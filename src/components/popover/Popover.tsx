@@ -29,6 +29,7 @@ import { PlayerButton } from "../hptracker/Token/PlayerButton.tsx";
 import { HPSvg } from "../svgs/HPSvg.tsx";
 import { ACSvg } from "../svgs/ACSvg.tsx";
 import { InitiativeSvg } from "../svgs/InitiativeSvg.tsx";
+import { updateItems } from "../../helper/obrHelper.ts";
 
 export const Popover = () => {
     const [ids, setIds] = useState<Array<string>>([]);
@@ -68,7 +69,7 @@ const MultiContent = ({ ids }: { ids: Array<string> }) => {
     const items = tokens ? [...tokens.values()].filter((v) => ids.includes(v.item.id)).map((v) => v.item) : [];
 
     const changeHP = async (value: number) => {
-        await OBR.scene.items.updateItems(items, (uItems) => {
+        await updateItems(items, (uItems) => {
             uItems.forEach((item) => {
                 if (itemMetadataKey in item.metadata) {
                     const itemData = item.metadata[itemMetadataKey] as GMGMetadata;

@@ -1,5 +1,6 @@
 import OBR, { buildShape, Image, Shape } from "@owlbear-rodeo/sdk";
 import { getImageBounds } from "./helpers.ts";
+import { addItems, deleteItems, updateItems } from "./obrHelper.ts";
 
 const indicatorName = "GM's Grimoire - Indicator";
 
@@ -25,7 +26,7 @@ export const createIndicator = async (token: Image) => {
         .name(indicatorName)
         .build();
 
-    await OBR.scene.items.addItems([indicator]);
+    await addItems([indicator]);
 };
 
 export const setIndicator = async (current: Image) => {
@@ -36,9 +37,9 @@ export const setIndicator = async (current: Image) => {
         const width = Math.abs(bounds.width) * 1.3;
         const height = Math.abs(bounds.height) * 1.3;
         const position = { x: bounds.position.x + bounds.width / 2, y: bounds.position.y + bounds.height / 2 };
-        await OBR.scene.items.updateItems([indicator], (items) => {
+        await updateItems([indicator], (items) => {
             if (items.length > 0) {
-                const item = items[0];
+                const item = items[0] as Shape;
                 item.attachedTo = current.id;
                 item.width = width;
                 item.height = height;
@@ -54,6 +55,6 @@ export const setIndicator = async (current: Image) => {
 export const destroyIndicator = async () => {
     const items = await OBR.scene.items.getItems<Shape | Image>((item) => item.name === indicatorName);
     if (items.length > 0) {
-        await OBR.scene.items.deleteItems(items.map((i) => i.id));
+        await deleteItems(items.map((i) => i.id));
     }
 };

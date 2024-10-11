@@ -2,6 +2,7 @@ import { components } from "../../../api/schema";
 import { GMGMetadata, Limit } from "../../../helper/types.ts";
 import OBR from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "../../../helper/variables.ts";
+import { updateItems } from "../../../helper/obrHelper.ts";
 
 export type LimitType = components["schemas"]["LimitedUse"];
 export const LimitComponent = ({
@@ -39,8 +40,8 @@ export const LimitComponent = ({
                                 <div
                                     key={i}
                                     className={`limit-use ${used ? "used" : ""}`}
-                                    onClick={() => {
-                                        OBR.scene.items.updateItems([itemId], (items) => {
+                                    onClick={async () => {
+                                        await updateItems([itemId], (items) => {
                                             items.forEach((item) => {
                                                 if (item) {
                                                     const metadata = item.metadata[itemMetadataKey] as GMGMetadata;
