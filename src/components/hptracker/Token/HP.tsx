@@ -145,16 +145,16 @@ export const HP = ({ id }: { id: string }) => {
                         onClick={async () => {
                             const b = !data.hpOnMap;
                             const newData = { ...data, hpOnMap: b, hpBar: b && !room?.disableHpBar };
-                            updateTokenMetadata(newData, [id]);
-                            return updateHp(item, newData);
+                            await updateTokenMetadata(newData, [id]);
+                            await updateHp(item, newData);
                         }}
                         onContextMenu={async () => {
                             const newData = {
                                 ...data,
                                 playerMap: { ac: !!data.playerMap?.ac, hp: !data.playerMap?.hp },
                             };
-                            updateTokenMetadata(newData, [id]);
-                            return updateHp(item, newData);
+                            await updateTokenMetadata(newData, [id]);
+                            await updateHp(item, newData);
                         }}
                         active={data.hpOnMap}
                         players={!!data.playerMap?.hp}

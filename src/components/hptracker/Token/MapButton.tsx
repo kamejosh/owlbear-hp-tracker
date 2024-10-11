@@ -3,7 +3,6 @@ import "./map-button.scss";
 import { PlayerSvg } from "../../svgs/PlayerSvg.tsx";
 import Tippy from "@tippyjs/react";
 import { useRef } from "react";
-import OBR from "@owlbear-rodeo/sdk";
 
 export const MapButton = ({
     onClick,
@@ -33,12 +32,7 @@ export const MapButton = ({
                             buttonRef.current.disabled = true;
                             buttonRef.current.classList.add("loading");
                         }
-                        try {
-                            await onClick();
-                        } catch (e) {
-                            // @ts-ignore exception contains error.message
-                            await OBR.notification.show(e.error.message, "WARNING");
-                        }
+                        await onClick();
                         if (buttonRef.current) {
                             buttonRef.current.disabled = false;
                             buttonRef.current.classList.remove("loading");
@@ -50,12 +44,8 @@ export const MapButton = ({
                             buttonRef.current.disabled = true;
                             buttonRef.current.classList.add("loading");
                         }
-                        try {
-                            await onContextMenu();
-                        } catch (e) {
-                            // @ts-ignore exception contains error.message
-                            await OBR.notification.show(e.error.message, "WARNING");
-                        }
+                        await onContextMenu();
+
                         if (buttonRef.current) {
                             buttonRef.current.disabled = false;
                             buttonRef.current.classList.remove("loading");
@@ -70,12 +60,7 @@ export const MapButton = ({
                                 buttonRef.current.disabled = true;
                                 buttonRef.current.classList.add("loading");
                             }
-                            try {
-                                await onContextMenu();
-                            } catch (e) {
-                                // @ts-ignore exception contains error.message
-                                await OBR.notification.show(e.error.message, "WARNING");
-                            }
+                            await onContextMenu();
                             if (buttonRef.current) {
                                 buttonRef.current.disabled = false;
                                 buttonRef.current.classList.remove("loading");
@@ -90,12 +75,7 @@ export const MapButton = ({
                                 buttonRef.current.disabled = true;
                                 buttonRef.current.classList.add("loading");
                             }
-                            try {
-                                await onClick();
-                            } catch (e) {
-                                // @ts-ignore exception contains error.message
-                                await OBR.notification.show(e.error.message, "WARNING");
-                            }
+                            await onClick();
                             if (buttonRef.current) {
                                 buttonRef.current.disabled = false;
                                 buttonRef.current.classList.remove("loading");

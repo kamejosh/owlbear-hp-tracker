@@ -31,6 +31,7 @@ import { useUISettingsContext } from "../../context/UISettingsContext.ts";
 import { BattleRounds } from "./Token/BattleRounds.tsx";
 import { DraggableLocation, DropResult, DragDropContext } from "@hello-pangea/dnd";
 import Tippy from "@tippyjs/react";
+import { updateItems } from "../../helper/obrHelper.ts";
 
 export const GMGrimoire = () => {
     return (
@@ -134,7 +135,7 @@ const Content = () => {
     const reorderMetadataIndexMulti = async (destList: Array<Item>, group: string, sourceList: Array<Item>) => {
         const combinedList = destList.concat(sourceList);
         const destinationIds = destList.map((d) => d.id);
-        await OBR.scene.items.updateItems(combinedList, (items) => {
+        await updateItems(combinedList, (items) => {
             let destIndex = 0;
             let sourceIndex = 0;
             items.forEach((item) => {

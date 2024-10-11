@@ -12,6 +12,7 @@ import Tippy from "@tippyjs/react";
 import { statblockPopover } from "../../../helper/variables.ts";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { updateSceneMetadata } from "../../../helper/helpers.ts";
+import { updateItems } from "../../../helper/obrHelper.ts";
 
 export const Sheet = ({ id }: { id: string }) => {
     const [room, scene] = useMetadataContext((state) => [state.room, state.scene]);
@@ -100,7 +101,7 @@ export const Sheet = ({ id }: { id: string }) => {
                         <select
                             value={owner}
                             onChange={async (e) => {
-                                await OBR.scene.items.updateItems([item], (items) => {
+                                await updateItems([item], (items) => {
                                     items.forEach((item) => {
                                         item.createdUserId = e.target.value;
                                     });

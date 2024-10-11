@@ -37,6 +37,7 @@ import { useBattleContext } from "../../context/BattleContext.tsx";
 import { FlagSvg } from "../svgs/FlagSvg.tsx";
 import { BattleSvg } from "../svgs/BattleSvg.tsx";
 import "./drop-group.scss";
+import { updateItems } from "../../helper/obrHelper.ts";
 
 type DropGroupProps = {
     title: string;
@@ -139,7 +140,7 @@ export const DropGroup = (props: DropGroupProps) => {
             }
         });
 
-        await OBR.scene.items.updateItems(props.list, (items) => {
+        await updateItems(props.list, (items) => {
             items.forEach((item) => {
                 const bonus = (item.metadata[itemMetadataKey] as GMGMetadata).stats.initiativeBonus;
                 (item.metadata[itemMetadataKey] as GMGMetadata).initiative =

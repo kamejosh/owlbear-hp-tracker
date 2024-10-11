@@ -20,6 +20,7 @@ import { PfStatblock } from "../api/pf/usePfApi.ts";
 import axiosRetry from "axios-retry";
 import { Ability } from "../components/hptracker/charactersheet/e5/E5Ability.tsx";
 import { chunk } from "lodash";
+import { deleteItems, updateItems } from "./obrHelper.ts";
 
 export const getYOffset = async (height: number) => {
     const metadata = (await OBR.room.getMetadata()) as Metadata;
@@ -92,7 +93,7 @@ export const getImageBounds = async (item: Image) => {
 
 export const deleteAttachments = async (attachments: Item[]) => {
     if (attachments.length > 0) {
-        await OBR.scene.items.deleteItems(attachments.map((attachment) => attachment.id));
+        await deleteItems(attachments.map((attachment) => attachment.id));
     }
 };
 
@@ -353,8 +354,12 @@ const getLimitsPf = (statblock: PfStatblock) => {
     return [];
 };
 
-export const updateTokenSheet = (statblock: E5Statblock | PfStatblock, characterId: string, ruleset: "e5" | "pf") => {
-    OBR.scene.items.updateItems([characterId], (items) => {
+export const updateTokenSheet = async (
+    statblock: E5Statblock | PfStatblock,
+    characterId: string,
+    ruleset: "e5" | "pf",
+) => {
+    await updateItems([characterId], (items) => {
         items.forEach((item) => {
             const data = item.metadata[itemMetadataKey] as GMGMetadata;
             const newValues =
@@ -529,7 +534,7 @@ export const getInitialValues = async (items: Array<Image>) => {
 
 export const updateLimit = async (itemId: string, limitValues: Limit) => {
     if (limitValues) {
-        await OBR.scene.items.updateItems([itemId], (items) => {
+        await updateItems([itemId], (items) => {
             items.forEach((item) => {
                 if (item) {
                     const metadata = item.metadata[itemMetadataKey] as GMGMetadata;
@@ -566,7 +571,7 @@ export const getTokenName = (token: Image) => {
 export const prepareTokenForGrimoire = async (contextItems: Array<Image>) => {
     const tokenIds: Array<string> = [];
     const itemStatblocks = await getInitialValues(contextItems as Array<Image>);
-    await OBR.scene.items.updateItems(contextItems, (items) => {
+    await updateItems(contextItems, (items) => {
         items.forEach((item) => {
             tokenIds.push(item.id);
             if (itemMetadataKey in item.metadata) {
@@ -615,7 +620,7 @@ export const reorderMetadataIndex = async (list: Array<Image>, group?: string) =
     const chunks = chunk(list, 12);
     let index = 0;
     for (const subList of chunks) {
-        await OBR.scene.items.updateItems(subList, (items) => {
+        await updateItems(subList, (items) => {
             items.forEach((item) => {
                 const data = item.metadata[itemMetadataKey] as GMGMetadata;
                 data.index = index;

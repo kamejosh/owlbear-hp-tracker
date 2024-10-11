@@ -30,6 +30,7 @@ import { migrateTo141 } from "../migrations/v141.ts";
 import { migrateTo160 } from "../migrations/v160.ts";
 import { migrateTo200 } from "../migrations/v200.ts";
 import { migrateTo300 } from "../migrations/v300.ts";
+import { updateItems } from "../helper/obrHelper.ts";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -181,7 +182,7 @@ const setupContextMenu = async () => {
             const contextItems = context.items.filter(
                 (i) => itemMetadataKey in i.metadata && (i.metadata[itemMetadataKey] as GMGMetadata).hpTrackerActive,
             );
-            await OBR.scene.items.updateItems(contextItems, (items) => {
+            await updateItems(contextItems, (items) => {
                 items.forEach((item) => {
                     if (itemMetadataKey in item.metadata) {
                         const data = item.metadata[itemMetadataKey] as GMGMetadata;
@@ -222,13 +223,13 @@ const setupContextMenu = async () => {
 
             const tokenIds = await prepareTokenForGrimoire(contextItems as Array<Image>);
             const tokens = await OBR.scene.items.getItems(tokenIds);
-            tokens.forEach((token) => {
+            for (const token of tokens) {
                 if (itemMetadataKey in token.metadata) {
                     const metadata = token.metadata[itemMetadataKey] as GMGMetadata;
-                    updateHp(token, metadata);
-                    updateAc(token, metadata);
+                    await updateHp(token, metadata);
+                    await updateAc(token, metadata);
                 }
-            });
+            }
         },
     });
 

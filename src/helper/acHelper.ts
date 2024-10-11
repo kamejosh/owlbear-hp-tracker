@@ -2,6 +2,7 @@ import OBR, { buildCurve, buildText, Curve, Image, isCurve, isText, Item, Text }
 import { ACItemChanges, GMGMetadata } from "./types.ts";
 import { attachmentFilter, deleteAttachments, getACOffset, getAttachedItems, getImageBounds } from "./helpers.ts";
 import { itemMetadataKey, infoMetadataKey } from "./variables.ts";
+import { addItems, updateItems } from "./obrHelper.ts";
 
 export const createAC = async (ac: number, token: Image) => {
     const bounds = await getImageBounds(token);
@@ -108,7 +109,7 @@ export const updateAc = async (token: Item, data: GMGMetadata) => {
 
 export const updateAcChanges = async (changes: Map<string, ACItemChanges>) => {
     if (changes.size > 0) {
-        await OBR.scene.items.updateItems(
+        await updateItems(
             (item): item is Curve => isCurve(item) && changes.has(item.id),
             (curves) => {
                 curves.forEach((curve) => {
@@ -126,10 +127,11 @@ export const updateAcChanges = async (changes: Map<string, ACItemChanges>) => {
                 });
             },
         );
-        await OBR.scene.items.updateItems(
+        await updateItems(
             (item): item is Text => isText(item) && changes.has(item.id),
-            (texts) => {
-                texts.forEach((text) => {
+            (items) => {
+                items.forEach((item) => {
+                    const text = item as Text;
                     if (changes.has(text.id)) {
                         const change = changes.get(text.id);
                         if (change && change.text) {
@@ -171,7 +173,7 @@ export const saveOrChangeAC = async (
     } else {
         const ac = await createAC(data.armorClass, character as Image);
         ac.forEach((item) => (item.visible = visible));
-        await OBR.scene.items.addItems(ac);
+        await addItems(ac);
     }
 };
 

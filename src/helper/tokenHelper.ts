@@ -1,15 +1,18 @@
 import { GMGMetadata, RoomMetadata } from "./types.ts";
-import OBR, { Image } from "@owlbear-rodeo/sdk";
+import { Image, Item } from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "./variables.ts";
 import { evalString } from "./helpers.ts";
 import { updateHp } from "./hpHelpers.ts";
 import { RefObject } from "react";
 import { updateAc } from "./acHelper.ts";
+import { updateItems, updateList } from "./obrHelper.ts";
 
 export const updateTokenMetadata = async (tokenData: GMGMetadata, ids: Array<string>) => {
-    await OBR.scene.items.updateItems(ids, (items) => {
-        items.forEach((item) => {
-            item.metadata[itemMetadataKey] = { ...tokenData };
+    await updateList(ids, 16, async (subList) => {
+        await updateItems(subList, (items: Array<Item>) => {
+            items.forEach((item) => {
+                item.metadata[itemMetadataKey] = { ...tokenData };
+            });
         });
     });
 };
