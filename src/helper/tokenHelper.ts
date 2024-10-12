@@ -20,7 +20,7 @@ export const updateTokenMetadata = async (tokenData: GMGMetadata, ids: Array<str
     } catch (e) {
         const errorName =
             isObject(e) && "error" in e && isObject(e.error) && "name" in e.error ? e.error.name : "Undefined Error";
-        console.log(`GM's Grimoire: Error while updating token metadata of ${ids.length} tokens: ${errorName}`);
+        console.warn(`GM's Grimoire: Error while updating token metadata of ${ids.length} tokens: ${errorName}`);
     }
 };
 

@@ -637,7 +637,7 @@ export const reorderMetadataIndex = async (list: Array<Image>, group?: string) =
                 isObject(e) && "error" in e && isObject(e.error) && "name" in e.error
                     ? e.error.name
                     : "Undefined Error";
-            console.log(`GM's Grimoire: Error while updating reordering ${subList.length} tokens: ${errorName}`);
+            console.warn(`GM's Grimoire: Error while updating reordering ${subList.length} tokens: ${errorName}`);
         }
     }
 };
