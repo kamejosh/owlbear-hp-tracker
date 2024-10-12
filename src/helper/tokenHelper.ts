@@ -6,15 +6,22 @@ import { updateHp } from "./hpHelpers.ts";
 import { RefObject } from "react";
 import { updateAc } from "./acHelper.ts";
 import { updateItems, updateList } from "./obrHelper.ts";
+import { isObject } from "lodash";
 
 export const updateTokenMetadata = async (tokenData: GMGMetadata, ids: Array<string>) => {
-    await updateList(ids, 16, async (subList) => {
-        await updateItems(subList, (items: Array<Item>) => {
-            items.forEach((item) => {
-                item.metadata[itemMetadataKey] = { ...tokenData };
+    try {
+        await updateList(ids, 16, async (subList) => {
+            await updateItems(subList, (items: Array<Item>) => {
+                items.forEach((item) => {
+                    item.metadata[itemMetadataKey] = { ...tokenData };
+                });
             });
         });
-    });
+    } catch (e) {
+        const errorName =
+            isObject(e) && "error" in e && isObject(e.error) && "name" in e.error ? e.error.name : "Undefined Error";
+        console.log(`GM's Grimoire: Error while updating token metadata of ${ids.length} tokens: ${errorName}`);
+    }
 };
 
 export const changeHp = async (

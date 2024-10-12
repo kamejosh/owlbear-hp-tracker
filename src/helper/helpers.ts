@@ -620,17 +620,25 @@ export const reorderMetadataIndex = async (list: Array<Image>, group?: string) =
     const chunks = chunk(list, 12);
     let index = 0;
     for (const subList of chunks) {
-        await updateItems(subList, (items) => {
-            items.forEach((item) => {
-                const data = item.metadata[itemMetadataKey] as GMGMetadata;
-                data.index = index;
-                if (group) {
-                    data.group = group;
-                }
-                index++;
-                item.metadata[itemMetadataKey] = { ...data };
+        try {
+            await updateItems(subList, (items) => {
+                items.forEach((item) => {
+                    const data = item.metadata[itemMetadataKey] as GMGMetadata;
+                    data.index = index;
+                    if (group) {
+                        data.group = group;
+                    }
+                    index++;
+                    item.metadata[itemMetadataKey] = { ...data };
+                });
             });
-        });
+        } catch (e) {
+            const errorName =
+                isObject(e) && "error" in e && isObject(e.error) && "name" in e.error
+                    ? e.error.name
+                    : "Undefined Error";
+            console.log(`GM's Grimoire: Error while updating reordering ${subList.length} tokens: ${errorName}`);
+        }
     }
 };
 

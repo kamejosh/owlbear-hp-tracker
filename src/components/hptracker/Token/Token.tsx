@@ -48,7 +48,7 @@ export const Token = (props: TokenProps) => {
     }, [room?.allowNegativeNumbers]);
 
     useEffect(() => {
-        if (playerContext.role === "GM" && data.isCurrent !== (current === item.id)) {
+        if (playerContext.role === "GM" && !!data.isCurrent && current === item.id) {
             updateTokenMetadata({ ...data, isCurrent: current === item.id }, [props.id]);
         }
     }, [current, playerContext]);
