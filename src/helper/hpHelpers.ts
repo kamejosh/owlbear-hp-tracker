@@ -36,6 +36,7 @@ export const createBar = async (percentage: number, tempHpPercentage: number, to
         .disableHit(true)
         .disableAttachmentBehavior(["ROTATION"])
         .visible(token.visible)
+        .zIndex(token.zIndex + 1)
         .build();
 
     const hpShape = buildShape()
@@ -54,6 +55,7 @@ export const createBar = async (percentage: number, tempHpPercentage: number, to
         .name("hp")
         .disableAttachmentBehavior(["ROTATION"])
         .visible(token.visible)
+        .zIndex(token.zIndex + 2)
         .build();
 
     const tempHp = buildShape()
@@ -72,6 +74,7 @@ export const createBar = async (percentage: number, tempHpPercentage: number, to
         .name("temp-hp")
         .disableAttachmentBehavior(["ROTATION"])
         .visible(token.visible)
+        .zIndex(token.zIndex + 3)
         .build();
 
     backgroundShape.metadata[infoMetadataKey] = { isHpText: true, attachmentType: "BAR" };
@@ -108,6 +111,7 @@ const createText = async (text: string, token: Image) => {
         .disableAttachmentBehavior(["ROTATION", "VISIBLE"])
         .visible(token.visible)
         .name("hp-text")
+        .zIndex(token.zIndex + 4)
         .build();
 
     textItem.metadata[infoMetadataKey] = { isHpText: true, attachmentType: "HP" };

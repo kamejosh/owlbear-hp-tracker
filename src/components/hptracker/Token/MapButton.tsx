@@ -28,6 +28,7 @@ export const MapButton = ({
                     ref={buttonRef}
                     className={"map-default"}
                     onClick={async () => {
+                        console.log("click");
                         if (buttonRef.current) {
                             buttonRef.current.disabled = true;
                             buttonRef.current.classList.add("loading");
@@ -40,15 +41,17 @@ export const MapButton = ({
                     }}
                     onContextMenu={async (e) => {
                         e.preventDefault();
-                        if (buttonRef.current) {
-                            buttonRef.current.disabled = true;
-                            buttonRef.current.classList.add("loading");
-                        }
-                        await onContextMenu();
+                        if (!buttonRef?.current?.disabled) {
+                            if (buttonRef.current) {
+                                buttonRef.current.disabled = true;
+                                buttonRef.current.classList.add("loading");
+                            }
+                            await onContextMenu();
 
-                        if (buttonRef.current) {
-                            buttonRef.current.disabled = false;
-                            buttonRef.current.classList.remove("loading");
+                            if (buttonRef.current) {
+                                buttonRef.current.disabled = false;
+                                buttonRef.current.classList.remove("loading");
+                            }
                         }
                     }}
                     onTouchStart={(e) => {

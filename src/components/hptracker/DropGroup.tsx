@@ -58,8 +58,9 @@ export const DropGroup = (props: DropGroupProps) => {
     const playerContext = usePlayerContext();
     const initButtonRef = useRef<HTMLButtonElement>(null);
     const defaultHidden = playerContext.role === "GM" && !!taSettings.gm_rolls_hidden;
-
     const [initHover, setInitHover] = useState<boolean>(false);
+    const start = useRef<number>(0);
+    let timeout: number;
 
     const setOpenGroupSetting = async (name: string) => {
         const metadata: Metadata = await OBR.scene.getMetadata();
@@ -233,8 +234,26 @@ export const DropGroup = (props: DropGroupProps) => {
                                     !initialized &&
                                     !room?.disableDiceRoller
                                 }
-                                onClick={async () => {
-                                    await setInitiative(defaultHidden);
+                                onPointerDown={async (e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    start.current = Date.now();
+                                    timeout = setTimeout(async () => {
+                                        await updateItems(props.list, (items) => {
+                                            items.forEach((item) => {
+                                                (item.metadata[itemMetadataKey] as GMGMetadata).initiative = 0;
+                                            });
+                                        });
+                                    }, 1000);
+                                }}
+                                onPointerUp={async (e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    const now = Date.now();
+                                    if (now - start.current < 1000) {
+                                        clearTimeout(timeout);
+                                        await setInitiative(defaultHidden);
+                                    }
                                 }}
                             >
                                 <div className={"dice-preview"}>{getDicePreview()}</div>

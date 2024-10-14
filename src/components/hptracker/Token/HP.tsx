@@ -3,6 +3,7 @@ import {
     changeMaxHp,
     changeTempHp,
     getNewHpValue,
+    getNewTempHp,
     updateTokenMetadata,
 } from "../../../helper/tokenHelper.ts";
 import { useEffect, useRef } from "react";
@@ -61,35 +62,34 @@ export const HP = ({ id }: { id: string }) => {
                         ref={hpRef}
                         type={"text"}
                         defaultValue={data.hp}
-                        onBlur={(e) => {
+                        onBlur={async (e) => {
                             const input = e.target.value;
-                            const hp = getNewHpValue(input, data, item, maxHpRef, room);
+                            const hp = await getNewHpValue(input, data, item, maxHpRef, room);
                             if (hp !== null) {
                                 e.target.value = String(hp);
-                                changeHp(hp, data, item, hpRef, tempHpRef, room);
+                                await changeHp(hp, data, item, hpRef, tempHpRef, room);
                             }
                         }}
-                        onKeyDown={(e) => {
+                        onKeyDown={async (e) => {
                             if (e.key === "ArrowUp") {
                                 const hp = Math.min(
                                     data.hp + 1,
                                     data.stats.tempHp ? data.maxHp + data.stats.tempHp : data.maxHp,
                                 );
-                                changeHp(hp, data, item, hpRef, tempHpRef, room);
+                                await changeHp(hp, data, item, hpRef, tempHpRef, room);
                                 e.currentTarget.value = String(hp);
                             } else if (e.key === "ArrowDown") {
                                 const hp = Math.min(
                                     data.hp - 1,
                                     data.stats.tempHp ? data.maxHp + data.stats.tempHp : data.maxHp,
                                 );
-                                changeHp(hp, data, item, hpRef, tempHpRef, room);
+                                await changeHp(hp, data, item, hpRef, tempHpRef, room);
                                 e.currentTarget.value = String(hp);
                             } else if (e.key === "Enter") {
                                 const input = e.currentTarget.value;
-                                const hp = getNewHpValue(input, data, item, maxHpRef, room);
+                                const hp = await getNewHpValue(input, data, item, maxHpRef, room);
                                 if (hp !== null) {
-                                    e.currentTarget.value = String(hp);
-                                    changeHp(hp, data, item, hpRef, tempHpRef, room);
+                                    await changeHp(hp, data, item, hpRef, tempHpRef, room);
                                 }
                             }
                         }}
@@ -101,19 +101,19 @@ export const HP = ({ id }: { id: string }) => {
                         type={"text"}
                         ref={maxHpRef}
                         defaultValue={data.maxHp}
-                        onKeyDown={(e) => {
+                        onKeyDown={async (e) => {
                             if (e.key === "ArrowUp") {
-                                changeMaxHp(data.maxHp + 1, data, item, maxHpRef);
+                                await changeMaxHp(data.maxHp + 1, data, item, maxHpRef);
                             } else if (e.key === "ArrowDown") {
-                                changeMaxHp(data.maxHp - 1, data, item, maxHpRef);
+                                await changeMaxHp(data.maxHp - 1, data, item, maxHpRef);
                             } else if (e.key === "Enter") {
                                 const value = Number(e.currentTarget.value.replace(/[^0-9]/g, ""));
-                                changeMaxHp(value, data, item, maxHpRef);
+                                await changeMaxHp(value, data, item, maxHpRef);
                             }
                         }}
-                        onBlur={(e) => {
+                        onBlur={async (e) => {
                             const value = Number(e.target.value.replace(/[^0-9]/g, ""));
-                            changeMaxHp(value, data, item, maxHpRef);
+                            await changeMaxHp(value, data, item, maxHpRef);
                         }}
                     />
                 </Tippy>
@@ -124,19 +124,19 @@ export const HP = ({ id }: { id: string }) => {
                         type={"text"}
                         defaultValue={data.stats.tempHp}
                         ref={tempHpRef}
-                        onKeyDown={(e) => {
+                        onKeyDown={async (e) => {
                             if (e.key === "ArrowUp") {
-                                changeTempHp((data.stats.tempHp || 0) + 1, data, item, hpRef, tempHpRef);
+                                await changeTempHp((data.stats.tempHp || 0) + 1, data, item, hpRef, tempHpRef);
                             } else if (e.key === "ArrowDown") {
-                                changeTempHp((data.stats.tempHp || 0) - 1, data, item, hpRef, tempHpRef);
+                                await changeTempHp((data.stats.tempHp || 0) - 1, data, item, hpRef, tempHpRef);
                             } else if (e.key === "Enter") {
-                                const value = Number(e.currentTarget.value.replace(/[^0-9]/g, ""));
-                                changeTempHp(value, data, item, hpRef, tempHpRef);
+                                const value = getNewTempHp(e.currentTarget.value);
+                                await changeTempHp(value, data, item, hpRef, tempHpRef);
                             }
                         }}
-                        onBlur={(e) => {
-                            const value = Number(e.target.value.replace(/[^0-9]/g, ""));
-                            changeTempHp(value, data, item, hpRef, tempHpRef);
+                        onBlur={async (e) => {
+                            const value = getNewTempHp(e.currentTarget.value);
+                            await changeTempHp(value, data, item, hpRef, tempHpRef);
                         }}
                     />
                 </Tippy>
