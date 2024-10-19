@@ -135,22 +135,25 @@ const Content = () => {
     const reorderMetadataIndexMulti = async (destList: Array<Item>, group: string, sourceList: Array<Item>) => {
         const combinedList = destList.concat(sourceList);
         const destinationIds = destList.map((d) => d.id);
-        await updateItems(combinedList, (items) => {
-            let destIndex = 0;
-            let sourceIndex = 0;
-            items.forEach((item) => {
-                const data = item.metadata[itemMetadataKey] as GMGMetadata;
-                if (destinationIds.includes(item.id)) {
-                    data.index = destIndex;
-                    destIndex += 1;
-                    data.group = group;
-                } else {
-                    data.index = sourceIndex;
-                    sourceIndex += 1;
-                }
-                item.metadata[itemMetadataKey] = { ...data };
-            });
-        });
+        await updateItems(
+            combinedList.map((i) => i.id),
+            (items) => {
+                let destIndex = 0;
+                let sourceIndex = 0;
+                items.forEach((item) => {
+                    const data = item.metadata[itemMetadataKey] as GMGMetadata;
+                    if (destinationIds.includes(item.id)) {
+                        data.index = destIndex;
+                        destIndex += 1;
+                        data.group = group;
+                    } else {
+                        data.index = sourceIndex;
+                        sourceIndex += 1;
+                    }
+                    item.metadata[itemMetadataKey] = { ...data };
+                });
+            },
+        );
     };
 
     const reorder = async (

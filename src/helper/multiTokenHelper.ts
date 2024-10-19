@@ -34,12 +34,15 @@ export const toggleHpOnMap = async (list: Array<Item>, room: RoomMetadata | null
     const current = getHpOnMap(list);
     const chunks = chunk(list, 4);
     for (const subList of chunks) {
-        await updateItems(subList, (items) => {
-            items.forEach((item) => {
-                (item.metadata[itemMetadataKey] as GMGMetadata).hpOnMap = !current;
-                (item.metadata[itemMetadataKey] as GMGMetadata).hpBar = !current && !room?.disableHpBar;
-            });
-        });
+        await updateItems(
+            subList.map((i) => i.id),
+            (items) => {
+                items.forEach((item) => {
+                    (item.metadata[itemMetadataKey] as GMGMetadata).hpOnMap = !current;
+                    (item.metadata[itemMetadataKey] as GMGMetadata).hpBar = !current && !room?.disableHpBar;
+                });
+            },
+        );
     }
     await updateList(list, current ? 4 : 2, async (subList) => {
         for (const item of subList) {
@@ -51,15 +54,18 @@ export const toggleHpOnMap = async (list: Array<Item>, room: RoomMetadata | null
 
 export const toggleHpForPlayers = async (list: Array<Item>) => {
     const current = getHpForPlayers(list);
-    await updateItems(list, (items) => {
-        items.forEach((item) => {
-            const data = item.metadata[itemMetadataKey] as GMGMetadata;
-            (item.metadata[itemMetadataKey] as GMGMetadata).playerMap = {
-                ac: !!data.playerMap?.ac,
-                hp: !current,
-            };
-        });
-    });
+    await updateItems(
+        list.map((i) => i.id),
+        (items) => {
+            items.forEach((item) => {
+                const data = item.metadata[itemMetadataKey] as GMGMetadata;
+                (item.metadata[itemMetadataKey] as GMGMetadata).playerMap = {
+                    ac: !!data.playerMap?.ac,
+                    hp: !current,
+                };
+            });
+        },
+    );
     await updateList(list, current ? 4 : 2, async (subList) => {
         for (const item of subList) {
             const data = item.metadata[itemMetadataKey] as GMGMetadata;
@@ -70,15 +76,18 @@ export const toggleHpForPlayers = async (list: Array<Item>) => {
 
 export const toggleAcForPlayers = async (list: Array<Item>) => {
     const current = getAcForPlayers(list);
-    await updateItems(list, (items) => {
-        items.forEach((item) => {
-            const data = item.metadata[itemMetadataKey] as GMGMetadata;
-            (item.metadata[itemMetadataKey] as GMGMetadata).playerMap = {
-                ac: !current,
-                hp: !!data.playerMap?.hp,
-            };
-        });
-    });
+    await updateItems(
+        list.map((i) => i.id),
+        (items) => {
+            items.forEach((item) => {
+                const data = item.metadata[itemMetadataKey] as GMGMetadata;
+                (item.metadata[itemMetadataKey] as GMGMetadata).playerMap = {
+                    ac: !current,
+                    hp: !!data.playerMap?.hp,
+                };
+            });
+        },
+    );
     await updateList(list, current ? 4 : 2, async (subList) => {
         for (const item of subList) {
             const data = item.metadata[itemMetadataKey] as GMGMetadata;
@@ -97,11 +106,14 @@ export const getAcOnMap = (list: Array<Item>) => {
 
 export const toggleAcOnMap = async (list: Array<Item>) => {
     const current = getAcOnMap(list);
-    await updateItems(list, (items) => {
-        items.forEach((item) => {
-            (item.metadata[itemMetadataKey] as GMGMetadata).acOnMap = !current;
-        });
-    });
+    await updateItems(
+        list.map((i) => i.id),
+        (items) => {
+            items.forEach((item) => {
+                (item.metadata[itemMetadataKey] as GMGMetadata).acOnMap = !current;
+            });
+        },
+    );
     await updateList(list, current ? 4 : 2, async (subList) => {
         for (const item of subList) {
             const data = item.metadata[itemMetadataKey] as GMGMetadata;
@@ -120,33 +132,39 @@ export const getTokenInPlayerList = (list: Array<Item>) => {
 
 export const toggleTokenInPlayerList = async (list: Array<Item>) => {
     const current = getTokenInPlayerList(list);
-    await updateItems(list, (items) => {
-        items.forEach((item) => {
-            (item.metadata[itemMetadataKey] as GMGMetadata).playerList = !current;
-        });
-    });
+    await updateItems(
+        list.map((i) => i.id),
+        (items) => {
+            items.forEach((item) => {
+                (item.metadata[itemMetadataKey] as GMGMetadata).playerList = !current;
+            });
+        },
+    );
 };
 
 export const rest = async (list: Array<Item>, restType: string) => {
     const hpUpdated: Array<string> = [];
 
-    await updateItems(list, (items) => {
-        items.forEach((item) => {
-            const data = item.metadata[itemMetadataKey] as GMGMetadata;
-            const newLimits = data.stats.limits?.map((limit) => {
-                if (limit.resets.includes(restType)) {
-                    return { ...limit, used: 0 };
-                } else {
-                    return limit;
+    await updateItems(
+        list.map((i) => i.id),
+        (items) => {
+            items.forEach((item) => {
+                const data = item.metadata[itemMetadataKey] as GMGMetadata;
+                const newLimits = data.stats.limits?.map((limit) => {
+                    if (limit.resets.includes(restType)) {
+                        return { ...limit, used: 0 };
+                    } else {
+                        return limit;
+                    }
+                });
+                (item.metadata[itemMetadataKey] as GMGMetadata).stats.limits = newLimits;
+                if (restType === "Long Rest" && data.hp !== data.maxHp + (data.stats?.tempHp ?? 0)) {
+                    (item.metadata[itemMetadataKey] as GMGMetadata).hp = data.maxHp + (data.stats?.tempHp ?? 0);
+                    hpUpdated.push(item.id);
                 }
             });
-            (item.metadata[itemMetadataKey] as GMGMetadata).stats.limits = newLimits;
-            if (restType === "Long Rest" && data.hp !== data.maxHp + (data.stats?.tempHp ?? 0)) {
-                (item.metadata[itemMetadataKey] as GMGMetadata).hp = data.maxHp + (data.stats?.tempHp ?? 0);
-                hpUpdated.push(item.id);
-            }
-        });
-    });
+        },
+    );
 
     const updated = list.filter((i) => hpUpdated.includes(i.id));
 

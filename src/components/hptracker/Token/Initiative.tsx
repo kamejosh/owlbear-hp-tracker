@@ -107,9 +107,9 @@ export const Initiative = ({ id }: { id: string }) => {
                     value={String(data.initiative)}
                     step={0.1}
                     ref={initRef}
-                    onChange={(e) => {
+                    onChange={async (e) => {
                         const newData = { ...data, initiative: Number(e.target.value) };
-                        updateTokenMetadata(newData, [id]);
+                        await updateTokenMetadata(newData, [id]);
                     }}
                     className={"initiative"}
                 />
@@ -128,7 +128,7 @@ export const Initiative = ({ id }: { id: string }) => {
                     onClick={async () => {
                         const value = await rollInitiative(defaultHidden);
                         const newData = { ...data, initiative: value };
-                        updateTokenMetadata(newData, [id]);
+                        await updateTokenMetadata(newData, [id]);
                     }}
                 >
                     <div className={"dice-preview"}>{getDicePreview()}</div>
@@ -141,7 +141,7 @@ export const Initiative = ({ id }: { id: string }) => {
                         onClick={async () => {
                             const value = await rollInitiative(defaultHidden, true);
                             const newData = { ...data, initiative: value };
-                            updateTokenMetadata(newData, [id]);
+                            await updateTokenMetadata(newData, [id]);
                         }}
                     >
                         {"ADV"}
@@ -151,7 +151,7 @@ export const Initiative = ({ id }: { id: string }) => {
                         onClick={async () => {
                             const value = await rollInitiative(defaultHidden, false, true);
                             const newData = { ...data, initiative: value };
-                            updateTokenMetadata(newData, [id]);
+                            await updateTokenMetadata(newData, [id]);
                         }}
                     >
                         DIS
@@ -161,7 +161,7 @@ export const Initiative = ({ id }: { id: string }) => {
                         onClick={async () => {
                             const value = await rollInitiative(!defaultHidden);
                             const newData = { ...data, initiative: value };
-                            updateTokenMetadata(newData, [id]);
+                            await updateTokenMetadata(newData, [id]);
                         }}
                     >
                         {defaultHidden ? "SHOW" : "HIDE"}
@@ -176,16 +176,16 @@ export const Initiative = ({ id }: { id: string }) => {
                     defaultValue={data.stats.initiativeBonus}
                     step={1}
                     ref={initBonusRef}
-                    onBlur={(e) => {
+                    onBlur={async (e) => {
                         const value = Number(e.target.value);
                         const newData = { ...data, stats: { initiativeBonus: value } };
-                        updateTokenMetadata(newData, [id]);
+                        await updateTokenMetadata(newData, [id]);
                     }}
-                    onKeyDown={(e) => {
+                    onKeyDown={async (e) => {
                         if (e.key === "Enter") {
                             const value = Number(e.currentTarget.value);
                             const newData = { ...data, stats: { initiativeBonus: value } };
-                            updateTokenMetadata(newData, [id]);
+                            await updateTokenMetadata(newData, [id]);
                         }
                     }}
                     className={"initiative-bonus"}
@@ -194,9 +194,9 @@ export const Initiative = ({ id }: { id: string }) => {
             {playerContext.role === "GM" ? (
                 <PlayerButton
                     active={!!data.playerList}
-                    onClick={() => {
+                    onClick={async () => {
                         const newData = { ...data, playerList: !data.playerList };
-                        updateTokenMetadata(newData, [id]);
+                        await updateTokenMetadata(newData, [id]);
                     }}
                 />
             ) : null}

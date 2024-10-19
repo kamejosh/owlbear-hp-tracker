@@ -37,7 +37,7 @@ export const setIndicator = async (current: Image) => {
         const width = Math.abs(bounds.width) * 1.3;
         const height = Math.abs(bounds.height) * 1.3;
         const position = { x: bounds.position.x + bounds.width / 2, y: bounds.position.y + bounds.height / 2 };
-        await updateItems([indicator], (items) => {
+        await updateItems([indicator.id], (items) => {
             if (items.length > 0) {
                 const item = items[0] as Shape;
                 item.attachedTo = current.id;

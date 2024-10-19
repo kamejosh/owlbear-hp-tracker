@@ -28,7 +28,6 @@ export const MapButton = ({
                     ref={buttonRef}
                     className={"map-default"}
                     onClick={async () => {
-                        console.log("click");
                         if (buttonRef.current) {
                             buttonRef.current.disabled = true;
                             buttonRef.current.classList.add("loading");

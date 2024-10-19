@@ -101,7 +101,7 @@ export const Sheet = ({ id }: { id: string }) => {
                         <select
                             value={owner}
                             onChange={async (e) => {
-                                await updateItems([item], (items) => {
+                                await updateItems([item.id], (items) => {
                                     items.forEach((item) => {
                                         item.createdUserId = e.target.value;
                                     });

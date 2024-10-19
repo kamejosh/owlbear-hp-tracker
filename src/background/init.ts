@@ -182,14 +182,17 @@ const setupContextMenu = async () => {
             const contextItems = context.items.filter(
                 (i) => itemMetadataKey in i.metadata && (i.metadata[itemMetadataKey] as GMGMetadata).hpTrackerActive,
             );
-            await updateItems(contextItems, (items) => {
-                items.forEach((item) => {
-                    if (itemMetadataKey in item.metadata) {
-                        const data = item.metadata[itemMetadataKey] as GMGMetadata;
-                        item.metadata[itemMetadataKey] = { ...data, hpTrackerActive: false };
-                    }
-                });
-            });
+            await updateItems(
+                contextItems.map((i) => i.id),
+                (items) => {
+                    items.forEach((item) => {
+                        if (itemMetadataKey in item.metadata) {
+                            const data = item.metadata[itemMetadataKey] as GMGMetadata;
+                            item.metadata[itemMetadataKey] = { ...data, hpTrackerActive: false };
+                        }
+                    });
+                },
+            );
         },
     });
 

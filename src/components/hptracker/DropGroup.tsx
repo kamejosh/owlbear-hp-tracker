@@ -141,14 +141,17 @@ export const DropGroup = (props: DropGroupProps) => {
             }
         });
 
-        await updateItems(props.list, (items) => {
-            items.forEach((item) => {
-                const bonus = (item.metadata[itemMetadataKey] as GMGMetadata).stats.initiativeBonus;
-                (item.metadata[itemMetadataKey] as GMGMetadata).initiative =
-                    newInitiativeValues.get(item.id) ??
-                    Math.floor(Math.random() * (room?.initiativeDice ?? 20)) + 1 + bonus;
-            });
-        });
+        await updateItems(
+            props.list.map((i) => i.id),
+            (items) => {
+                items.forEach((item) => {
+                    const bonus = (item.metadata[itemMetadataKey] as GMGMetadata).stats.initiativeBonus;
+                    (item.metadata[itemMetadataKey] as GMGMetadata).initiative =
+                        newInitiativeValues.get(item.id) ??
+                        Math.floor(Math.random() * (room?.initiativeDice ?? 20)) + 1 + bonus;
+                });
+            },
+        );
         initButtonRef.current?.classList.remove("rolling");
         initButtonRef.current?.blur();
     };
@@ -214,8 +217,8 @@ export const DropGroup = (props: DropGroupProps) => {
                         <InitiativeSvg />
                         <PlayerButton
                             active={getTokenInPlayerList(props.list)}
-                            onClick={() => {
-                                toggleTokenInPlayerList(props.list);
+                            onClick={async () => {
+                                await toggleTokenInPlayerList(props.list);
                             }}
                         />
                         <div
@@ -239,11 +242,14 @@ export const DropGroup = (props: DropGroupProps) => {
                                     e.stopPropagation();
                                     start.current = Date.now();
                                     timeout = setTimeout(async () => {
-                                        await updateItems(props.list, (items) => {
-                                            items.forEach((item) => {
-                                                (item.metadata[itemMetadataKey] as GMGMetadata).initiative = 0;
-                                            });
-                                        });
+                                        await updateItems(
+                                            props.list.map((i) => i.id),
+                                            (items) => {
+                                                items.forEach((item) => {
+                                                    (item.metadata[itemMetadataKey] as GMGMetadata).initiative = 0;
+                                                });
+                                            },
+                                        );
                                     }, 1000);
                                 }}
                                 onPointerUp={async (e) => {

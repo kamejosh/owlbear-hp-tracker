@@ -4,7 +4,7 @@ import { delay } from "./helpers.ts";
 
 const delayDelta = 500;
 
-export const updateItems = async (list: Item[] | ItemFilter<Item>, update: (items: Array<Item>) => void) => {
+export const updateItems = async (list: ItemFilter<Item>, update: (items: Array<Item>) => void) => {
     try {
         await OBR.scene.items.updateItems(list, update);
     } catch (e: any) {

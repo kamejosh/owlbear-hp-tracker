@@ -69,31 +69,34 @@ const MultiContent = ({ ids }: { ids: Array<string> }) => {
     const items = tokens ? [...tokens.values()].filter((v) => ids.includes(v.item.id)).map((v) => v.item) : [];
 
     const changeHP = async (value: number) => {
-        await updateItems(items, (uItems) => {
-            uItems.forEach((item) => {
-                if (itemMetadataKey in item.metadata) {
-                    const itemData = item.metadata[itemMetadataKey] as GMGMetadata;
-                    const newHp = itemData.hp + value;
-                    if (newHp < itemData.hp && itemData.stats.tempHp && itemData.stats.tempHp > 0) {
-                        itemData.stats.tempHp = Math.max(itemData.stats.tempHp - (itemData.hp - newHp), 0);
+        await updateItems(
+            items.map((i) => i.id),
+            (uItems) => {
+                uItems.forEach((item) => {
+                    if (itemMetadataKey in item.metadata) {
+                        const itemData = item.metadata[itemMetadataKey] as GMGMetadata;
+                        const newHp = itemData.hp + value;
+                        if (newHp < itemData.hp && itemData.stats.tempHp && itemData.stats.tempHp > 0) {
+                            itemData.stats.tempHp = Math.max(itemData.stats.tempHp - (itemData.hp - newHp), 0);
+                        }
+                        itemData.hp = Math.min(
+                            room?.allowNegativeNumbers ? newHp : Math.max(newHp, 0),
+                            itemData.maxHp + (itemData.stats.tempHp || 0),
+                        );
+                        const uItem = items.find((i) => i.id === item.id);
+                        if (uItem && itemMetadataKey in uItem.metadata) {
+                            const uItemData = uItem.metadata[itemMetadataKey] as GMGMetadata;
+                            updateHp(uItem, {
+                                ...uItemData,
+                                hp: itemData.hp,
+                                stats: { ...uItemData.stats, tempHp: itemData.stats.tempHp },
+                            });
+                        }
+                        item.metadata[itemMetadataKey] = { ...itemData };
                     }
-                    itemData.hp = Math.min(
-                        room?.allowNegativeNumbers ? newHp : Math.max(newHp, 0),
-                        itemData.maxHp + (itemData.stats.tempHp || 0),
-                    );
-                    const uItem = items.find((i) => i.id === item.id);
-                    if (uItem && itemMetadataKey in uItem.metadata) {
-                        const uItemData = uItem.metadata[itemMetadataKey] as GMGMetadata;
-                        updateHp(uItem, {
-                            ...uItemData,
-                            hp: itemData.hp,
-                            stats: { ...uItemData.stats, tempHp: itemData.stats.tempHp },
-                        });
-                    }
-                    item.metadata[itemMetadataKey] = { ...itemData };
-                }
-            });
-        });
+                });
+            },
+        );
     };
 
     return (

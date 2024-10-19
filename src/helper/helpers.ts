@@ -571,48 +571,51 @@ export const getTokenName = (token: Image) => {
 export const prepareTokenForGrimoire = async (contextItems: Array<Image>) => {
     const tokenIds: Array<string> = [];
     const itemStatblocks = await getInitialValues(contextItems as Array<Image>);
-    await updateItems(contextItems, (items) => {
-        items.forEach((item) => {
-            tokenIds.push(item.id);
-            if (itemMetadataKey in item.metadata) {
-                const metadata = item.metadata[itemMetadataKey] as GMGMetadata;
-                metadata.hpTrackerActive = true;
-                item.metadata[itemMetadataKey] = metadata;
-            } else {
-                // variable allows us to be typesafe
-                const defaultMetadata: GMGMetadata = {
-                    hp: 0,
-                    maxHp: 0,
-                    armorClass: 0,
-                    hpTrackerActive: true,
-                    hpOnMap: false,
-                    acOnMap: false,
-                    hpBar: false,
-                    initiative: 0,
-                    sheet: "",
-                    stats: {
-                        initiativeBonus: 0,
-                        initial: true,
-                    },
-                    playerMap: {
-                        hp: false,
-                        ac: false,
-                    },
-                };
-                if (item.id in itemStatblocks) {
-                    defaultMetadata.sheet = itemStatblocks[item.id].slug;
-                    defaultMetadata.ruleset = itemStatblocks[item.id].ruleset;
-                    defaultMetadata.maxHp = itemStatblocks[item.id].hp;
-                    defaultMetadata.hp = itemStatblocks[item.id].hp;
-                    defaultMetadata.armorClass = itemStatblocks[item.id].ac;
-                    defaultMetadata.stats.initiativeBonus = itemStatblocks[item.id].bonus;
-                    defaultMetadata.stats.initial = true;
-                    defaultMetadata.stats.limits = itemStatblocks[item.id].limits;
+    await updateItems(
+        contextItems.map((i) => i.id),
+        (items) => {
+            items.forEach((item) => {
+                tokenIds.push(item.id);
+                if (itemMetadataKey in item.metadata) {
+                    const metadata = item.metadata[itemMetadataKey] as GMGMetadata;
+                    metadata.hpTrackerActive = true;
+                    item.metadata[itemMetadataKey] = metadata;
+                } else {
+                    // variable allows us to be typesafe
+                    const defaultMetadata: GMGMetadata = {
+                        hp: 0,
+                        maxHp: 0,
+                        armorClass: 0,
+                        hpTrackerActive: true,
+                        hpOnMap: false,
+                        acOnMap: false,
+                        hpBar: false,
+                        initiative: 0,
+                        sheet: "",
+                        stats: {
+                            initiativeBonus: 0,
+                            initial: true,
+                        },
+                        playerMap: {
+                            hp: false,
+                            ac: false,
+                        },
+                    };
+                    if (item.id in itemStatblocks) {
+                        defaultMetadata.sheet = itemStatblocks[item.id].slug;
+                        defaultMetadata.ruleset = itemStatblocks[item.id].ruleset;
+                        defaultMetadata.maxHp = itemStatblocks[item.id].hp;
+                        defaultMetadata.hp = itemStatblocks[item.id].hp;
+                        defaultMetadata.armorClass = itemStatblocks[item.id].ac;
+                        defaultMetadata.stats.initiativeBonus = itemStatblocks[item.id].bonus;
+                        defaultMetadata.stats.initial = true;
+                        defaultMetadata.stats.limits = itemStatblocks[item.id].limits;
+                    }
+                    item.metadata[itemMetadataKey] = defaultMetadata;
                 }
-                item.metadata[itemMetadataKey] = defaultMetadata;
-            }
-        });
-    });
+            });
+        },
+    );
     return tokenIds;
 };
 
@@ -621,17 +624,20 @@ export const reorderMetadataIndex = async (list: Array<Image>, group?: string) =
     let index = 0;
     for (const subList of chunks) {
         try {
-            await updateItems(subList, (items) => {
-                items.forEach((item) => {
-                    const data = item.metadata[itemMetadataKey] as GMGMetadata;
-                    data.index = index;
-                    if (group) {
-                        data.group = group;
-                    }
-                    index++;
-                    item.metadata[itemMetadataKey] = { ...data };
-                });
-            });
+            await updateItems(
+                subList.map((i) => i.id),
+                (items) => {
+                    items.forEach((item) => {
+                        const data = item.metadata[itemMetadataKey] as GMGMetadata;
+                        data.index = index;
+                        if (group) {
+                            data.group = group;
+                        }
+                        index++;
+                        item.metadata[itemMetadataKey] = { ...data };
+                    });
+                },
+            );
         } catch (e) {
             const errorName =
                 isObject(e) && "error" in e && isObject(e.error) && "name" in e.error
