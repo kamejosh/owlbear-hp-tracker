@@ -44,6 +44,7 @@ export const setIndicator = async (current: Image) => {
                 item.width = width;
                 item.height = height;
                 item.position = position;
+                item.scale = { x: 1, y: 1 };
                 item.visible = current.visible;
             }
         });
