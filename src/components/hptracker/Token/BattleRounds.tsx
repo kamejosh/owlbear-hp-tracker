@@ -12,6 +12,7 @@ import { useMetadataContext } from "../../../context/MetadataContext.ts";
 export const BattleRounds = () => {
     const tokens = useTokenListContext((state) => state.tokens);
     const scene = useMetadataContext((state) => state.scene);
+    const [hold, setHold] = useState<boolean>(false);
     const [groups, current, setCurrent, battle, setBattle] = useBattleContext((state) => [
         state.groups,
         state.current,
@@ -96,16 +97,20 @@ export const BattleRounds = () => {
         }
         setCurrent(newCurrent.id);
         await setIndicator(newCurrent);
+        setHold(true);
+        setTimeout(() => {
+            setHold(false);
+        }, 500);
     };
 
     return (
         <div
             className={"battle-rounds"}
-            onKeyDown={(e) => {
+            onKeyDown={async (e) => {
                 if (e.key === "ArrowRight") {
-                    changeCurrent(+1);
+                    await changeCurrent(+1);
                 } else if (e.key === "ArrowLeft") {
-                    changeCurrent(-1);
+                    await changeCurrent(-1);
                 }
             }}
         >
@@ -117,9 +122,9 @@ export const BattleRounds = () => {
                     <button
                         disabled={groups.length === 0 || battleTokens.length === 0}
                         className={"button"}
-                        onClick={() => {
+                        onClick={async () => {
                             if (battleTokens.length > 0) {
-                                changeCurrent(0);
+                                await changeCurrent(0);
                                 setBattle(true);
                             }
                         }}
@@ -131,8 +136,9 @@ export const BattleRounds = () => {
                 <>
                     <button
                         className={"button"}
-                        onClick={() => {
-                            changeCurrent(-1);
+                        disabled={hold}
+                        onClick={async () => {
+                            await changeCurrent(-1);
                         }}
                     >
                         Back
@@ -140,8 +146,9 @@ export const BattleRounds = () => {
                     <span className={"battle-round"}>{battleRound}</span>
                     <button
                         className={"button"}
-                        onClick={() => {
-                            changeCurrent(+1);
+                        disabled={hold}
+                        onClick={async () => {
+                            await changeCurrent(+1);
                         }}
                     >
                         Next

@@ -49,8 +49,8 @@ export const Token = (props: TokenProps) => {
 
     useEffect(() => {
         if (
-            (playerContext.role === "GM" && !data.isCurrent && current === item.id) ||
-            (!!data.isCurrent && current !== item.id)
+            playerContext.role === "GM" &&
+            ((!data.isCurrent && current === item.id) || (!!data.isCurrent && current !== item.id))
         ) {
             updateTokenMetadata({ ...data, isCurrent: current === item.id }, [props.id]);
         }
