@@ -101,7 +101,8 @@ export const Sheet = ({ id }: { id: string }) => {
                         <select
                             value={owner}
                             onChange={async (e) => {
-                                await updateItems([item.id], (items) => {
+                                // this doesn't work with the abstraction layer
+                                await OBR.scene.items.updateItems([item], (items) => {
                                     items.forEach((item) => {
                                         item.createdUserId = e.target.value;
                                     });
