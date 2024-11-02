@@ -131,26 +131,22 @@ export const ContextWrapper = (props: ContextWrapperProps) => {
 
     const playerContext: PlayerContextType = { role: role, id: playerId, name: playerName };
 
-    if (ready) {
-        return (
-            <PluginGate>
-                <QueryClientProvider client={queryClient}>
-                    <PlayerContext.Provider value={playerContext}>
-                        <Content>
-                            {component && room ? (
-                                props.children
-                            ) : (
-                                <div>
-                                    GM's Grimoire - initializing...
-                                    <Loader className={"initialization-loader"} />
-                                </div>
-                            )}
-                        </Content>
-                    </PlayerContext.Provider>
-                </QueryClientProvider>
-            </PluginGate>
-        );
-    } else {
-        return null;
-    }
+    return (
+        <PluginGate>
+            <QueryClientProvider client={queryClient}>
+                <PlayerContext.Provider value={playerContext}>
+                    <Content>
+                        {component && room ? (
+                            props.children
+                        ) : (
+                            <div>
+                                GM's Grimoire - initializing...
+                                <Loader className={"initialization-loader"} />
+                            </div>
+                        )}
+                    </Content>
+                </PlayerContext.Provider>
+            </QueryClientProvider>
+        </PluginGate>
+    );
 };

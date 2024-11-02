@@ -13,18 +13,20 @@ export const PluginGate = ({ children }: { children: ReactNode }) => {
     }, []);
 
     useEffect(() => {
-        const initIsReady = async () => {
-            setIsReady(await OBR.scene.isReady());
-        };
-        OBR.scene.onReadyChange(async (ready) => {
-            setIsReady(ready);
-        });
-        initIsReady();
-    }, []);
+        if (ready) {
+            const initIsReady = async () => {
+                setIsReady(await OBR.scene.isReady());
+            };
+            OBR.scene.onReadyChange(async (ready) => {
+                setIsReady(ready);
+            });
+            initIsReady();
+        }
+    }, [ready]);
 
     if (ready) {
         return <>{children}</>;
     } else {
-        return null;
+        return <>Waiting for owlbear rodeo</>;
     }
 };
