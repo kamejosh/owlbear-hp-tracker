@@ -121,13 +121,14 @@ export const ContextWrapper = (props: ContextWrapperProps) => {
             isReady &&
             scene &&
             scene.groups &&
+            role === "GM" &&
             !scene.groups.every((element) => taSettings.default_groups.includes(element))
         ) {
             const currentGroups = scene.groups ?? [];
             const newGroups = currentGroups.concat(taSettings.default_groups);
             updateSceneMetadata(scene, { groups: uniq(newGroups) });
         }
-    }, [isReady, taSettings, scene]);
+    }, [isReady, taSettings, scene, role]);
 
     const playerContext: PlayerContextType = { role: role, id: playerId, name: playerName };
 

@@ -242,7 +242,7 @@ export const updateSceneMetadata = async (scene: SceneMetadata | null, data: Par
     const ownMetadata: Metadata = {};
     ownMetadata[metadataKey] = { ...scene, ...data };
 
-    if (!scene || !objectsEqual(ownMetadata, scene)) {
+    if (!scene || !objectsEqual({ ...scene, ...data }, scene)) {
         await OBR.scene.setMetadata({ ...ownMetadata });
     }
 };
