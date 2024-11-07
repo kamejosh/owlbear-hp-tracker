@@ -251,11 +251,12 @@ export const updateRoomMetadata = async (
     room: RoomMetadata | null,
     data: Partial<RoomMetadata>,
     additionalData?: Metadata,
+    force: boolean = false,
 ) => {
     const ownMetadata: Metadata = additionalData ?? {};
     ownMetadata[metadataKey] = { ...room, ...data };
 
-    if (!room || !objectsEqual({ ...room, ...data }, room)) {
+    if (!room || !objectsEqual({ ...room, ...data }, room) || force) {
         await OBR.room.setMetadata({ ...ownMetadata });
     }
 };

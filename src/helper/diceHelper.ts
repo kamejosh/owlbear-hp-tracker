@@ -32,7 +32,7 @@ export const updateRoomMetadataDiceUser = async (
         apiKey?: string;
         diceTheme?: string;
         diceRendering?: boolean;
-    }
+    },
 ) => {
     const diceUser: Array<{
         playerId: string;
@@ -68,7 +68,7 @@ export const updateRoomMetadataDiceUser = async (
         return user.lastUse > new Date().getTime() - 1000 * 60 * 60 * 24 * 30;
     });
 
-    await updateRoomMetadata(room, { diceUser: filteredUser });
+    await updateRoomMetadata(room, { diceUser: filteredUser }, undefined, true);
 };
 
 export const updateRoomMetadataDiceRoom = async (room: RoomMetadata, slug: string | undefined) => {
@@ -82,7 +82,7 @@ export const updateRoomMetadataDiceRoom = async (room: RoomMetadata, slug: strin
                 slug: slug,
             },
         },
-        dddiceMetadata
+        dddiceMetadata,
     );
 };
 export const getDiceUser = async (rollerApi: ThreeDDiceAPI) => {
@@ -129,7 +129,7 @@ export const getApiKey = async (room: RoomMetadata | null) => {
 export const getDiceRoom = async (
     rollerApi: ThreeDDiceAPI,
     room: RoomMetadata | null,
-    diceRoom?: IRoom
+    diceRoom?: IRoom,
 ): Promise<IRoom | undefined> => {
     const roomMetadata = await OBR.room.getMetadata();
     let slug: string | undefined;
@@ -256,7 +256,7 @@ export const connectToDddiceRoom = async (
     api: ThreeDDiceAPI,
     room: RoomMetadata | null,
     user?: IUser,
-    currentDiceRoom?: IRoom
+    currentDiceRoom?: IRoom,
 ) => {
     const diceRoom = await getDiceRoom(api, room, currentDiceRoom);
     if (diceRoom) {
@@ -379,7 +379,7 @@ export const localRoll = async (
     label: string,
     addRoll: (entry: RollLogEntryType) => void,
     hidden: boolean = false,
-    statblock?: string
+    statblock?: string,
 ) => {
     try {
         const roll = new DiceRoll(diceEquation);
@@ -413,7 +413,7 @@ export const localRoll = async (
 export const rollWrapper = async (
     api: ThreeDDiceAPI | null,
     dice: Array<IDiceRoll>,
-    options?: Partial<IDiceRollOptions>
+    options?: Partial<IDiceRollOptions>,
 ) => {
     if (api) {
         try {
@@ -424,7 +424,7 @@ export const rollWrapper = async (
         } catch {
             await OBR.notification.show(
                 "Error while rolling dice - check if the selected dice theme is available",
-                "WARNING"
+                "WARNING",
             );
             return null;
         }
