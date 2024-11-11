@@ -66,8 +66,8 @@ export const Token = (props: TokenProps) => {
         const currentGroup = data.group;
         const index = data.index!;
 
-        if (currentGroup) {
-            const groupItems = props.tokenLists?.get(currentGroup);
+        if (currentGroup || currentGroup === undefined) {
+            const groupItems = props.tokenLists?.get(currentGroup || "Default");
             if (groupItems) {
                 const selectedGroupItems = groupItems.filter((item) => currentSelection.includes(item.id));
 
