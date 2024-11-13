@@ -5,6 +5,7 @@ import { useInterval } from "../../../helper/hooks.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { isObject } from "lodash";
 import Tippy from "@tippyjs/react";
+import { useShallow } from "zustand/react/shallow";
 
 type RollLogEntryProps = {
     entry: RollLogEntryType;
@@ -12,7 +13,7 @@ type RollLogEntryProps = {
 };
 
 export const RollLog = () => {
-    const log = useRollLogContext((state) => state.log);
+    const log = useRollLogContext(useShallow((state) => state.log));
     const [numberOfEntries, setNumberOfEntries] = useState<number>(20);
 
     return (

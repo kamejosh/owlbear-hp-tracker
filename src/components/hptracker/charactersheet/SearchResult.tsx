@@ -5,6 +5,7 @@ import { PfStatblock, usePfStatblockSearch } from "../../../api/pf/usePfApi.ts";
 import { useEffect } from "react";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { updateTokenSheet } from "../../../helper/helpers.ts";
+import { useShallow } from "zustand/react/shallow";
 
 type SearchResultProps = {
     search: string;
@@ -14,8 +15,8 @@ type SearchResultProps = {
 };
 
 export const SearchResult5e = (props: SearchResultProps) => {
-    const characterId = useCharSheet((state) => state.characterId);
-    const room = useMetadataContext((state) => state.room);
+    const characterId = useCharSheet(useShallow((state) => state.characterId));
+    const room = useMetadataContext(useShallow((state) => state.room));
     const setSheet = (statblock: E5Statblock) => {
         if (characterId) {
             if (statblock.slug === props.current) {
@@ -89,8 +90,8 @@ export const SearchResult5e = (props: SearchResultProps) => {
 };
 
 export const SearchResultPf = (props: SearchResultProps) => {
-    const room = useMetadataContext((state) => state.room);
-    const characterId = useCharSheet((state) => state.characterId);
+    const room = useMetadataContext(useShallow((state) => state.room));
+    const characterId = useCharSheet(useShallow((state) => state.characterId));
     const setSheet = (statblock: PfStatblock) => {
         if (characterId) {
             if (statblock.slug === props.current) {

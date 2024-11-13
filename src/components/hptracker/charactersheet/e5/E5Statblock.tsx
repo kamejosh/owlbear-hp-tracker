@@ -15,6 +15,7 @@ import { Rest } from "../../Token/Rest.tsx";
 import { useEffect } from "react";
 import { Image } from "@owlbear-rodeo/sdk";
 import { getTokenName } from "../../../../helper/helpers.ts";
+import { useShallow } from "zustand/react/shallow";
 
 export const E5StatBlock = ({
     slug,
@@ -25,10 +26,10 @@ export const E5StatBlock = ({
     itemId: string;
     setScrollTargets?: (scrollTargets: Array<{ name: string; target: string }>) => void;
 }) => {
-    const room = useMetadataContext((state) => state.room);
+    const room = useMetadataContext(useShallow((state) => state.room));
     const statblockQuery = useE5GetStatblock(slug, room?.tabletopAlmanacAPIKey);
     const statblock = statblockQuery.isSuccess && statblockQuery.data ? statblockQuery.data : null;
-    const token = useTokenListContext((state) => state.tokens?.get(itemId));
+    const token = useTokenListContext(useShallow((state) => state.tokens?.get(itemId)));
     const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
 

@@ -14,6 +14,7 @@ import { SettingsSvg } from "../../svgs/SettingsSvg.tsx";
 import { StatblockSvg } from "../../svgs/StatblockSvg.tsx";
 import { updateSceneMetadata } from "../../../helper/helpers.ts";
 import { useMemo } from "react";
+import { useShallow } from "zustand/react/shallow";
 
 type HelpButtonsProps = {
     ignoredChanges?: boolean;
@@ -21,7 +22,7 @@ type HelpButtonsProps = {
 };
 
 export const Helpbuttons = (props: HelpButtonsProps) => {
-    const [room, scene] = useMetadataContext((state) => [state.room, state.scene]);
+    const [room, scene] = useMetadataContext(useShallow((state) => [state.room, state.scene]));
     const playerContext = usePlayerContext();
 
     const playerStatblockPopoverOpen = useMemo(() => {

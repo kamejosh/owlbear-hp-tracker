@@ -14,6 +14,7 @@ import { Select } from "../Select.tsx";
 import { isNull, isString } from "lodash";
 import Tippy from "@tippyjs/react";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
+import { useShallow } from "zustand/react/shallow";
 
 type DiceRoomButtonsProps = {
     open: boolean;
@@ -26,15 +27,12 @@ type CustomDiceButtonProps = {
 };
 
 const CustomDiceButton = (props: CustomDiceButtonProps) => {
-    const [rollerApi, theme, initialized, themes] = useDiceRoller((state) => [
-        state.rollerApi,
-        state.theme,
-        state.initialized,
-        state.themes,
-    ]);
-    const addRoll = useRollLogContext((state) => state.addRoll);
+    const [rollerApi, theme, initialized, themes] = useDiceRoller(
+        useShallow((state) => [state.rollerApi, state.theme, state.initialized, state.themes]),
+    );
+    const addRoll = useRollLogContext(useShallow((state) => state.addRoll));
     const { buttons, setButtons } = useDiceButtonsContext();
-    const [room, taSettings] = useMetadataContext((state) => [state.room, state.taSettings]);
+    const [room, taSettings] = useMetadataContext(useShallow((state) => [state.room, state.taSettings]));
     const [hover, setHover] = useState<boolean>(false);
     const [addCustom, setAddCustom] = useState<boolean>(false);
     const [validCustom, setValidCustom] = useState<boolean>(false);
@@ -328,8 +326,8 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
 
 const QuickButtons = ({ open }: { open: boolean }) => {
     const { theme, rollerApi } = useDiceRoller();
-    const addRoll = useRollLogContext((state) => state.addRoll);
-    const [room, taSettings] = useMetadataContext((state) => [state.room, state.taSettings]);
+    const addRoll = useRollLogContext(useShallow((state) => state.addRoll));
+    const [room, taSettings] = useMetadataContext(useShallow((state) => [state.room, state.taSettings]));
     const [validCustom, setValidCustom] = useState<boolean>(true);
     const playerContext = usePlayerContext();
 

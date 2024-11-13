@@ -3,9 +3,10 @@ import "./rest.scss";
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
 import { Image } from "@owlbear-rodeo/sdk";
 import { rest } from "../../../helper/multiTokenHelper.ts";
+import { useShallow } from "zustand/react/shallow";
 
 export const Rest = ({ id }: { id: string }) => {
-    const token = useTokenListContext((state) => state.tokens?.get(id));
+    const token = useTokenListContext(useShallow((state) => state.tokens?.get(id)));
     const item = token?.item as Image;
     return (
         <div className={"token-rest"}>

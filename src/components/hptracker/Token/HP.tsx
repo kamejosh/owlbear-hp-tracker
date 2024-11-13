@@ -18,14 +18,15 @@ import { MapButton } from "./MapButton.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { updateHp } from "../../../helper/hpHelpers.ts";
 import Tippy from "@tippyjs/react";
+import { useShallow } from "zustand/react/shallow";
 
 export const HP = ({ id }: { id: string }) => {
     const playerContext = usePlayerContext();
     const hpRef = useRef<HTMLInputElement>(null);
     const maxHpRef = useRef<HTMLInputElement>(null);
     const tempHpRef = useRef<HTMLInputElement>(null);
-    const room = useMetadataContext((state) => state.room);
-    const token = useTokenListContext((state) => state.tokens?.get(id));
+    const room = useMetadataContext(useShallow((state) => state.room));
+    const token = useTokenListContext(useShallow((state) => state.tokens?.get(id)));
     const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
 

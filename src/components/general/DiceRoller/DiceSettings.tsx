@@ -11,16 +11,13 @@ import { getThemePreview } from "../../../helper/previewHelpers.tsx";
 import { Loader } from "../Loader.tsx";
 import { isNull } from "lodash";
 import { ITheme } from "dddice-js";
+import { useShallow } from "zustand/react/shallow";
 
 export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean) => void }) => {
-    const room = useMetadataContext((state) => state.room);
-    const [rollerApi, theme, setTheme, themes, rooms] = useDiceRoller((state) => [
-        state.rollerApi,
-        state.theme,
-        state.setTheme,
-        state.themes,
-        state.rooms,
-    ]);
+    const room = useMetadataContext(useShallow((state) => state.room));
+    const [rollerApi, theme, setTheme, themes, rooms] = useDiceRoller(
+        useShallow((state) => [state.rollerApi, state.theme, state.setTheme, state.themes, state.rooms]),
+    );
     const playerContext = usePlayerContext();
     const [validTheme, setValidTheme] = useState<boolean>(true);
     const [searching, setSearching] = useState<boolean>(false);

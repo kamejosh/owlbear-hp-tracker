@@ -5,11 +5,12 @@ import { useInterval } from "../../../helper/hooks.ts";
 import { updateRoomMetadataDiceUser } from "../../../helper/diceHelper.ts";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
+import { useShallow } from "zustand/react/shallow";
 
 export const DiceLogin = () => {
     const [activate, setActivate] = useState<{ code: string; expires_at: string; secret: string } | null>(null);
     const [timeLeft, setTimeLeft] = useState<number | null>(null);
-    const room = useMetadataContext((state) => state.room);
+    const room = useMetadataContext(useShallow((state) => state.room));
     const playerContext = usePlayerContext();
 
     const initAuth = async () => {

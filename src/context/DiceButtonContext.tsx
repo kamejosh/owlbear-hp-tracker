@@ -26,7 +26,7 @@ export type DiceButtonsContextType = {
     setButtons: (button: Partial<DiceButtonsType>) => void;
 };
 
-const dicebuttonsSlice: StateCreator<DiceButtonsContextType, [["zustand/persist", unknown]]> = (set) => ({
+const diceButtonsSlice: StateCreator<DiceButtonsContextType, [["zustand/persist", unknown]]> = (set) => ({
     buttons: { 1: null, 2: null, 3: null, 4: null, 5: null, 6: null, 7: null, 8: null },
     setButtons: (button) =>
         set((state) => {
@@ -34,9 +34,9 @@ const dicebuttonsSlice: StateCreator<DiceButtonsContextType, [["zustand/persist"
         }),
 });
 export const diceButtonsStore = createStore<DiceButtonsContextType>()(
-    persist(dicebuttonsSlice, {
+    persist(diceButtonsSlice, {
         name: `${ID}.dice-buttons`,
-    })
+    }),
 );
 
 export function useDiceButtonsContext(): DiceButtonsContextType;

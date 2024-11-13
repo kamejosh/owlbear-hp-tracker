@@ -8,6 +8,7 @@ import { E5SpellSlot } from "../../../../api/e5/useE5Api.ts";
 import { GMGMetadata } from "../../../../helper/types.ts";
 import { useMetadataContext } from "../../../../context/MetadataContext.ts";
 import Tippy from "@tippyjs/react";
+import { useShallow } from "zustand/react/shallow";
 
 type Spell = components["schemas"]["src__types__e5__Spell"];
 
@@ -29,7 +30,7 @@ const Spell = ({
     attack?: string | null;
 }) => {
     const [open, setOpen] = useState<boolean>(false);
-    const room = useMetadataContext((state) => state.room);
+    const room = useMetadataContext(useShallow((state) => state.room));
 
     const getSpellLevel = () => {
         if (spell.level === 0) {
