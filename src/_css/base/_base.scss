@@ -75,3 +75,39 @@ body {
     max-width: 1280px;
     text-align: center;
 }
+
+.inline-markdown {
+    display: inline;
+
+    p {
+        margin: 0 1ch;
+        display: inline;
+    }
+}
+
+ul,
+menu,
+nav {
+    all: unset;
+    display: revert;
+    padding-left: 32px;
+    list-style: disc;
+
+    &:not(:not([class])) {
+        padding-left: 0;
+        list-style: none;
+    }
+}
+
+table {
+    thead {
+        font-weight: 800;
+    }
+
+    tr,
+    th,
+    td {
+        border: 1px solid white;
+        padding: 0.2ch 1ch;
+    }
+}

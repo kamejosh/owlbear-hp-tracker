@@ -16,6 +16,8 @@ import { useEffect } from "react";
 import { Image } from "@owlbear-rodeo/sdk";
 import { getTokenName } from "../../../../helper/helpers.ts";
 import { useShallow } from "zustand/react/shallow";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export const E5StatBlock = ({
     slug,
@@ -348,7 +350,7 @@ export const E5StatBlock = ({
             {(statblock.legendary_actions && statblock.legendary_actions.length > 0) || !!statblock.legendary_desc ? (
                 <div className={"legendary-actions"}>
                     <h3>Legendary Actions</h3>
-                    {statblock.legendary_desc}
+                    <Markdown remarkPlugins={[remarkGfm]}>{statblock.legendary_desc}</Markdown>
                     <ul className={"ability-list"}>
                         {statblock.legendary_actions?.map((legendary_action, index) => (
                             <E5Ability

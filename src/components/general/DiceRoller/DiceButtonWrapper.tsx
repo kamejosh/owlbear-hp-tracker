@@ -9,6 +9,8 @@ import { D20 } from "../../svgs/dice/D20.tsx";
 import Tippy from "@tippyjs/react";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { useShallow } from "zustand/react/shallow";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 type DiceButtonProps = {
     dice: string;
@@ -288,7 +290,9 @@ export const DiceButtonWrapper = ({
                 }
                 return (
                     <span key={index}>
-                        {part}
+                        <Markdown className={"inline-markdown"} remarkPlugins={[remarkGfm]}>
+                            {part}
+                        </Markdown>
                         {diceField}
                     </span>
                 );
