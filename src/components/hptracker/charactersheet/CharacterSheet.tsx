@@ -9,6 +9,7 @@ import { Statblock } from "./Statblock.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { getSearchString, getTokenName, updateRoomMetadata } from "../../../helper/helpers.ts";
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
+import { useShallow } from "zustand/react/shallow";
 
 type SearchWrapperProps = {
     name: string;
@@ -29,7 +30,7 @@ type StatblockWrapperProps = {
 
 const SearchWrapper = (props: SearchWrapperProps) => {
     const playerContext = usePlayerContext();
-    const room = useMetadataContext((state) => state.room);
+    const room = useMetadataContext(useShallow((state) => state.room));
 
     const searchRef = useRef<HTMLInputElement>(null);
 
@@ -89,7 +90,7 @@ const SearchWrapper = (props: SearchWrapperProps) => {
 };
 
 const StatblockWrapper = (props: StatblockWrapperProps) => {
-    const room = useMetadataContext((state) => state.room);
+    const room = useMetadataContext(useShallow((state) => state.room));
     const ruleSetMap = new Map<Ruleset, ReactElement>([
         [
             "pf",
@@ -127,8 +128,8 @@ const StatblockWrapper = (props: StatblockWrapperProps) => {
 export const CharacterSheet = (props: { itemId: string }) => {
     const { setId } = useCharSheet();
     const playerContext = usePlayerContext();
-    const room = useMetadataContext((state) => state.room);
-    const token = useTokenListContext((state) => state.tokens?.get(props.itemId));
+    const room = useMetadataContext(useShallow((state) => state.room));
+    const token = useTokenListContext(useShallow((state) => state.tokens?.get(props.itemId)));
     const item = token?.item as Image;
     const data = token?.data as GMGMetadata;
     const [search, setSearch] = useState<string>("");

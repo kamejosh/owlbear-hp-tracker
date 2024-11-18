@@ -8,18 +8,15 @@ import { isUndefined } from "lodash";
 import { destroyIndicator, setIndicator } from "../../../helper/currentHelper.ts";
 import { rest } from "../../../helper/multiTokenHelper.ts";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
+import { useShallow } from "zustand/react/shallow";
 
 export const BattleRounds = () => {
-    const tokens = useTokenListContext((state) => state.tokens);
-    const scene = useMetadataContext((state) => state.scene);
+    const tokens = useTokenListContext(useShallow((state) => state.tokens));
+    const scene = useMetadataContext(useShallow((state) => state.scene));
     const [hold, setHold] = useState<boolean>(false);
-    const [groups, current, setCurrent, battle, setBattle] = useBattleContext((state) => [
-        state.groups,
-        state.current,
-        state.setCurrent,
-        state.battle,
-        state.setBattle,
-    ]);
+    const [groups, current, setCurrent, battle, setBattle] = useBattleContext(
+        useShallow((state) => [state.groups, state.current, state.setCurrent, state.battle, state.setBattle]),
+    );
     const tokensData: Array<{ data: GMGMetadata; item: Image }> = tokens
         ? [...tokens].map((t) => {
               return { data: t[1].data, item: t[1].item };

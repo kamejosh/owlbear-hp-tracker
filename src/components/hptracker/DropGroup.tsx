@@ -38,6 +38,7 @@ import { FlagSvg } from "../svgs/FlagSvg.tsx";
 import { BattleSvg } from "../svgs/BattleSvg.tsx";
 import "./drop-group.scss";
 import { updateItems } from "../../helper/obrHelper.ts";
+import { useShallow } from "zustand/react/shallow";
 
 type DropGroupProps = {
     title: string;
@@ -47,14 +48,16 @@ type DropGroupProps = {
 };
 
 export const DropGroup = (props: DropGroupProps) => {
-    const [room, scene, taSettings] = useMetadataContext((state) => [state.room, state.scene, state.taSettings]);
-    const [rollerApi, initialized, theme] = useDiceRoller((state) => [state.rollerApi, state.initialized, state.theme]);
-    const [groups, addGroup, removeGroup] = useBattleContext((state) => [
-        state.groups,
-        state.addGroup,
-        state.removeGroup,
-    ]);
-    const addRoll = useRollLogContext((state) => state.addRoll);
+    const [room, scene, taSettings] = useMetadataContext(
+        useShallow((state) => [state.room, state.scene, state.taSettings]),
+    );
+    const [rollerApi, initialized, theme] = useDiceRoller(
+        useShallow((state) => [state.rollerApi, state.initialized, state.theme]),
+    );
+    const [groups, addGroup, removeGroup] = useBattleContext(
+        useShallow((state) => [state.groups, state.addGroup, state.removeGroup]),
+    );
+    const addRoll = useRollLogContext(useShallow((state) => state.addRoll));
     const playerContext = usePlayerContext();
     const initButtonRef = useRef<HTMLButtonElement>(null);
     const defaultHidden = playerContext.role === "GM" && !!taSettings.gm_rolls_hidden;

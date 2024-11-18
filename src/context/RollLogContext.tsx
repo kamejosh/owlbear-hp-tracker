@@ -36,7 +36,7 @@ export const rollLogStore = createStore<RollLogContextType>()(
                             state.log.splice(0, state.log.length - 100);
                         }
                         window.dispatchEvent(
-                            new StorageEvent("storage", { newValue: "new roll", key: `${ID}.roll-log` })
+                            new StorageEvent("storage", { newValue: "new roll", key: `${ID}.roll-log` }),
                         );
                     }
                     return { ...state };
@@ -51,8 +51,8 @@ export const rollLogStore = createStore<RollLogContextType>()(
         {
             name: `${ID}.roll-log`,
             storage: createJSONStorage(() => localStorage),
-        }
-    )
+        },
+    ),
 );
 
 export function useRollLogContext(): RollLogContextType;

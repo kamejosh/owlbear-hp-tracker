@@ -16,6 +16,7 @@ import { TokenIcon } from "./TokenIcon.tsx";
 import { useComponentContext } from "../../../context/ComponentContext.tsx";
 import { Rest } from "./Rest.tsx";
 import { useBattleContext } from "../../../context/BattleContext.tsx";
+import { useShallow } from "zustand/react/shallow";
 
 type TokenProps = {
     id: string;
@@ -25,14 +26,14 @@ type TokenProps = {
 };
 
 export const Token = (props: TokenProps) => {
-    const component = useComponentContext((state) => state.component);
+    const component = useComponentContext(useShallow((state) => state.component));
     const playerContext = usePlayerContext();
-    const room = useMetadataContext((state) => state.room);
+    const room = useMetadataContext(useShallow((state) => state.room));
     const containerRef = useRef<HTMLDivElement>(null);
-    const token = useTokenListContext((state) => state.tokens?.get(props.id));
+    const token = useTokenListContext(useShallow((state) => state.tokens?.get(props.id)));
     const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
-    const current = useBattleContext((state) => state.current);
+    const current = useBattleContext(useShallow((state) => state.current));
     const start = useRef<number>(0);
 
     useEffect(() => {

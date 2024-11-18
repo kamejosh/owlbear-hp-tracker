@@ -32,6 +32,7 @@ import { BattleRounds } from "./Token/BattleRounds.tsx";
 import { DraggableLocation, DropResult, DragDropContext } from "@hello-pangea/dnd";
 import Tippy from "@tippyjs/react";
 import { updateItems } from "../../helper/obrHelper.ts";
+import { useShallow } from "zustand/react/shallow";
 
 export const GMGrimoire = () => {
     return (
@@ -46,19 +47,18 @@ export const GMGrimoire = () => {
 
 const Content = () => {
     const playerContext = usePlayerContext();
-    const tokens = useTokenListContext((state) => state.tokens);
+    const tokens = useTokenListContext(useShallow((state) => state.tokens));
 
     const [selectedTokens, setSelectedTokens] = useState<Array<string>>([]);
     const [ignoredChanges, setIgnoredChanges] = useState<boolean>(false);
-    const [scene, room] = useMetadataContext((state) => [state.scene, state.room]);
+    const [scene, room] = useMetadataContext(useShallow((state) => [state.scene, state.room]));
     const sortInitiative = scene?.sortMethod ?? SORT.DESC;
     const enableAutoSort = !!scene?.enableAutoSort;
     const { isReady } = SceneReadyContext();
-    const characterId = useCharSheet((state) => state.characterId);
-    const [playerPreview, setPlayerPreview] = useUISettingsContext((state) => [
-        state.playerPreview,
-        state.setPlayerPreview,
-    ]);
+    const characterId = useCharSheet(useShallow((state) => state.characterId));
+    const [playerPreview, setPlayerPreview] = useUISettingsContext(
+        useShallow((state) => [state.playerPreview, state.setPlayerPreview]),
+    );
 
     useEffect(() => {
         const initGrimoire = async () => {

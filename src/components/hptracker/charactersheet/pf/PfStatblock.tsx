@@ -9,6 +9,7 @@ import { HP } from "../../Token/HP.tsx";
 import { AC } from "../../Token/AC.tsx";
 import { Initiative } from "../../Token/Initiative.tsx";
 import { useEffect } from "react";
+import { useShallow } from "zustand/react/shallow";
 
 export const PfStatBlock = ({
     slug,
@@ -21,7 +22,7 @@ export const PfStatBlock = ({
     itemId: string;
     setScrollTargets?: (scrollTargets: Array<{ name: string; target: string }>) => void;
 }) => {
-    const room = useMetadataContext((state) => state.room);
+    const room = useMetadataContext(useShallow((state) => state.room));
     const statblockQuery = usePfGetStatblock(slug, room?.tabletopAlmanacAPIKey);
 
     const statblock = statblockQuery.isSuccess && statblockQuery.data ? statblockQuery.data : null;

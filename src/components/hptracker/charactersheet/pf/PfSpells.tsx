@@ -6,13 +6,14 @@ import { components } from "../../../../api/schema";
 import { SpellFilter } from "../SpellFilter.tsx";
 import { capitalize } from "lodash";
 import { useMetadataContext } from "../../../../context/MetadataContext.ts";
+import { useShallow } from "zustand/react/shallow";
 
 export type PfSpellCategory = components["schemas"]["SpellCategoryOut"];
 export type PfSpellList = components["schemas"]["SpelllistOut"];
 export type PfSpellOut = components["schemas"]["SpellOut"];
 
 const Spell = (props: { spell: PfSpellOut; statblock: string }) => {
-    const room = useMetadataContext((state) => state.room);
+    const room = useMetadataContext(useShallow((state) => state.room));
     const [open, setOpen] = useState<boolean>(false);
 
     const spellQuery = usePfGetSpell(props.spell.slug, room?.tabletopAlmanacAPIKey);
@@ -223,7 +224,7 @@ const PfSpellCategory = (props: { spellCategory: PfSpellCategory; statblock: str
                           return list.level;
                       }
                   })
-                : []
+                : [],
         )
         .filter((value, index, self) => {
             return self.indexOf(value) === index;

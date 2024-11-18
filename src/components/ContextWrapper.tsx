@@ -13,13 +13,14 @@ import { useComponentContext } from "../context/ComponentContext.tsx";
 import "tippy.js/dist/tippy.css";
 import { useGetSettings } from "../api/tabletop-almanac/useUser.ts";
 import { uniq } from "lodash";
+import { useShallow } from "zustand/react/shallow";
 
 type ContextWrapperProps = PropsWithChildren & {
     component: string;
 };
 
 const Content = (props: PropsWithChildren) => {
-    const [setTaSettings, room] = useMetadataContext((state) => [state.setTaSettings, state.room]);
+    const [setTaSettings, room] = useMetadataContext(useShallow((state) => [state.setTaSettings, state.room]));
 
     const settingsQuery = useGetSettings(room?.tabletopAlmanacAPIKey);
 
@@ -36,13 +37,15 @@ export const ContextWrapper = (props: ContextWrapperProps) => {
     const [playerId, setPlayerId] = useState<string | null>(null);
     const [playerName, setPlayerName] = useState<string | null>(null);
     const [ready, setReady] = useState<boolean>(false);
-    const [room, scene, setSceneMetadata, setRoomMetadata, taSettings] = useMetadataContext((state) => [
-        state.room,
-        state.scene,
-        state.setSceneMetadata,
-        state.setRoomMetadata,
-        state.taSettings,
-    ]);
+    const [room, scene, setSceneMetadata, setRoomMetadata, taSettings] = useMetadataContext(
+        useShallow((state) => [
+            state.room,
+            state.scene,
+            state.setSceneMetadata,
+            state.setRoomMetadata,
+            state.taSettings,
+        ]),
+    );
     const { component, setComponent } = useComponentContext();
     const queryClient = new QueryClient();
     const { isReady } = SceneReadyContext();

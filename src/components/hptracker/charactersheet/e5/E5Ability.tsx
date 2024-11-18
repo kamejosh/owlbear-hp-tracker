@@ -1,6 +1,6 @@
 import { components } from "../../../../api/schema";
 import { DiceButton, DiceButtonWrapper } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
-import { capitalize } from "lodash";
+import { capitalize, isInteger } from "lodash";
 import { LimitComponent } from "../LimitComponent.tsx";
 import { GMGMetadata } from "../../../../helper/types.ts";
 import { updateLimit } from "../../../../helper/helpers.ts";
@@ -64,21 +64,25 @@ export const E5Ability = ({
                 {ability.damage_dice ? (
                     <span>
                         <i>Damage</i>:{" "}
-                        <DiceButton
-                            dice={ability.damage_dice}
-                            text={ability.damage_dice}
-                            context={`${capitalize(ability.name)}: Damage`}
-                            statblock={statblock}
-                            onRoll={
-                                !ability.attack_bonus
-                                    ? async () => {
-                                          await updateLimit(itemId, limitValues);
-                                      }
-                                    : undefined
-                            }
-                            limitReached={!ability.attack_bonus ? limitReached : undefined}
-                            damageDie={true}
-                        />
+                        {isInteger(Number(ability.damage_dice)) ? (
+                            <span className={"dice-button button"}>{ability.damage_dice}</span>
+                        ) : (
+                            <DiceButton
+                                dice={ability.damage_dice}
+                                text={ability.damage_dice}
+                                context={`${capitalize(ability.name)}: Damage`}
+                                statblock={statblock}
+                                onRoll={
+                                    !ability.attack_bonus
+                                        ? async () => {
+                                              await updateLimit(itemId, limitValues);
+                                          }
+                                        : undefined
+                                }
+                                limitReached={!ability.attack_bonus ? limitReached : undefined}
+                                damageDie={true}
+                            />
+                        )}
                     </span>
                 ) : null}
             </span>

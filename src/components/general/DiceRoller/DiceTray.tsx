@@ -15,6 +15,7 @@ import { getRoomDiceUser } from "../../../helper/helpers.ts";
 import { useListRooms, useListThemes } from "../../../api/dddiceApi.ts";
 import OBR from "@owlbear-rodeo/sdk";
 import { isNull } from "lodash";
+import { useShallow } from "zustand/react/shallow";
 
 type DiceTrayProps = {
     classes: string;
@@ -22,19 +23,21 @@ type DiceTrayProps = {
 
 export const DiceTray = (props: DiceTrayProps) => {
     const [rollerApi, setRollerApi, setInitialized, theme, setTheme, themes, setThemes, rooms, setRooms] =
-        useDiceRoller((state) => [
-            state.rollerApi,
-            state.setRollerApi,
-            state.setInitialized,
-            state.theme,
-            state.setTheme,
-            state.themes,
-            state.setThemes,
-            state.rooms,
-            state.setRooms,
-        ]);
+        useDiceRoller(
+            useShallow((state) => [
+                state.rollerApi,
+                state.setRollerApi,
+                state.setInitialized,
+                state.theme,
+                state.setTheme,
+                state.themes,
+                state.setThemes,
+                state.rooms,
+                state.setRooms,
+            ]),
+        );
     const playerContext = usePlayerContext();
-    const room = useMetadataContext((state) => state.room);
+    const room = useMetadataContext(useShallow((state) => state.room));
     const [diceUser, setDiceUser] = useState<DiceUser>();
     const [apiKey, setApiKey] = useState<string>();
     const [roomSlug, setRoomSlug] = useState<string>();

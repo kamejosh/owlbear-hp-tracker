@@ -9,10 +9,11 @@ import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { getRoomDiceUser, updateRoomMetadata } from "../../../helper/helpers.ts";
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
 import { updateTokenMetadata } from "../../../helper/tokenHelper.ts";
+import { useShallow } from "zustand/react/shallow";
 
 export const Settings = () => {
-    const tokens = useTokenListContext((state) => state.tokens);
-    const [room, scene] = useMetadataContext((state) => [state.room, state.scene]);
+    const tokens = useTokenListContext(useShallow((state) => state.tokens));
+    const [room, scene] = useMetadataContext(useShallow((state) => [state.room, state.scene]));
 
     const handleOffsetChange = (value: number) => {
         updateHpOffset(value);

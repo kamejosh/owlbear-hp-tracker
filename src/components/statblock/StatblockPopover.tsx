@@ -8,6 +8,7 @@ import { DiceTray } from "../general/DiceRoller/DiceTray.tsx";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { TokenContextWrapper } from "../TokenContextWrapper.tsx";
 import { updateSceneMetadata } from "../../helper/helpers.ts";
+import { useShallow } from "zustand/react/shallow";
 
 export const StatblockPopover = () => {
     return (
@@ -23,7 +24,7 @@ const Content = () => {
     const [minimized, setMinimized] = useState<boolean>(false);
     const [pinned, setPinned] = useState<boolean>(false);
     const [selection, setSelection] = useState<string>();
-    const [room, scene] = useMetadataContext((state) => [state.room, state.scene]);
+    const [room, scene] = useMetadataContext(useShallow((state) => [state.room, state.scene]));
     const { isReady } = SceneReadyContext();
 
     const initPopover = async () => {

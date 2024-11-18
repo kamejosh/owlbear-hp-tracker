@@ -12,12 +12,13 @@ import Tippy from "@tippyjs/react";
 import { statblockPopover } from "../../../helper/variables.ts";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { updateSceneMetadata } from "../../../helper/helpers.ts";
+import { useShallow } from "zustand/react/shallow";
 
 export const Sheet = ({ id }: { id: string }) => {
-    const [room, scene] = useMetadataContext((state) => [state.room, state.scene]);
+    const [room, scene] = useMetadataContext(useShallow((state) => [state.room, state.scene]));
     const playerContext = usePlayerContext();
-    const token = useTokenListContext((state) => state.tokens?.get(id));
-    const setId = useCharSheet((state) => state.setId);
+    const token = useTokenListContext(useShallow((state) => state.tokens?.get(id)));
+    const setId = useCharSheet(useShallow((state) => state.setId));
     const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
     const [players, setPlayers] = useState<Array<Player>>([]);

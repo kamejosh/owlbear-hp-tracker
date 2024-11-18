@@ -19,6 +19,6 @@ export const useUISettingsContext = create<UISettingsContextType>()(
         {
             name: `${ID}.ui-settings`,
             storage: createJSONStorage(() => localStorage),
-        }
-    )
+        },
+    ),
 );

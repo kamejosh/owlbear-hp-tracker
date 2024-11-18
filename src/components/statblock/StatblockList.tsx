@@ -13,6 +13,7 @@ import { useTokenListContext } from "../../context/TokenContext.tsx";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
+import { useShallow } from "zustand/react/shallow";
 
 type StatblockListProps = {
     minimized: boolean;
@@ -21,9 +22,11 @@ type StatblockListProps = {
     selection?: string;
 };
 export const StatblockList = (props: StatblockListProps) => {
-    const tokens = useTokenListContext((state) => state.tokens);
+    const tokens = useTokenListContext(useShallow((state) => state.tokens));
     const playerContext = usePlayerContext();
-    const [scene, collapsedStatblocks] = useMetadataContext((state) => [state.scene, state.scene?.collapsedStatblocks]);
+    const [scene, collapsedStatblocks] = useMetadataContext(
+        useShallow((state) => [state.scene, state.scene?.collapsedStatblocks]),
+    );
     const { isReady } = SceneReadyContext();
     const [id, setId] = useState<string | undefined>();
     const [swiper, setSwiper] = useState<SwiperClass>();

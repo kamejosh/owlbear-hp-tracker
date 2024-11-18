@@ -10,12 +10,13 @@ import "./ac.scss";
 import { updateAc } from "../../../helper/acHelper.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import Tippy from "@tippyjs/react";
+import { useShallow } from "zustand/react/shallow";
 
 export const AC = ({ id }: { id: string }) => {
     const playerContext = usePlayerContext();
-    const room = useMetadataContext((state) => state.room);
+    const room = useMetadataContext(useShallow((state) => state.room));
     const acRef = useRef<HTMLInputElement>(null);
-    const token = useTokenListContext((state) => state.tokens?.get(id));
+    const token = useTokenListContext(useShallow((state) => state.tokens?.get(id)));
     const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
 

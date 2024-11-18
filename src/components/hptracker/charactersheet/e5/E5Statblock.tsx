@@ -15,6 +15,9 @@ import { Rest } from "../../Token/Rest.tsx";
 import { useEffect } from "react";
 import { Image } from "@owlbear-rodeo/sdk";
 import { getTokenName } from "../../../../helper/helpers.ts";
+import { useShallow } from "zustand/react/shallow";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export const E5StatBlock = ({
     slug,
@@ -25,10 +28,10 @@ export const E5StatBlock = ({
     itemId: string;
     setScrollTargets?: (scrollTargets: Array<{ name: string; target: string }>) => void;
 }) => {
-    const room = useMetadataContext((state) => state.room);
+    const room = useMetadataContext(useShallow((state) => state.room));
     const statblockQuery = useE5GetStatblock(slug, room?.tabletopAlmanacAPIKey);
     const statblock = statblockQuery.isSuccess && statblockQuery.data ? statblockQuery.data : null;
-    const token = useTokenListContext((state) => state.tokens?.get(itemId));
+    const token = useTokenListContext(useShallow((state) => state.tokens?.get(itemId)));
     const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
 
@@ -347,7 +350,7 @@ export const E5StatBlock = ({
             {(statblock.legendary_actions && statblock.legendary_actions.length > 0) || !!statblock.legendary_desc ? (
                 <div className={"legendary-actions"}>
                     <h3>Legendary Actions</h3>
-                    {statblock.legendary_desc}
+                    <Markdown remarkPlugins={[remarkGfm]}>{statblock.legendary_desc}</Markdown>
                     <ul className={"ability-list"}>
                         {statblock.legendary_actions?.map((legendary_action, index) => (
                             <E5Ability

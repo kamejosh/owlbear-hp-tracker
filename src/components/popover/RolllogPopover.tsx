@@ -2,6 +2,7 @@ import { ContextWrapper } from "../ContextWrapper.tsx";
 import { rollLogStore, useRollLogContext } from "../../context/RollLogContext.tsx";
 import { RollLogEntry } from "../general/DiceRoller/RollLog.tsx";
 import { useInterval } from "../../helper/hooks.ts";
+import { useShallow } from "zustand/react/shallow";
 
 export const RollLogPopover = () => {
     return (
@@ -12,7 +13,7 @@ export const RollLogPopover = () => {
 };
 
 const Content = () => {
-    const log = useRollLogContext((state) => state.log);
+    const log = useRollLogContext(useShallow((state) => state.log));
 
     useInterval(() => {
         rollLogStore.persist.rehydrate();

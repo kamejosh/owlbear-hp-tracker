@@ -8,6 +8,9 @@ import { getDiceImage, getSvgForDiceType } from "../../../helper/previewHelpers.
 import { D20 } from "../../svgs/dice/D20.tsx";
 import Tippy from "@tippyjs/react";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
+import { useShallow } from "zustand/react/shallow";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 type DiceButtonProps = {
     dice: string;
@@ -19,9 +22,11 @@ type DiceButtonProps = {
     damageDie?: boolean;
 };
 export const DiceButton = (props: DiceButtonProps) => {
-    const [room, taSettings] = useMetadataContext((state) => [state.room, state.taSettings]);
-    const addRoll = useRollLogContext((state) => state.addRoll);
-    const [rollerApi, initialized, theme] = useDiceRoller((state) => [state.rollerApi, state.initialized, state.theme]);
+    const [room, taSettings] = useMetadataContext(useShallow((state) => [state.room, state.taSettings]));
+    const addRoll = useRollLogContext(useShallow((state) => state.addRoll));
+    const [rollerApi, initialized, theme] = useDiceRoller(
+        useShallow((state) => [state.rollerApi, state.initialized, state.theme]),
+    );
     const [context, setContext] = useState<boolean>(false);
     const rollButton = useRef<HTMLButtonElement>(null);
     const playerContext = usePlayerContext();
@@ -285,7 +290,9 @@ export const DiceButtonWrapper = ({
                 }
                 return (
                     <span key={index}>
-                        {part}
+                        <Markdown className={"inline-markdown"} remarkPlugins={[remarkGfm]}>
+                            {part}
+                        </Markdown>
                         {diceField}
                     </span>
                 );

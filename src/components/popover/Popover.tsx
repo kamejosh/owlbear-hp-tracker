@@ -30,6 +30,7 @@ import { HPSvg } from "../svgs/HPSvg.tsx";
 import { ACSvg } from "../svgs/ACSvg.tsx";
 import { InitiativeSvg } from "../svgs/InitiativeSvg.tsx";
 import { updateItems } from "../../helper/obrHelper.ts";
+import { useShallow } from "zustand/react/shallow";
 
 export const Popover = () => {
     const [ids, setIds] = useState<Array<string>>([]);
@@ -62,7 +63,7 @@ export const Popover = () => {
 };
 
 const MultiContent = ({ ids }: { ids: Array<string> }) => {
-    const tokens = useTokenListContext((state) => state.tokens);
+    const tokens = useTokenListContext(useShallow((state) => state.tokens));
     const inputRef = useRef<HTMLInputElement>(null);
     const { room } = useMetadataContext();
     const playerContext = usePlayerContext();
@@ -196,7 +197,7 @@ const MultiContent = ({ ids }: { ids: Array<string> }) => {
 
 const Content = (props: { id: string }) => {
     const id = props.id;
-    const token = useTokenListContext((state) => state.tokens?.get(props.id));
+    const token = useTokenListContext(useShallow((state) => state.tokens?.get(props.id)));
     const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
 

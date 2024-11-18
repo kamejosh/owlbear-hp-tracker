@@ -9,6 +9,7 @@ import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useUISettingsContext } from "../../../context/UISettingsContext.ts";
 import Tippy from "@tippyjs/react";
 import { getTokenName } from "../../../helper/helpers.ts";
+import { useShallow } from "zustand/react/shallow";
 
 export const TokenIcon = ({
     id,
@@ -17,10 +18,10 @@ export const TokenIcon = ({
     id: string;
     onClick?: (e: React.MouseEvent<HTMLDivElement>) => Promise<void>;
 }) => {
-    const playerPreview = useUISettingsContext((state) => state.playerPreview);
+    const playerPreview = useUISettingsContext(useShallow((state) => state.playerPreview));
     const playerContext = usePlayerContext();
-    const room = useMetadataContext((state) => state.room);
-    const token = useTokenListContext((state) => state.tokens?.get(id));
+    const room = useMetadataContext(useShallow((state) => state.room));
+    const token = useTokenListContext(useShallow((state) => state.tokens?.get(id)));
     const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
 

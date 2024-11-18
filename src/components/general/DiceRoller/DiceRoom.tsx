@@ -10,10 +10,11 @@ import { CopySvg } from "../../svgs/CopySvg.tsx";
 import { IUser } from "dddice-js";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { updateRoomMetadata } from "../../../helper/helpers.ts";
+import { useShallow } from "zustand/react/shallow";
 
 export const DiceRoom = ({ className, user }: { className?: string; user?: IUser }) => {
-    const room = useMetadataContext((state) => state.room);
-    const clear = useRollLogContext((state) => state.clear);
+    const room = useMetadataContext(useShallow((state) => state.room));
+    const clear = useRollLogContext(useShallow((state) => state.clear));
 
     const [settings, setSettings] = useState<boolean>(false);
     const [open, setOpen] = useState<boolean>(false);
@@ -81,7 +82,7 @@ export const DiceRoom = ({ className, user }: { className?: string; user?: IUser
                                             className={"copy-link"}
                                             onClick={(e) => {
                                                 navigator.clipboard.writeText(
-                                                    `https://dddice.com/room/${room?.diceRoom?.slug}`
+                                                    `https://dddice.com/room/${room?.diceRoom?.slug}`,
                                                 );
                                                 e.currentTarget.blur();
                                             }}
