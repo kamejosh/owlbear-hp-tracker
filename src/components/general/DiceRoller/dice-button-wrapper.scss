@@ -1,0 +1,29 @@
+.dice-button-wrapper {
+    margin-inline: 1ch;
+    .dice-button-wrapper-part {
+        &:has(.button-wrapper) {
+            display: inline;
+            .inline-markdown {
+                p {
+                    &:last-child {
+                        margin: 0 1ch 0 0;
+                        display: inline;
+                    }
+                }
+            }
+        }
+    }
+
+    .dice-button-wrapper-part:has(.button-wrapper) + .dice-button-wrapper-part {
+        display: inline;
+
+        .inline-markdown {
+            p {
+                margin: 0 0 1ch 0;
+                &:first-child {
+                    display: inline;
+                }
+            }
+        }
+    }
+}

@@ -11,6 +11,7 @@ import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { useShallow } from "zustand/react/shallow";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import "./dice-button-wrapper.scss";
 
 type DiceButtonProps = {
     dice: string;
@@ -265,7 +266,7 @@ export const DiceButtonWrapper = ({
     const parts = text.split("|||");
 
     return (
-        <span>
+        <div className={"dice-button-wrapper"}>
             {parts.map((part, index) => {
                 let diceField = null;
                 if (dice && dice.length >= index && dice[index]) {
@@ -289,14 +290,14 @@ export const DiceButtonWrapper = ({
                     );
                 }
                 return (
-                    <span key={index}>
-                        <Markdown className={"inline-markdown"} remarkPlugins={[remarkGfm]}>
+                    <div key={index} className={"dice-button-wrapper-part"}>
+                        <Markdown className={"inline-markdown"} remarkPlugins={[remarkGfm]} components={{}}>
                             {part}
                         </Markdown>
                         {diceField}
-                    </span>
+                    </div>
                 );
             })}
-        </span>
+        </div>
     );
 };
