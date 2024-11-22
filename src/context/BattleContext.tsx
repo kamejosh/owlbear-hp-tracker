@@ -27,7 +27,7 @@ export const useBattleContext = create<BattleContextType & BattleContextActions>
                 }),
             addGroup: (group) =>
                 set((state) => {
-                    const groups = state.groups;
+                    const groups = Array.from(state.groups);
                     if (!groups.includes(group)) {
                         groups.push(group);
                     }
@@ -35,7 +35,7 @@ export const useBattleContext = create<BattleContextType & BattleContextActions>
                 }),
             removeGroup: (group) =>
                 set((state) => {
-                    const groups = state.groups;
+                    const groups = Array.from(state.groups);
                     const index = groups.findIndex((g) => g === group);
                     if (index >= 0) {
                         groups.splice(index, 1);
