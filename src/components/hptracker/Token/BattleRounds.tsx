@@ -1,5 +1,5 @@
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useBattleContext } from "../../../context/BattleContext.tsx";
 import Tippy from "@tippyjs/react";
 import { GMGMetadata, SORT } from "../../../helper/types.ts";
@@ -11,12 +11,13 @@ import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useShallow } from "zustand/react/shallow";
 
 export const BattleRounds = () => {
-    const tokens = useTokenListContext(useShallow((state) => state.tokens));
+    const [tokens, changeList] = useTokenListContext(useShallow((state) => [state.tokens, state.changeList]));
     const scene = useMetadataContext(useShallow((state) => state.scene));
     const [hold, setHold] = useState<boolean>(false);
     const [groups, current, setCurrent, battle, setBattle] = useBattleContext(
         useShallow((state) => [state.groups, state.current, state.setCurrent, state.battle, state.setBattle]),
     );
+    const currentIndex = useRef<number>(0);
     const tokensData: Array<{ data: GMGMetadata; item: Image }> = tokens
         ? [...tokens].map((t) => {
               return { data: t[1].data, item: t[1].item };
@@ -63,6 +64,7 @@ export const BattleRounds = () => {
         setBattle(false);
         setBattleRound(1);
         setCurrent(null);
+        currentIndex.current = 0;
         destroyIndicator();
         rest(
             battleTokens.map((b) => b.item),
@@ -76,16 +78,18 @@ export const BattleRounds = () => {
             await OBR.notification.show("GM's Grimoire - No groups or tokens assigned for battle!", "WARNING");
             return;
         }
-        const currentTokenIndex = current ? battleTokens.findIndex((bt) => bt.item.id === current) : 0;
-        const nextIndex = currentTokenIndex + mod;
+        const nextIndex = currentIndex.current + mod;
         let newCurrent: Image;
         if (nextIndex >= 0 && nextIndex < battleTokens.length) {
-            newCurrent = battleTokens[currentTokenIndex + mod].item;
+            newCurrent = battleTokens[currentIndex.current + mod].item;
+            currentIndex.current = currentIndex.current + mod;
         } else if (nextIndex < 0) {
             newCurrent = battleTokens[battleTokens.length - 1].item;
+            currentIndex.current = battleTokens.length - 1;
             setBattleRound(battleRound + mod);
         } else {
             newCurrent = battleTokens[0].item;
+            currentIndex.current = 0;
             setBattleRound(battleRound + mod);
             await rest(
                 battleTokens.map((b) => b.item),
@@ -99,6 +103,18 @@ export const BattleRounds = () => {
             setHold(false);
         }, 500);
     };
+
+    useEffect(() => {
+        if (current) {
+            const deletedTokens = changeList.filter((c) => c.changeType === "delete");
+            if (deletedTokens.length > 0 && deletedTokens.map((d) => d.id).includes(current)) {
+                const deletedCurrent = deletedTokens.find((d) => d.id === current);
+                if (deletedCurrent) {
+                    changeCurrent(0);
+                }
+            }
+        }
+    }, [changeList]);
 
     return (
         <div
