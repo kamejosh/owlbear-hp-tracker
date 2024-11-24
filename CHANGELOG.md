@@ -1,3 +1,13 @@
+# 3.2.1
+
++ Fix dddice login is not persisted
++ Fix multi-token-select and move between groups
++ Update library dependencies
++ Add markdown styling for custom statblocks
++ Fix battle group buttons don't update state
++ Fix battle round tracking when current token is deleted
++ Auto collapse statblocks in popover when group is collapsed
+
 # 3.2.0
 
 + Improve GMG performance and multi token updates
