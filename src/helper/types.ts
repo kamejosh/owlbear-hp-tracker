@@ -64,6 +64,7 @@ export type SceneMetadata = {
     groups?: Array<string>;
     openGroups?: Array<string>;
     collapsedStatblocks?: Array<string>;
+    openStatblocks?: Array<string>;
     statblockPopoverOpen?: { [key: string]: boolean };
     sortMethod?: SORT;
     enableAutoSort?: boolean;

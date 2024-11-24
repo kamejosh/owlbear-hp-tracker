@@ -105,6 +105,7 @@ const initScene = async () => {
             groups: ["Default"],
             openGroups: ["Default"],
             collapsedStatblocks: [],
+            openStatblocks: [],
             statblockPopoverOpen: {},
         };
 

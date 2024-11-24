@@ -8,7 +8,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { itemMetadataKey } from "../../helper/variables.ts";
 import { GMGMetadata } from "../../helper/types.ts";
 import SwiperClass from "swiper/types/swiper-class";
-import { getBgColor, getTokenName, sortItems, updateSceneMetadata } from "../../helper/helpers.ts";
+import { delay, getBgColor, getTokenName, sortItems, updateSceneMetadata } from "../../helper/helpers.ts";
 import { useTokenListContext } from "../../context/TokenContext.tsx";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
@@ -24,8 +24,8 @@ type StatblockListProps = {
 export const StatblockList = (props: StatblockListProps) => {
     const tokens = useTokenListContext(useShallow((state) => state.tokens));
     const playerContext = usePlayerContext();
-    const [scene, collapsedStatblocks] = useMetadataContext(
-        useShallow((state) => [state.scene, state.scene?.collapsedStatblocks]),
+    const [scene, collapsedStatblocks, openStatblocks] = useMetadataContext(
+        useShallow((state) => [state.scene, state.scene?.collapsedStatblocks, state.scene?.openStatblocks]),
     );
     const { isReady } = SceneReadyContext();
     const [id, setId] = useState<string | undefined>();
@@ -78,6 +78,16 @@ export const StatblockList = (props: StatblockListProps) => {
         }
     }, [props.selection]);
 
+    useEffect(() => {
+        const updateSwiper = async () => {
+            if (swiper) {
+                await delay(300);
+                swiper.update();
+            }
+        };
+        updateSwiper();
+    }, [scene?.openGroups, openStatblocks, collapsedStatblocks]);
+
     return isReady && scene ? (
         <>
             <Swiper
@@ -93,7 +103,13 @@ export const StatblockList = (props: StatblockListProps) => {
                 <SwiperSlide className={"pre"}> </SwiperSlide>
                 {items.map((item) => {
                     const tokenData = item.metadata[itemMetadataKey] as GMGMetadata;
-                    const collapsed = collapsedStatblocks?.includes(item.id);
+
+                    // the tab is collapsed if the tab is explicitly collapsed (collapsedStatblocks)
+                    // or if the group of the statblock is collapsed and the statblock is not explicitly open (openStatblocks)
+                    const collapsed =
+                        collapsedStatblocks?.includes(item.id) ||
+                        (!scene.openGroups?.includes(tokenData.group || "Default") &&
+                            !openStatblocks?.includes(item.id));
 
                     return (
                         <SwiperSlide
@@ -106,22 +122,40 @@ export const StatblockList = (props: StatblockListProps) => {
                             onContextMenu={async (e) => {
                                 e.preventDefault();
 
-                                if (collapsedStatblocks) {
-                                    const newCollapse = [...collapsedStatblocks];
-                                    if (newCollapse.includes(item.id)) {
+                                let newCollapse: Array<string> = [];
+                                let newOpen: Array<string> = [];
+                                if (collapsed) {
+                                    if (collapsedStatblocks?.includes(item.id)) {
+                                        newCollapse = [...collapsedStatblocks];
                                         newCollapse.splice(
                                             newCollapse.findIndex((c) => c === item.id),
                                             1,
                                         );
                                     } else {
-                                        newCollapse.push(item.id);
+                                        // token was implicitly collapsed via the group
+                                        if (openStatblocks) {
+                                            newOpen = [...openStatblocks];
+                                        }
+                                        newOpen.push(item.id);
                                     }
-                                    await updateSceneMetadata(scene, { collapsedStatblocks: newCollapse });
                                 } else {
-                                    await updateSceneMetadata(scene, {
-                                        collapsedStatblocks: [item.id],
-                                    });
+                                    if (openStatblocks && openStatblocks.includes(item.id)) {
+                                        const newOpen = [...openStatblocks];
+                                        newOpen.splice(
+                                            newOpen.findIndex((c) => c === item.id),
+                                            1,
+                                        );
+                                    }
+                                    if (collapsedStatblocks) {
+                                        newCollapse = [...collapsedStatblocks];
+                                    }
+                                    newCollapse.push(item.id);
                                 }
+                                await updateSceneMetadata(scene, { openStatblocks: newOpen });
+                                await updateSceneMetadata(scene, {
+                                    collapsedStatblocks: newCollapse,
+                                    openStatblocks: newOpen,
+                                });
                             }}
                             key={item.id}
                             title={getTokenName(item)}
