@@ -214,7 +214,9 @@ export const Token = (props: TokenProps) => {
         <div
             ref={containerRef}
             className={`token ${data.isCurrent ? "current" : ""}`}
-            style={{ background: `linear-gradient(to right, ${getBgColor(data)}, #242424 50%, #242424 )` }}
+            style={{
+                background: `linear-gradient(to right, ${getBgColor(data, "0.2", playerContext.role === "PLAYER" && room?.disableColorGradient, "#1F1E26")}, #1F1E26 50%, #1F1E26 )`,
+            }}
         >
             <TokenIcon id={props.id} />
         </div>

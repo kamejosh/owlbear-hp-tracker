@@ -78,7 +78,7 @@ const initRoom = async () => {
             hpBarOffset: 0,
             acOffset: { x: 0, y: 0 },
             acShield: true,
-            playerSort: false,
+            playerSort: true,
             statblockPopover: { width: 500, height: 600 },
             initiativeDice: 20,
             ruleset: "e5",

@@ -202,9 +202,14 @@ export const attachmentFilter = (attachment: Item, attachmentType: "BAR" | "HP" 
     return false;
 };
 
-export const getBgColor = (data: GMGMetadata, opacity: string = "0.2") => {
-    if (data.hp === 0 && data.maxHp === 0) {
-        return "#1C1B22";
+export const getBgColor = (
+    data: GMGMetadata,
+    opacity: string = "0.2",
+    disable: boolean = false,
+    color: string = "#1C1B22",
+) => {
+    if ((data.hp === 0 && data.maxHp === 0) || disable) {
+        return color;
     }
 
     const percent = data.hp / (data.stats.tempHp ? data.stats.tempHp + data.maxHp : data.maxHp);

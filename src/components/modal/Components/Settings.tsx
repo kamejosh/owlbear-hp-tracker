@@ -1,4 +1,4 @@
-import { diceTrayModal, diceTrayModalId, modalId } from "../../../helper/variables.ts";
+import { diceTrayModal, diceTrayModalId, itemMetadataKey, modalId } from "../../../helper/variables.ts";
 import OBR from "@owlbear-rodeo/sdk";
 import { updateHp, updateHpOffset } from "../../../helper/hpHelpers.ts";
 import { Groups } from "./Groups.tsx";
@@ -8,8 +8,9 @@ import { updateAcOffset } from "../../../helper/acHelper.ts";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { getRoomDiceUser, updateRoomMetadata } from "../../../helper/helpers.ts";
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
-import { updateTokenMetadata } from "../../../helper/tokenHelper.ts";
 import { useShallow } from "zustand/react/shallow";
+import { updateList } from "../../../helper/obrHelper.ts";
+import { GMGMetadata } from "../../../helper/types.ts";
 
 export const Settings = () => {
     const tokens = useTokenListContext(useShallow((state) => state.tokens));
@@ -33,7 +34,7 @@ export const Settings = () => {
             <div className={"global-setting"}>
                 <h2>Settings</h2>
                 <>
-                    <div className={"settings-context"}>
+                    <div className={"settings-context vertical"}>
                         <h3>Room Settings</h3>
                         <span className={"small"}>(Shared across all scenes in opened in the current Room)</span>
                     </div>
@@ -62,7 +63,7 @@ export const Settings = () => {
                             }}
                         />
                     </div>
-                    <div className={"hp-mode setting"}>
+                    <div className={"hp-mode setting-group vertical"}>
                         <div>
                             HP Bar Segments:{" "}
                             <input
@@ -88,70 +89,90 @@ export const Settings = () => {
                                 type={"checkbox"}
                                 checked={!!room?.disableHpBar}
                                 onChange={async () => {
-                                    await updateRoomMetadata(room, { disableHpBar: !room?.disableHpBar });
-                                    tokens?.forEach((token) => {
-                                        const data = {
-                                            ...token.data,
-                                            hpBar: token.data.hpOnMap && !!room?.disableHpBar,
-                                        };
-                                        updateTokenMetadata(data, [token.item.id]);
-                                        updateHp(token.item, data);
+                                    const hpBarDisabled = !room?.disableHpBar;
+                                    await updateRoomMetadata(room, {
+                                        disableHpBar: hpBarDisabled,
+                                    });
+                                    const items = tokens ? [...tokens].map((t) => t[1].item) : [];
+                                    await updateList(items, hpBarDisabled ? 4 : 2, async (subList) => {
+                                        for (const item of subList) {
+                                            const data = item.metadata[itemMetadataKey] as GMGMetadata;
+                                            await updateHp(item, {
+                                                ...data,
+                                                hpBar: data.hpOnMap && !hpBarDisabled,
+                                            });
+                                        }
+                                    });
+                                }}
+                            />
+                        </div>
+                        <div>
+                            Disable Color Gradient For Players:
+                            <input
+                                type={"checkbox"}
+                                checked={!!room?.disableColorGradient}
+                                onChange={async () => {
+                                    await updateRoomMetadata(room, {
+                                        disableColorGradient: !room?.disableColorGradient,
                                     });
                                 }}
                             />
                         </div>
                     </div>
-                    <div className={"hp-position setting"}>
-                        Text and Bar Offset:{" "}
-                        <input
-                            type={"text"}
-                            size={2}
-                            defaultValue={room?.hpBarOffset || 0}
-                            onChange={(e) => {
-                                const factor = e.target.value.startsWith("-") ? -1 : 1;
-                                const nValue = Number(e.target.value.replace(/[^0-9]/g, ""));
-                                handleOffsetChange(nValue * factor);
-                                if (factor < 0 && nValue === 0) {
-                                    e.currentTarget.value = "-";
-                                } else {
-                                    e.currentTarget.value = String(nValue * factor);
-                                }
-                            }}
-                            onKeyDown={(e) => {
-                                if (e.key === "ArrowUp") {
-                                    handleOffsetChange((room?.hpBarOffset || 0) + 1);
-                                    e.currentTarget.value = String((room?.hpBarOffset || 0) + 1);
-                                } else if (e.key === "ArrowDown") {
-                                    handleOffsetChange((room?.hpBarOffset || 0) - 1);
-                                    e.currentTarget.value = String((room?.hpBarOffset || 0) + 1);
-                                }
-                            }}
-                        />
-                    </div>
-                    <div className={"ac setting"}>
-                        <div className={"ac-position"}>
-                            AC Offset: X{" "}
+                    <div className={"setting-group vertical"}>
+                        <div className={"hp-position setting"}>
+                            Text and Bar Offset:{" "}
                             <input
                                 type={"text"}
                                 size={2}
-                                value={room?.acOffset?.x || 0}
+                                defaultValue={room?.hpBarOffset || 0}
                                 onChange={(e) => {
                                     const factor = e.target.value.startsWith("-") ? -1 : 1;
                                     const nValue = Number(e.target.value.replace(/[^0-9]/g, ""));
-                                    handleAcOffsetChange(nValue * factor, room?.acOffset?.y || 0);
+                                    handleOffsetChange(nValue * factor);
+                                    if (factor < 0 && nValue === 0) {
+                                        e.currentTarget.value = "-";
+                                    } else {
+                                        e.currentTarget.value = String(nValue * factor);
+                                    }
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === "ArrowUp") {
+                                        handleOffsetChange((room?.hpBarOffset || 0) + 1);
+                                        e.currentTarget.value = String((room?.hpBarOffset || 0) + 1);
+                                    } else if (e.key === "ArrowDown") {
+                                        handleOffsetChange((room?.hpBarOffset || 0) - 1);
+                                        e.currentTarget.value = String((room?.hpBarOffset || 0) + 1);
+                                    }
                                 }}
                             />
-                            Y{" "}
-                            <input
-                                type={"text"}
-                                size={2}
-                                value={room?.acOffset?.y || 0}
-                                onChange={(e) => {
-                                    const factor = e.target.value.startsWith("-") ? -1 : 1;
-                                    const nValue = Number(e.target.value.replace(/[^0-9]/g, ""));
-                                    handleAcOffsetChange(room?.acOffset?.x || 0, nValue * factor);
-                                }}
-                            />
+                        </div>
+                        <div className={"ac setting"}>
+                            AC Offset:
+                            <div>
+                                X{" "}
+                                <input
+                                    type={"text"}
+                                    size={2}
+                                    value={room?.acOffset?.x || 0}
+                                    onChange={(e) => {
+                                        const factor = e.target.value.startsWith("-") ? -1 : 1;
+                                        const nValue = Number(e.target.value.replace(/[^0-9]/g, ""));
+                                        handleAcOffsetChange(nValue * factor, room?.acOffset?.y || 0);
+                                    }}
+                                />
+                                Y{" "}
+                                <input
+                                    type={"text"}
+                                    size={2}
+                                    value={room?.acOffset?.y || 0}
+                                    onChange={(e) => {
+                                        const factor = e.target.value.startsWith("-") ? -1 : 1;
+                                        const nValue = Number(e.target.value.replace(/[^0-9]/g, ""));
+                                        handleAcOffsetChange(room?.acOffset?.x || 0, nValue * factor);
+                                    }}
+                                />
+                            </div>
                         </div>
                     </div>
                     <div className={"dice-roller-enabled setting"}>
@@ -209,9 +230,11 @@ export const Settings = () => {
                             }}
                         />
                     </div>
-                    <div className={"statblock-popover setting"}>
-                        Statblock Popover dimensions{" "}
-                        <span className={"small"}>(bigger than the current viewport is not possible)</span>
+                    <div className={"statblock-popover setting-group vertical"}>
+                        <div className={"settings-context vertical"}>
+                            <h4>Statblock Popover dimensions</h4>
+                            <span className={"small"}>(bigger than the current viewport is not possible)</span>
+                        </div>
                         <label>
                             width{" "}
                             <input
@@ -278,7 +301,7 @@ export const Settings = () => {
                             }}
                         />
                     </div>
-                    <div className={"settings-context"}>
+                    <div className={"settings-context vertical"}>
                         <h3>Scene Settings</h3>
                         <span className={"small"}>(Settings only affect the current Scene)</span>
                     </div>

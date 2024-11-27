@@ -89,17 +89,24 @@ export const Groups = () => {
     };
 
     return (
-        <>
-            Groups:
-            <DragDropContext onDragEnd={onDragEnd}>
-                <Droppable droppableId={"groups"} direction="horizontal">
-                    {(provided) => (
-                        <div ref={provided.innerRef} {...provided.droppableProps}>
-                            <DraggableGroupList />
-                            {provided.placeholder}
-                        </div>
-                    )}
-                </Droppable>
+        <div className={"setting-group"} style={{ alignItems: "flex-start" }}>
+            <div style={{ alignItems: "flex-start" }}>
+                <div style={{ maxWidth: "70px" }}>
+                    Groups:
+                    <div className={"small"}>(Drag and Drop to reorder)</div>
+                </div>
+                <DragDropContext onDragEnd={onDragEnd}>
+                    <Droppable droppableId={"groups"} direction="vertical">
+                        {(provided) => (
+                            <div ref={provided.innerRef} {...provided.droppableProps}>
+                                <DraggableGroupList />
+                                {provided.placeholder}
+                            </div>
+                        )}
+                    </Droppable>
+                </DragDropContext>
+            </div>
+            <div className={"new-group-wrapper"}>
                 Add Group:{" "}
                 <input
                     className={"new-group"}
@@ -119,7 +126,7 @@ export const Groups = () => {
                         }
                     }}
                 />
-            </DragDropContext>
-        </>
+            </div>
+        </div>
     );
 };

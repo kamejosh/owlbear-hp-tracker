@@ -94,6 +94,7 @@ export type RoomMetadata = {
     disableDiceRoller?: boolean;
     tabletopAlmanacAPIKey?: string;
     disableHpBar?: boolean;
+    disableColorGradient?: boolean;
 };
 
 export type AttachmentMetadata = {
