@@ -65,11 +65,11 @@ export const Token = (props: TokenProps) => {
 
     const getGroupSelectRange = (currentSelection: Array<string>): Array<string> | null => {
         const currentGroup = data.group;
-        const index = data.index!;
 
         if (currentGroup || currentGroup === undefined) {
             const groupItems = props.tokenLists?.get(currentGroup || "Default");
             if (groupItems) {
+                const index = data.index || groupItems.indexOf(item);
                 const selectedGroupItems = groupItems.filter((item) => currentSelection.includes(item.id));
 
                 const sortedByDistance = selectedGroupItems.sort((a, b) => {
@@ -90,16 +90,22 @@ export const Token = (props: TokenProps) => {
                     const closestDistance = sortedByDistance[0];
                     const cdData = closestDistance.metadata[itemMetadataKey] as GMGMetadata;
 
+                    const cdIndex = cdData.index || groupItems.indexOf(closestDistance);
                     let indices: Array<number> = [];
-                    if (cdData.index! < index) {
-                        indices = _.range(cdData.index!, index);
+                    if (cdIndex < index) {
+                        indices = _.range(cdIndex, index);
                     } else {
-                        indices = _.range(index, cdData.index);
+                        indices = _.range(index, cdIndex);
                     }
                     const toSelect = groupItems.map((item) => {
                         const itemData = item.metadata[itemMetadataKey] as GMGMetadata;
                         if (itemData.index) {
                             if (indices.includes(itemData.index)) {
+                                return item.id;
+                            }
+                        } else {
+                            const idx = groupItems.indexOf(item);
+                            if (indices.includes(idx)) {
                                 return item.id;
                             }
                         }

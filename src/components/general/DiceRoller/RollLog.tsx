@@ -120,6 +120,8 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
         }
     }, [props.entry.label]);
 
+    const detail = getDetailedResult();
+
     return (
         <li className={`roll-log-entry ${props.classes} ${ownRoll ? "self" : ""}`}>
             <div className={"roll-time"}>{rollTimeText}</div>
@@ -132,8 +134,8 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
                 statblock={props.entry.username}
             />
             <div className={"roll-equation"}>{props.entry.equation}</div>
-            <Tippy content={getDetailedResult()} maxWidth={"100vw"}>
-                <div className={"detailed-result"}>{getDetailedResult()}</div>
+            <Tippy content={detail} maxWidth={"100vw"}>
+                <div className={"detailed-result"}>{detail}</div>
             </Tippy>
             <div className={"divider"}>=</div>
             <div className={"total"}>{hidden ? "?" : String(props.entry.total_value)}</div>
