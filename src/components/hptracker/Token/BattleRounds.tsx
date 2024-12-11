@@ -1,5 +1,5 @@
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useBattleContext } from "../../../context/BattleContext.tsx";
 import Tippy from "@tippyjs/react";
 import { GMGMetadata, SORT } from "../../../helper/types.ts";
@@ -10,6 +10,8 @@ import { rest } from "../../../helper/multiTokenHelper.ts";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useShallow } from "zustand/react/shallow";
 
+let currentIndex = 0;
+
 export const BattleRounds = () => {
     const [tokens, changeList] = useTokenListContext(useShallow((state) => [state.tokens, state.changeList]));
     const scene = useMetadataContext(useShallow((state) => state.scene));
@@ -17,7 +19,6 @@ export const BattleRounds = () => {
     const [groups, current, setCurrent, battle, setBattle] = useBattleContext(
         useShallow((state) => [state.groups, state.current, state.setCurrent, state.battle, state.setBattle]),
     );
-    const currentIndex = useRef<number>(0);
     const tokensData: Array<{ data: GMGMetadata; item: Image }> = tokens
         ? [...tokens].map((t) => {
               return { data: t[1].data, item: t[1].item };
@@ -64,7 +65,7 @@ export const BattleRounds = () => {
         setBattle(false);
         setBattleRound(1);
         setCurrent(null);
-        currentIndex.current = 0;
+        currentIndex = 0;
         destroyIndicator();
         rest(
             battleTokens.map((b) => b.item),
@@ -78,19 +79,19 @@ export const BattleRounds = () => {
             await OBR.notification.show("GM's Grimoire - No groups or tokens assigned for battle!", "WARNING");
             return;
         }
-        const nextIndex = currentIndex.current + mod;
+        const nextIndex = currentIndex + mod;
         let newCurrent: Image;
         if (nextIndex >= 0 && nextIndex < battleTokens.length) {
-            newCurrent = battleTokens[currentIndex.current + mod].item;
-            currentIndex.current = currentIndex.current + mod;
+            newCurrent = battleTokens[nextIndex].item;
+            currentIndex = nextIndex;
         } else if (nextIndex < 0) {
             newCurrent = battleTokens[battleTokens.length - 1].item;
-            currentIndex.current = battleTokens.length - 1;
-            setBattleRound(battleRound + mod);
+            currentIndex = battleTokens.length - 1;
+            setBattleRound(battleRound - 1);
         } else {
             newCurrent = battleTokens[0].item;
-            currentIndex.current = 0;
-            setBattleRound(battleRound + mod);
+            currentIndex = 0;
+            setBattleRound(battleRound + 1);
             await rest(
                 battleTokens.map((b) => b.item),
                 "Round",

@@ -46,7 +46,7 @@ export const createAC = async (ac: number, token: Image) => {
         .position({ x: position.x, y: position.y + height * 0.15 })
         .attachedTo(acShape.id)
         .layer(token.layer)
-        .zIndex(token.zIndex + 1)
+        .zIndex(token.zIndex + 2)
         .locked(true)
         .plainText(String(ac))
         .textAlign("CENTER")

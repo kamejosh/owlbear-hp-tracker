@@ -28,28 +28,33 @@ export const MapButton = ({
                     ref={buttonRef}
                     className={"map-default"}
                     onClick={async () => {
-                        if (buttonRef.current) {
-                            buttonRef.current.disabled = true;
-                            buttonRef.current.classList.add("loading");
-                        }
-                        await onClick();
-                        if (buttonRef.current) {
-                            buttonRef.current.disabled = false;
-                            buttonRef.current.classList.remove("loading");
+                        try {
+                            if (buttonRef.current) {
+                                buttonRef.current.disabled = true;
+                                buttonRef.current.classList.add("loading");
+                            }
+                            await onClick();
+                        } finally {
+                            if (buttonRef.current) {
+                                buttonRef.current.disabled = false;
+                                buttonRef.current.classList.remove("loading");
+                            }
                         }
                     }}
                     onContextMenu={async (e) => {
                         e.preventDefault();
                         if (!buttonRef?.current?.disabled) {
-                            if (buttonRef.current) {
-                                buttonRef.current.disabled = true;
-                                buttonRef.current.classList.add("loading");
-                            }
-                            await onContextMenu();
-
-                            if (buttonRef.current) {
-                                buttonRef.current.disabled = false;
-                                buttonRef.current.classList.remove("loading");
+                            try {
+                                if (buttonRef.current) {
+                                    buttonRef.current.disabled = true;
+                                    buttonRef.current.classList.add("loading");
+                                }
+                                await onContextMenu();
+                            } finally {
+                                if (buttonRef.current) {
+                                    buttonRef.current.disabled = false;
+                                    buttonRef.current.classList.remove("loading");
+                                }
                             }
                         }
                     }}
@@ -58,14 +63,17 @@ export const MapButton = ({
                         e.stopPropagation();
                         start.current = Date.now();
                         timeout = setTimeout(async () => {
-                            if (buttonRef.current) {
-                                buttonRef.current.disabled = true;
-                                buttonRef.current.classList.add("loading");
-                            }
-                            await onContextMenu();
-                            if (buttonRef.current) {
-                                buttonRef.current.disabled = false;
-                                buttonRef.current.classList.remove("loading");
+                            try {
+                                if (buttonRef.current) {
+                                    buttonRef.current.disabled = true;
+                                    buttonRef.current.classList.add("loading");
+                                }
+                                await onContextMenu();
+                            } finally {
+                                if (buttonRef.current) {
+                                    buttonRef.current.disabled = false;
+                                    buttonRef.current.classList.remove("loading");
+                                }
                             }
                         }, 300);
                     }}
@@ -73,14 +81,17 @@ export const MapButton = ({
                         const now = Date.now();
                         if (now - start.current < 300) {
                             clearTimeout(timeout);
-                            if (buttonRef.current) {
-                                buttonRef.current.disabled = true;
-                                buttonRef.current.classList.add("loading");
-                            }
-                            await onClick();
-                            if (buttonRef.current) {
-                                buttonRef.current.disabled = false;
-                                buttonRef.current.classList.remove("loading");
+                            try {
+                                if (buttonRef.current) {
+                                    buttonRef.current.disabled = true;
+                                    buttonRef.current.classList.add("loading");
+                                }
+                                await onClick();
+                            } finally {
+                                if (buttonRef.current) {
+                                    buttonRef.current.disabled = false;
+                                    buttonRef.current.classList.remove("loading");
+                                }
                             }
                         } else {
                             e.preventDefault();
