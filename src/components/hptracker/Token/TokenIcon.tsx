@@ -14,9 +14,11 @@ import { useShallow } from "zustand/react/shallow";
 export const TokenIcon = ({
     id,
     onClick,
+    hideName,
 }: {
     id: string;
     onClick?: (e: React.MouseEvent<HTMLDivElement>) => Promise<void>;
+    hideName?: boolean;
 }) => {
     const playerPreview = useUISettingsContext(useShallow((state) => state.playerPreview));
     const playerContext = usePlayerContext();
@@ -36,7 +38,7 @@ export const TokenIcon = ({
     };
 
     return (
-        <Tippy content={getTokenName(item)} className={"token-name-tooltip"}>
+        <Tippy content={getTokenName(item)} className={"token-name-tooltip"} disabled={hideName}>
             <div className={"token-icon"} onDoubleClick={handleOnPlayerDoubleClick} onClick={onClick}>
                 <img
                     src={item.image.url}

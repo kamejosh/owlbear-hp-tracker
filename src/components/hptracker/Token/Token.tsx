@@ -205,6 +205,7 @@ export const Token = (props: TokenProps) => {
                 onClick={async (e) => {
                     handleOnPlayerClick(e, true);
                 }}
+                hideName={!display()}
             />
             <HP id={props.id} />
             <AC id={props.id} />
@@ -224,7 +225,7 @@ export const Token = (props: TokenProps) => {
                 background: `linear-gradient(to right, ${getBgColor(data, "0.2", playerContext.role === "PLAYER" && room?.disableColorGradient, "#1F1E26")}, #1F1E26 50%, #1F1E26 )`,
             }}
         >
-            <TokenIcon id={props.id} />
+            <TokenIcon id={props.id} hideName={!display()} />
         </div>
     ) : (
         <></>
