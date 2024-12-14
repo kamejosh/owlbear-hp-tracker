@@ -130,6 +130,7 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
             <DiceButton
                 dice={props.entry.equation}
                 text={props.entry.equation}
+                stats={{ strength: 0, dexterity: 0, constitution: 0, intelligence: 0, wisdom: 0, charisma: 0 }}
                 context={props.entry.label || "re-roll"}
                 statblock={props.entry.username}
             />

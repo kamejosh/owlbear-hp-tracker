@@ -97,6 +97,7 @@ export const PfStatBlock = ({
                                     text={Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
                                         Math.floor(value),
                                     )}
+                                    stats={statblock.stats}
                                     context={`${capitalize(stat)}: Check`}
                                     statblock={name}
                                 />
@@ -119,6 +120,7 @@ export const PfStatBlock = ({
                                                 <DiceButton
                                                     dice={`d20+${value}`}
                                                     text={`+${value}`}
+                                                    stats={statblock.stats}
                                                     context={`${capitalize(key)}: Save`}
                                                     statblock={name}
                                                 />
@@ -168,6 +170,7 @@ export const PfStatBlock = ({
                                         <DiceButton
                                             dice={`d20${value}`}
                                             text={value}
+                                            stats={statblock.stats}
                                             context={`${capitalize(skill.name)}: Check`}
                                             statblock={name}
                                         />
@@ -178,7 +181,7 @@ export const PfStatBlock = ({
                     </div>
                 </div>
             ) : null}
-            <About about={statblock.about} slug={slug} />
+            <About about={statblock.about} slug={slug} statblock={statblock} />
             {statblock.items?.length && statblock.items.length > 0 ? (
                 <div className={"items"}>
                     <b>Items</b>: {statblock.items.join(", ")}
@@ -204,7 +207,7 @@ export const PfStatBlock = ({
                 <h3>Actions</h3>
                 <ul className={"ability-list"}>
                     {statblock.actions.map((action, index) => {
-                        return <PfAbility key={index} ability={action} statblock={name} />;
+                        return <PfAbility key={index} ability={action} statblock={name} stats={statblock.stats} />;
                     })}
                 </ul>
             </div>
@@ -213,7 +216,9 @@ export const PfStatBlock = ({
                     <h3>Reactions</h3>
                     <ul className={"ability-list"}>
                         {statblock.reactions?.map((reaction, index) => {
-                            return <PfAbility key={index} ability={reaction} statblock={name} />;
+                            return (
+                                <PfAbility key={index} ability={reaction} statblock={name} stats={statblock.stats} />
+                            );
                         })}
                     </ul>
                 </div>
@@ -223,13 +228,13 @@ export const PfStatBlock = ({
                     <h3>Special Abilities</h3>
                     <ul className={"ability-list"}>
                         {statblock.special_abilities?.map((ability, index) => {
-                            return <PfAbility key={index} ability={ability} statblock={name} />;
+                            return <PfAbility key={index} ability={ability} statblock={name} stats={statblock.stats} />;
                         })}
                     </ul>
                 </div>
             ) : null}
             {statblock.spells && statblock.spells.length > 0 ? (
-                <PfSpells spells={statblock.spells} statblock={name} />
+                <PfSpells spells={statblock.spells} statblock={name} stats={statblock.stats} />
             ) : null}
         </div>
     ) : null;

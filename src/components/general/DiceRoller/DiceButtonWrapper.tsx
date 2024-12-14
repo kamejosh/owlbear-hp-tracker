@@ -12,11 +12,22 @@ import { useShallow } from "zustand/react/shallow";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import "./dice-button-wrapper.scss";
+import { startsWith } from "lodash";
+
+export type Stats = {
+    strength: number;
+    dexterity: number;
+    constitution: number;
+    intelligence: number;
+    wisdom: number;
+    charisma: number;
+};
 
 type DiceButtonProps = {
     dice: string;
     text: string;
     context: string;
+    stats: Stats;
     statblock?: string;
     onRoll?: () => void;
     limitReached?: boolean | null;
@@ -33,12 +44,68 @@ export const DiceButton = (props: DiceButtonProps) => {
     const playerContext = usePlayerContext();
     const defaultHidden = playerContext.role === "GM" && !!taSettings.gm_rolls_hidden;
 
+    const replaceStatWithMod = (text: string) => {
+        if (text.endsWith("STR")) {
+            return text.replace(
+                "STR",
+                (room?.ruleset === "pf"
+                    ? props.stats.strength
+                    : Math.floor((props.stats.strength - 10) / 2)
+                ).toString(),
+            );
+        } else if (text.endsWith("DEX")) {
+            return text.replace(
+                "DEX",
+                (room?.ruleset === "pf"
+                    ? props.stats.strength
+                    : Math.floor((props.stats.dexterity - 10) / 2)
+                ).toString(),
+            );
+        } else if (text.endsWith("CON")) {
+            return text.replace(
+                "CON",
+                (room?.ruleset === "pf"
+                    ? props.stats.strength
+                    : Math.floor((props.stats.constitution - 10) / 2)
+                ).toString(),
+            );
+        } else if (text.endsWith("INT")) {
+            return text.replace(
+                "INT",
+                (room?.ruleset === "pf"
+                    ? props.stats.strength
+                    : Math.floor((props.stats.intelligence - 10) / 2)
+                ).toString(),
+            );
+        } else if (text.endsWith("WIS")) {
+            return text.replace(
+                "WIS",
+                (room?.ruleset === "pf"
+                    ? props.stats.strength
+                    : Math.floor((props.stats.intelligence - 10) / 2)
+                ).toString(),
+            );
+        } else if (text.endsWith("CHA")) {
+            return text.replace(
+                "CHA",
+                (room?.ruleset === "pf"
+                    ? props.stats.strength
+                    : Math.floor((props.stats.charisma - 10) / 2)
+                ).toString(),
+            );
+        }
+        return text;
+    };
+
+    const dice = replaceStatWithMod(props.dice);
+    const text = replaceStatWithMod(props.text);
+
     const addModifier = (originalDie: string, baseDie: string) => {
         if (originalDie.includes("+")) {
-            baseDie += `+${props.dice.split("+").pop()}`;
+            baseDie += `+${dice.split("+").pop()}`;
         }
         if (originalDie.includes("-")) {
-            baseDie += `-${props.dice.split("-").pop()}`;
+            baseDie += `-${dice.split("-").pop()}`;
         }
         return baseDie;
     };
@@ -48,11 +115,11 @@ export const DiceButton = (props: DiceButtonProps) => {
         if (button) {
             button.classList.add("rolling");
             let label = props.context;
-            let modifiedDice = props.dice;
+            let modifiedDice = dice;
             if (modifier && modifier === "ADV") {
-                modifiedDice = addModifier(props.dice, "2d20kh1");
+                modifiedDice = addModifier(dice, "2d20kh1");
             } else if (modifier && modifier === "DIS") {
-                modifiedDice = addModifier(props.dice, "2d20dh1");
+                modifiedDice = addModifier(dice, "2d20dh1");
             } else if (modifier && modifier === "CRIT") {
                 label = label.substring(0, label.indexOf(":")) + ": Critical Damage";
                 const diceCountsRegx = /\d+(?=d\d)/gi;
@@ -126,7 +193,7 @@ export const DiceButton = (props: DiceButtonProps) => {
 
     const getDicePreview = () => {
         try {
-            const parsed = parseRollEquation(props.dice, "dddice-bees");
+            const parsed = parseRollEquation(dice, "dddice-bees");
             const die = parsed.dice.find((d) => d.type !== "mod");
             if (die) {
                 if (room?.disableDiceRoller) {
@@ -180,22 +247,22 @@ export const DiceButton = (props: DiceButtonProps) => {
                     }}
                 >
                     <div className={"dice-preview"}>{getDicePreview()}</div>
-                    {props.text.replace(/\s/g, "").replace("&nbsp", " ")}
+                    {text.replace(/\s/g, "").replace("&nbsp", " ")}
                 </button>
                 <div
                     className={`dice-context-button ${context && isEnabled() ? "visible" : ""} ${
-                        props.dice.startsWith("1d20") ||
-                        props.dice.startsWith("d20") ||
-                        props.dice.startsWith("+") ||
-                        props.dice.startsWith("-")
+                        dice.startsWith("1d20") ||
+                        dice.startsWith("d20") ||
+                        dice.startsWith("+") ||
+                        dice.startsWith("-")
                             ? "full"
                             : "reduced"
                     }`}
                 >
-                    {props.dice.startsWith("1d20") ||
-                    props.dice.startsWith("d20") ||
-                    props.dice.startsWith("+") ||
-                    props.dice.startsWith("-") ? (
+                    {dice.startsWith("1d20") ||
+                    dice.startsWith("d20") ||
+                    dice.startsWith("+") ||
+                    dice.startsWith("-") ? (
                         <>
                             <button
                                 className={"advantage"}
@@ -247,6 +314,7 @@ export const DiceButtonWrapper = ({
     text,
     context,
     statblock,
+    stats,
     onRoll,
     limitReached,
     damageDie,
@@ -254,14 +322,17 @@ export const DiceButtonWrapper = ({
     text: string;
     context: string;
     statblock?: string;
+    stats: Stats;
     onRoll?: () => void;
     limitReached?: boolean | null;
     damageDie?: boolean;
 }) => {
-    const regex = /((\d*?d\d+)( ?[\+\-] ?\d+)?)|([\+\-]\d+)/gi;
+    const regex = /`?((\d*?d\d+)(( ?[\+\-] ?((\d+)|([A-Z]{3})))?)|([\+\-]\d))`?/gi;
     const dice = text.match(regex);
     dice?.forEach((die) => {
-        text = text.split(die).join("|||");
+        if (!die.startsWith("`")) {
+            text = text.split(die).join("|||");
+        }
     });
     const parts = text.split("|||");
 
@@ -270,28 +341,58 @@ export const DiceButtonWrapper = ({
             {parts.map((part, index) => {
                 let diceField = null;
                 if (dice && dice.length >= index && dice[index]) {
-                    let die = dice[index];
-                    const text = die;
-                    if (die.startsWith("DC")) {
-                        die = `1d20>${parseInt(die.substring(3))}`;
-                    } else if (die.startsWith("+") || die.startsWith("-")) {
-                        die = `1d20${die}`;
+                    if (startsWith(dice[index], "`")) {
+                        part += dice[index];
+                    } else {
+                        let die = dice[index];
+                        const text = die;
+                        if (die.startsWith("DC")) {
+                            die = `1d20>${parseInt(die.substring(3))}`;
+                        } else if (die.startsWith("+") || die.startsWith("-")) {
+                            die = `1d20${die}`;
+                        }
+                        diceField = (
+                            <DiceButton
+                                dice={die}
+                                text={text}
+                                context={context}
+                                stats={stats}
+                                statblock={statblock}
+                                onRoll={onRoll}
+                                limitReached={limitReached}
+                                damageDie={damageDie}
+                            />
+                        );
                     }
-                    diceField = (
-                        <DiceButton
-                            dice={die}
-                            text={text}
-                            context={context}
-                            statblock={statblock}
-                            onRoll={onRoll}
-                            limitReached={limitReached}
-                            damageDie={damageDie}
-                        />
-                    );
                 }
+
                 return (
                     <div key={index} className={"dice-button-wrapper-part"}>
-                        <Markdown className={"inline-markdown"} remarkPlugins={[remarkGfm]} components={{}}>
+                        <Markdown
+                            className={"inline-markdown"}
+                            remarkPlugins={[remarkGfm]}
+                            components={{
+                                code: ({ node, ...props }) => {
+                                    try {
+                                        const diceMatches = String(props.children).match(regex);
+                                        if (diceMatches) {
+                                            return (
+                                                <DiceButton
+                                                    dice={diceMatches[0]}
+                                                    text={diceMatches[0]}
+                                                    context={context}
+                                                    stats={stats}
+                                                    statblock={statblock}
+                                                    onRoll={onRoll}
+                                                    limitReached={limitReached}
+                                                    damageDie={damageDie}
+                                                />
+                                            );
+                                        }
+                                    } catch {}
+                                },
+                            }}
+                        >
                             {part}
                         </Markdown>
                         {diceField}

@@ -1,5 +1,5 @@
 import { components } from "../../../../api/schema";
-import { DiceButton, DiceButtonWrapper } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { DiceButton, DiceButtonWrapper, Stats } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { capitalize, isInteger } from "lodash";
 import { LimitComponent } from "../LimitComponent.tsx";
 import { GMGMetadata } from "../../../../helper/types.ts";
@@ -12,11 +12,13 @@ export const E5Ability = ({
     statblock,
     tokenData,
     itemId,
+    stats,
 }: {
     ability: Ability;
     statblock: string;
     tokenData: GMGMetadata;
     itemId: string;
+    stats: Stats;
 }) => {
     const limitValues = tokenData.stats.limits?.find((l) => l.id === ability.limit?.name)!;
 
@@ -35,6 +37,7 @@ export const E5Ability = ({
                     text={ability.desc}
                     context={`${capitalize(ability.name)}`}
                     statblock={statblock}
+                    stats={stats}
                     onRoll={
                         !ability.attack_bonus
                             ? async () => {
@@ -54,6 +57,7 @@ export const E5Ability = ({
                             text={`+${ability.attack_bonus}`}
                             context={`${capitalize(ability.name)}: To Hit`}
                             statblock={statblock}
+                            stats={stats}
                             onRoll={async () => {
                                 await updateLimit(itemId, limitValues);
                             }}
@@ -72,6 +76,7 @@ export const E5Ability = ({
                                 text={ability.damage_dice}
                                 context={`${capitalize(ability.name)}: Damage`}
                                 statblock={statblock}
+                                stats={stats}
                                 onRoll={
                                     !ability.attack_bonus
                                         ? async () => {

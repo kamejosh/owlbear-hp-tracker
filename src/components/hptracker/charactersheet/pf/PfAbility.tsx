@@ -1,6 +1,6 @@
 import { components } from "../../../../api/schema";
 import { useState } from "react";
-import { DiceButtonWrapper } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { DiceButtonWrapper, Stats } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { capitalize, isString } from "lodash";
 
 type Action = components["schemas"]["ActionOut"];
@@ -10,9 +10,11 @@ type SpecialAbility = components["schemas"]["SpecialAbility"];
 export const PfAbility = ({
     ability,
     statblock,
+    stats,
 }: {
     ability: Action | Reaction | SpecialAbility;
     statblock: string;
+    stats: Stats;
 }) => {
     const [open, setOpen] = useState<boolean>(false);
 
@@ -67,6 +69,7 @@ export const PfAbility = ({
                                 text={(ability as Action).description!}
                                 context={`${capitalize(ability.name)}`}
                                 statblock={statblock}
+                                stats={stats}
                             />
                         </div>
                     ) : null}
@@ -90,6 +93,7 @@ export const PfAbility = ({
                                     <b>{key}</b>:{" "}
                                     <DiceButtonWrapper
                                         text={value}
+                                        stats={stats}
                                         context={`${capitalize(ability.name)}: ${capitalize(key)}`}
                                         statblock={statblock}
                                         damageDie={key === "damage"}

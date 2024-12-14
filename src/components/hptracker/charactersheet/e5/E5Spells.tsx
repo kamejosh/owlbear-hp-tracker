@@ -1,6 +1,6 @@
 import { components } from "../../../../api/schema";
 import { useState } from "react";
-import { DiceButton, DiceButtonWrapper } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { DiceButton, DiceButtonWrapper, Stats } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { getDamage, updateLimit } from "../../../../helper/helpers.ts";
 import { SpellFilter } from "../SpellFilter.tsx";
 import { capitalize } from "lodash";
@@ -15,6 +15,7 @@ type Spell = components["schemas"]["src__types__e5__Spell"];
 const Spell = ({
     spell,
     statblock,
+    stats,
     spellSlots,
     tokenData,
     itemId,
@@ -23,6 +24,7 @@ const Spell = ({
 }: {
     spell: Spell;
     statblock: string;
+    stats: Stats;
     spellSlots?: Array<E5SpellSlot> | null;
     tokenData?: GMGMetadata;
     itemId?: string;
@@ -77,6 +79,7 @@ const Spell = ({
                                                 text={`+${attack}&nbspattack`}
                                                 context={`${capitalize(spell.name)}: Attack`}
                                                 statblock={statblock}
+                                                stats={stats}
                                                 onRoll={async () => {
                                                     if (itemId && limitValues) {
                                                         await updateLimit(itemId, limitValues);
@@ -106,7 +109,12 @@ const Spell = ({
                     {spell.dc ? (
                         <span className={"spell-damage"}>
                             DC: {spell.dc}
-                            <DiceButton dice={"1d20"} text={`DC ${dc}`} context={`${capitalize(spell.name)}: Attack`} />
+                            <DiceButton
+                                dice={"1d20"}
+                                text={`DC ${dc}`}
+                                context={`${capitalize(spell.name)}: Attack`}
+                                stats={stats}
+                            />
                         </span>
                     ) : null}
                     {damage ? (
@@ -116,6 +124,7 @@ const Spell = ({
                                 dice={damage}
                                 text={damage}
                                 context={`${capitalize(spell.name)}: Damage`}
+                                stats={stats}
                                 statblock={statblock}
                                 limitReached={limitReached}
                                 damageDie={true}
@@ -179,6 +188,7 @@ const Spell = ({
                         <DiceButtonWrapper
                             text={spell.desc || ""}
                             context={`${capitalize(spell.name)}`}
+                            stats={stats}
                             statblock={statblock}
                             onRoll={async () => {
                                 if (itemId && limitValues) {
@@ -193,6 +203,7 @@ const Spell = ({
                             <b>Higher Levels</b>:{" "}
                             <DiceButtonWrapper
                                 text={spell.higher_level}
+                                stats={stats}
                                 context={`${capitalize(spell.name)}: Higher Level`}
                                 statblock={statblock}
                             />
@@ -207,6 +218,7 @@ const Spell = ({
 export const E5Spells = (props: {
     spells: Array<Spell>;
     statblock: string;
+    stats: Stats;
     spellSlots?: Array<E5SpellSlot> | null;
     tokenData?: GMGMetadata;
     itemId?: string;
@@ -266,6 +278,7 @@ export const E5Spells = (props: {
                                 spell={spell}
                                 key={`${spell.name}${index}`}
                                 statblock={props.statblock}
+                                stats={props.stats}
                                 spellSlots={props.spellSlots}
                                 tokenData={props.tokenData}
                                 itemId={props.itemId}
