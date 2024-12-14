@@ -364,11 +364,14 @@ export const DiceButtonWrapper = ({
                 }
 
                 return (
-                    <div key={index} className={"dice-button-wrapper-part"}>
+                    <div key={index} className={"dice-button-wrapper-part"} style={{ paddingRight: "0.5ch" }}>
                         <Markdown
                             className={"inline-markdown"}
                             remarkPlugins={[remarkGfm]}
                             components={{
+                                p: ({ node, ...props }) => {
+                                    return <span style={{ paddingRight: "0.5ch" }}>{props.children}</span>;
+                                },
                                 code: ({ node, ...props }) => {
                                     try {
                                         const diceMatches = String(props.children).match(regex);
