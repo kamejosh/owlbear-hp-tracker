@@ -57,7 +57,7 @@ export const DiceButton = (props: DiceButtonProps) => {
             return text.replace(
                 "DEX",
                 (room?.ruleset === "pf"
-                    ? props.stats.strength
+                    ? props.stats.dexterity
                     : Math.floor((props.stats.dexterity - 10) / 2)
                 ).toString(),
             );
@@ -65,7 +65,7 @@ export const DiceButton = (props: DiceButtonProps) => {
             return text.replace(
                 "CON",
                 (room?.ruleset === "pf"
-                    ? props.stats.strength
+                    ? props.stats.constitution
                     : Math.floor((props.stats.constitution - 10) / 2)
                 ).toString(),
             );
@@ -73,23 +73,20 @@ export const DiceButton = (props: DiceButtonProps) => {
             return text.replace(
                 "INT",
                 (room?.ruleset === "pf"
-                    ? props.stats.strength
+                    ? props.stats.intelligence
                     : Math.floor((props.stats.intelligence - 10) / 2)
                 ).toString(),
             );
         } else if (text.endsWith("WIS")) {
             return text.replace(
                 "WIS",
-                (room?.ruleset === "pf"
-                    ? props.stats.strength
-                    : Math.floor((props.stats.intelligence - 10) / 2)
-                ).toString(),
+                (room?.ruleset === "pf" ? props.stats.wisdom : Math.floor((props.stats.wisdom - 10) / 2)).toString(),
             );
         } else if (text.endsWith("CHA")) {
             return text.replace(
                 "CHA",
                 (room?.ruleset === "pf"
-                    ? props.stats.strength
+                    ? props.stats.charisma
                     : Math.floor((props.stats.charisma - 10) / 2)
                 ).toString(),
             );
