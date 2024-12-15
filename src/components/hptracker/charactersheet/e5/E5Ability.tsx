@@ -31,23 +31,23 @@ export const E5Ability = ({
             const statBonuses: Array<number> = [];
             ability.stat_bonus.forEach((stat) => {
                 if (stat === "STR") {
-                    statBonuses.push(stats.strength);
+                    statBonuses.push(Math.floor((stats.strength - 10) / 2));
                 } else if (stat === "DEX") {
-                    statBonuses.push(stats.dexterity);
+                    statBonuses.push(Math.floor((stats.dexterity - 10) / 2));
                 } else if (stat === "CON") {
-                    statBonuses.push(stats.constitution);
+                    statBonuses.push(Math.floor((stats.constitution - 10) / 2));
                 } else if (stat === "INT") {
-                    statBonuses.push(stats.intelligence);
+                    statBonuses.push(Math.floor((stats.intelligence - 10) / 2));
                 } else if (stat === "WIS") {
-                    statBonuses.push(stats.wisdom);
+                    statBonuses.push(Math.floor((stats.wisdom - 10) / 2));
                 } else if (stat === "CHA") {
-                    statBonuses.push(stats.charisma);
+                    statBonuses.push(Math.floor((stats.charisma - 10) / 2));
                 }
             });
             statBonus = Math.max(...statBonuses);
         }
         return ability.attack_bonus ? Math.max(ability.attack_bonus, statBonus) : statBonus;
-    }, [ability]);
+    }, [ability, stats]);
 
     return (
         <li key={ability.name} className={"e5-ability"}>
@@ -74,12 +74,12 @@ export const E5Ability = ({
                 />
             </div>
             <span className={"ability-extra-info"}>
-                {ability.attack_bonus ? (
+                {bonus > 0 ? (
                     <span>
                         <i>Attack bonus</i>:
                         <DiceButton
-                            dice={`d20+${ability.attack_bonus}`}
-                            text={`+${ability.attack_bonus}`}
+                            dice={`d20+${bonus}`}
+                            text={`+${bonus}`}
                             context={`${capitalize(ability.name)}: To Hit`}
                             statblock={statblock}
                             stats={stats}

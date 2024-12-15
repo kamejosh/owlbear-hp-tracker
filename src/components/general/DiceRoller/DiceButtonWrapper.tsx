@@ -226,7 +226,7 @@ export const DiceButton = (props: DiceButtonProps) => {
             }
             disabled={!(!initialized && !room?.disableDiceRoller) && !props.limitReached}
         >
-            <div
+            <span
                 className={`button-wrapper ${isEnabled() ? "enabled" : "disabled"} ${
                     room?.disableDiceRoller ? "calculated" : "three-d-dice"
                 }`}
@@ -246,7 +246,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                     <div className={"dice-preview"}>{getDicePreview()}</div>
                     {text.replace(/\s/g, "").replace("&nbsp", " ")}
                 </button>
-                <div
+                <span
                     className={`dice-context-button ${context && isEnabled() ? "visible" : ""} ${
                         dice.startsWith("1d20") ||
                         dice.startsWith("d20") ||
@@ -301,8 +301,8 @@ export const DiceButton = (props: DiceButtonProps) => {
                     >
                         {defaultHidden ? "SHOW" : "HIDE"}
                     </button>
-                </div>
-            </div>
+                </span>
+            </span>
         </Tippy>
     );
 };
@@ -350,10 +350,10 @@ export const DiceButtonWrapper = ({
                         part += dice[index];
                     } else {
                         let die = dice[index];
-                        const text = die;
-                        if (die.startsWith("DC")) {
+                        const text = die.replace(" ", "");
+                        if (text.startsWith("DC")) {
                             die = `1d20>${parseInt(die.substring(3))}`;
-                        } else if (die.startsWith("+") || die.startsWith("-")) {
+                        } else if (text.startsWith("+") || text.startsWith("-")) {
                             die = `1d20${die}`;
                         }
                         diceField = (
@@ -378,7 +378,7 @@ export const DiceButtonWrapper = ({
                             remarkPlugins={[remarkGfm]}
                             components={{
                                 p: ({ node, ...props }) => {
-                                    return <span style={{ paddingRight: "0.5ch" }}>{props.children}</span>;
+                                    return <p style={{ paddingRight: "0.5ch" }}>{props.children}</p>;
                                 },
                                 code: ({ node, ...props }) => {
                                     try {
