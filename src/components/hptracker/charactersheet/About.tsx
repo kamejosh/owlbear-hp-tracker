@@ -20,7 +20,19 @@ export const About = ({
             <button className={`expand ${open ? "open" : null}`} onClick={() => setOpen(!open)}></button>
             <div className={`about-content-wrapper ${open ? "open" : "hidden"}`}>
                 <div className={"about-content"}>
-                    <DiceButtonWrapper text={about} context={""} statblock={statblock.name} stats={statblock.stats} />
+                    <DiceButtonWrapper
+                        text={about}
+                        context={""}
+                        statblock={statblock.name}
+                        stats={{
+                            strength: statblock?.stats.strength || 0,
+                            dexterity: statblock?.stats.dexterity || 0,
+                            constitution: statblock?.stats.constitution || 0,
+                            intelligence: statblock?.stats.intelligence || 0,
+                            wisdom: statblock?.stats.wisdom || 0,
+                            charisma: statblock?.stats.charisma || 0,
+                        }}
+                    />
                 </div>
             </div>
         </div>

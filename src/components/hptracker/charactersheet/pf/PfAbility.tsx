@@ -4,8 +4,8 @@ import { DiceButtonWrapper, Stats } from "../../../general/DiceRoller/DiceButton
 import { capitalize, isString } from "lodash";
 
 type Action = components["schemas"]["ActionOut"];
-type Reaction = components["schemas"]["Reaction"];
-type SpecialAbility = components["schemas"]["SpecialAbility"];
+type Reaction = components["schemas"]["Reaction-Output"];
+type SpecialAbility = components["schemas"]["SpecialAbility-Output"];
 
 export const PfAbility = ({
     ability,

@@ -10,7 +10,7 @@ import { useMetadataContext } from "../../../../context/MetadataContext.ts";
 import Tippy from "@tippyjs/react";
 import { useShallow } from "zustand/react/shallow";
 
-type Spell = components["schemas"]["src__types__e5__Spell"];
+type Spell = components["schemas"]["src__types__e5__spell__Spell"];
 
 const Spell = ({
     spell,

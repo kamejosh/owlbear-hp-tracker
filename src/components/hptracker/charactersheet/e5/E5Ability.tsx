@@ -4,6 +4,7 @@ import { capitalize, isInteger } from "lodash";
 import { LimitComponent } from "../LimitComponent.tsx";
 import { GMGMetadata } from "../../../../helper/types.ts";
 import { updateLimit } from "../../../../helper/helpers.ts";
+import { useMemo } from "react";
 
 export type Ability = components["schemas"]["Action-Output"];
 
@@ -23,6 +24,30 @@ export const E5Ability = ({
     const limitValues = tokenData.stats.limits?.find((l) => l.id === ability.limit?.name)!;
 
     const limitReached = limitValues && limitValues.max === limitValues.used;
+
+    const bonus = useMemo(() => {
+        let statBonus = 0;
+        if (ability.stat_bonus) {
+            const statBonuses: Array<number> = [];
+            ability.stat_bonus.forEach((stat) => {
+                if (stat === "STR") {
+                    statBonuses.push(stats.strength);
+                } else if (stat === "DEX") {
+                    statBonuses.push(stats.dexterity);
+                } else if (stat === "CON") {
+                    statBonuses.push(stats.constitution);
+                } else if (stat === "INT") {
+                    statBonuses.push(stats.intelligence);
+                } else if (stat === "WIS") {
+                    statBonuses.push(stats.wisdom);
+                } else if (stat === "CHA") {
+                    statBonuses.push(stats.charisma);
+                }
+            });
+            statBonus = Math.max(...statBonuses);
+        }
+        return ability.attack_bonus ? Math.max(ability.attack_bonus, statBonus) : statBonus;
+    }, [ability]);
 
     return (
         <li key={ability.name} className={"e5-ability"}>

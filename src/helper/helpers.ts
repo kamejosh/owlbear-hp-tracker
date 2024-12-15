@@ -382,7 +382,7 @@ export const updateTokenSheet = async (
                     ...data.stats,
                     initiativeBonus:
                         ruleset === "e5"
-                            ? Math.floor((statblock.stats.dexterity - 10) / 2)
+                            ? Math.floor(((statblock.stats.dexterity || 0) - 10) / 2)
                             : parseInt(statblock.perception?.toString() ?? "0"),
                     initial: false,
                     limits:
@@ -476,7 +476,7 @@ export const getInitialValues = async (items: Array<Image>) => {
                                 statblock: {
                                     hp: statblock.hp.value,
                                     ac: statblock.armor_class.value,
-                                    bonus: Math.floor((statblock.stats.dexterity - 10) / 2),
+                                    bonus: Math.floor(((statblock.stats.dexterity || 0) - 10) / 2),
                                     slug: statblock.slug,
                                     ruleset: "e5",
                                     limits: getLimitsE5(statblock),

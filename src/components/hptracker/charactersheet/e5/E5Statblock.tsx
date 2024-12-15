@@ -2,7 +2,7 @@ import { useMetadataContext } from "../../../../context/MetadataContext.ts";
 import { useE5GetStatblock } from "../../../../api/e5/useE5Api.ts";
 import { useTokenListContext } from "../../../../context/TokenContext.tsx";
 import { GMGMetadata } from "../../../../helper/types.ts";
-import { DiceButton } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { DiceButton, Stats } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { capitalize, isNull } from "lodash";
 import { About } from "../About.tsx";
 import { LimitComponent } from "../LimitComponent.tsx";
@@ -12,7 +12,7 @@ import { HP } from "../../Token/HP.tsx";
 import { AC } from "../../Token/AC.tsx";
 import { Initiative } from "../../Token/Initiative.tsx";
 import { Rest } from "../../Token/Rest.tsx";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Image } from "@owlbear-rodeo/sdk";
 import { getTokenName } from "../../../../helper/helpers.ts";
 import { useShallow } from "zustand/react/shallow";
@@ -34,6 +34,14 @@ export const E5StatBlock = ({
     const token = useTokenListContext(useShallow((state) => state.tokens?.get(itemId)));
     const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
+    const [stats, setStats] = useState<Stats>({
+        strength: statblock?.stats.strength || 0,
+        dexterity: statblock?.stats.dexterity || 0,
+        constitution: statblock?.stats.constitution || 0,
+        intelligence: statblock?.stats.intelligence || 0,
+        wisdom: statblock?.stats.wisdom || 0,
+        charisma: statblock?.stats.charisma || 0,
+    });
 
     useEffect(() => {
         if (statblock && setScrollTargets) {
@@ -65,6 +73,16 @@ export const E5StatBlock = ({
                 scrollTargets.push({ name: "spells", target: "StatblockSpells" });
             }
             setScrollTargets(scrollTargets);
+        }
+        if (statblock) {
+            setStats({
+                strength: statblock.stats.strength || 0,
+                dexterity: statblock.stats.dexterity || 0,
+                constitution: statblock.stats.constitution || 0,
+                intelligence: statblock.stats.intelligence || 0,
+                wisdom: statblock.stats.wisdom || 0,
+                charisma: statblock.stats.charisma || 0,
+            });
         }
     }, [statblock]);
 
@@ -106,7 +124,7 @@ export const E5StatBlock = ({
                             <DiceButton
                                 dice={statblock.hp.hit_dice}
                                 text={statblock.hp.hit_dice}
-                                stats={statblock.stats}
+                                stats={stats}
                                 context={getTokenName(item) + ": Hit Dice"}
                                 statblock={getTokenName(item)}
                             />
@@ -119,7 +137,7 @@ export const E5StatBlock = ({
                 </span>
             </div>
             <div className={"stats"}>
-                {Object.entries(statblock.stats).map(([stat, value]) => {
+                {Object.entries(stats).map(([stat, value]) => {
                     return (
                         <div className={"stat"} key={stat}>
                             <div className={"stat-name"}>{stat.substring(0, 3)}</div>
@@ -132,7 +150,7 @@ export const E5StatBlock = ({
                                     text={Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
                                         Math.floor((value - 10) / 2),
                                     )}
-                                    stats={statblock.stats}
+                                    stats={stats}
                                     context={`${capitalize(stat)}: Check`}
                                     statblock={getTokenName(item)}
                                 />
@@ -155,7 +173,7 @@ export const E5StatBlock = ({
                                                 <DiceButton
                                                     dice={`d20+${value}`}
                                                     text={`+${value}`}
-                                                    stats={statblock.stats}
+                                                    stats={stats}
                                                     context={`${capitalize(key.substring(0, 3))}: Save`}
                                                     statblock={getTokenName(item)}
                                                 />
@@ -196,7 +214,7 @@ export const E5StatBlock = ({
                                             text={Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
                                                 Math.floor(value),
                                             )}
-                                            stats={statblock.stats}
+                                            stats={stats}
                                             context={`${capitalize(key)}: Check`}
                                             statblock={getTokenName(item)}
                                         />
@@ -266,7 +284,7 @@ export const E5StatBlock = ({
                                 statblock={getTokenName(item)}
                                 tokenData={data}
                                 itemId={itemId}
-                                stats={statblock.stats}
+                                stats={stats}
                             />
                         ))}
                     </ul>
@@ -283,7 +301,7 @@ export const E5StatBlock = ({
                                 statblock={getTokenName(item)}
                                 tokenData={data}
                                 itemId={itemId}
-                                stats={statblock.stats}
+                                stats={stats}
                             />
                         ))}
                     </ul>
@@ -300,7 +318,7 @@ export const E5StatBlock = ({
                                 statblock={getTokenName(item)}
                                 tokenData={data}
                                 itemId={itemId}
-                                stats={statblock.stats}
+                                stats={stats}
                             />
                         ))}
                     </ul>
@@ -317,7 +335,7 @@ export const E5StatBlock = ({
                                 statblock={getTokenName(item)}
                                 tokenData={data}
                                 itemId={itemId}
-                                stats={statblock.stats}
+                                stats={stats}
                             />
                         ))}
                     </ul>
@@ -334,7 +352,7 @@ export const E5StatBlock = ({
                                 statblock={getTokenName(item)}
                                 tokenData={data}
                                 itemId={itemId}
-                                stats={statblock.stats}
+                                stats={stats}
                             />
                         ))}
                     </ul>
@@ -351,7 +369,7 @@ export const E5StatBlock = ({
                                 statblock={getTokenName(item)}
                                 tokenData={data}
                                 itemId={itemId}
-                                stats={statblock.stats}
+                                stats={stats}
                             />
                         ))}
                     </ul>
@@ -369,7 +387,7 @@ export const E5StatBlock = ({
                                 statblock={getTokenName(item)}
                                 tokenData={data}
                                 itemId={itemId}
-                                stats={statblock.stats}
+                                stats={stats}
                             />
                         ))}
                     </ul>
@@ -402,7 +420,7 @@ export const E5StatBlock = ({
             {statblock.spells && statblock.spells.length > 0 ? (
                 <E5Spells
                     spells={statblock.spells}
-                    stats={statblock.stats}
+                    stats={stats}
                     statblock={getTokenName(item)}
                     spellSlots={statblock.spell_slots}
                     tokenData={data}

@@ -5,7 +5,7 @@ import { updateItems } from "../../../helper/obrHelper.ts";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-export type LimitType = components["schemas"]["LimitedUse"];
+export type LimitType = components["schemas"]["src__types__base__LimitedUse"];
 export const LimitComponent = ({
     limit,
     title,

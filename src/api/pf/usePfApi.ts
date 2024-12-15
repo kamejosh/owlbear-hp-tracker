@@ -4,13 +4,13 @@ import { components } from "../schema";
 import { TTRPG_URL } from "../../config.ts";
 
 export type PfStatblock = components["schemas"]["PFStatblockOut"];
-export type PfSpell = components["schemas"]["src__types__pf__Spell"];
+export type PfSpell = components["schemas"]["SpellOut"];
 
 const fetchPfSearch = (
     search_string: string,
     take: number,
     skip: number,
-    api_key?: string
+    api_key?: string,
 ): Promise<Array<PfStatblock>> => {
     let headers = {};
     if (api_key) {
