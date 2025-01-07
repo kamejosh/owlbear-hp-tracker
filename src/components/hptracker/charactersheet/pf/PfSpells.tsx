@@ -10,7 +10,7 @@ import { useShallow } from "zustand/react/shallow";
 
 export type PfSpellCategory = components["schemas"]["SpellCategoryOut"];
 export type PfSpellList = components["schemas"]["SpelllistOut"];
-export type PfSpellOut = components["schemas"]["SpellOut"];
+export type PfSpellOut = components["schemas"]["SpellStatblockOut"];
 
 const Spell = (props: { spell: PfSpellOut; statblock: string; stats: Stats }) => {
     const room = useMetadataContext(useShallow((state) => state.room));

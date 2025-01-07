@@ -325,13 +325,13 @@ const getLimitsE5 = (statblock: E5Statblock) => {
         });
     };
 
-    getActionTypeLimits(statblock.actions);
-    getActionTypeLimits(statblock.reactions);
-    getActionTypeLimits(statblock.bonus_actions);
-    getActionTypeLimits(statblock.special_abilities);
-    getActionTypeLimits(statblock.lair_actions);
-    getActionTypeLimits(statblock.mythic_actions);
-    getActionTypeLimits(statblock.legendary_actions);
+    getActionTypeLimits(statblock.actions || []);
+    getActionTypeLimits(statblock.reactions || []);
+    getActionTypeLimits(statblock.bonus_actions || []);
+    getActionTypeLimits(statblock.special_abilities || []);
+    getActionTypeLimits(statblock.lair_actions || []);
+    getActionTypeLimits(statblock.mythic_actions || []);
+    getActionTypeLimits(statblock.legendary_actions || []);
 
     statblock.spell_slots?.forEach((spellSlot) => {
         limits.push({
@@ -382,8 +382,9 @@ export const updateTokenSheet = async (
                     ...data.stats,
                     initiativeBonus:
                         ruleset === "e5"
-                            ? Math.floor(((statblock.stats.dexterity || 0) - 10) / 2)
-                            : parseInt(statblock.perception?.toString() ?? "0"),
+                            ? (statblock as E5Statblock).initiative ||
+                              Math.floor(((statblock.stats.dexterity || 0) - 10) / 2)
+                            : (statblock as PfStatblock).perception,
                     initial: false,
                     limits:
                         ruleset === "e5"
