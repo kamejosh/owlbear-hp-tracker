@@ -682,7 +682,9 @@ export interface components {
             /** Attack Bonus */
             attack_bonus?: number | null;
             /** Stat Bonus */
-            stat_bonus?: ("STR" | "DEX" | "CON" | "INT" | "WIS" | "CHA")[];
+            stat_bonus?: ("STR" | "DEX" | "CON" | "INT" | "WIS" | "CHA")[] | null;
+            /** Use Proficiency */
+            use_proficiency?: boolean | null;
             /** Damage Dice */
             damage_dice?: string | null;
             limit?: components["schemas"]["src__types__base__LimitedUse"] | null;
@@ -896,8 +898,10 @@ export interface components {
             speed: components["schemas"]["Speed"];
             stats: components["schemas"]["src__types__e5__base__Stats"];
             saving_throws: components["schemas"]["src__types__e5__base__SavingThrows"];
-            /** Perception */
-            perception?: number | null;
+            /** Initiative */
+            initiative?: number | null;
+            /** Proficiency Bonus */
+            proficiency_bonus?: number | null;
             skills?: components["schemas"]["Skills"] | null;
             /** Damage Vulnerabilities */
             damage_vulnerabilities?: string | null;
@@ -908,43 +912,43 @@ export interface components {
             /** Condition Immunities */
             condition_immunities?: string | null;
             /** Senses */
-            senses?: string[];
+            senses?: string[] | null;
             /** Languages */
-            languages?: string[];
+            languages?: string[] | null;
             /** Items */
-            items?: string[];
+            items?: string[] | null;
             /** Equipment */
-            equipment?: components["schemas"]["StatblockItemIn"][];
+            equipment?: components["schemas"]["StatblockItemIn"][] | null;
             /** Challenge Rating */
             challenge_rating?: string | null;
             /** Cr */
             cr?: number | null;
             /** Actions */
-            actions?: components["schemas"]["src__types__e5__base__Action-Input"][];
+            actions?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
             /** Bonus Actions */
-            bonus_actions?: components["schemas"]["src__types__e5__base__Action-Input"][];
+            bonus_actions?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
             /** Lair Actions */
-            lair_actions?: components["schemas"]["src__types__e5__base__Action-Input"][];
+            lair_actions?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
             /** Mythic Actions */
-            mythic_actions?: components["schemas"]["src__types__e5__base__Action-Input"][];
+            mythic_actions?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
             /** Reactions */
-            reactions?: components["schemas"]["src__types__e5__base__Action-Input"][];
+            reactions?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
             /** Legendary Desc */
             legendary_desc?: string | null;
             /** Legendary Actions */
-            legendary_actions?: components["schemas"]["src__types__e5__base__Action-Input"][];
+            legendary_actions?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
             /** Special Abilities */
-            special_abilities?: components["schemas"]["src__types__e5__base__Action-Input"][];
+            special_abilities?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
             /** Spell Slots */
-            spell_slots?: components["schemas"]["SpellSlots-Input"][];
+            spell_slots?: components["schemas"]["SpellSlots-Input"][] | null;
             /** Spells */
-            spells?: string[];
+            spells?: string[] | null;
             /** Spell Dc */
             spell_dc?: string | null;
             /** Spell Attack */
             spell_attack?: string | null;
             /** Limits */
-            limits?: components["schemas"]["LimitedUse-Input"][];
+            limits?: components["schemas"]["LimitedUse-Input"][] | null;
             /** Source */
             source?: string | null;
         };
@@ -972,8 +976,10 @@ export interface components {
             speed: components["schemas"]["Speed"];
             stats: components["schemas"]["src__types__e5__base__Stats"];
             saving_throws: components["schemas"]["src__types__e5__base__SavingThrows"];
-            /** Perception */
-            perception?: number | null;
+            /** Initiative */
+            initiative?: number | null;
+            /** Proficiency Bonus */
+            proficiency_bonus?: number | null;
             skills?: components["schemas"]["Skills"] | null;
             /** Damage Vulnerabilities */
             damage_vulnerabilities?: string | null;
@@ -984,11 +990,11 @@ export interface components {
             /** Condition Immunities */
             condition_immunities?: string | null;
             /** Senses */
-            senses?: string[];
+            senses?: string[] | null;
             /** Languages */
-            languages?: string[];
+            languages?: string[] | null;
             /** Items */
-            items?: string[];
+            items?: string[] | null;
             /** Equipment */
             equipment?: components["schemas"]["StatblockItemOut"][];
             /** Challenge Rating */
@@ -996,23 +1002,23 @@ export interface components {
             /** Cr */
             cr?: number | null;
             /** Actions */
-            actions?: components["schemas"]["Action-Output"][];
+            actions?: components["schemas"]["Action-Output"][] | null;
             /** Bonus Actions */
-            bonus_actions?: components["schemas"]["Action-Output"][];
+            bonus_actions?: components["schemas"]["Action-Output"][] | null;
             /** Lair Actions */
-            lair_actions?: components["schemas"]["Action-Output"][];
+            lair_actions?: components["schemas"]["Action-Output"][] | null;
             /** Mythic Actions */
-            mythic_actions?: components["schemas"]["Action-Output"][];
+            mythic_actions?: components["schemas"]["Action-Output"][] | null;
             /** Reactions */
-            reactions?: components["schemas"]["Action-Output"][];
+            reactions?: components["schemas"]["Action-Output"][] | null;
             /** Legendary Desc */
             legendary_desc?: string | null;
             /** Legendary Actions */
-            legendary_actions?: components["schemas"]["Action-Output"][];
+            legendary_actions?: components["schemas"]["Action-Output"][] | null;
             /** Special Abilities */
-            special_abilities?: components["schemas"]["Action-Output"][];
+            special_abilities?: components["schemas"]["Action-Output"][] | null;
             /** Spell Slots */
-            spell_slots?: components["schemas"]["SpellSlots-Output"][];
+            spell_slots?: components["schemas"]["SpellSlots-Output"][] | null;
             /** Spells */
             spells?: components["schemas"]["src__types__e5__spell__Spell"][];
             /** Spell Dc */
@@ -1020,11 +1026,13 @@ export interface components {
             /** Spell Attack */
             spell_attack?: string | null;
             /** Limits */
-            limits?: components["schemas"]["src__types__base__LimitedUse"][];
+            limits?: components["schemas"]["src__types__base__LimitedUse"][] | null;
             /** Source */
             source?: string | null;
             /** Slug */
             slug: string;
+            /** External Id */
+            external_id: string | null;
             /** License */
             license?: string | null;
             /**
@@ -1063,9 +1071,9 @@ export interface components {
         /** ItemBonusIn */
         ItemBonusIn: {
             /** Hp */
-            hp?: number;
+            hp?: number | null;
             /** Armor Class */
-            armor_class?: number;
+            armor_class?: number | null;
             /** Damage Vulnerabilities */
             damage_vulnerabilities?: string | null;
             /** Damage Resistances */
@@ -1075,17 +1083,17 @@ export interface components {
             /** Condition Immunities */
             condition_immunities?: string | null;
             /** Senses */
-            senses?: string[];
+            senses?: string[] | null;
             /** Proficiency */
-            proficiency?: string[];
+            proficiency?: string[] | null;
             /** Actions */
-            actions?: components["schemas"]["src__types__e5__base__Action-Input"][];
+            actions?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
             /** Bonus Actions */
-            bonus_actions?: components["schemas"]["src__types__e5__base__Action-Input"][];
+            bonus_actions?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
             /** Reactions */
-            reactions?: components["schemas"]["src__types__e5__base__Action-Input"][];
+            reactions?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
             /** Special Abilities */
-            special_abilities?: components["schemas"]["src__types__e5__base__Action-Input"][];
+            special_abilities?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
             stats?: components["schemas"]["src__types__e5__base__Stats"] | null;
             speed?: components["schemas"]["Speed"] | null;
             saving_throws?: components["schemas"]["src__types__e5__base__SavingThrows"] | null;
@@ -1094,9 +1102,9 @@ export interface components {
         /** ItemBonusOut */
         ItemBonusOut: {
             /** Hp */
-            hp?: number;
+            hp?: number | null;
             /** Armor Class */
-            armor_class?: number;
+            armor_class?: number | null;
             /** Damage Vulnerabilities */
             damage_vulnerabilities?: string | null;
             /** Damage Resistances */
@@ -1106,17 +1114,17 @@ export interface components {
             /** Condition Immunities */
             condition_immunities?: string | null;
             /** Senses */
-            senses?: string[];
+            senses?: string[] | null;
             /** Proficiency */
-            proficiency?: string[];
+            proficiency?: string[] | null;
             /** Actions */
-            actions?: components["schemas"]["Action-Output"][];
+            actions?: components["schemas"]["Action-Output"][] | null;
             /** Bonus Actions */
-            bonus_actions?: components["schemas"]["Action-Output"][];
+            bonus_actions?: components["schemas"]["Action-Output"][] | null;
             /** Reactions */
-            reactions?: components["schemas"]["Action-Output"][];
+            reactions?: components["schemas"]["Action-Output"][] | null;
             /** Special Abilities */
-            special_abilities?: components["schemas"]["Action-Output"][];
+            special_abilities?: components["schemas"]["Action-Output"][] | null;
             stats?: components["schemas"]["src__types__e5__base__Stats"] | null;
             speed?: components["schemas"]["Speed"] | null;
             saving_throws?: components["schemas"]["src__types__e5__base__SavingThrows"] | null;
@@ -1127,7 +1135,7 @@ export interface components {
         /** ItemIn */
         ItemIn: {
             /** Tags */
-            tags?: string[];
+            tags?: string[] | null;
             /** Name */
             name: string;
             /** Type */
@@ -1139,16 +1147,16 @@ export interface components {
             /** Sentient */
             sentient?: boolean | null;
             /** Can Equip */
-            can_equip?: boolean;
+            can_equip?: boolean | null;
             /** Requires Attuning */
-            requires_attuning?: boolean;
+            requires_attuning?: boolean | null;
             cost?: components["schemas"]["CostIn"] | null;
             /** Weight */
             weight?: number | null;
             /** Range */
             range?: string | null;
             /** Spells */
-            spells?: components["schemas"]["ItemSpellIn"][];
+            spells?: components["schemas"]["ItemSpellIn"][] | null;
             charges?: components["schemas"]["LimitedUse-Input"] | null;
             stats?: components["schemas"]["ItemStatsIn"] | null;
             bonus?: components["schemas"]["ItemBonusIn"] | null;
@@ -1157,19 +1165,19 @@ export interface components {
         /** ItemModifiersIn */
         ItemModifiersIn: {
             /** Stats */
-            stats?: components["schemas"]["ModifierStats"][];
+            stats?: components["schemas"]["ModifierStats"][] | null;
         };
         /** ItemModifiersOut */
         ItemModifiersOut: {
             /** Stats */
-            stats?: components["schemas"]["ModifierStats"][];
+            stats?: components["schemas"]["ModifierStats"][] | null;
             /** Id */
             id: number;
         };
         /** ItemOut */
         ItemOut: {
             /** Tags */
-            tags?: string[];
+            tags?: string[] | null;
             /** Name */
             name: string;
             /** Type */
@@ -1181,9 +1189,9 @@ export interface components {
             /** Sentient */
             sentient?: boolean | null;
             /** Can Equip */
-            can_equip?: boolean;
+            can_equip?: boolean | null;
             /** Requires Attuning */
-            requires_attuning?: boolean;
+            requires_attuning?: boolean | null;
             cost?: components["schemas"]["CostOut"] | null;
             /** Weight */
             weight?: number | null;
@@ -1234,17 +1242,17 @@ export interface components {
             armor_class?: components["schemas"]["ArmorClass"] | null;
             hp?: components["schemas"]["src__types__e5__base__Hitpoints"] | null;
             /** Senses */
-            senses?: string[];
+            senses?: string[] | null;
             /** Languages */
-            languages?: string[];
+            languages?: string[] | null;
             /** Actions */
-            actions?: components["schemas"]["src__types__e5__base__Action-Input"][];
+            actions?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
             /** Bonus Actions */
-            bonus_actions?: components["schemas"]["src__types__e5__base__Action-Input"][];
+            bonus_actions?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
             /** Reactions */
-            reactions?: components["schemas"]["src__types__e5__base__Action-Input"][];
+            reactions?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
             /** Special Abilities */
-            special_abilities?: components["schemas"]["src__types__e5__base__Action-Input"][];
+            special_abilities?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
             /** Spell Dc */
             spell_dc?: string | null;
             /** Spell Attack */
@@ -1259,17 +1267,17 @@ export interface components {
             armor_class?: components["schemas"]["ArmorClass"] | null;
             hp?: components["schemas"]["src__types__e5__base__Hitpoints"] | null;
             /** Senses */
-            senses?: string[];
+            senses?: string[] | null;
             /** Languages */
-            languages?: string[];
+            languages?: string[] | null;
             /** Actions */
-            actions?: components["schemas"]["Action-Output"][];
+            actions?: components["schemas"]["Action-Output"][] | null;
             /** Bonus Actions */
-            bonus_actions?: components["schemas"]["Action-Output"][];
+            bonus_actions?: components["schemas"]["Action-Output"][] | null;
             /** Reactions */
-            reactions?: components["schemas"]["Action-Output"][];
+            reactions?: components["schemas"]["Action-Output"][] | null;
             /** Special Abilities */
-            special_abilities?: components["schemas"]["Action-Output"][];
+            special_abilities?: components["schemas"]["Action-Output"][] | null;
             /** Spell Dc */
             spell_dc?: string | null;
             /** Spell Attack */
@@ -1393,7 +1401,7 @@ export interface components {
             /** Reactions */
             reactions?: components["schemas"]["Reaction-Output"][];
             /** Spells */
-            spells?: components["schemas"]["SpellCategoryOut"][];
+            spells: components["schemas"]["SpellCategoryOut"][];
             /** About */
             about?: string | null;
             /** Limits */
@@ -1589,7 +1597,7 @@ export interface components {
             /** Attack */
             attack?: number | null;
             /** Spell Lists */
-            spell_lists?: components["schemas"]["SpelllistOut"][];
+            spell_lists: components["schemas"]["SpelllistOut"][];
         };
         /** SpellCircle */
         SpellCircle: {
@@ -1612,17 +1620,17 @@ export interface components {
             name: string;
             info: components["schemas"]["Info"];
             /** Traits */
-            traits?: components["schemas"]["SpellTrait"][];
+            traits: components["schemas"]["SpellTrait"][];
             /** Traditions */
-            traditions?: components["schemas"]["Tradition"][];
+            traditions: components["schemas"]["Tradition"][];
             /** Bloodlines */
-            bloodlines?: components["schemas"]["Bloodline"][];
+            bloodlines: components["schemas"]["Bloodline"][];
             /** Deities */
-            deities?: components["schemas"]["Deity"][];
+            deities: components["schemas"]["Deity"][];
             /** Domains */
-            domains?: components["schemas"]["Domain"][];
+            domains: components["schemas"]["Domain"][];
             /** Mysteries */
-            mysteries?: components["schemas"]["Mystery"][];
+            mysteries: components["schemas"]["Mystery"][];
             /** Range */
             range?: string | null;
             /** Area */
@@ -1665,6 +1673,48 @@ export interface components {
             level: number;
             limit: components["schemas"]["src__types__base__LimitedUse"];
         };
+        /** SpellStatblockOut */
+        SpellStatblockOut: {
+            /** Name */
+            name: string;
+            info?: components["schemas"]["Info"] | null;
+            /** Traits */
+            traits?: components["schemas"]["SpellTrait"][] | null;
+            /** Traditions */
+            traditions?: components["schemas"]["Tradition"][] | null;
+            /** Bloodlines */
+            bloodlines?: components["schemas"]["Bloodline"][] | null;
+            /** Deities */
+            deities?: components["schemas"]["Deity"][] | null;
+            /** Domains */
+            domains?: components["schemas"]["Domain"][] | null;
+            /** Mysteries */
+            mysteries?: components["schemas"]["Mystery"][] | null;
+            /** Range */
+            range?: string | null;
+            /** Area */
+            area?: string | null;
+            /** Targets */
+            targets?: string | null;
+            /** Duration */
+            duration?: string | null;
+            /** Saving Throws */
+            saving_throws?: string | null;
+            /** Trigger */
+            trigger?: string | null;
+            cast?: components["schemas"]["Cast"] | null;
+            description?: components["schemas"]["Description"] | null;
+            /** Heightened */
+            heightened?: components["schemas"]["Heightened"][] | null;
+            /** Slug */
+            slug: string;
+            /** License */
+            license?: string | null;
+            /** Active */
+            active: boolean;
+            /** Source */
+            source?: string | null;
+        };
         /** SpellTrait */
         SpellTrait: {
             /** Name */
@@ -1687,32 +1737,35 @@ export interface components {
             /** Level */
             level: string;
             /** Spells */
-            spells?: components["schemas"]["SpellOut"][];
+            spells: components["schemas"]["SpellStatblockOut"][];
             limit?: components["schemas"]["src__types__base__LimitedUse"] | null;
         };
         /** StatblockItemIn */
         StatblockItemIn: {
             /** Equipped */
-            equipped?: boolean;
+            equipped?: boolean | null;
             /** Attuned */
-            attuned?: boolean;
+            attuned?: boolean | null;
             /** Loot */
-            loot?: boolean;
+            loot?: boolean | null;
+            /** Proficient */
+            proficient?: boolean | null;
             /** Item */
             item: number;
         };
         /** StatblockItemOut */
         StatblockItemOut: {
-            /** Equipped */
-            equipped?: boolean;
-            /** Attuned */
-            attuned?: boolean;
-            /** Loot */
-            loot?: boolean;
-            /** Item */
-            item: number;
             /** Id */
             id: number;
+            /** Equipped */
+            equipped: boolean;
+            /** Attuned */
+            attuned: boolean;
+            /** Loot */
+            loot: boolean;
+            /** Proficient */
+            proficient: boolean;
+            item: components["schemas"]["ItemOut"];
         };
         /** Tradition */
         Tradition: {
@@ -1862,6 +1915,8 @@ export interface components {
             stat_bonus: string[];
             /** Damage Dice */
             damage_dice?: string | null;
+            /** Use Proficiency */
+            use_proficiency: boolean;
             limit?: components["schemas"]["prisma__models__LimitedUse"] | null;
             e5_StatBlock?: components["schemas"]["e5_StatBlock"] | null;
             /** E5 Statblockid */
@@ -1909,6 +1964,8 @@ export interface components {
             stat_bonus: string[];
             /** Damage Dice */
             damage_dice?: string | null;
+            /** Use Proficiency */
+            use_proficiency: boolean;
             limit?: components["schemas"]["prisma__models__LimitedUse"] | null;
             e5_StatBlock?: components["schemas"]["e5_StatBlock"] | null;
             /** E5 Statblockid */
@@ -2112,6 +2169,8 @@ export interface components {
             stat_bonus: string[];
             /** Damage Dice */
             damage_dice?: string | null;
+            /** Use Proficiency */
+            use_proficiency: boolean;
             limit?: components["schemas"]["prisma__models__LimitedUse"] | null;
             e5_StatBlock?: components["schemas"]["e5_StatBlock"] | null;
             /** E5 Statblockid */
@@ -2136,6 +2195,8 @@ export interface components {
             stat_bonus: string[];
             /** Damage Dice */
             damage_dice?: string | null;
+            /** Use Proficiency */
+            use_proficiency: boolean;
             limit?: components["schemas"]["prisma__models__LimitedUse"] | null;
             e5_StatBlock?: components["schemas"]["e5_StatBlock"] | null;
             /** E5 Statblockid */
@@ -2160,6 +2221,8 @@ export interface components {
             stat_bonus: string[];
             /** Damage Dice */
             damage_dice?: string | null;
+            /** Use Proficiency */
+            use_proficiency: boolean;
             limit?: components["schemas"]["prisma__models__LimitedUse"] | null;
             e5_StatBlock?: components["schemas"]["e5_StatBlock"] | null;
             /** E5 Statblockid */
@@ -2184,6 +2247,8 @@ export interface components {
             stat_bonus: string[];
             /** Damage Dice */
             damage_dice?: string | null;
+            /** Use Proficiency */
+            use_proficiency: boolean;
             limit?: components["schemas"]["prisma__models__LimitedUse"] | null;
             e5_StatBlock?: components["schemas"]["e5_StatBlock"] | null;
             /** E5 Statblockid */
@@ -2294,6 +2359,8 @@ export interface components {
             stat_bonus: string[];
             /** Damage Dice */
             damage_dice?: string | null;
+            /** Use Proficiency */
+            use_proficiency: boolean;
             limit?: components["schemas"]["prisma__models__LimitedUse"] | null;
             e5_StatBlock?: components["schemas"]["e5_StatBlock"] | null;
             /** E5 Statblockid */
@@ -2474,6 +2541,8 @@ export interface components {
             id: string;
             /** Slug */
             slug: string;
+            /** External Id */
+            external_id?: string | null;
             /** Name */
             name: string;
             /** About */
@@ -2493,8 +2562,10 @@ export interface components {
             speed?: components["schemas"]["e5_Speed"] | null;
             stats?: components["schemas"]["e5_Stats"] | null;
             saving_throws?: components["schemas"]["e5_SavingThrows"] | null;
-            /** Perception */
-            perception?: number | null;
+            /** Initiative */
+            initiative?: number | null;
+            /** Proficiency Bonus */
+            proficiency_bonus?: number | null;
             skills?: components["schemas"]["e5_Skills"] | null;
             /** Damage Vulnerabilities */
             damage_vulnerabilities?: string | null;
@@ -2577,6 +2648,8 @@ export interface components {
             attuned: boolean;
             /** Loot */
             loot: boolean;
+            /** Proficient */
+            proficient: boolean;
             item?: components["schemas"]["e5_Item"] | null;
             statblock?: components["schemas"]["e5_StatBlock"] | null;
             /** E5 Itemid */
@@ -3213,7 +3286,9 @@ export interface components {
             /** Attack Bonus */
             attack_bonus?: number | null;
             /** Stat Bonus */
-            stat_bonus?: ("STR" | "DEX" | "CON" | "INT" | "WIS" | "CHA")[];
+            stat_bonus?: ("STR" | "DEX" | "CON" | "INT" | "WIS" | "CHA")[] | null;
+            /** Use Proficiency */
+            use_proficiency?: boolean | null;
             /** Damage Dice */
             damage_dice?: string | null;
             limit?: components["schemas"]["LimitedUse-Input"] | null;
@@ -3272,19 +3347,19 @@ export interface components {
             /** Range */
             range: string;
             /** Verbal */
-            verbal?: boolean;
+            verbal?: boolean | null;
             /** Somatic */
-            somatic?: boolean;
+            somatic?: boolean | null;
             /** Material */
-            material?: boolean;
+            material?: boolean | null;
             /** Materials */
             materials?: string | null;
             /** Ritual */
-            ritual?: boolean;
+            ritual?: boolean | null;
             /** Duration */
             duration: string;
             /** Concentration */
-            concentration?: boolean;
+            concentration?: boolean | null;
             /** Casting Time */
             casting_time: string;
             /** Level */
@@ -3324,19 +3399,19 @@ export interface components {
             /** Range */
             range: string;
             /** Verbal */
-            verbal?: boolean;
+            verbal?: boolean | null;
             /** Somatic */
-            somatic?: boolean;
+            somatic?: boolean | null;
             /** Material */
-            material?: boolean;
+            material?: boolean | null;
             /** Materials */
             materials?: string | null;
             /** Ritual */
-            ritual?: boolean;
+            ritual?: boolean | null;
             /** Duration */
             duration: string;
             /** Concentration */
-            concentration?: boolean;
+            concentration?: boolean | null;
             /** Casting Time */
             casting_time: string;
             /** Level */
@@ -3348,11 +3423,11 @@ export interface components {
             /** School */
             school: string;
             /** Classes */
-            classes?: string[];
+            classes?: string[] | null;
             /** Archetypes */
-            archetypes?: string[];
+            archetypes?: string[] | null;
             /** Circles */
-            circles?: string[];
+            circles?: string[] | null;
         };
         /** Spell */
         src__types__pf__spell__Spell: {
@@ -3360,17 +3435,17 @@ export interface components {
             name: string;
             info: components["schemas"]["Info"];
             /** Traits */
-            traits?: components["schemas"]["SpellTrait"][];
+            traits: components["schemas"]["SpellTrait"][];
             /** Traditions */
-            traditions?: components["schemas"]["Tradition"][];
+            traditions: components["schemas"]["Tradition"][];
             /** Bloodlines */
-            bloodlines?: components["schemas"]["Bloodline"][];
+            bloodlines: components["schemas"]["Bloodline"][];
             /** Deities */
-            deities?: components["schemas"]["Deity"][];
+            deities: components["schemas"]["Deity"][];
             /** Domains */
-            domains?: components["schemas"]["Domain"][];
+            domains: components["schemas"]["Domain"][];
             /** Mysteries */
-            mysteries?: components["schemas"]["Mystery"][];
+            mysteries: components["schemas"]["Mystery"][];
             /** Range */
             range?: string | null;
             /** Area */
@@ -3402,17 +3477,17 @@ export interface components {
             name: string;
             info: components["schemas"]["Info"];
             /** Traits */
-            traits?: string[];
+            traits?: string[] | null;
             /** Traditions */
-            traditions?: string[];
+            traditions?: string[] | null;
             /** Bloodlines */
-            bloodlines?: string[];
+            bloodlines?: string[] | null;
             /** Deities */
-            deities?: string[];
+            deities?: string[] | null;
             /** Domains */
-            domains?: string[];
+            domains?: string[] | null;
             /** Mysteries */
-            mysteries?: string[];
+            mysteries?: string[] | null;
             /** Range */
             range?: string | null;
             /** Area */
@@ -3500,6 +3575,8 @@ export interface components {
             statblocks: number;
             /** Spells */
             spells: number;
+            /** Items */
+            items: number;
             /** Patreon */
             patreon?: number | null;
         };
@@ -4497,9 +4574,7 @@ export interface operations {
     search_e5_creature_api_v1_e5_statblock_search__get: {
         parameters: {
             query?: {
-                name?: string;
-                type?: string;
-                cr?: number | null;
+                search_string?: string;
                 take?: number;
                 skip?: number;
             };
@@ -4760,7 +4835,7 @@ export interface operations {
     search_e5_spell_api_v1_e5_spell_search_get: {
         parameters: {
             query?: {
-                name?: string;
+                search_string?: string;
                 take?: number;
                 skip?: number;
             };

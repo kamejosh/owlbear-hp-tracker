@@ -45,6 +45,13 @@ export const useTokenListContext = create<TokenListContextType>()((set) => ({
                                 oldData: null,
                                 newData: null,
                             });
+                        } else if (item.visible !== state.tokens.get(item.id)!.item.visible) {
+                            changes.push({
+                                changeType: "visibility-changed",
+                                id: item.id,
+                                oldData: null,
+                                newData: null,
+                            });
                         }
                     } else {
                         changes.push({ changeType: "new", id: item.id, oldData: null, newData: metadata });

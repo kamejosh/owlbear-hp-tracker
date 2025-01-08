@@ -208,7 +208,6 @@ export const handleNewRoll = async (addRoll: (entry: RollLogEntryType) => void, 
 
 export const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => void) => {
     const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
-
     const rollLogEntry = await dddiceRollToRollLog(e, { participant: participant });
 
     // we only handle new rolls dddice extension is not loaded

@@ -23,7 +23,7 @@ const fetchE5Search = (
             url: `${TTRPG_URL}/e5/statblock/search/`,
             headers: headers,
             params: {
-                name: search_string,
+                search_string: search_string,
                 take: take,
                 skip: skip,
             },
