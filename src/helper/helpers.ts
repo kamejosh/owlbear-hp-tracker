@@ -460,7 +460,7 @@ export const getInitialValues = async (items: Array<Image>) => {
                         method: "GET",
                         headers: headers,
                         params: {
-                            name: name,
+                            search_string: name,
                             take: 20,
                             skip: 0,
                         },
