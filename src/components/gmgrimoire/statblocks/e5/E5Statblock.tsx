@@ -1,8 +1,6 @@
 import { useMetadataContext } from "../../../../context/MetadataContext.ts";
 import { useE5GetStatblock } from "../../../../api/e5/useE5Api.ts";
-import { useTokenListContext } from "../../../../context/TokenContext.tsx";
-import { GMGMetadata } from "../../../../helper/types.ts";
-import { DiceButton, Stats } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { DiceButton } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { capitalize, isNull } from "lodash";
 import { About } from "../About.tsx";
 import { LimitComponent } from "../LimitComponent.tsx";
@@ -12,79 +10,38 @@ import { HP } from "../../Token/HP.tsx";
 import { AC } from "../../Token/AC.tsx";
 import { Initiative } from "../../Token/Initiative.tsx";
 import { Rest } from "../../Token/Rest.tsx";
-import { useEffect, useState } from "react";
-import { Image } from "@owlbear-rodeo/sdk";
-import { getTokenName } from "../../../../helper/helpers.ts";
 import { useShallow } from "zustand/react/shallow";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { E5StatblockContextProvider, useE5StatblockContext } from "../../../../context/E5StatblockContext.tsx";
+import { Loader } from "../../../general/Loader.tsx";
+import styles from "./e5statblock.module.scss";
+import { LineBreak } from "../../../general/LineBreak.tsx";
+import { StatblockValues } from "../StatblockValues.tsx";
+import { useMemo } from "react";
+import { StatblockContent } from "../StatblockContent.tsx";
 
-export const E5StatBlock = ({
-    slug,
-    itemId,
-    setScrollTargets,
-}: {
-    slug: string;
-    itemId: string;
-    setScrollTargets?: (scrollTargets: Array<{ name: string; target: string }>) => void;
-}) => {
-    const room = useMetadataContext(useShallow((state) => state.room));
-    const statblockQuery = useE5GetStatblock(slug, room?.tabletopAlmanacAPIKey);
-    const statblock = statblockQuery.isSuccess && statblockQuery.data ? statblockQuery.data : null;
-    const token = useTokenListContext(useShallow((state) => state.tokens?.get(itemId)));
-    const data = token?.data as GMGMetadata;
-    const item = token?.item as Image;
-    const [stats, setStats] = useState<Stats>({
-        strength: statblock?.stats.strength || 0,
-        dexterity: statblock?.stats.dexterity || 0,
-        constitution: statblock?.stats.constitution || 0,
-        intelligence: statblock?.stats.intelligence || 0,
-        wisdom: statblock?.stats.wisdom || 0,
-        charisma: statblock?.stats.charisma || 0,
-    });
+export const E5StatBlock = () => {
+    const { stats, tokenName, data, item, statblock } = useE5StatblockContext();
 
-    useEffect(() => {
-        if (statblock && setScrollTargets) {
-            const scrollTargets = new Array({ name: "top", target: "StatblockTop" });
-            if (Object.entries(statblock.saving_throws).filter((st) => !!st[1]).length > 0) {
-                scrollTargets.push({ name: "saves", target: "StatblockSavingThrows" });
-            }
-            if (statblock.skills && Object.entries(statblock.skills).filter(([_, value]) => !!value).length > 0) {
-                scrollTargets.push({ name: "skills", target: "StatblockSkills" });
-            }
-            if (
-                statblock.damage_vulnerabilities ||
-                statblock.damage_resistances ||
-                statblock.damage_immunities ||
-                statblock.condition_immunities
-            ) {
-                scrollTargets.push({ name: "immunities", target: "StatblockImmunities" });
-            }
-            if (statblock.actions && statblock.actions.length > 0) {
-                scrollTargets.push({ name: "actions", target: "StatblockActions" });
-            }
-            if (statblock.bonus_actions && statblock.bonus_actions.length > 0) {
-                scrollTargets.push({ name: "bonus", target: "StatblockBonusActions" });
-            }
-            if (statblock.special_abilities && statblock.special_abilities.length > 0) {
-                scrollTargets.push({ name: "special", target: "SpecialAbilities" });
-            }
-            if (statblock.spells && statblock.spells.length > 0) {
-                scrollTargets.push({ name: "spells", target: "StatblockSpells" });
-            }
-            setScrollTargets(scrollTargets);
-        }
-        if (statblock) {
-            setStats({
-                strength: statblock.stats.strength || 0,
-                dexterity: statblock.stats.dexterity || 0,
-                constitution: statblock.stats.constitution || 0,
-                intelligence: statblock.stats.intelligence || 0,
-                wisdom: statblock.stats.wisdom || 0,
-                charisma: statblock.stats.charisma || 0,
-            });
-        }
-    }, [statblock]);
+    return (
+        <div className={styles.statblock}>
+            <div className={styles.title}>
+                <div>
+                    <h1 className={styles.name}>{statblock.name}</h1>
+                    <div className={styles.note}>
+                        {statblock.size} {statblock.type}, {statblock.alignment}
+                    </div>
+                </div>
+                <StatblockValues />
+            </div>
+            <StatblockContent />
+        </div>
+    );
+};
+
+export const E5StatBlockOld = ({}: {}) => {
+    const { stats, tokenName, data, item, statblock } = useE5StatblockContext();
 
     return statblock ? (
         <div className={"e5-statblock"}>
@@ -111,29 +68,29 @@ export const E5StatBlock = ({
             <div className={"values"}>
                 <div className={"init"}>
                     <b>Initiative</b>
-                    <Initiative id={itemId} />
+                    <Initiative id={item.id} />
                 </div>
                 <span className={"ac"}>
-                    <b>Armor Class</b> <AC id={itemId} />
+                    <b>Armor Class</b> <AC id={item.id} />
                     {!!statblock.armor_class.special ? `(${statblock.armor_class.special})` : null}
                 </span>
                 <span className={"hp"}>
-                    <b>Hit Points</b> <HP id={itemId} />
+                    <b>Hit Points</b> <HP id={item.id} />
                     {statblock.hp.hit_dice ? (
                         <div className={"hit-dice"}>
                             <DiceButton
                                 dice={statblock.hp.hit_dice}
                                 text={statblock.hp.hit_dice}
                                 stats={stats}
-                                context={getTokenName(item) + ": Hit Dice"}
-                                statblock={getTokenName(item)}
+                                context={tokenName + ": Hit Dice"}
+                                statblock={tokenName}
                             />
                         </div>
                     ) : null}
                 </span>
                 <span className={"rest"}>
                     <b>Rest</b>
-                    <Rest id={itemId} />
+                    <Rest id={item.id} />
                 </span>
             </div>
             <div className={"stats"}>
@@ -152,7 +109,7 @@ export const E5StatBlock = ({
                                     )}
                                     stats={stats}
                                     context={`${capitalize(stat)}: Check`}
-                                    statblock={getTokenName(item)}
+                                    statblock={tokenName}
                                 />
                             </div>
                         </div>
@@ -175,7 +132,7 @@ export const E5StatBlock = ({
                                                     text={`+${value}`}
                                                     stats={stats}
                                                     context={`${capitalize(key.substring(0, 3))}: Save`}
-                                                    statblock={getTokenName(item)}
+                                                    statblock={tokenName}
                                                 />
                                             </span>
                                         );
@@ -197,7 +154,7 @@ export const E5StatBlock = ({
                     <b>Challenge</b> {statblock.challenge_rating}
                 </div>
             </div>
-            <About about={statblock.about} slug={slug} statblock={statblock} />
+            <About about={statblock.about} slug={data.sheet} statblock={statblock} />
             {statblock.skills && Object.entries(statblock.skills).filter(([_, value]) => !!value).length > 0 ? (
                 <div className={"skills scroll-target"} id={"StatblockSkills"}>
                     <h3>Skills</h3>
@@ -216,7 +173,7 @@ export const E5StatBlock = ({
                                             )}
                                             stats={stats}
                                             context={`${capitalize(key)}: Check`}
-                                            statblock={getTokenName(item)}
+                                            statblock={tokenName}
                                         />
                                     </li>
                                 );
@@ -267,7 +224,7 @@ export const E5StatBlock = ({
                                 limit={limit}
                                 title={"name"}
                                 limitValues={data.stats.limits?.find((l) => l.id === limit!.name)!}
-                                itemId={itemId}
+                                itemId={item.id}
                             />
                         ) : null;
                     })}
@@ -278,14 +235,7 @@ export const E5StatBlock = ({
                     <h3>Actions</h3>
                     <ul className={"ability-list"}>
                         {statblock.actions.map((action, index) => (
-                            <E5Ability
-                                ability={action}
-                                key={action.name + index}
-                                statblock={getTokenName(item)}
-                                tokenData={data}
-                                itemId={itemId}
-                                stats={stats}
-                            />
+                            <E5Ability key={action.name + index} ability={action} statblock={tokenName} />
                         ))}
                     </ul>
                 </div>
@@ -295,14 +245,7 @@ export const E5StatBlock = ({
                     <h3>Bonus Actions</h3>
                     <ul className={"ability-list"}>
                         {statblock.bonus_actions.map((action, index) => (
-                            <E5Ability
-                                ability={action}
-                                key={action.name + index}
-                                statblock={getTokenName(item)}
-                                tokenData={data}
-                                itemId={itemId}
-                                stats={stats}
-                            />
+                            <E5Ability ability={action} key={action.name + index} statblock={tokenName} />
                         ))}
                     </ul>
                 </div>
@@ -312,14 +255,7 @@ export const E5StatBlock = ({
                     <h3>Special Abilities</h3>
                     <ul className={"ability-list"}>
                         {statblock.special_abilities?.map((ability, index) => (
-                            <E5Ability
-                                ability={ability}
-                                key={ability.name + index}
-                                statblock={getTokenName(item)}
-                                tokenData={data}
-                                itemId={itemId}
-                                stats={stats}
-                            />
+                            <E5Ability ability={ability} key={ability.name + index} statblock={tokenName} />
                         ))}
                     </ul>
                 </div>
@@ -329,14 +265,7 @@ export const E5StatBlock = ({
                     <h3>Reactions</h3>
                     <ul className={"ability-list"}>
                         {statblock.reactions?.map((reaction, index) => (
-                            <E5Ability
-                                ability={reaction}
-                                key={reaction.name + index}
-                                statblock={getTokenName(item)}
-                                tokenData={data}
-                                itemId={itemId}
-                                stats={stats}
-                            />
+                            <E5Ability ability={reaction} key={reaction.name + index} statblock={tokenName} />
                         ))}
                     </ul>
                 </div>
@@ -346,14 +275,7 @@ export const E5StatBlock = ({
                     <h3>Lair Actions</h3>
                     <ul className={"ability-list"}>
                         {statblock.lair_actions.map((action, index) => (
-                            <E5Ability
-                                ability={action}
-                                key={action.name + index}
-                                statblock={getTokenName(item)}
-                                tokenData={data}
-                                itemId={itemId}
-                                stats={stats}
-                            />
+                            <E5Ability ability={action} key={action.name + index} statblock={tokenName} />
                         ))}
                     </ul>
                 </div>
@@ -363,14 +285,7 @@ export const E5StatBlock = ({
                     <h3>Mythic Actions</h3>
                     <ul className={"ability-list"}>
                         {statblock.mythic_actions.map((action, index) => (
-                            <E5Ability
-                                ability={action}
-                                key={action.name + index}
-                                statblock={getTokenName(item)}
-                                tokenData={data}
-                                itemId={itemId}
-                                stats={stats}
-                            />
+                            <E5Ability ability={action} key={action.name + index} statblock={tokenName} />
                         ))}
                     </ul>
                 </div>
@@ -384,10 +299,7 @@ export const E5StatBlock = ({
                             <E5Ability
                                 ability={legendary_action}
                                 key={legendary_action.name + index}
-                                statblock={getTokenName(item)}
-                                tokenData={data}
-                                itemId={itemId}
-                                stats={stats}
+                                statblock={tokenName}
                             />
                         ))}
                     </ul>
@@ -409,7 +321,7 @@ export const E5StatBlock = ({
                                             title={"none"}
                                             hideReset={true}
                                             limitValues={limitValues}
-                                            itemId={itemId}
+                                            itemId={item.id}
                                         />
                                     </div>
                                 ) : null;
@@ -420,15 +332,26 @@ export const E5StatBlock = ({
             {statblock.spells && statblock.spells.length > 0 ? (
                 <E5Spells
                     spells={statblock.spells}
-                    stats={stats}
-                    statblock={getTokenName(item)}
+                    statblock={tokenName}
                     spellSlots={statblock.spell_slots}
-                    tokenData={data}
-                    itemId={itemId}
                     dc={statblock.spell_dc}
                     attack={statblock.spell_attack}
                 />
             ) : null}
         </div>
     ) : null;
+};
+
+export const E5StatBlockWrapper = ({ slug, itemId }: { slug: string; itemId: string }) => {
+    const room = useMetadataContext(useShallow((state) => state.room));
+    const statblockQuery = useE5GetStatblock(slug, room?.tabletopAlmanacAPIKey);
+    const statblock = statblockQuery.isSuccess && statblockQuery.data ? statblockQuery.data : null;
+
+    return statblock ? (
+        <E5StatblockContextProvider itemId={itemId} statblock={statblock}>
+            <E5StatBlock />
+        </E5StatblockContextProvider>
+    ) : (
+        <Loader />
+    );
 };

@@ -1,4 +1,4 @@
-import { Statblock } from "../hptracker/charactersheet/Statblock.tsx";
+import { Statblock } from "../gmgrimoire/statblocks/Statblock.tsx";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode, Mousewheel } from "swiper/modules";
 import "swiper/css";
@@ -193,20 +193,7 @@ export const StatblockList = (props: StatblockListProps) => {
                 })}
                 <SwiperSlide className={"post"}> </SwiperSlide>
             </Swiper>
-            {props.minimized ? null : (
-                <div className={"statblock-sheet"} style={{ ["--sticky-height" as string]: `${stickHeight}px` }}>
-                    <ul className={"jump-links fixed"} ref={jumpLinksRef}>
-                        {scrollTargets.map((t) => {
-                            return (
-                                <li key={t.name} className={"button"}>
-                                    <a href={`#${t.target}`}>{t.name}</a>
-                                </li>
-                            );
-                        })}
-                    </ul>
-                    {id ? <Statblock id={id} setScrollTargets={setScrollTargets} /> : null}
-                </div>
-            )}
+            {props.minimized ? null : id ? <Statblock id={id} setScrollTargets={setScrollTargets} /> : null}
         </>
     ) : (
         <></>

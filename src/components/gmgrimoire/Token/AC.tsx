@@ -12,7 +12,7 @@ import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import Tippy from "@tippyjs/react";
 import { useShallow } from "zustand/react/shallow";
 
-export const AC = ({ id }: { id: string }) => {
+export const AC = ({ id, hideExtras }: { id: string; hideExtras?: boolean }) => {
     const playerContext = usePlayerContext();
     const room = useMetadataContext(useShallow((state) => state.room));
     const acRef = useRef<HTMLInputElement>(null);
@@ -27,8 +27,8 @@ export const AC = ({ id }: { id: string }) => {
     }, [data?.armorClass]);
 
     return (
-        <div className={"token-ac"}>
-            <ACSvg />
+        <div className={`token-ac ${hideExtras ? "no-extras" : ""}`}>
+            {!hideExtras ? <ACSvg /> : null}
             <Tippy content={"Set AC"}>
                 <input
                     className={"ac-input"}
@@ -52,7 +52,7 @@ export const AC = ({ id }: { id: string }) => {
                     }}
                 />
             </Tippy>
-            {playerContext.role === "GM" ? (
+            {playerContext.role === "GM" && !hideExtras ? (
                 <MapButton
                     onClick={async () => {
                         const newData = { ...data, acOnMap: !data.acOnMap };

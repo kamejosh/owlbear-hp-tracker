@@ -1,27 +1,16 @@
 import { components } from "../../../../api/schema";
-import { DiceButton, DiceButtonWrapper, Stats } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { DiceButton, DiceButtonWrapper } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { capitalize, isInteger } from "lodash";
 import { LimitComponent } from "../LimitComponent.tsx";
-import { GMGMetadata } from "../../../../helper/types.ts";
 import { updateLimit } from "../../../../helper/helpers.ts";
 import { useMemo } from "react";
+import { useE5StatblockContext } from "../../../../context/E5StatblockContext.tsx";
 
 export type Ability = components["schemas"]["Action-Output"];
 
-export const E5Ability = ({
-    ability,
-    statblock,
-    tokenData,
-    itemId,
-    stats,
-}: {
-    ability: Ability;
-    statblock: string;
-    tokenData: GMGMetadata;
-    itemId: string;
-    stats: Stats;
-}) => {
-    const limitValues = tokenData.stats.limits?.find((l) => l.id === ability.limit?.name)!;
+export const E5Ability = ({ ability, statblock }: { ability: Ability; statblock: string }) => {
+    const { item, stats, data } = useE5StatblockContext();
+    const limitValues = data.stats.limits?.find((l) => l.id === ability.limit?.name)!;
 
     const limitReached = limitValues && limitValues.max === limitValues.used;
 
@@ -53,8 +42,8 @@ export const E5Ability = ({
         <li key={ability.name} className={"e5-ability"}>
             <span className={"ability-info"}>
                 <b className={"ability-name"}>{ability.name}.</b>
-                {ability.limit && tokenData.stats.limits && limitValues ? (
-                    <LimitComponent limit={ability.limit} title={"uses"} limitValues={limitValues} itemId={itemId} />
+                {ability.limit && data.stats.limits && limitValues ? (
+                    <LimitComponent limit={ability.limit} title={"uses"} limitValues={limitValues} itemId={item.id} />
                 ) : null}
             </span>
             <div>
@@ -66,7 +55,7 @@ export const E5Ability = ({
                     onRoll={
                         !ability.attack_bonus
                             ? async () => {
-                                  await updateLimit(itemId, limitValues);
+                                  await updateLimit(item.id, limitValues);
                               }
                             : undefined
                     }
@@ -84,7 +73,7 @@ export const E5Ability = ({
                             statblock={statblock}
                             stats={stats}
                             onRoll={async () => {
-                                await updateLimit(itemId, limitValues);
+                                await updateLimit(item.id, limitValues);
                             }}
                             limitReached={limitReached}
                         />
@@ -105,7 +94,7 @@ export const E5Ability = ({
                                 onRoll={
                                     !ability.attack_bonus
                                         ? async () => {
-                                              await updateLimit(itemId, limitValues);
+                                              await updateLimit(item.id, limitValues);
                                           }
                                         : undefined
                                 }

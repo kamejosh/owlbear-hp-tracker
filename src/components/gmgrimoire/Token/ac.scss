@@ -9,6 +9,11 @@
     align-items: start;
     height: 46px;
 
+    &.no-extras {
+        display: block;
+        height: auto;
+    }
+
     input[type="text"],
     input[type="number"] {
         padding-inline: 4px;

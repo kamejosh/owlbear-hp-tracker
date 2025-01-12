@@ -18,9 +18,10 @@ import diff_match_patch from "./diff/diff_match_patch.ts";
 import { E5Statblock } from "../api/e5/useE5Api.ts";
 import { PfStatblock } from "../api/pf/usePfApi.ts";
 import axiosRetry from "axios-retry";
-import { Ability } from "../components/hptracker/charactersheet/e5/E5Ability.tsx";
+import { Ability } from "../components/gmgrimoire/statblocks/e5/E5Ability.tsx";
 import { chunk } from "lodash";
 import { deleteItems, updateItems } from "./obrHelper.ts";
+import { getEquipmentBonuses } from "./equipmentHelpers.ts";
 
 export const getYOffset = async (height: number) => {
     const metadata = (await OBR.room.getMetadata()) as Metadata;
@@ -471,13 +472,22 @@ export const getInitialValues = async (items: Array<Image>) => {
                         const d = diff.diff_main(statblock.name, name);
                         const dist = diff.diff_levenshtein(d);
                         if (isBestMatch(dist, statblock, bestMatch)) {
+                            const equipmentBonuses = getEquipmentBonuses(statblock.stats, statblock.equipment || []);
+
                             bestMatch = {
                                 source: statblock.source,
                                 distance: dist,
                                 statblock: {
-                                    hp: statblock.hp.value,
-                                    ac: statblock.armor_class.value,
-                                    bonus: Math.floor(((statblock.stats.dexterity || 0) - 10) / 2),
+                                    hp: statblock.hp.value + equipmentBonuses.statblockBonuses.hpBonus,
+                                    ac: statblock.armor_class.value + equipmentBonuses.statblockBonuses.ac,
+                                    bonus:
+                                        statblock.initiative ??
+                                        Math.floor(
+                                            ((statblock.stats.dexterity || 0) +
+                                                equipmentBonuses.statblockBonuses.stats.dexterity -
+                                                10) /
+                                                2,
+                                        ),
                                     slug: statblock.slug,
                                     ruleset: "e5",
                                     limits: getLimitsE5(statblock),

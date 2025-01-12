@@ -6,7 +6,7 @@ import { changelogModal, itemMetadataKey, version } from "../../helper/variables
 import { GMGMetadata, SORT } from "../../helper/types.ts";
 import { PlayerTokenList } from "./TokenList.tsx";
 import { useCharSheet } from "../../context/CharacterContext.ts";
-import { CharacterSheet } from "./charactersheet/CharacterSheet.tsx";
+import { CharacterSheet } from "./statblocks/CharacterSheet.tsx";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { DropGroup } from "./DropGroup.tsx";
 import {

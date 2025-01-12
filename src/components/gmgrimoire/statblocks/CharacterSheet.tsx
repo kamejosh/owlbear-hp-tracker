@@ -184,15 +184,6 @@ export const CharacterSheet = (props: { itemId: string }) => {
                         <h2 className={"statblock-name"}>
                             {getTokenName(item)} <span className={"note"}>(using {room?.ruleset} Filter)</span>
                         </h2>
-                        <ul className={"jump-links"} ref={jumpLinksRef}>
-                            {scrollTargets.map((t) => {
-                                return (
-                                    <li className={"button"} key={t.name}>
-                                        <a href={`#${t.target}`}>{t.name}</a>
-                                    </li>
-                                );
-                            })}
-                        </ul>
                     </div>
                     {room?.ruleset === "e5" || room?.ruleset === "pf" ? (
                         <>

@@ -1,6 +1,6 @@
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import { useEffect, useRef, useState } from "react";
-import { Token } from "../hptracker/Token/Token.tsx";
+import { Token } from "../gmgrimoire/Token/Token.tsx";
 import OBR, { Image } from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "../../helper/variables.ts";
 import { GMGMetadata } from "../../helper/types.ts";
@@ -24,8 +24,8 @@ import {
 import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { useTokenListContext } from "../../context/TokenContext.tsx";
 import { TokenContextWrapper } from "../TokenContextWrapper.tsx";
-import { MapButton } from "../hptracker/Token/MapButton.tsx";
-import { PlayerButton } from "../hptracker/Token/PlayerButton.tsx";
+import { MapButton } from "../gmgrimoire/Token/MapButton.tsx";
+import { PlayerButton } from "../gmgrimoire/Token/PlayerButton.tsx";
 import { HPSvg } from "../svgs/HPSvg.tsx";
 import { ACSvg } from "../svgs/ACSvg.tsx";
 import { InitiativeSvg } from "../svgs/InitiativeSvg.tsx";

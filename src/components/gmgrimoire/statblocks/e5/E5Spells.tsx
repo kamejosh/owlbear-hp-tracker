@@ -9,6 +9,7 @@ import { GMGMetadata } from "../../../../helper/types.ts";
 import { useMetadataContext } from "../../../../context/MetadataContext.ts";
 import Tippy from "@tippyjs/react";
 import { useShallow } from "zustand/react/shallow";
+import { useE5StatblockContext } from "../../../../context/E5StatblockContext.tsx";
 
 type Spell = components["schemas"]["src__types__e5__spell__Spell"];
 
@@ -218,14 +219,12 @@ const Spell = ({
 export const E5Spells = (props: {
     spells: Array<Spell>;
     statblock: string;
-    stats: Stats;
     spellSlots?: Array<E5SpellSlot> | null;
-    tokenData?: GMGMetadata;
-    itemId?: string;
     dc?: string | null;
     attack?: string | null;
 }) => {
     const [spellFilter, setSpellFilter] = useState<Array<number>>([]);
+    const { stats, data, item } = useE5StatblockContext();
 
     const filters = ["All"]
         .concat(
@@ -278,10 +277,10 @@ export const E5Spells = (props: {
                                 spell={spell}
                                 key={`${spell.name}${index}`}
                                 statblock={props.statblock}
-                                stats={props.stats}
+                                stats={stats}
                                 spellSlots={props.spellSlots}
-                                tokenData={props.tokenData}
-                                itemId={props.itemId}
+                                tokenData={data}
+                                itemId={item.id}
                                 dc={props.dc}
                                 attack={props.attack}
                             />

@@ -1,0 +1,38 @@
+.content {
+    border: 1px solid white;
+    border-top: none;
+    padding: 4px 8px;
+    overflow-y: auto;
+}
+
+.tabs {
+    display: flex;
+    flex-wrap: wrap;
+    min-width: 100%;
+    list-style: none;
+}
+
+.tab {
+    flex-grow: 1;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    border: 1px solid grey;
+    border-top-right-radius: 4px;
+    border-top-left-radius: 4px;
+    padding: 1px 8px;
+    color: grey;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: capitalize;
+
+    &:hover,
+    &:focus-visible {
+        text-shadow: 0 0 4px dimgrey;
+    }
+}
+
+.activeTab {
+    border-color: white;
+    border-bottom: none;
+    color: white;
+}

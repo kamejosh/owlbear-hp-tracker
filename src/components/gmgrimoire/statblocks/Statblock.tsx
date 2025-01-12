@@ -1,7 +1,7 @@
 import { GMGMetadata } from "../../../helper/types.ts";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
-import { E5StatBlock } from "./e5/E5Statblock.tsx";
+import { E5StatBlockWrapper } from "./e5/E5Statblock.tsx";
 import { PfStatBlock } from "./pf/PfStatblock.tsx";
 import { Image } from "@owlbear-rodeo/sdk";
 import { getTokenName } from "../../../helper/helpers.ts";
@@ -22,7 +22,7 @@ export const Statblock = ({
     return token ? (
         <div className={"statblock-wrapper"}>
             {room && room.ruleset === "e5" ? (
-                <E5StatBlock slug={data.sheet} itemId={id} setScrollTargets={setScrollTargets} />
+                <E5StatBlockWrapper slug={data.sheet} itemId={id} />
             ) : (
                 <PfStatBlock
                     slug={data.sheet}

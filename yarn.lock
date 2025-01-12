@@ -39,11 +39,6 @@
   dependencies:
     regenerator-runtime "^0.14.0"
 
-"@bitperfect-software/prettier-config@^2.0.1":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@bitperfect-software/prettier-config/-/prettier-config-2.0.1.tgz#cd90861f43d24426fa0e4849998a3b9e82ed4d77"
-  integrity sha512-9gKRXEfylfnieZouObv8jj/H/FAFj/9SYD2zJVeKXLhTAKgHE7fyUSxYiaE6jJMOUwdylQgICNjSW+TGcnk+Sg==
-
 "@dice-roller/rpg-dice-roller@^5.5.0":
   version "5.5.0"
   resolved "https://registry.yarnpkg.com/@dice-roller/rpg-dice-roller/-/rpg-dice-roller-5.5.0.tgz#8b840da34a72e22846b896d8077f8219882fdd09"
@@ -915,10 +910,10 @@ csstype@3.1.3, csstype@^3.0.2:
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-3.1.3.tgz#d80ff294d114fb0e6ac500fbf85b60137d7eff81"
   integrity sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==
 
-dddice-js@^0.19.16:
-  version "0.19.16"
-  resolved "https://registry.yarnpkg.com/dddice-js/-/dddice-js-0.19.16.tgz#6ae8d87f12f857f2257424e557499c7c86538b11"
-  integrity sha512-itCvC5jRwtZokTGtpXGKr60baM99bTn60uuz9d5QLfnHxmoHeKSE8mr3F2NKBxl2uL2Pt67ljbZSvVHSAmNwLw==
+dddice-js@^0.19.23:
+  version "0.19.23"
+  resolved "https://registry.yarnpkg.com/dddice-js/-/dddice-js-0.19.23.tgz#0ea5d0b781c559d9f29074d6d6c6662f5264cdeb"
+  integrity sha512-E+VL6RJQQo+ZQvyyQo0mqlE724UHIpxYobXdKjazEy/yVnu8edpDuLdcKlyrlcOyx9iqpY7VdD6R8P98P1r5tQ==
   dependencies:
     "@types/three" "0.143.2"
 
@@ -2108,10 +2103,10 @@ prettier-plugin-css-order@^2.1.2:
     postcss-less "^6.0.0"
     postcss-scss "^4.0.9"
 
-prettier@^3.3.3:
-  version "3.3.3"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.3.3.tgz#30c54fe0be0d8d12e6ae61dbb10109ea00d53105"
-  integrity sha512-i2tDNA0O5IrMO757lfrdQZCc2jPNDVntV0m/+4whiDfWaTKfMNgR7Qz0NAeGz/nRqF4m5/6CLzbP4/liHt12Ew==
+prettier@^3.4.2:
+  version "3.4.2"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.4.2.tgz#a5ce1fb522a588bf2b78ca44c6e6fe5aa5a2b13f"
+  integrity sha512-e9MewbtFo+Fevyuxn/4rrcDAaq0IYxPGLvObpQjiZBMAzB9IGmzlnG9RZy3FFas+eBMu2vA0CszMeduow5dIuQ==
 
 property-information@^6.0.0:
   version "6.5.0"

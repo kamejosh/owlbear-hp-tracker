@@ -1,0 +1,48 @@
+.stats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 4px;
+}
+
+.savingThrows {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1ch;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.name {
+    display: flex;
+    gap: 1ch;
+
+    :first-child {
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+}
+
+.value {
+    display: flex;
+    gap: 1ch;
+}
+
+.infos {
+    list-style: none;
+
+    li {
+        line-height: 1.2;
+    }
+}
+
+.ac {
+    display: flex;
+    align-items: center;
+    gap: 1ch;
+}
