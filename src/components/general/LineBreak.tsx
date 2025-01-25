@@ -7,3 +7,11 @@ export const LineBreak = () => {
         </div>
     );
 };
+
+export const FancyLineBreak = () => {
+    return (
+        <div className={styles.fancyLine}>
+            <span className={styles.decoration}></span>
+        </div>
+    );
+};

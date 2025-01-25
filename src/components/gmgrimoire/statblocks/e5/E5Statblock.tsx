@@ -305,30 +305,7 @@ export const E5StatBlockOld = ({}: {}) => {
                     </ul>
                 </div>
             ) : null}
-            {statblock.spell_slots && statblock.spell_slots.length > 0 ? (
-                <div className={"spell-slots"}>
-                    <h3>Spell Slots</h3>
-                    <div className={"spell-slot-limits"}>
-                        {statblock.spell_slots
-                            .sort((a, b) => a.level - b.level)
-                            .map((spellSlot, i) => {
-                                const limitValues = data.stats.limits?.find((l) => l.id === spellSlot.limit!.name);
-                                return limitValues ? (
-                                    <div className={"spell-slot-entry"} key={i}>
-                                        <div className={"spell-slot-level"}>Level: {spellSlot.level}</div>
-                                        <LimitComponent
-                                            limit={spellSlot.limit}
-                                            title={"none"}
-                                            hideReset={true}
-                                            limitValues={limitValues}
-                                            itemId={item.id}
-                                        />
-                                    </div>
-                                ) : null;
-                            })}
-                    </div>
-                </div>
-            ) : null}
+
             {statblock.spells && statblock.spells.length > 0 ? (
                 <E5Spells
                     spells={statblock.spells}

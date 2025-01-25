@@ -45,14 +45,14 @@ const Content = () => {
 
     useEffect(() => {
         if (!minimized && isReady) {
-            OBR.popover.setHeight(statblockPopoverId, room?.statblockPopover?.height || 600);
-            OBR.popover.setWidth(statblockPopoverId, room?.statblockPopover?.width || 500);
+            void OBR.popover.setHeight(statblockPopoverId, room?.statblockPopover?.height || 600);
+            void OBR.popover.setWidth(statblockPopoverId, room?.statblockPopover?.width || 500);
         }
     }, [room, isReady]);
 
     useEffect(() => {
         if (isReady) {
-            initPopover();
+            void initPopover();
         }
     }, [isReady]);
 

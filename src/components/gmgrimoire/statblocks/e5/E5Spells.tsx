@@ -10,6 +10,9 @@ import { useMetadataContext } from "../../../../context/MetadataContext.ts";
 import Tippy from "@tippyjs/react";
 import { useShallow } from "zustand/react/shallow";
 import { useE5StatblockContext } from "../../../../context/E5StatblockContext.tsx";
+import { FancyLineBreak, LineBreak } from "../../../general/LineBreak.tsx";
+import styles from "./statblock-spells.module.scss";
+import { SpellSlots } from "./E5SpellSlots.tsx";
 
 type Spell = components["schemas"]["src__types__e5__spell__Spell"];
 
@@ -60,12 +63,12 @@ const Spell = ({
               (spellSlots && spellSlots.length > 0 && !spellLevelLimit);
 
     return (
-        <li className={`spell`}>
-            <div className={"spell-main"}>
-                <div className={"spell-info"}>
-                    <div className={"spell-header"}>
-                        <h4 className={"spell-name"}>{spell.name}</h4>
-                        <span className={"spell-level"}>({getSpellLevel()})</span>
+        <>
+            <div className={styles.spellMain}>
+                <div className={styles.spellInfo}>
+                    <div className={styles.spellHeader}>
+                        <h4 className={styles.spellName}>{spell.name}</h4>
+                        <span className={styles.spellLevel}>({getSpellLevel()})</span>
                         {spellSlots && spellSlots.length > 0 ? (
                             <Tippy content={"No more spellslots"} disabled={!limitReached}>
                                 <div
@@ -108,7 +111,7 @@ const Spell = ({
                         ) : null}
                     </div>
                     {spell.dc ? (
-                        <span className={"spell-damage"}>
+                        <span className={styles.spellDamage}>
                             DC: {spell.dc}
                             <DiceButton
                                 dice={"1d20"}
@@ -119,7 +122,7 @@ const Spell = ({
                         </span>
                     ) : null}
                     {damage ? (
-                        <span className={"spell-damage"}>
+                        <span className={styles.spellDamage}>
                             Damage:{" "}
                             <DiceButton
                                 dice={damage}
@@ -132,12 +135,12 @@ const Spell = ({
                             />
                         </span>
                     ) : null}
-                    <div className={"spell-components"}>
+                    <div className={styles.spellComponents}>
                         {spell.verbal ? "V" : null}
                         {spell.somatic ? "S" : null}
                         <span className={"spell-materials"}>
                             {spell.material ? `M` : null}
-                            <span className={"material-details"}>
+                            <span className={styles.materialDetails}>
                                 {!!spell.materials ? ` (${spell.materials})` : null}
                             </span>
                         </span>
@@ -145,9 +148,9 @@ const Spell = ({
                 </div>
                 <button className={`expand ${open ? "open" : null}`} onClick={() => setOpen(!open)}></button>
             </div>
-            <div className={`spell-more-info ${open ? "open" : null}`}>
-                <div className={"more-info-content"}>
-                    <div className={"info-bits"}>
+            <div className={`${styles.spellMoreInfo} ${open ? styles.open : null}`}>
+                <div className={`${styles.moreInfoContent} ${open ? styles.micOpen : null}`}>
+                    <div className={styles.infoBits}>
                         {!!spell.school.name ? (
                             <span>
                                 <b>School</b>: {spell.school.name}
@@ -184,8 +187,8 @@ const Spell = ({
                             <b>Concentration</b>: {spell.concentration ? "Yes" : "No"}
                         </span>
                     </div>
-                    <div className={"spell-description"}>
-                        <b>Description</b>:{" "}
+                    <div>
+                        <b>Description</b>:
                         <DiceButtonWrapper
                             text={spell.desc || ""}
                             context={`${capitalize(spell.name)}`}
@@ -200,7 +203,7 @@ const Spell = ({
                         />
                     </div>
                     {!!spell.higher_level ? (
-                        <div className={"spell-higher-level"}>
+                        <div>
                             <b>Higher Levels</b>:{" "}
                             <DiceButtonWrapper
                                 text={spell.higher_level}
@@ -212,23 +215,19 @@ const Spell = ({
                     ) : null}
                 </div>
             </div>
-        </li>
+        </>
     );
 };
 
-export const E5Spells = (props: {
-    spells: Array<Spell>;
-    statblock: string;
-    spellSlots?: Array<E5SpellSlot> | null;
-    dc?: string | null;
-    attack?: string | null;
-}) => {
+export const E5Spells = () => {
     const [spellFilter, setSpellFilter] = useState<Array<number>>([]);
-    const { stats, data, item } = useE5StatblockContext();
+    const { stats, data, item, tokenName, statblock, equipmentBonuses } = useE5StatblockContext();
+
+    const spells = statblock.spells || [];
 
     const filters = ["All"]
         .concat(
-            props.spells.map((spell) => {
+            spells.map((spell) => {
                 if (spell.level === 0) {
                     return "Cant";
                 } else if (spell.level === 1) {
@@ -260,32 +259,69 @@ export const E5Spells = (props: {
         });
 
     return (
-        <div className={"spells scroll-target"} id={"StatblockSpells"}>
-            <div className={"top"}>
-                <h3>Spells</h3>
-                {props.dc ? <span>DC {props.dc}</span> : null}
-                {props.attack ? <span>Attack +{props.attack}</span> : null}
+        <div className={"spells"}>
+            <div className={styles.top}>
+                <h3 className={styles.heading}>Spells</h3>
             </div>
-            <SpellFilter filters={filters} spellFilter={spellFilter} setSpellFilter={setSpellFilter} />
-            <ul className={"spell-list"}>
-                {props.spells
+            <FancyLineBreak />
+            <div className={styles.sticky}>
+                <SpellFilter filters={filters} spellFilter={spellFilter} setSpellFilter={setSpellFilter} />
+                <div className={styles.info}>
+                    {statblock.spell_dc ? <span>DC {statblock.spell_dc}</span> : null}
+                    {statblock.spell_attack ? (
+                        <span className={styles.spellAttack}>
+                            Attack{" "}
+                            <DiceButton
+                                dice={`d20+${statblock.spell_attack}`}
+                                text={`+${statblock.spell_attack}`}
+                                context={"Spell Attack"}
+                                stats={stats}
+                            />
+                        </span>
+                    ) : null}
+                </div>
+                <SpellSlots />
+            </div>
+
+            <ul className={styles.spellList}>
+                <li>
+                    <LineBreak />
+                </li>
+                {spells
                     .sort((a, b) => a.level - b.level)
                     .filter((spell) => spellFilter.indexOf(spell.level) >= 0 || spellFilter.length === 0)
                     .map((spell, index) => {
                         return (
-                            <Spell
-                                spell={spell}
-                                key={`${spell.name}${index}`}
-                                statblock={props.statblock}
-                                stats={stats}
-                                spellSlots={props.spellSlots}
-                                tokenData={data}
-                                itemId={item.id}
-                                dc={props.dc}
-                                attack={props.attack}
-                            />
+                            <li key={`${spell.name}${index}`}>
+                                <Spell
+                                    spell={spell}
+                                    statblock={tokenName}
+                                    stats={stats}
+                                    spellSlots={statblock.spell_slots}
+                                    tokenData={data}
+                                    itemId={item.id}
+                                    dc={statblock.spell_dc}
+                                    attack={statblock.spell_attack}
+                                />
+                                <LineBreak />
+                            </li>
                         );
                     })}
+                {equipmentBonuses.statblockBonuses.spells.map((itemSpells, index) => {
+                    const spellItem = statblock.equipment?.find((e) => e.item.id === itemSpells.itemId);
+                    return (
+                        <li key={index}>
+                            {itemSpells.spells
+                                .sort((a, b) => a.spell.level - b.spell.level)
+                                .filter(
+                                    (spell) => spellFilter.indexOf(spell.spell.level) >= 0 || spellFilter.length === 0,
+                                )
+                                .map((spell, index) => {
+                                    return <>{spellItem?.item.name}</>;
+                                })}
+                        </li>
+                    );
+                })}
             </ul>
         </div>
     );

@@ -8,8 +8,8 @@ import { useE5StatblockContext } from "../../../../context/E5StatblockContext.ts
 
 export type Ability = components["schemas"]["Action-Output"];
 
-export const E5Ability = ({ ability, statblock }: { ability: Ability; statblock: string }) => {
-    const { item, stats, data } = useE5StatblockContext();
+export const E5Ability = ({ ability }: { ability: Ability }) => {
+    const { item, stats, data, tokenName } = useE5StatblockContext();
     const limitValues = data.stats.limits?.find((l) => l.id === ability.limit?.name)!;
 
     const limitReached = limitValues && limitValues.max === limitValues.used;
@@ -50,7 +50,7 @@ export const E5Ability = ({ ability, statblock }: { ability: Ability; statblock:
                 <DiceButtonWrapper
                     text={ability.desc}
                     context={`${capitalize(ability.name)}`}
-                    statblock={statblock}
+                    statblock={tokenName}
                     stats={stats}
                     onRoll={
                         !ability.attack_bonus
@@ -70,7 +70,7 @@ export const E5Ability = ({ ability, statblock }: { ability: Ability; statblock:
                             dice={`d20+${bonus}`}
                             text={`+${bonus}`}
                             context={`${capitalize(ability.name)}: To Hit`}
-                            statblock={statblock}
+                            statblock={tokenName}
                             stats={stats}
                             onRoll={async () => {
                                 await updateLimit(item.id, limitValues);
@@ -89,7 +89,7 @@ export const E5Ability = ({ ability, statblock }: { ability: Ability; statblock:
                                 dice={ability.damage_dice}
                                 text={ability.damage_dice}
                                 context={`${capitalize(ability.name)}: Damage`}
-                                statblock={statblock}
+                                statblock={tokenName}
                                 stats={stats}
                                 onRoll={
                                     !ability.attack_bonus

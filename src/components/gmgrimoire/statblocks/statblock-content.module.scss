@@ -1,8 +1,30 @@
+@use "../../../_css/utilities/breakpoint";
+
+:root {
+    --header-size: 70px;
+
+    @include breakpoint.tablet {
+        --header-size: 42px;
+    }
+}
+
 .content {
     border: 1px solid white;
     border-top: none;
     padding: 4px 8px;
+    height: calc(100% - var(--header-size));
     overflow-y: auto;
+
+    &::-webkit-scrollbar {
+        background-color: rgba(55, 55, 55, 0.1);
+        width: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+        background-color: rgba(255, 255, 255, 0.5);
+    }
 }
 
 .tabs {
@@ -35,4 +57,14 @@
     border-color: white;
     border-bottom: none;
     color: white;
+}
+
+.wrapper {
+    height: calc(100% - var(--header-size));
+    overflow: hidden;
+}
+
+.actionWrapper {
+    height: 100%;
+    overflow: hidden;
 }

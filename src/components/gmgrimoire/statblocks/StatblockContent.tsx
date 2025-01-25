@@ -1,24 +1,30 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useE5StatblockContext } from "../../../context/E5StatblockContext.tsx";
 import styles from "./statblock-content.module.scss";
 import { E5General } from "./e5/E5General.tsx";
+import { E5Skills } from "./e5/E5Skills.tsx";
+import { useActiveTabContext } from "../../../context/ActiveTabContext.tsx";
+import { E5ActionTabs } from "./e5/E5ActionTabs.tsx";
+import { E5Legendary, E5Special } from "./e5/E5Actions.tsx";
+import { E5Spells } from "./e5/E5Spells.tsx";
 
 export const StatblockContent = () => {
-    const { statblock } = useE5StatblockContext();
-    const [activeTab, setActiveTab] = useState<string>("general");
+    const { statblock, item } = useE5StatblockContext();
+    const { activeTab, setActiveTab } = useActiveTabContext();
+    const tab = item.id in activeTab ? activeTab[item.id] : "general";
 
     const tabs = useMemo(() => {
         const tabList: Array<string> = ["general", "skills"];
         if (
-            statblock.actions ||
-            statblock.bonus_actions ||
-            statblock.mythic_actions ||
-            statblock.reactions ||
+            statblock.actions?.length ||
+            statblock.bonus_actions?.length ||
+            statblock.mythic_actions?.length ||
+            statblock.reactions?.length ||
             statblock.equipment?.some(
                 (equipment) =>
-                    equipment.item.bonus?.actions ||
-                    equipment.item.bonus?.bonus_actions ||
-                    equipment.item.bonus?.reactions,
+                    equipment.item.bonus?.actions?.length ||
+                    equipment.item.bonus?.bonus_actions?.length ||
+                    equipment.item.bonus?.reactions?.length,
             )
         ) {
             tabList.push("actions");
@@ -30,33 +36,51 @@ export const StatblockContent = () => {
             tabList.push("spells");
         }
         if (
-            statblock.special_abilities ||
-            statblock.equipment?.some((equipment) => equipment.item.bonus?.special_abilities)
+            statblock.special_abilities?.length ||
+            statblock.equipment?.some((equipment) => equipment.item.bonus?.special_abilities?.length)
         ) {
             tabList.push("special");
         }
-        if (statblock.legendary_actions) {
+        if (statblock.legendary_actions?.length) {
             tabList.push("legendary");
         }
         return tabList;
     }, [statblock]);
+
+    const currentTab = useMemo(() => {
+        if (tab === "general") {
+            return <E5General />;
+        } else if (tab === "skills") {
+            return <E5Skills />;
+        } else if (tab === "actions") {
+            return <E5ActionTabs />;
+        } else if (tab === "spells") {
+            return <E5Spells />;
+        } else if (tab === "special") {
+            return <E5Special />;
+        } else if (tab === "legendary") {
+            return <E5Legendary />;
+        } else {
+            return <></>;
+        }
+    }, [tab]);
+
     return (
-        <div>
+        <div className={styles.wrapper}>
             <ul className={styles.tabs}>
-                {tabs.map((tab, index) => {
+                {tabs.map((t, index) => {
                     return (
                         <li
                             key={index}
-                            className={activeTab === tab ? `${styles.tab} ${styles.activeTab}` : styles.tab}
+                            className={tab === t ? `${styles.tab} ${styles.activeTab}` : styles.tab}
+                            onClick={() => setActiveTab(item.id, t)}
                         >
-                            {tab}
+                            {t}
                         </li>
                     );
                 })}
             </ul>
-            <div className={styles.content}>
-                <E5General />
-            </div>
+            <div className={styles.content}>{currentTab}</div>
         </div>
     );
 };

@@ -1,14 +1,14 @@
 import { useE5StatblockContext } from "../../../../context/E5StatblockContext.tsx";
 import { LineBreak } from "../../../general/LineBreak.tsx";
 import { DiceButton } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
-import { capitalize, isNull, isNumber } from "lodash";
+import { capitalize, isNull } from "lodash";
 import styles from "./statblock-general.module.scss";
 import { AC } from "../../Token/AC.tsx";
-import { getEquipmentBonuses } from "../../../../helper/equipmentHelpers.ts";
+
+const statList = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 
 export const E5General = () => {
-    const { statblock, stats, tokenName, item } = useE5StatblockContext();
-    const equipmentBonuses = getEquipmentBonuses(statblock.stats, statblock.equipment || []);
+    const { statblock, stats, tokenName, item, equipmentBonuses } = useE5StatblockContext();
 
     return (
         <div>
@@ -32,25 +32,51 @@ export const E5General = () => {
                     .filter((v) => !!v)
                     .join(", ")}
             </div>
+            {statblock.proficiency_bonus ? (
+                <div>
+                    <b>Proficiency Bonus:</b> {statblock.proficiency_bonus}
+                </div>
+            ) : null}
             <LineBreak />
             <ul className={styles.stats}>
-                {Object.entries(stats).map(([stat, value]) => {
+                <li className={styles.header}>
+                    <div></div>
+                    <div>Check</div>
+                    <div>Save</div>
+                </li>
+                {statList.map((name) => {
+                    const savingThrowKey = `${name}_save`;
+                    // @ts-ignore name is always in stats
+                    const statValue = equipmentBonuses.stats[name];
+                    // @ts-ignore name is always in stats
+                    const saveValue = Object.hasOwn(statblock.stats, savingThrowKey)
+                        ? // @ts-ignore
+                          statblock.stats[savingThrowKey]
+                        : // @ts-ignore
+                          0 + equipmentBonuses.statblockBonuses.savingThrows[savingThrowKey];
                     return (
-                        <li className={styles.stat} key={stat}>
+                        <li className={styles.stat} key={name}>
                             <div className={styles.name}>
-                                <span>{stat.substring(0, 3)}</span>
-                                <span>{value}</span>
+                                <span>{name.substring(0, 3)}</span>
+                                <span>{statValue}</span>
                             </div>
                             <div className={styles.value}>
                                 <DiceButton
                                     dice={`d20${Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
-                                        Math.floor((value - 10) / 2),
+                                        Math.floor((statValue - 10) / 2),
                                     )}`}
                                     text={Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
-                                        Math.floor((value - 10) / 2),
+                                        Math.floor((statValue - 10) / 2),
                                     )}
                                     stats={stats}
-                                    context={`${capitalize(stat)}: Check`}
+                                    context={`${capitalize(name)}: Check`}
+                                    statblock={tokenName}
+                                />
+                                <DiceButton
+                                    dice={`d20+${saveValue}`}
+                                    text={`+${saveValue}`}
+                                    stats={stats}
+                                    context={`${capitalize(name.substring(0, 3))}: Save`}
                                     statblock={tokenName}
                                 />
                             </div>
@@ -59,39 +85,11 @@ export const E5General = () => {
                 })}
             </ul>
             <LineBreak />
-            {Object.entries(statblock.saving_throws) ? (
-                <>
-                    <b>Saving Throws</b>
-                    <ul className={styles.savingThrows}>
-                        {Object.entries(statblock.saving_throws)
-                            .map(([key, value]) => {
-                                // @ts-ignore
-                                const bonusValue: number = equipmentBonuses.statblockBonuses.savingThrows[key];
-                                const combinedValue = (value || 0) + bonusValue;
-                                return (
-                                    <li className={styles.stat} key={key}>
-                                        <div className={styles.name}>
-                                            <span>{key.substring(0, 3)}</span>
-                                        </div>
-                                        <DiceButton
-                                            dice={`d20+${combinedValue}`}
-                                            text={`+${combinedValue}`}
-                                            stats={stats}
-                                            context={`${capitalize(key.substring(0, 3))}: Save`}
-                                            statblock={tokenName}
-                                        />
-                                    </li>
-                                );
-                            })
-                            .filter((v) => !!v)}
-                    </ul>
-                </>
-            ) : null}
-            <LineBreak />
             <ul className={styles.infos}>
-                {statblock.senses ? (
+                {statblock.senses || equipmentBonuses.statblockBonuses.senses ? (
                     <li>
-                        <b>Senses:</b> {statblock.senses?.join(", ")}
+                        <b>Senses:</b>{" "}
+                        {(statblock.senses || []).concat(...equipmentBonuses.statblockBonuses.senses).join(", ")}
                     </li>
                 ) : null}
                 <li>
@@ -103,24 +101,28 @@ export const E5General = () => {
                         {statblock.challenge_rating ? `(${statblock.challenge_rating})` : null}
                     </li>
                 ) : null}
-                {statblock.damage_vulnerabilities ? (
+                {statblock.damage_vulnerabilities || equipmentBonuses.statblockBonuses.damageVulnerabilities ? (
                     <li>
-                        <b>Damage Vulnerabilities:</b> {statblock.damage_vulnerabilities}
+                        <b>Damage Vulnerabilities:</b> {statblock.damage_vulnerabilities}{" "}
+                        {equipmentBonuses.statblockBonuses.damageVulnerabilities}
                     </li>
                 ) : null}
-                {statblock.damage_resistances ? (
+                {statblock.damage_resistances || equipmentBonuses.statblockBonuses.damageResistances ? (
                     <li>
-                        <b>Damage Resistances:</b> {statblock.damage_resistances}
+                        <b>Damage Resistances:</b> {statblock.damage_resistances}{" "}
+                        {equipmentBonuses.statblockBonuses.damageResistances}
                     </li>
                 ) : null}
-                {statblock.damage_immunities ? (
+                {statblock.damage_immunities || equipmentBonuses.statblockBonuses.damageImmunities ? (
                     <li>
-                        <b>Damage Immunities:</b> {statblock.damage_immunities}
+                        <b>Damage Immunities:</b> {statblock.damage_immunities}{" "}
+                        {equipmentBonuses.statblockBonuses.damageResistances}
                     </li>
                 ) : null}
-                {statblock.condition_immunities ? (
+                {statblock.condition_immunities || equipmentBonuses.statblockBonuses.conditionImmunities ? (
                     <li>
-                        <b>Condition Immunities:</b> {statblock.condition_immunities}
+                        <b>Condition Immunities:</b> {statblock.condition_immunities}{" "}
+                        {equipmentBonuses.statblockBonuses.conditionImmunities}
                     </li>
                 ) : null}
             </ul>

@@ -7,7 +7,7 @@ import { useShallow } from "zustand/react/shallow";
 import { getTokenName } from "../helper/helpers.ts";
 import { E5Statblock } from "../api/e5/useE5Api.ts";
 import { Loader } from "../components/general/Loader.tsx";
-import { getEquipmentBonuses } from "../helper/equipmentHelpers.ts";
+import { EquipmentBonuses, getEquipmentBonuses } from "../helper/equipmentHelpers.ts";
 
 export type E5StatblockContextType = {
     stats: Stats;
@@ -15,6 +15,7 @@ export type E5StatblockContextType = {
     data: GMGMetadata;
     item: Image;
     statblock: E5Statblock;
+    equipmentBonuses: EquipmentBonuses;
 };
 
 export const E5StatblockContext = createContext<E5StatblockContextType | null>(null);
@@ -49,6 +50,7 @@ export const E5StatblockContextProvider = (props: PropsWithChildren & { itemId: 
                         intelligence: equipmentBonuses.stats.intelligence,
                         charisma: equipmentBonuses.stats.charisma,
                     },
+                    equipmentBonuses: equipmentBonuses,
                 }}
             >
                 {props.children}

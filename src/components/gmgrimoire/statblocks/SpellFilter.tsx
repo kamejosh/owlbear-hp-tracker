@@ -1,10 +1,12 @@
+import styles from "./spell-filter.module.scss";
+
 export const SpellFilter = (props: {
     filters: Array<string>;
     spellFilter: Array<number>;
     setSpellFilter: (filters: Array<number>) => void;
 }) => {
     return (
-        <div className={"spell-filters"}>
+        <div className={styles.spellFilters}>
             {props.filters.map((filter) => {
                 let active = false;
                 if (filter === "All" && props.spellFilter.length === 0) {
@@ -19,7 +21,7 @@ export const SpellFilter = (props: {
 
                 return (
                     <button
-                        className={`button spell-filter ${active ? "active" : null}`}
+                        className={`button ${styles.spellFilter} ${active ? styles.active : null}`}
                         key={filter}
                         onClick={() => {
                             if (filter === "All") {

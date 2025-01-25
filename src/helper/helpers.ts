@@ -481,13 +481,7 @@ export const getInitialValues = async (items: Array<Image>) => {
                                     hp: statblock.hp.value + equipmentBonuses.statblockBonuses.hpBonus,
                                     ac: statblock.armor_class.value + equipmentBonuses.statblockBonuses.ac,
                                     bonus:
-                                        statblock.initiative ??
-                                        Math.floor(
-                                            ((statblock.stats.dexterity || 0) +
-                                                equipmentBonuses.statblockBonuses.stats.dexterity -
-                                                10) /
-                                                2,
-                                        ),
+                                        statblock.initiative ?? Math.floor((equipmentBonuses.stats.dexterity - 10) / 2),
                                     slug: statblock.slug,
                                     ruleset: "e5",
                                     limits: getLimitsE5(statblock),

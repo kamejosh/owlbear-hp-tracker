@@ -172,7 +172,7 @@ export const Token = (props: TokenProps) => {
             data.hpTrackerActive &&
             (playerContext.role === "GM" ||
                 item.createdUserId === playerContext.id ||
-                (!!data.playerMap?.hp && !!data.playerMap?.ac && !!data.playerList))
+                (!!data.playerMap?.hp && !!data.playerMap?.ac && data.hpOnMap && data.acOnMap && !!data.playerList))
         );
     };
 

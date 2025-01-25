@@ -209,10 +209,10 @@ export const getEquipmentBonuses = (stats: StatblockStats, equipment: Array<Stat
                     bonuses.conditionImmunities += ` ${itemBonus.condition_immunities}`;
                 }
                 if (itemBonus.senses) {
-                    bonuses.senses.concat(itemBonus.senses);
+                    bonuses.senses = bonuses.senses.concat(...itemBonus.senses);
                 }
                 if (itemBonus.proficiency) {
-                    bonuses.proficiencies.concat(itemBonus.proficiency);
+                    bonuses.proficiencies = bonuses.proficiencies.concat(...itemBonus.proficiency);
                 }
                 if (itemBonus.stats) {
                     if (itemBonus.stats.strength) {
@@ -339,11 +339,10 @@ export const getEquipmentBonuses = (stats: StatblockStats, equipment: Array<Stat
                         bonuses.skills.survival = itemBonus.skills.survival;
                     }
                 }
-
-                item.item.modifiers?.stats?.forEach((modifier) => {
-                    modifiers.push(modifier);
-                });
             }
+            item.item.modifiers?.stats?.forEach((modifier) => {
+                modifiers.push(modifier);
+            });
         }
 
         if (item.equipped && item.item.bonus) {

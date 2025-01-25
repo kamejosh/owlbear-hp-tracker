@@ -1,8 +1,8 @@
 .stats {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(43px, 1fr));
     justify-content: space-between;
-    gap: 4px;
+    gap: 2px;
 }
 
 .savingThrows {
@@ -16,21 +16,68 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+
+    &:last-child {
+        :global {
+            .button-wrapper {
+                .dice-context-button {
+                    right: unset;
+                    left: 0;
+                    translate: -100% -50%;
+                }
+            }
+        }
+    }
 }
 
 .name {
     display: flex;
-    gap: 1ch;
+    align-items: center;
+    gap: 3px;
 
     :first-child {
         font-weight: bold;
         text-transform: uppercase;
     }
+
+    :last-child {
+        font-size: 11px;
+    }
 }
 
 .value {
     display: flex;
-    gap: 1ch;
+    flex-direction: column;
+    :global {
+        .button-wrapper {
+            width: 100%;
+
+            .dice-button {
+                justify-content: space-between;
+                background-color: var(--bg-color-light);
+                width: 100%;
+            }
+
+            &:first-child {
+                .dice-button {
+                    background-color: var(--bg-color);
+                }
+            }
+        }
+    }
+}
+
+.header {
+    display: grid;
+    grid-template-rows: repeat(3, 1fr);
+
+    :last-child {
+        color: color-mix(in srgb, var(--bg-color-light), white 50%);
+    }
+
+    > * {
+        font-weight: bold;
+    }
 }
 
 .infos {
