@@ -4,6 +4,7 @@ import { DiceButton } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { capitalize, isNull } from "lodash";
 import styles from "./statblock-general.module.scss";
 import { AC } from "../../Token/AC.tsx";
+import { About } from "../About.tsx";
 
 const statList = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 
@@ -11,7 +12,7 @@ export const E5General = () => {
     const { statblock, stats, tokenName, item, equipmentBonuses } = useE5StatblockContext();
 
     return (
-        <div>
+        <div className={styles.general}>
             <div className={styles.ac}>
                 <b>Armor Class:</b> <AC id={item.id} hideExtras={true} />
                 {statblock.armor_class.special ? <span>({statblock.armor_class.special})</span> : null}
@@ -126,6 +127,8 @@ export const E5General = () => {
                     </li>
                 ) : null}
             </ul>
+            <LineBreak />
+            <About about={statblock.about} slug={statblock.slug} statblock={statblock} stats={stats} />
         </div>
     );
 };

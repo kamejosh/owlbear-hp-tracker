@@ -15,17 +15,24 @@
     gap: 2px;
 }
 
+.heading {
+    margin: 0;
+    font-size: 1.3rem;
+    line-height: 1.1;
+}
+
 .savingThrows {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: 1ch;
 }
 
 .stat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: grid;
+    grid-template-rows: repeat(2, 1fr);
+    justify-content: center;
+    justify-items: center;
 
     &:last-child {
         :global {
@@ -38,6 +45,16 @@
             }
         }
     }
+}
+
+.traits {
+    list-style: none;
+}
+
+.trait {
+    display: flex;
+    gap: 1ch;
+    text-transform: capitalize;
 }
 
 .name {
@@ -79,11 +96,7 @@
 
 .header {
     display: grid;
-    grid-template-rows: repeat(3, 1fr);
-
-    :last-child {
-        color: color-mix(in srgb, var(--bg-color-light), white 50%);
-    }
+    grid-template-rows: repeat(2, 1fr);
 
     > * {
         font-weight: bold;

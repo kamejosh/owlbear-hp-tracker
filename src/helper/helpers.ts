@@ -372,6 +372,15 @@ const getLimitsPf = (statblock: PfStatblock) => {
     return [];
 };
 
+const getPfInitiativeBonus = (bonus?: string | null) => {
+    if (bonus) {
+        try {
+            return parseInt(bonus);
+        } catch {}
+    }
+    return 0;
+};
+
 export const updateTokenSheet = async (
     statblock: E5Statblock | PfStatblock,
     characterId: string,
@@ -396,7 +405,7 @@ export const updateTokenSheet = async (
                         ruleset === "e5"
                             ? (statblock as E5Statblock).initiative ||
                               Math.floor(((statblock.stats.dexterity || 0) - 10) / 2)
-                            : (statblock as PfStatblock).perception,
+                            : getPfInitiativeBonus((statblock as PfStatblock).perception),
                     initial: false,
                     limits:
                         ruleset === "e5"

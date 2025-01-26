@@ -3,9 +3,9 @@ import { useState } from "react";
 import { DiceButtonWrapper, Stats } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { capitalize, isString } from "lodash";
 
-type Action = components["schemas"]["ActionOut"];
-type Reaction = components["schemas"]["Reaction-Output"];
-type SpecialAbility = components["schemas"]["SpecialAbility-Output"];
+export type Action = components["schemas"]["ActionOut"];
+export type Reaction = components["schemas"]["Reaction-Output"];
+export type SpecialAbility = components["schemas"]["SpecialAbility-Output"];
 
 export const PfAbility = ({
     ability,
@@ -59,7 +59,7 @@ export const PfAbility = ({
     };
 
     return (
-        <li key={ability.name} className={`pf-ability ${open ? "open" : ""}`}>
+        <div key={ability.name} className={`pf-ability ${open ? "open" : ""}`}>
             <div className={"main-info"}>
                 <div className={"name-and-description"}>
                     <b className={"ability-name"}>{ability.name}</b> {actionTypeConvert(ability)}
@@ -104,6 +104,6 @@ export const PfAbility = ({
                     })}
                 </ul>
             </div>
-        </li>
+        </div>
     );
 };

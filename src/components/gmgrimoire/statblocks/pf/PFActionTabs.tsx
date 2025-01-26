@@ -1,37 +1,23 @@
-import { useE5StatblockContext } from "../../../../context/E5StatblockContext.tsx";
 import { useActiveTabContext } from "../../../../context/ActiveTabContext.tsx";
 import { useMemo } from "react";
-import { E5Abilities } from "./E5Abilities.tsx";
 import styles from "../pf/statblock-content.module.scss";
+import { usePFStatblockContext } from "../../../../context/PFStatblockContext.tsx";
+import { PFAbilities } from "./PFAbilities.tsx";
 
-export const E5ActionTabs = () => {
-    const { statblock, item } = useE5StatblockContext();
+export const PFActionTabs = () => {
+    const { statblock, item } = usePFStatblockContext();
     const { activeTab, setActiveTab } = useActiveTabContext();
     const tabId = `${item.id}-action`;
 
     const tabs = useMemo(() => {
         const tabList: Array<string> = [];
-        if (
-            statblock.actions?.length ||
-            statblock.equipment?.some((equipment) => equipment.item.bonus?.actions?.length)
-        ) {
+        if (statblock.actions?.length) {
             tabList.push("action");
         }
-        if (
-            statblock.bonus_actions?.length ||
-            statblock.equipment?.some((equipment) => equipment.item.bonus?.bonus_actions?.length)
-        ) {
-            tabList.push("bonus");
-        }
-        if (
-            statblock.reactions?.length ||
-            statblock.equipment?.some((equipment) => equipment.item.bonus?.reactions?.length)
-        ) {
+        if (statblock.reactions?.length) {
             tabList.push("reaction");
         }
-        if (statblock.mythic_actions?.length) {
-            tabList.push("mythic");
-        }
+
         return tabList;
     }, [statblock]);
 
@@ -39,25 +25,9 @@ export const E5ActionTabs = () => {
 
     const currentTab = useMemo(() => {
         if (tab === "action") {
-            return <E5Abilities heading={"Actions"} abilities={statblock.actions} abilityKey={"actions"} />;
-        } else if (tab === "bonus") {
-            return (
-                <E5Abilities
-                    heading={"Bonus Actions"}
-                    abilities={statblock.bonus_actions}
-                    abilityKey={"bonus_actions"}
-                />
-            );
+            return <PFAbilities heading={"Actions"} abilities={statblock.actions} />;
         } else if (tab === "reaction") {
-            return <E5Abilities heading={"Reactions"} abilities={statblock.reactions} abilityKey={"reactions"} />;
-        } else if (tab === "mythic") {
-            return (
-                <E5Abilities
-                    heading={"Mythic Actions"}
-                    abilities={statblock.mythic_actions}
-                    abilityKey={"mythic_actions"}
-                />
-            );
+            return <PFAbilities heading={"Reactions"} abilities={statblock.reactions} />;
         } else {
             return <></>;
         }

@@ -4,9 +4,10 @@ export const SpellFilter = (props: {
     filters: Array<string>;
     spellFilter: Array<number>;
     setSpellFilter: (filters: Array<number>) => void;
+    left?: boolean;
 }) => {
     return (
-        <div className={styles.spellFilters}>
+        <div className={`${styles.spellFilters} ${props.left ? styles.left : null}`}>
             {props.filters.map((filter) => {
                 let active = false;
                 if (filter === "All" && props.spellFilter.length === 0) {

@@ -7,6 +7,8 @@ import { SpellFilter } from "../SpellFilter.tsx";
 import { capitalize } from "lodash";
 import { useMetadataContext } from "../../../../context/MetadataContext.ts";
 import { useShallow } from "zustand/react/shallow";
+import { FancyLineBreak, LineBreak } from "../../../general/LineBreak.tsx";
+import styles from "./statblock-spells.module.scss";
 
 export type PfSpellCategory = components["schemas"]["SpellCategoryOut"];
 export type PfSpellList = components["schemas"]["SpelllistOut"];
@@ -192,7 +194,15 @@ const PfSpellListComponent = (props: { list: PfSpellList; statblock: string; sta
                 {!!props.list.spells
                     ? props.list.spells.map((spell) => {
                           return (
-                              <Spell spell={spell} key={spell.slug} statblock={props.statblock} stats={props.stats} />
+                              <>
+                                  <Spell
+                                      spell={spell}
+                                      key={spell.slug}
+                                      statblock={props.statblock}
+                                      stats={props.stats}
+                                  />
+                                  <LineBreak />
+                              </>
                           );
                       })
                     : null}
@@ -242,7 +252,7 @@ const PfSpellCategory = (props: { spellCategory: PfSpellCategory; statblock: str
         <div className={"spell-category"}>
             <div className={"spell-category-main"}>
                 <div className={"spell-category-header"}>
-                    <h3 className={"spell-category-name"}>{props.spellCategory.name}</h3>
+                    <h3 className={styles.sectionHeading}>{props.spellCategory.name}</h3>
                     <span className={"spell-category-info"}>
                         {props.spellCategory.dc ? `DC: ${props.spellCategory.dc}` : null}{" "}
                         {props.spellCategory.attack ? (
@@ -263,7 +273,12 @@ const PfSpellCategory = (props: { spellCategory: PfSpellCategory; statblock: str
             </div>
             <div className={`spell-category-details ${open ? "open" : null}`}>
                 <div className={"spell-category-details-content"}>
-                    <SpellFilter filters={filters} spellFilter={spellFilter} setSpellFilter={setSpellFilter} />
+                    <SpellFilter
+                        filters={filters}
+                        spellFilter={spellFilter}
+                        setSpellFilter={setSpellFilter}
+                        left={true}
+                    />
                     {!!props.spellCategory.spell_lists
                         ? props.spellCategory.spell_lists
                               .sort((a, b) => {
@@ -315,7 +330,8 @@ const PfSpellCategory = (props: { spellCategory: PfSpellCategory; statblock: str
 export const PfSpells = (props: { spells: Array<PfSpellCategory>; statblock: string; stats: Stats }) => {
     return (
         <div className={"spells"}>
-            <h3 className={"section-title"}>Spells</h3>
+            <h3 className={styles.heading}>Spells</h3>
+            <FancyLineBreak />
             {props.spells.map((spellCategory, index) => {
                 return !!spellCategory ? (
                     <PfSpellCategory
@@ -326,6 +342,7 @@ export const PfSpells = (props: { spells: Array<PfSpellCategory>; statblock: str
                     />
                 ) : null;
             })}
+            <FancyLineBreak />
         </div>
     );
 };

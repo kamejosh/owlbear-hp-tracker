@@ -4,8 +4,8 @@ import { useShallow } from "zustand/react/shallow";
 import { E5StatblockContextProvider, useE5StatblockContext } from "../../../../context/E5StatblockContext.tsx";
 import { Loader } from "../../../general/Loader.tsx";
 import styles from "./e5statblock.module.scss";
-import { StatblockValues } from "../StatblockValues.tsx";
-import { StatblockContent } from "../StatblockContent.tsx";
+import { E5StatblockValues } from "./E5StatblockValues.tsx";
+import { E5StatblockContent } from "./E5StatblockContent.tsx";
 
 export const E5StatBlock = () => {
     const { statblock } = useE5StatblockContext();
@@ -19,9 +19,9 @@ export const E5StatBlock = () => {
                         {statblock.size} {statblock.type}, {statblock.alignment}
                     </div>
                 </div>
-                <StatblockValues />
+                <E5StatblockValues />
             </div>
-            <StatblockContent />
+            <E5StatblockContent />
         </div>
     );
 };

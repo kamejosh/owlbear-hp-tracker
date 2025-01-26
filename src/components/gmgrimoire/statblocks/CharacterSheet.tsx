@@ -25,7 +25,6 @@ type StatblockWrapperProps = {
     search: string;
     itemId: string;
     setEmpty: (empty: boolean) => void;
-    setScrollTargets: (targets: Array<{ name: string; target: string }>) => void;
 };
 
 const SearchWrapper = (props: SearchWrapperProps) => {
@@ -115,7 +114,7 @@ const StatblockWrapper = (props: StatblockWrapperProps) => {
     return (
         <>
             {props.data.sheet && !props.forceSearch ? (
-                <Statblock id={props.itemId} setScrollTargets={props.setScrollTargets} />
+                <Statblock id={props.itemId} />
             ) : props.search !== "" ? (
                 ruleSetMap.get(room?.ruleset || "e5")
             ) : (
@@ -136,9 +135,6 @@ export const CharacterSheet = (props: { itemId: string }) => {
     const [forceSearch, setForceSearch] = useState<boolean>(false);
     const [emptySearch, setEmptySearch] = useState<boolean>(false);
     const [backgroundColor, setBackgroundColor] = useState<string>();
-    const [scrollTargets, setScrollTargets] = useState<Array<{ name: string; target: string }>>([]);
-    const [stickHeight, setStickyHeight] = useState<number>();
-    const jumpLinksRef = useRef<HTMLUListElement>(null);
 
     const initData = async () => {
         if (playerContext.role !== "GM" && item.createdUserId === OBR.player.id) {
@@ -162,16 +158,8 @@ export const CharacterSheet = (props: { itemId: string }) => {
         }
     }, [data?.sheet]);
 
-    useEffect(() => {
-        if (jumpLinksRef.current) {
-            setTimeout(() => {
-                setStickyHeight(jumpLinksRef.current?.clientHeight);
-            }, 1000);
-        }
-    }, [jumpLinksRef.current]);
-
     return (
-        <div className={`character-sheet`} style={{ ["--sticky-height" as string]: `${stickHeight}px` }}>
+        <div className={`character-sheet`}>
             {backgroundColor ? (
                 <div className={"background"} style={{ borderLeft: `5px solid ${backgroundColor}` }}></div>
             ) : null}
@@ -200,7 +188,6 @@ export const CharacterSheet = (props: { itemId: string }) => {
                                 setForceSearch={setForceSearch}
                                 itemId={props.itemId}
                                 setEmpty={setEmptySearch}
-                                setScrollTargets={setScrollTargets}
                             />
                         </>
                     ) : (

@@ -1,15 +1,15 @@
 import { useMemo } from "react";
-import { useE5StatblockContext } from "../../../context/E5StatblockContext.tsx";
+import { useE5StatblockContext } from "../../../../context/E5StatblockContext.tsx";
 import styles from "./statblock-content.module.scss";
-import { E5General } from "./e5/E5General.tsx";
-import { E5Skills } from "./e5/E5Skills.tsx";
-import { useActiveTabContext } from "../../../context/ActiveTabContext.tsx";
-import { E5ActionTabs } from "./e5/E5ActionTabs.tsx";
-import { E5Abilities } from "./e5/E5Abilities.tsx";
-import { E5Spells } from "./e5/E5Spells.tsx";
-import { E5Inventory } from "./e5/E5Inventory.tsx";
+import { E5General } from "./E5General.tsx";
+import { E5Skills } from "./E5Skills.tsx";
+import { useActiveTabContext } from "../../../../context/ActiveTabContext.tsx";
+import { E5ActionTabs } from "./E5ActionTabs.tsx";
+import { E5Abilities } from "./E5Abilities.tsx";
+import { E5Spells } from "./E5Spells.tsx";
+import { E5Inventory } from "./E5Inventory.tsx";
 
-export const StatblockContent = () => {
+export const E5StatblockContent = () => {
     const { statblock, item } = useE5StatblockContext();
     const { activeTab, setActiveTab } = useActiveTabContext();
     const tab = item.id in activeTab ? activeTab[item.id] : "general";
@@ -30,10 +30,10 @@ export const StatblockContent = () => {
         ) {
             tabList.push("actions");
         }
-        if (statblock.items || statblock.equipment) {
+        if (statblock.items?.length || statblock.equipment?.length) {
             tabList.push("inventory");
         }
-        if (statblock.spells || statblock.equipment?.some((equipment) => equipment.item.spells)) {
+        if (statblock.spells?.length || statblock.equipment?.some((equipment) => equipment.item.spells)) {
             tabList.push("spells");
         }
         if (

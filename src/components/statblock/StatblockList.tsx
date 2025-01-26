@@ -4,7 +4,7 @@ import { FreeMode, Mousewheel } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/mousewheel";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { itemMetadataKey } from "../../helper/variables.ts";
 import { GMGMetadata } from "../../helper/types.ts";
 import SwiperClass from "swiper/types/swiper-class";
@@ -30,7 +30,6 @@ export const StatblockList = (props: StatblockListProps) => {
     const { isReady } = SceneReadyContext();
     const [id, setId] = useState<string | undefined>();
     const [swiper, setSwiper] = useState<SwiperClass>();
-    const [scrollTargets, setScrollTargets] = useState<Array<{ name: string; target: string }>>([]);
     const items = useCallback(() => {
         if (tokens) {
             const itemList = [...tokens].map((t) => t[1].item).sort(sortItems);
@@ -42,16 +41,6 @@ export const StatblockList = (props: StatblockListProps) => {
         }
         return [];
     }, [tokens, playerContext])();
-    const [stickHeight, setStickyHeight] = useState<number>();
-    const jumpLinksRef = useRef<HTMLUListElement>(null);
-
-    useEffect(() => {
-        if (jumpLinksRef.current) {
-            setTimeout(() => {
-                setStickyHeight(jumpLinksRef.current?.getBoundingClientRect().height);
-            }, 1000);
-        }
-    }, [jumpLinksRef.current, id]);
 
     useEffect(() => {
         if ((!id || !items.map((i) => i.id).includes(id)) && items.length > 0) {
@@ -193,7 +182,7 @@ export const StatblockList = (props: StatblockListProps) => {
                 })}
                 <SwiperSlide className={"post"}> </SwiperSlide>
             </Swiper>
-            {props.minimized ? null : id ? <Statblock id={id} setScrollTargets={setScrollTargets} /> : null}
+            {props.minimized ? null : id ? <Statblock id={id} /> : null}
         </>
     ) : (
         <></>
