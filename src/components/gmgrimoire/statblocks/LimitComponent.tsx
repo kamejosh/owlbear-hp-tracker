@@ -12,12 +12,14 @@ export const LimitComponent = ({
     limitValues,
     itemId,
     hideReset,
+    hideDescription,
 }: {
     limit: LimitType;
     title: "name" | "uses" | "none";
     limitValues: Limit;
     itemId: string;
     hideReset?: boolean;
+    hideDescription?: boolean;
 }) => {
     const getTitle = () => {
         if (title === "name") {
@@ -66,7 +68,9 @@ export const LimitComponent = ({
                         })}
                 </div>
             </div>
-            {limit.description ? <Markdown remarkPlugins={[remarkGfm]}>{limit.description}</Markdown> : null}
+            {limit.description && !hideDescription ? (
+                <Markdown remarkPlugins={[remarkGfm]}>{limit.description}</Markdown>
+            ) : null}
             {limit.resets && !hideReset ? (
                 <div>
                     <b>Resets after:</b> {limit.resets.join(", ")}

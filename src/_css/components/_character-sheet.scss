@@ -687,7 +687,10 @@ b {
             gap: 5px;
 
             .limit-use {
-                position: relative;
+                display: grid;
+                grid-template-areas: "all";
+                justify-content: center;
+                align-items: center;
                 transition: all 0.25s ease;
                 cursor: pointer;
                 outline: 1px solid transparent;
@@ -704,10 +707,8 @@ b {
                 &.used {
                     &::after,
                     &::before {
-                        position: absolute;
-                        top: 50%;
-                        left: 50%;
-                        translate: -65% -45%;
+                        grid-area: all;
+                        translate: 0 5%;
                         rotate: 40deg;
                         background-color: #aaa;
                         width: 3px;
@@ -728,8 +729,8 @@ b {
     position: sticky;
     top: calc(16px + var(--sticky-height));
     z-index: 2;
-    border-bottom: none;
     transition: all 0.25s ease;
+    border-bottom: none;
 
     h3 {
         margin-block: 0.3rem;
@@ -763,8 +764,8 @@ b {
 
     &.fixed {
         position: fixed;
-        z-index: 3;
         top: calc(65px + 1rem);
+        z-index: 3;
         background: linear-gradient(to top, #ffffff00, var(--bg-color) 20px);
         padding-bottom: 20px;
     }

@@ -5,8 +5,9 @@ import { E5General } from "./e5/E5General.tsx";
 import { E5Skills } from "./e5/E5Skills.tsx";
 import { useActiveTabContext } from "../../../context/ActiveTabContext.tsx";
 import { E5ActionTabs } from "./e5/E5ActionTabs.tsx";
-import { E5Legendary, E5Special } from "./e5/E5Actions.tsx";
+import { E5Abilities } from "./e5/E5Abilities.tsx";
 import { E5Spells } from "./e5/E5Spells.tsx";
+import { E5Inventory } from "./e5/E5Inventory.tsx";
 
 export const StatblockContent = () => {
     const { statblock, item } = useE5StatblockContext();
@@ -54,12 +55,26 @@ export const StatblockContent = () => {
             return <E5Skills />;
         } else if (tab === "actions") {
             return <E5ActionTabs />;
+        } else if (tab === "inventory") {
+            return <E5Inventory />;
         } else if (tab === "spells") {
             return <E5Spells />;
         } else if (tab === "special") {
-            return <E5Special />;
+            return (
+                <E5Abilities
+                    heading={"Specials & Traits"}
+                    abilities={statblock.special_abilities}
+                    abilityKey={"special_abilities"}
+                />
+            );
         } else if (tab === "legendary") {
-            return <E5Legendary />;
+            return (
+                <E5Abilities
+                    heading={"Legendary Actions"}
+                    abilities={statblock.legendary_actions}
+                    abilityKey={"legendary_actions"}
+                />
+            );
         } else {
             return <></>;
         }

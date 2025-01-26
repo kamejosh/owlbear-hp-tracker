@@ -352,6 +352,17 @@ const getLimitsE5 = (statblock: E5Statblock) => {
         });
     });
 
+    statblock.equipment?.forEach((equipment) => {
+        if (equipment.item.charges) {
+            limits.push({
+                id: equipment.item.charges.name,
+                max: equipment.item.charges.uses,
+                used: 0,
+                resets: equipment.item.charges.resets ?? [],
+            });
+        }
+    });
+
     return limits;
 };
 
@@ -543,7 +554,7 @@ export const getInitialValues = async (items: Array<Image>) => {
     return itemInitValues;
 };
 
-export const updateLimit = async (itemId: string, limitValues: Limit) => {
+export const updateLimit = async (itemId: string, limitValues: Limit, usage?: number) => {
     if (limitValues) {
         await updateItems([itemId], (items) => {
             items.forEach((item) => {
@@ -556,7 +567,7 @@ export const updateLimit = async (itemId: string, limitValues: Limit) => {
                         if (index !== undefined) {
                             // @ts-ignore
                             item.metadata[itemMetadataKey]["stats"]["limits"][index]["used"] = Math.min(
-                                limitValues.used + 1,
+                                limitValues.used + (usage || 1),
                                 limitValues.max,
                             );
                         }

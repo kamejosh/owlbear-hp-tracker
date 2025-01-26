@@ -1,5 +1,5 @@
 import { components } from "../../../../api/schema";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { DiceButton, DiceButtonWrapper, Stats } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { getDamage, updateLimit } from "../../../../helper/helpers.ts";
 import { SpellFilter } from "../SpellFilter.tsx";
@@ -13,6 +13,8 @@ import { useE5StatblockContext } from "../../../../context/E5StatblockContext.ts
 import { FancyLineBreak, LineBreak } from "../../../general/LineBreak.tsx";
 import styles from "./statblock-spells.module.scss";
 import { SpellSlots } from "./E5SpellSlots.tsx";
+import { LimitType } from "../LimitComponent.tsx";
+import { ItemCharges } from "./ItemCharges.tsx";
 
 type Spell = components["schemas"]["src__types__e5__spell__Spell"];
 
@@ -21,6 +23,8 @@ const Spell = ({
     statblock,
     stats,
     spellSlots,
+    charges,
+    chargesUsed,
     tokenData,
     itemId,
     dc,
@@ -30,6 +34,8 @@ const Spell = ({
     statblock: string;
     stats: Stats;
     spellSlots?: Array<E5SpellSlot> | null;
+    charges?: LimitType | null;
+    chargesUsed?: number;
     tokenData?: GMGMetadata;
     itemId?: string;
     dc?: string | null;
@@ -53,14 +59,23 @@ const Spell = ({
     };
 
     const damage = spell.desc ? getDamage(spell.desc) : null;
-    const spellLevelLimit = spellSlots?.find((s) => s.level === spell.level)?.limit;
+    const spellLevelLimit = useMemo(() => {
+        if (spellSlots) {
+            return spellSlots?.find((s) => s.level === spell.level)?.limit;
+        } else if (charges) {
+            return charges;
+        }
+        return undefined;
+    }, [spellSlots, spell, charges]);
 
     const limitValues = tokenData?.stats.limits?.find((l) => l.id === spellLevelLimit?.name);
-    const limitReached =
-        spell.level === 0
+
+    const limitReached = useMemo(() => {
+        return spell.level === 0
             ? false
-            : (limitValues && limitValues.max === limitValues.used) ||
-              (spellSlots && spellSlots.length > 0 && !spellLevelLimit);
+            : (limitValues && limitValues.max < limitValues.used + (chargesUsed || 1)) ||
+                  (spellSlots && spellSlots.length > 0 && !spellLevelLimit);
+    }, [spell, limitValues, spellSlots, spellLevelLimit]);
 
     return (
         <>
@@ -69,7 +84,8 @@ const Spell = ({
                     <div className={styles.spellHeader}>
                         <h4 className={styles.spellName}>{spell.name}</h4>
                         <span className={styles.spellLevel}>({getSpellLevel()})</span>
-                        {spellSlots && spellSlots.length > 0 ? (
+                        {chargesUsed ? <span className={styles.spellLevel}>(uses {chargesUsed} charges)</span> : null}
+                        {(spellSlots && spellSlots.length > 0) || charges ? (
                             <Tippy content={"No more spellslots"} disabled={!limitReached}>
                                 <div
                                     className={`button-wrapper enabled ${
@@ -86,7 +102,7 @@ const Spell = ({
                                                 stats={stats}
                                                 onRoll={async () => {
                                                     if (itemId && limitValues) {
-                                                        await updateLimit(itemId, limitValues);
+                                                        await updateLimit(itemId, limitValues, chargesUsed);
                                                     }
                                                 }}
                                                 limitReached={limitReached}
@@ -97,7 +113,7 @@ const Spell = ({
                                             className={`dice-button button ${limitReached ? "limit" : ""}`}
                                             onClick={async () => {
                                                 if (itemId && limitValues) {
-                                                    await updateLimit(itemId, limitValues);
+                                                    await updateLimit(itemId, limitValues, chargesUsed);
                                                 }
                                             }}
                                         >
@@ -309,15 +325,36 @@ export const E5Spells = () => {
                     })}
                 {equipmentBonuses.statblockBonuses.spells.map((itemSpells, index) => {
                     const spellItem = statblock.equipment?.find((e) => e.item.id === itemSpells.itemId);
+                    if (!itemSpells.spells.length || !spellItem) {
+                        return null;
+                    }
                     return (
                         <li key={index}>
+                            <h4 className={styles.heading}>{spellItem?.item.name}</h4>
+                            <ItemCharges equippedItem={spellItem.item} />
+                            <FancyLineBreak />
                             {itemSpells.spells
                                 .sort((a, b) => a.spell.level - b.spell.level)
                                 .filter(
                                     (spell) => spellFilter.indexOf(spell.spell.level) >= 0 || spellFilter.length === 0,
                                 )
                                 .map((spell, index) => {
-                                    return <>{spellItem?.item.name}</>;
+                                    return (
+                                        <div key={index}>
+                                            <Spell
+                                                spell={spell.spell}
+                                                statblock={tokenName}
+                                                stats={stats}
+                                                charges={spellItem.item.charges}
+                                                chargesUsed={spell.charges}
+                                                tokenData={data}
+                                                itemId={item.id}
+                                                dc={statblock.spell_dc}
+                                                attack={statblock.spell_attack}
+                                            />
+                                            <LineBreak />
+                                        </div>
+                                    );
                                 })}
                         </li>
                     );

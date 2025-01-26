@@ -1,7 +1,7 @@
 import { useE5StatblockContext } from "../../../../context/E5StatblockContext.tsx";
 import { useActiveTabContext } from "../../../../context/ActiveTabContext.tsx";
 import { useMemo } from "react";
-import { E5Actions, E5BonusActions, E5Mythics, E5Reactions } from "./E5Actions.tsx";
+import { E5Abilities } from "./E5Abilities.tsx";
 import styles from "../statblock-content.module.scss";
 
 export const E5ActionTabs = () => {
@@ -39,13 +39,25 @@ export const E5ActionTabs = () => {
 
     const currentTab = useMemo(() => {
         if (tab === "action") {
-            return <E5Actions />;
+            return <E5Abilities heading={"Actions"} abilities={statblock.actions} abilityKey={"actions"} />;
         } else if (tab === "bonus") {
-            return <E5BonusActions />;
+            return (
+                <E5Abilities
+                    heading={"Bonus Actions"}
+                    abilities={statblock.bonus_actions}
+                    abilityKey={"bonus_actions"}
+                />
+            );
         } else if (tab === "reaction") {
-            return <E5Reactions />;
+            return <E5Abilities heading={"Reactions"} abilities={statblock.reactions} abilityKey={"reactions"} />;
         } else if (tab === "mythic") {
-            return <E5Mythics />;
+            return (
+                <E5Abilities
+                    heading={"Mythic Actions"}
+                    abilities={statblock.mythic_actions}
+                    abilityKey={"mythic_actions"}
+                />
+            );
         } else {
             return <></>;
         }

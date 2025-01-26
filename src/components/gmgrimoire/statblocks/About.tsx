@@ -1,6 +1,6 @@
 import { useLocalStorage } from "../../../helper/hooks.ts";
 import { ID } from "../../../helper/variables.ts";
-import { DiceButtonWrapper } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { DiceButtonWrapper, Stats } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { E5Statblock } from "../../../api/e5/useE5Api.ts";
 import { PfStatblock } from "../../../api/pf/usePfApi.ts";
 
@@ -8,10 +8,12 @@ export const About = ({
     about,
     slug,
     statblock,
+    stats,
 }: {
     about?: string | null;
     slug: string;
-    statblock: E5Statblock | PfStatblock;
+    statblock?: E5Statblock | PfStatblock;
+    stats?: Stats;
 }) => {
     const [open, setOpen] = useLocalStorage<boolean>(`${ID}.about.${slug}`, false);
     return about ? (
@@ -23,15 +25,17 @@ export const About = ({
                     <DiceButtonWrapper
                         text={about}
                         context={""}
-                        statblock={statblock.name}
-                        stats={{
-                            strength: statblock?.stats.strength || 0,
-                            dexterity: statblock?.stats.dexterity || 0,
-                            constitution: statblock?.stats.constitution || 0,
-                            intelligence: statblock?.stats.intelligence || 0,
-                            wisdom: statblock?.stats.wisdom || 0,
-                            charisma: statblock?.stats.charisma || 0,
-                        }}
+                        statblock={statblock?.name}
+                        stats={
+                            stats || {
+                                strength: statblock?.stats.strength || 0,
+                                dexterity: statblock?.stats.dexterity || 0,
+                                constitution: statblock?.stats.constitution || 0,
+                                intelligence: statblock?.stats.intelligence || 0,
+                                wisdom: statblock?.stats.wisdom || 0,
+                                charisma: statblock?.stats.charisma || 0,
+                            }
+                        }
                     />
                 </div>
             </div>
