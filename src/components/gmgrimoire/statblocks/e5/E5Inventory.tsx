@@ -73,7 +73,7 @@ export const E5Inventory = () => {
             <h3 className={styles.heading}>Inventory</h3>
             <FancyLineBreak />
             <ul className={styles.items}>
-                {statblock.equipment?.map((equipment) => <E5Item equipment={equipment} />)}
+                {statblock.equipment?.map((equipment, index) => <E5Item key={index} equipment={equipment} />)}
             </ul>
             <h3 className={styles.heading}>Other</h3>
             <FancyLineBreak />

@@ -33,7 +33,7 @@ export const E5StatblockContent = () => {
         if (statblock.items?.length || statblock.equipment?.length) {
             tabList.push("inventory");
         }
-        if (statblock.spells?.length || statblock.equipment?.some((equipment) => equipment.item.spells)) {
+        if (statblock.spells?.length || statblock.equipment?.some((equipment) => equipment.item.spells?.length)) {
             tabList.push("spells");
         }
         if (

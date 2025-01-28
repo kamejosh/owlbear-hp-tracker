@@ -361,6 +361,10 @@ const getLimitsE5 = (statblock: E5Statblock) => {
                 resets: equipment.item.charges.resets ?? [],
             });
         }
+        getActionTypeLimits(equipment.item.bonus?.actions || []);
+        getActionTypeLimits(equipment.item.bonus?.bonus_actions || []);
+        getActionTypeLimits(equipment.item.bonus?.reactions || []);
+        getActionTypeLimits(equipment.item.bonus?.special_abilities || []);
     });
 
     return limits;

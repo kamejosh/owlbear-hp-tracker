@@ -32,6 +32,9 @@ export const E5ActionTabs = () => {
         if (statblock.mythic_actions?.length) {
             tabList.push("mythic");
         }
+        if (statblock.lair_actions?.length) {
+            tabList.push("lair");
+        }
         return tabList;
     }, [statblock]);
 
@@ -57,6 +60,10 @@ export const E5ActionTabs = () => {
                     abilities={statblock.mythic_actions}
                     abilityKey={"mythic_actions"}
                 />
+            );
+        } else if (tab === "lair") {
+            return (
+                <E5Abilities heading={"Lair Actions"} abilities={statblock.lair_actions} abilityKey={"lair_actions"} />
             );
         } else {
             return <></>;
