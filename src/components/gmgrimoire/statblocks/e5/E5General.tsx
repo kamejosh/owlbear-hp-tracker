@@ -50,11 +50,14 @@ export const E5General = () => {
                     // @ts-ignore name is always in stats
                     const statValue = equipmentBonuses.stats[name];
                     // @ts-ignore name is always in stats
-                    const saveValue = Object.hasOwn(statblock.stats, savingThrowKey)
+                    const saveValue = Object.hasOwn(equipmentBonuses.statblockBonuses.savingThrows, savingThrowKey)
                         ? // @ts-ignore
-                          statblock.stats[savingThrowKey]
+                          statblock.saving_throws[savingThrowKey] +
+                          // @ts-ignore
+                          equipmentBonuses.statblockBonuses.savingThrows[savingThrowKey]
                         : // @ts-ignore
-                          0 + equipmentBonuses.statblockBonuses.savingThrows[savingThrowKey];
+                          statblock.saving_throws[savingThrowKey];
+
                     return (
                         <li className={styles.stat} key={name}>
                             <div className={styles.name}>
@@ -74,8 +77,12 @@ export const E5General = () => {
                                     statblock={tokenName}
                                 />
                                 <DiceButton
-                                    dice={`d20+${saveValue}`}
-                                    text={`+${saveValue}`}
+                                    dice={`d20${Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
+                                        Math.floor(saveValue),
+                                    )}`}
+                                    text={Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
+                                        Math.floor(saveValue),
+                                    )}
                                     stats={stats}
                                     context={`${capitalize(name.substring(0, 3))}: Save`}
                                     statblock={tokenName}
