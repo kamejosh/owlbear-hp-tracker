@@ -53,7 +53,8 @@ export const DiceButton = (props: DiceButtonProps) => {
                     : Math.floor((props.stats.strength - 10) / 2)
                 ).toString(),
             );
-        } else if (text.endsWith("DEX")) {
+        }
+        if (text.includes("DEX")) {
             return text.replace(
                 "DEX",
                 (room?.ruleset === "pf"
@@ -61,7 +62,8 @@ export const DiceButton = (props: DiceButtonProps) => {
                     : Math.floor((props.stats.dexterity - 10) / 2)
                 ).toString(),
             );
-        } else if (text.endsWith("CON")) {
+        }
+        if (text.includes("CON")) {
             return text.replace(
                 "CON",
                 (room?.ruleset === "pf"
@@ -69,7 +71,8 @@ export const DiceButton = (props: DiceButtonProps) => {
                     : Math.floor((props.stats.constitution - 10) / 2)
                 ).toString(),
             );
-        } else if (text.endsWith("INT")) {
+        }
+        if (text.includes("INT")) {
             return text.replace(
                 "INT",
                 (room?.ruleset === "pf"
@@ -77,12 +80,14 @@ export const DiceButton = (props: DiceButtonProps) => {
                     : Math.floor((props.stats.intelligence - 10) / 2)
                 ).toString(),
             );
-        } else if (text.endsWith("WIS")) {
+        }
+        if (text.includes("WIS")) {
             return text.replace(
                 "WIS",
                 (room?.ruleset === "pf" ? props.stats.wisdom : Math.floor((props.stats.wisdom - 10) / 2)).toString(),
             );
-        } else if (text.endsWith("CHA")) {
+        }
+        if (text.includes("CHA")) {
             return text.replace(
                 "CHA",
                 (room?.ruleset === "pf"
