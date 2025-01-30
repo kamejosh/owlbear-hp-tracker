@@ -47,7 +47,7 @@ export const E5Abilities = ({
                                 <FancyLineBreak />
                                 {equipmentAbilities.map((action, index) => (
                                     <div key={index}>
-                                        <E5Ability ability={action} />
+                                        <E5Ability ability={action} proficient={equippedItem.proficient} />
                                         <LineBreak />
                                     </div>
                                 ))}

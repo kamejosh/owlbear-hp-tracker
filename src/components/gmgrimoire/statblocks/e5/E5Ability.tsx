@@ -8,14 +8,15 @@ import { useE5StatblockContext } from "../../../../context/E5StatblockContext.ts
 
 export type Ability = components["schemas"]["Action-Output"];
 
-export const E5Ability = ({ ability }: { ability: Ability }) => {
-    const { item, stats, data, tokenName } = useE5StatblockContext();
+export const E5Ability = ({ ability, proficient }: { ability: Ability; proficient?: boolean }) => {
+    const { item, stats, data, tokenName, statblock } = useE5StatblockContext();
     const limitValues = data.stats.limits?.find((l) => l.id === ability.limit?.name)!;
 
     const limitReached = limitValues && limitValues.max === limitValues.used;
 
     const bonus = useMemo(() => {
         let statBonus = 0;
+        const profBonus = proficient && statblock.proficiency_bonus ? statblock.proficiency_bonus : 0;
         if (ability.stat_bonus) {
             const statBonuses: Array<number> = [];
             ability.stat_bonus.forEach((stat) => {
@@ -35,7 +36,7 @@ export const E5Ability = ({ ability }: { ability: Ability }) => {
             });
             statBonus = Math.max(...statBonuses);
         }
-        return ability.attack_bonus ? Math.max(ability.attack_bonus, statBonus) : statBonus;
+        return (ability.attack_bonus || 0) + statBonus + profBonus;
     }, [ability, stats]);
 
     return (

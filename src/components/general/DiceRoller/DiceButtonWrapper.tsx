@@ -45,7 +45,7 @@ export const DiceButton = (props: DiceButtonProps) => {
     const defaultHidden = playerContext.role === "GM" && !!taSettings.gm_rolls_hidden;
 
     const replaceStatWithMod = (text: string) => {
-        if (text.endsWith("STR")) {
+        if (text.includes("STR")) {
             return text.replace(
                 "STR",
                 (room?.ruleset === "pf"
