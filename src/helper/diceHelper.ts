@@ -381,7 +381,8 @@ export const localRoll = async (
     statblock?: string,
 ) => {
     try {
-        const roll = new DiceRoll(diceEquation);
+        const roll = new DiceRoll(diceEquation.replaceAll(" ", ""));
+        console.log(roll);
         const name = await OBR.player.getName();
         const logEntry = {
             uuid: v4(),
@@ -404,7 +405,8 @@ export const localRoll = async (
         rollLogStore.persist.rehydrate();
 
         return roll;
-    } catch {
+    } catch (e) {
+        console.debug(e);
         return false;
     }
 };
