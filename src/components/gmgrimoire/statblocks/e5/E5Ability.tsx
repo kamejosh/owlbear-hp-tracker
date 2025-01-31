@@ -113,7 +113,7 @@ export const E5Ability = ({ ability, proficient }: { ability: Ability; proficien
                     <span className={"extra-info-with-button"}>
                         <i>Damage:</i>
                         {isInteger(Number(ability.damage_dice)) ? (
-                            <span className={"dice-button button"}>{ability.damage_dice}</span>
+                            <b>{ability.damage_dice}</b>
                         ) : (
                             <DiceButton
                                 dice={ability.damage_dice}

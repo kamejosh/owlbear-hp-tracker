@@ -382,7 +382,6 @@ export const localRoll = async (
 ) => {
     try {
         const roll = new DiceRoll(diceEquation.replaceAll(" ", ""));
-        console.log(roll);
         const name = await OBR.player.getName();
         const logEntry = {
             uuid: v4(),
