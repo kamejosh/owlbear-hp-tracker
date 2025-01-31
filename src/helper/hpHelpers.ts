@@ -86,9 +86,10 @@ export const createBar = async (percentage: number, tempHpPercentage: number, to
 const createText = async (text: string, token: Image) => {
     const bounds = await getImageBounds(token);
     const height = Math.abs(Math.ceil(bounds.height / 4.85));
-    const width = Math.abs(bounds.width);
+    const overflow = 100;
+    const width = Math.abs(bounds.width) + overflow;
     const position = {
-        x: bounds.width < 0 ? bounds.position.x - width : bounds.position.x,
+        x: bounds.width < 0 ? bounds.position.x - width - overflow / 2 : bounds.position.x - overflow / 2,
         y: bounds.position.y + bounds.height - height + (await getYOffset(bounds.height)),
     };
 
