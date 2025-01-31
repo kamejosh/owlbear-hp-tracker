@@ -55,7 +55,7 @@ export const E5Ability = ({ ability, proficient }: { ability: Ability; proficien
         if (attackBonus) {
             tooltips.push(`Attack: ${attackBonus}`);
         }
-        if (statBonus) {
+        if (statBonus.bonus) {
             tooltips.push(`Stat (${statBonus.stat}): ${statBonus.bonus}`);
         }
         if (profBonus) {
