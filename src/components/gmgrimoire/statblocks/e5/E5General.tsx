@@ -5,11 +5,28 @@ import { capitalize, isNull } from "lodash";
 import styles from "./statblock-general.module.scss";
 import { AC } from "../../Token/AC.tsx";
 import { About } from "../About.tsx";
+import { LimitComponent, LimitType } from "../LimitComponent.tsx";
+import { updateLimit } from "../../../../helper/helpers.ts";
+import { updateHp } from "../../../../helper/hpHelpers.ts";
+import { updateTokenMetadata } from "../../../../helper/tokenHelper.ts";
 
 const statList = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 
 export const E5General = () => {
-    const { statblock, stats, tokenName, item, equipmentBonuses } = useE5StatblockContext();
+    const { statblock, stats, tokenName, item, equipmentBonuses, data } = useE5StatblockContext();
+    const hitDice = data.stats.limits?.find((l) => l.id === "Hit Dice");
+    let hitDiceLimit: LimitType | null = null;
+    let hitDiceText: string | null = null;
+    if (statblock.hp.hit_dice) {
+        try {
+            hitDiceLimit = {
+                name: "Hit Dice",
+                uses: Number(statblock.hp.hit_dice.split("d")[0]),
+                resets: ["Long Rest"],
+            };
+            hitDiceText = statblock.hp.hit_dice.split("d")[1].split("+")[0];
+        } catch {}
+    }
 
     return (
         <div className={styles.general}>
@@ -39,6 +56,45 @@ export const E5General = () => {
                 </div>
             ) : null}
             <LineBreak />
+            {hitDiceLimit && hitDice && hitDiceText ? (
+                <div className={styles.hitDiceWrapper}>
+                    <h3 className={styles.hitDice}>Hit Dice</h3>
+                    <LimitComponent
+                        limit={hitDiceLimit}
+                        title={"uses"}
+                        limitValues={hitDice}
+                        itemId={item.id}
+                        hideReset={true}
+                    />
+                    <div className={"dice-button-wrapper"}>
+                        <DiceButton
+                            dice={`1d${hitDiceText}`}
+                            text={`1d${hitDiceText}`}
+                            context={"Hit Dice"}
+                            stats={stats}
+                            statblock={tokenName}
+                            onRoll={async (rollResult) => {
+                                let heal = 0;
+                                try {
+                                    if (rollResult && "total" in rollResult) {
+                                        heal = rollResult.total;
+                                    } else if (rollResult && "values" in rollResult) {
+                                        heal = rollResult.values.map((v) => v.value).reduce((a, b) => a + b, 0);
+                                    }
+                                } catch {}
+                                if (heal) {
+                                    const newData = { ...data, hp: Math.min(data.hp + heal, data.maxHp) };
+                                    await updateHp(item, newData);
+                                    await updateTokenMetadata(newData, [item.id]);
+                                }
+                                await updateLimit(item.id, hitDice);
+                            }}
+                            limitReached={hitDiceLimit.uses === hitDice.used}
+                        />
+                    </div>
+                    <LineBreak />
+                </div>
+            ) : null}
             <ul className={styles.stats}>
                 <li className={styles.header}>
                     <div></div>

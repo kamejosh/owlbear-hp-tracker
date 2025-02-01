@@ -404,10 +404,7 @@ export const localRoll = async (
         rollLogStore.persist.rehydrate();
 
         return roll;
-    } catch (e) {
-        console.debug(e);
-        return false;
-    }
+    } catch {}
 };
 
 export const rollWrapper = async (

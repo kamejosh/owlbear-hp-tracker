@@ -1,5 +1,5 @@
 import OBR, { buildShape, buildText, Image, isShape, Item, Text, Shape, isText } from "@owlbear-rodeo/sdk";
-import { GMGMetadata, BarItemChanges, TextItemChanges, AttachmentMetadata } from "./types.ts";
+import { GMGMetadata, BarItemChanges, TextItemChanges, AttachmentMetadata, RoomMetadata } from "./types.ts";
 import {
     attachmentFilter,
     calculatePercentage,
@@ -387,4 +387,21 @@ export const updateTextVisibility = async (tokens: Array<Item>) => {
         });
     }
     await updateTextChanges(textChanges);
+};
+
+export const updateTokenHp = async (data: GMGMetadata, value: number, item: Item, room?: RoomMetadata | null) => {
+    const newHp = data.hp + value;
+    if (newHp < data.hp && data.stats.tempHp && data.stats.tempHp > 0) {
+        data.stats.tempHp = Math.max(data.stats.tempHp - (data.hp - newHp), 0);
+    }
+    data.hp = Math.min(room?.allowNegativeNumbers ? newHp : Math.max(newHp, 0), data.maxHp + (data.stats.tempHp || 0));
+    if (item && itemMetadataKey in item.metadata) {
+        const uItemData = item.metadata[itemMetadataKey] as GMGMetadata;
+        await updateHp(item, {
+            ...uItemData,
+            hp: data.hp,
+            stats: { ...uItemData.stats, tempHp: data.stats.tempHp },
+        });
+    }
+    item.metadata[itemMetadataKey] = { ...data };
 };

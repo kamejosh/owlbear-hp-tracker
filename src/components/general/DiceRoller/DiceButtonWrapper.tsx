@@ -3,7 +3,7 @@ import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useCallback, useRef, useState } from "react";
 import { diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
-import { parseRollEquation } from "dddice-js";
+import { IRoll, parseRollEquation } from "dddice-js";
 import { getDiceImage, getSvgForDiceType } from "../../../helper/previewHelpers.tsx";
 import { D20 } from "../../svgs/dice/D20.tsx";
 import Tippy from "@tippyjs/react";
@@ -13,6 +13,7 @@ import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import "./dice-button-wrapper.scss";
 import { startsWith } from "lodash";
+import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 
 export type Stats = {
     strength: number;
@@ -29,7 +30,7 @@ type DiceButtonProps = {
     context: string;
     stats: Stats;
     statblock?: string;
-    onRoll?: () => void;
+    onRoll?: (rollResult?: IRoll | DiceRoll | null) => void;
     limitReached?: boolean | null;
     damageDie?: boolean;
 };
@@ -168,11 +169,12 @@ export const DiceButton = (props: DiceButtonProps) => {
                 } catch {}
             }
 
+            let rollResult = null;
             if (theme && !room?.disableDiceRoller) {
                 const parsed = diceToRoll(modifiedDice, theme.id);
                 if (parsed && rollerApi) {
                     try {
-                        await rollWrapper(rollerApi, parsed.dice, {
+                        rollResult = await rollWrapper(rollerApi, parsed.dice, {
                             label: label,
                             operator: parsed.operator,
                             external_id: props.statblock,
@@ -183,10 +185,10 @@ export const DiceButton = (props: DiceButtonProps) => {
                     }
                 }
             } else {
-                await localRoll(modifiedDice, label, addRoll, modifier === "SELF", props.statblock);
+                rollResult = await localRoll(modifiedDice, label, addRoll, modifier === "SELF", props.statblock);
             }
             if (props.onRoll) {
-                props.onRoll();
+                props.onRoll(rollResult);
             }
             button.classList.remove("rolling");
             button.blur();

@@ -5,7 +5,7 @@ import copy from "rollup-plugin-copy";
 
 declare var __dirname: string;
 export default defineConfig({
-    server: { https: true, host: "0.0.0.0" },
+    server: { host: "0.0.0.0", cors: true },
     assetsInclude: ["**/*.md"],
     build: {
         rollupOptions: {

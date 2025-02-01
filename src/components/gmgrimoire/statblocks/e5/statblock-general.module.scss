@@ -8,6 +8,16 @@
     }
 }
 
+.hitDiceWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.hitDice {
+    margin-block: 0;
+}
+
 .stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(43px, 1fr));
