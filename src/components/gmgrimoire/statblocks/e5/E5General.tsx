@@ -1,5 +1,5 @@
 import { useE5StatblockContext } from "../../../../context/E5StatblockContext.tsx";
-import { LineBreak } from "../../../general/LineBreak.tsx";
+import { FancyLineBreak, LineBreak } from "../../../general/LineBreak.tsx";
 import { DiceButton } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { capitalize, isNull } from "lodash";
 import styles from "./statblock-general.module.scss";
@@ -149,6 +149,26 @@ export const E5General = () => {
                 })}
             </ul>
             <LineBreak />
+            {statblock.limits && statblock.limits.length > 0 ? (
+                <div>
+                    <h3 className={styles.hitDice}>Limits</h3>
+                    {statblock.limits.map((limit, i) => {
+                        const limitValues = data.stats.limits?.find((l) => l.id === limit!.name);
+                        return limitValues ? (
+                            <>
+                                <LimitComponent
+                                    key={i}
+                                    limit={limit}
+                                    title={"name"}
+                                    limitValues={data.stats.limits?.find((l) => l.id === limit!.name)!}
+                                    itemId={item.id}
+                                />
+                                <LineBreak />
+                            </>
+                        ) : null;
+                    })}
+                </div>
+            ) : null}
             <ul className={styles.infos}>
                 {statblock.senses || equipmentBonuses.statblockBonuses.senses ? (
                     <li>

@@ -642,6 +642,10 @@ b {
 }
 
 .limit {
+    p {
+        margin-block: 4px;
+    }
+
     .limit-heading {
         display: flex;
         align-items: center;
