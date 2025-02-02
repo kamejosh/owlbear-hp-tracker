@@ -15,6 +15,7 @@ import styles from "./statblock-spells.module.scss";
 import { SpellSlots } from "./E5SpellSlots.tsx";
 import { LimitType } from "../LimitComponent.tsx";
 import { ItemCharges } from "./ItemCharges.tsx";
+import { isItemInUse } from "../../../../helper/equipmentHelpers.ts";
 
 type Spell = components["schemas"]["src__types__e5__spell__Spell"];
 
@@ -274,6 +275,14 @@ export const E5Spells = () => {
             }
         });
 
+    const equipmentSpells: Array<{ item: number; spells: Array<Spell> }> =
+        equipmentBonuses.statblockBonuses.spells.flatMap((itemSpell) => {
+            return {
+                item: itemSpell.itemId,
+                spells: itemSpell.spells.map((spell) => spell.spell),
+            };
+        });
+
     return (
         <div className={"spells"}>
             <div className={styles.top}>
@@ -323,42 +332,64 @@ export const E5Spells = () => {
                             </li>
                         );
                     })}
-                {equipmentBonuses.statblockBonuses.spells.map((itemSpells, index) => {
-                    const spellItem = statblock.equipment?.find((e) => e.item.id === itemSpells.itemId);
-                    if (!itemSpells.spells.length || !spellItem) {
-                        return null;
-                    }
-                    return (
-                        <li key={index}>
-                            <h4 className={styles.heading}>{spellItem?.item.name}</h4>
-                            <ItemCharges equippedItem={spellItem.item} />
-                            <FancyLineBreak />
-                            {itemSpells.spells
-                                .sort((a, b) => a.spell.level - b.spell.level)
-                                .filter(
-                                    (spell) => spellFilter.indexOf(spell.spell.level) >= 0 || spellFilter.length === 0,
-                                )
-                                .map((spell, index) => {
+                {statblock.equipment
+                    ?.filter((e) => e.embedded && isItemInUse(data, e))
+                    ?.map((e) => {
+                        return equipmentSpells
+                            .filter((itemSpells) => itemSpells.item === e.item.id)
+                            .map((itemSpells) => {
+                                return itemSpells.spells.map((spell, index) => {
                                     return (
-                                        <div key={index}>
+                                        <li key={`${spell.name}${index}`}>
                                             <Spell
-                                                spell={spell.spell}
+                                                spell={spell}
                                                 statblock={tokenName}
                                                 stats={stats}
-                                                charges={spellItem.item.charges}
-                                                chargesUsed={spell.charges}
+                                                spellSlots={statblock.spell_slots}
                                                 tokenData={data}
                                                 itemId={item.id}
                                                 dc={statblock.spell_dc}
                                                 attack={statblock.spell_attack}
                                             />
                                             <LineBreak />
-                                        </div>
+                                        </li>
                                     );
-                                })}
-                        </li>
-                    );
-                })}
+                                });
+                            });
+                    })}
+                {statblock.equipment
+                    ?.filter((e) => !e.embedded && isItemInUse(data, e))
+                    ?.map((e) => {
+                        return equipmentSpells
+                            .filter((itemSpells) => itemSpells.item === e.item.id)
+                            .map((itemSpells, index) => {
+                                if (!itemSpells.spells.length) return null;
+                                return (
+                                    <li key={index}>
+                                        <h4 className={styles.heading}>{e.item.name}</h4>
+                                        <ItemCharges equippedItem={e.item} />
+                                        <FancyLineBreak />
+                                        {itemSpells.spells.map((spell, index) => {
+                                            return (
+                                                <div key={`${spell.name}${index}`}>
+                                                    <Spell
+                                                        spell={spell}
+                                                        statblock={tokenName}
+                                                        stats={stats}
+                                                        spellSlots={statblock.spell_slots}
+                                                        tokenData={data}
+                                                        itemId={item.id}
+                                                        dc={statblock.spell_dc}
+                                                        attack={statblock.spell_attack}
+                                                    />
+                                                    <LineBreak />
+                                                </div>
+                                            );
+                                        })}
+                                    </li>
+                                );
+                            });
+                    })}
             </ul>
         </div>
     );

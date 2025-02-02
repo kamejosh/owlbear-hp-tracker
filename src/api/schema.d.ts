@@ -618,6 +618,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Users */
+        get: operations["list_users_admin_users_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search Users */
+        get: operations["search_users_admin_users_search_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/{username}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update User */
+        put: operations["update_user_admin_users__username__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -829,6 +880,8 @@ export interface components {
             name: string;
             /** About */
             about?: string | null;
+            /** External Id */
+            external_id?: string | null;
             /** Size */
             size: string;
             /** Type */
@@ -907,6 +960,8 @@ export interface components {
             name: string;
             /** About */
             about?: string | null;
+            /** External Id */
+            external_id?: string | null;
             /** Size */
             size: string;
             /** Type */
@@ -980,8 +1035,6 @@ export interface components {
             source?: string | null;
             /** Slug */
             slug: string;
-            /** External Id */
-            external_id: string | null;
             /** License */
             license?: string | null;
             /**
@@ -1288,30 +1341,30 @@ export interface components {
             skills?: components["schemas"]["Skill"][] | null;
             stats: components["schemas"]["src__types__pf__statblock__Stats"];
             /** Items */
-            items?: string[];
+            items?: string[] | null;
             armor_class: components["schemas"]["ArmorClass"];
             saving_throws: components["schemas"]["src__types__pf__statblock__SavingThrows"];
             hp: components["schemas"]["src__types__pf__statblock__Hitpoints"];
             /** Immunities */
-            immunities?: string[];
+            immunities?: string[] | null;
             /** Weaknesses */
-            weaknesses?: string[];
+            weaknesses?: string[] | null;
             /** Resistances */
-            resistances?: string[];
+            resistances?: string[] | null;
             /** Speed */
             speed: string;
             /** Actions */
-            actions?: components["schemas"]["src__types__pf__statblock__Action"][];
+            actions?: components["schemas"]["src__types__pf__statblock__Action"][] | null;
             /** Reactions */
-            reactions?: components["schemas"]["Reaction-Input"][];
+            reactions?: components["schemas"]["Reaction-Input"][] | null;
             /** Spells */
-            spells?: components["schemas"]["SpellCategory"][];
+            spells?: components["schemas"]["SpellCategory"][] | null;
             /** About */
             about?: string | null;
             /** Limits */
-            limits?: components["schemas"]["LimitedUse-Input"][];
+            limits?: components["schemas"]["LimitedUse-Input"][] | null;
             /** Special Abilities */
-            special_abilities?: components["schemas"]["SpecialAbility-Input"][];
+            special_abilities?: components["schemas"]["SpecialAbility-Input"][] | null;
         };
         /** PFStatblockOut */
         PFStatblockOut: {
@@ -1333,30 +1386,30 @@ export interface components {
             skills?: components["schemas"]["Skill"][] | null;
             stats: components["schemas"]["src__types__pf__statblock__Stats"];
             /** Items */
-            items?: string[];
+            items?: string[] | null;
             armor_class: components["schemas"]["ArmorClass"];
             saving_throws: components["schemas"]["src__types__pf__statblock__SavingThrows"];
             hp: components["schemas"]["src__types__pf__statblock__Hitpoints"];
             /** Immunities */
-            immunities?: string[];
+            immunities?: string[] | null;
             /** Weaknesses */
-            weaknesses?: string[];
+            weaknesses?: string[] | null;
             /** Resistances */
-            resistances?: string[];
+            resistances?: string[] | null;
             /** Speed */
             speed: string;
             /** Actions */
             actions: components["schemas"]["ActionOut"][];
             /** Reactions */
-            reactions?: components["schemas"]["Reaction-Output"][];
+            reactions?: components["schemas"]["Reaction-Output"][] | null;
             /** Spells */
             spells: components["schemas"]["SpellCategoryOut"][];
             /** About */
             about?: string | null;
             /** Limits */
-            limits?: components["schemas"]["src__types__base__LimitedUse"][];
+            limits?: components["schemas"]["src__types__base__LimitedUse"][] | null;
             /** Special Abilities */
-            special_abilities?: components["schemas"]["SpecialAbility-Output"][];
+            special_abilities?: components["schemas"]["SpecialAbility-Output"][] | null;
             /** Slug */
             slug: string;
             /** Active */
@@ -1535,7 +1588,7 @@ export interface components {
             /** Attack */
             attack?: number | null;
             /** Spell Lists */
-            spell_lists?: components["schemas"]["Spelllist"][];
+            spell_lists?: components["schemas"]["Spelllist"][] | null;
         };
         /** SpellCategoryOut */
         SpellCategoryOut: {
@@ -1697,6 +1750,8 @@ export interface components {
             attuned?: boolean | null;
             /** Loot */
             loot?: boolean | null;
+            /** Embedded */
+            embedded?: boolean | null;
             /** Proficient */
             proficient?: boolean | null;
             /** Item */
@@ -1714,6 +1769,8 @@ export interface components {
             loot: boolean;
             /** Proficient */
             proficient: boolean;
+            /** Embedded */
+            embedded: boolean;
             item: components["schemas"]["ItemOut"];
         };
         /** Tradition */
@@ -1769,6 +1826,21 @@ export interface components {
             pf_Spell?: components["schemas"]["pf_Spell"][] | null;
             /** E5 Item */
             e5_Item?: components["schemas"]["e5_Item"][] | null;
+        };
+        /** UserAdminInfo */
+        UserAdminInfo: {
+            /** Username */
+            username: string;
+            /** Email */
+            email: string;
+            /** Scopes */
+            scopes: string[];
+            /** Active */
+            active: boolean;
+            /** Statblocks */
+            statblocks: number;
+            /** Spells */
+            spells: number;
         };
         /** UserIn */
         UserIn: {
@@ -2584,6 +2656,8 @@ export interface components {
             loot: boolean;
             /** Proficient */
             proficient: boolean;
+            /** Embedded */
+            embedded: boolean;
             item?: components["schemas"]["e5_Item"] | null;
             statblock?: components["schemas"]["e5_StatBlock"] | null;
             /** E5 Itemid */
@@ -5141,6 +5215,106 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+        };
+    };
+    list_users_admin_users_get: {
+        parameters: {
+            query?: {
+                take?: number;
+                skip?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserAdminInfo"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search_users_admin_users_search_get: {
+        parameters: {
+            query?: {
+                email?: string | null;
+                username?: string | null;
+                scopes?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserAdminInfo"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_user_admin_users__username__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                username: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": string[];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserWithScopes"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

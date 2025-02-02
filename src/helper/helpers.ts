@@ -416,6 +416,18 @@ export const updateTokenSheet = async (
                 maxHp: newValues ? statblock.hp.value : data.hp,
                 armorClass: newValues ? statblock.armor_class.value : data.armorClass,
                 hp: newValues ? statblock.hp.value : data.hp,
+                equipment: {
+                    equipped:
+                        ruleset === "e5"
+                            ? (statblock as E5Statblock).equipment?.filter((e) => e.equipped).map((e) => e.item.slug) ||
+                              []
+                            : [],
+                    attuned:
+                        ruleset === "e5"
+                            ? (statblock as E5Statblock).equipment?.filter((e) => e.attuned).map((e) => e.item.slug) ||
+                              []
+                            : [],
+                },
                 stats: {
                     ...data.stats,
                     initiativeBonus:
@@ -522,6 +534,13 @@ export const getInitialValues = async (items: Array<Image>) => {
                                     slug: statblock.slug,
                                     ruleset: "e5",
                                     limits: getLimitsE5(statblock),
+                                    equipment: {
+                                        equipped:
+                                            statblock.equipment?.filter((e) => e.equipped).map((e) => e.item.slug) ||
+                                            [],
+                                        attuned:
+                                            statblock.equipment?.filter((e) => e.attuned).map((e) => e.item.slug) || [],
+                                    },
                                 },
                             };
                         }
@@ -658,6 +677,7 @@ export const prepareTokenForGrimoire = async (contextItems: Array<Image>) => {
                         defaultMetadata.stats.initiativeBonus = itemStatblocks[item.id].bonus;
                         defaultMetadata.stats.initial = true;
                         defaultMetadata.stats.limits = itemStatblocks[item.id].limits;
+                        defaultMetadata.equipment = itemStatblocks[item.id].equipment;
                     }
                     item.metadata[itemMetadataKey] = defaultMetadata;
                 }

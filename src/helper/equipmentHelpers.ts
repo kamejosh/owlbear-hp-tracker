@@ -2,6 +2,7 @@ import { components } from "../api/schema";
 import { LimitType } from "../components/gmgrimoire/statblocks/LimitComponent.tsx";
 import { Ability } from "../components/gmgrimoire/statblocks/e5/E5Ability.tsx";
 import { Stats } from "../components/general/DiceRoller/DiceButtonWrapper.tsx";
+import { GMGMetadata } from "./types.ts";
 
 export type ItemOut = components["schemas"]["ItemOut"];
 export type StatblockItems = components["schemas"]["StatblockItemOut"];
@@ -379,4 +380,31 @@ export const getEquipmentBonuses = (stats: StatblockStats, equipment: Array<Stat
         charges: charges,
         stats: totalStats,
     };
+};
+
+export const isItemInUse = (data: GMGMetadata, item: StatblockItems) => {
+    if (
+        item.item.requires_attuning &&
+        data.equipment?.attuned.includes(item.item.slug) &&
+        data.equipment?.equipped.includes(item.item.slug)
+    ) {
+        return true;
+    } else if (
+        !item.item.requires_attuning &&
+        item.item.can_equip &&
+        data.equipment?.equipped.includes(item.item.slug)
+    ) {
+        return true;
+    } else if (!item.item.requires_attuning && !item.item.can_equip) {
+        return true;
+    }
+    return false;
+};
+
+export const isItemEquipped = (data: GMGMetadata, item: StatblockItems) => {
+    return !!(item.item.can_equip && data.equipment?.equipped.includes(item.item.slug));
+};
+
+export const isItemAttuned = (data: GMGMetadata, item: StatblockItems) => {
+    return !!(item.item.requires_attuning && data.equipment?.attuned.includes(item.item.slug));
 };

@@ -74,7 +74,7 @@ export const E5Ability = ({ ability, proficient }: { ability: Ability; proficien
             </span>
             <div>
                 <DiceButtonWrapper
-                    text={ability.desc}
+                    text={ability.desc || ""}
                     context={`${capitalize(ability.name)}`}
                     statblock={tokenName}
                     stats={stats}

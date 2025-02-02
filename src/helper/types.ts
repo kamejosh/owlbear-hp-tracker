@@ -21,6 +21,10 @@ export type GMGMetadata = {
     hpBar: boolean;
     initiative: number;
     sheet: string;
+    equipment?: {
+        equipped: Array<string>;
+        attuned: Array<string>;
+    };
     stats: {
         initiativeBonus: number;
         tempHp?: number;
@@ -130,6 +134,10 @@ export type InitialStatblockData = {
     slug: string;
     ruleset: Ruleset;
     limits: Array<Limit>;
+    equipment?: {
+        equipped: Array<string>;
+        attuned: Array<string>;
+    };
 };
 
 export type BestMatch = {

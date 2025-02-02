@@ -2,8 +2,8 @@ import { useE5StatblockContext } from "../../../../context/E5StatblockContext.ts
 import styles from "./statblock-actions.module.scss";
 import { FancyLineBreak, LineBreak } from "../../../general/LineBreak.tsx";
 import { Ability, E5Ability } from "./E5Ability.tsx";
-import { isArray } from "lodash";
 import { ItemCharges } from "./ItemCharges.tsx";
+import { isItemInUse } from "../../../../helper/equipmentHelpers.ts";
 
 export const E5Abilities = ({
     heading,
@@ -14,7 +14,17 @@ export const E5Abilities = ({
     abilities?: Array<Ability> | null;
     abilityKey: string;
 }) => {
-    const { statblock, equipmentBonuses } = useE5StatblockContext();
+    const { statblock, equipmentBonuses, data } = useE5StatblockContext();
+
+    const equipmentAbilities: Array<{ item: number; abilities: Array<Ability> }> =
+        equipmentBonuses.itemActions.items.flatMap((itemAction) => {
+            return {
+                item: itemAction.itemId,
+                // @ts-ignore we check if key is in object before accessing it
+                abilities: abilityKey in itemAction ? itemAction[abilityKey] : [],
+            };
+        });
+
     return (
         <div>
             <h3 className={styles.heading}>{heading}</h3>
@@ -22,42 +32,51 @@ export const E5Abilities = ({
             {abilities?.map((action, index) => {
                 return (
                     <div key={index}>
-                        <E5Ability ability={action} />
+                        <E5Ability ability={action} proficient={!!action.use_proficiency} />
                         <LineBreak />
                     </div>
                 );
             })}
-            {equipmentBonuses.itemActions.items.map((itemAction, index) => {
-                const equipmentAbilities: Array<Ability> =
-                    // @ts-ignore we check if key is in object before accessing it
-                    abilityKey in itemAction ? itemAction[abilityKey] : [];
-
-                if (isArray(equipmentAbilities) && equipmentAbilities.length > 0) {
-                    const equippedItem = statblock.equipment?.find((e) => e.item.id === itemAction.itemId);
-
-                    if (
-                        equippedItem &&
-                        ((equippedItem.item.requires_attuning && equippedItem.attuned && equippedItem.equipped) ||
-                            (!equippedItem.item.requires_attuning && equippedItem.equipped))
-                    ) {
-                        return (
-                            <div key={index}>
-                                <h4 className={styles.itemName}>{equippedItem?.item.name}</h4>
-                                <ItemCharges equippedItem={equippedItem.item} />
-                                <FancyLineBreak />
-                                {equipmentAbilities.map((action, index) => (
+            {statblock.equipment
+                ?.filter((e) => e.embedded && isItemInUse(data, e))
+                ?.map((e) => {
+                    return equipmentAbilities
+                        .filter((itemAction) => itemAction.item === e.item.id)
+                        .map((itemAction) => {
+                            return itemAction.abilities.map((ability, index) => {
+                                return (
                                     <div key={index}>
-                                        <E5Ability ability={action} proficient={equippedItem.proficient} />
+                                        <E5Ability ability={ability} proficient={e.proficient} />
                                         <LineBreak />
                                     </div>
-                                ))}
-                            </div>
-                        );
-                    }
-                    return null;
-                }
-                return null;
-            })}
+                                );
+                            });
+                        });
+                })}
+            {statblock.equipment
+                ?.filter((e) => !e.embedded && isItemInUse(data, e))
+                ?.map((e) => {
+                    return equipmentAbilities
+                        .filter((itemAction) => itemAction.item === e.item.id)
+                        .map((itemAction, index) => {
+                            if (!itemAction.abilities.length) return null;
+                            return (
+                                <div key={index}>
+                                    <h4 className={styles.itemName}>{e?.item.name}</h4>
+                                    <ItemCharges equippedItem={e.item} />
+                                    <FancyLineBreak />
+                                    {itemAction.abilities.map((ability, index) => {
+                                        return (
+                                            <div key={index}>
+                                                <E5Ability ability={ability} proficient={e.proficient} />
+                                                <LineBreak />
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            );
+                        });
+                })}
         </div>
     );
 };
