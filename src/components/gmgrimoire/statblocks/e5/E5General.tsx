@@ -1,5 +1,5 @@
 import { useE5StatblockContext } from "../../../../context/E5StatblockContext.tsx";
-import { FancyLineBreak, LineBreak } from "../../../general/LineBreak.tsx";
+import { LineBreak } from "../../../general/LineBreak.tsx";
 import { DiceButton } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { capitalize, isNull } from "lodash";
 import styles from "./statblock-general.module.scss";
