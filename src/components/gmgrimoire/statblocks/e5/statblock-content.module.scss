@@ -1,7 +1,7 @@
 @use "../../../../_css/utilities/breakpoint";
 
 :root {
-    --header-size: 70px;
+    --header-size: 80px;
 
     @include breakpoint.tablet {
         --header-size: 42px;

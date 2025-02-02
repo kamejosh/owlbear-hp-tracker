@@ -5,6 +5,10 @@
     flex-wrap: wrap;
     gap: 2px;
 
+    @include breakpoint.tablet {
+        min-width: 206px;
+    }
+
     :global {
         .initiative-wrapper {
             &:last-child {

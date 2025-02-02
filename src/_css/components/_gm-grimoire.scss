@@ -5,7 +5,12 @@
     position: relative;
     flex-direction: column;
     gap: 2px;
+    margin-top: 60px;
     margin-bottom: 36px;
+
+    @include breakpoint.tablet {
+        margin-top: 0;
+    }
 
     &.player {
         .help-buttons {
@@ -32,6 +37,7 @@
         display: flex;
         position: fixed;
         top: calc(1rem - 6px);
+        flex-wrap: wrap;
         align-items: center;
         gap: 1ch;
         z-index: 200;
@@ -39,11 +45,12 @@
         border-radius: 4px;
         background-color: var(--bg-color);
         padding: 4px 8px;
-        width: min-content;
-        height: 25px;
+        max-width: 210px;
 
         @include breakpoint.laptop {
-            //margin-left: 3px;
+            flex-wrap: nowrap;
+            width: min-content;
+            height: 25px;
         }
 
         .toggle-preview {
@@ -84,14 +91,14 @@
 
                 &.disabled {
                     &::after {
-                        content: "";
                         position: absolute;
                         top: 0;
                         left: 50%;
-                        height: 100%;
-                        width: 1px;
-                        background-color: white;
                         rotate: 45deg;
+                        background-color: white;
+                        width: 1px;
+                        height: 100%;
+                        content: "";
                     }
                 }
 
@@ -114,11 +121,16 @@
             height: 20px;
 
             &::before {
+                display: none;
                 margin-right: 4px;
                 background-color: white;
                 width: 2px;
                 height: 100%;
                 content: "";
+
+                @include breakpoint.tablet {
+                    display: block;
+                }
             }
 
             button {
@@ -151,7 +163,7 @@
     }
 
     .gmg-name {
-        display: flex;
+        display: none;
         grid-row: 3/3;
         grid-column-start: 1;
         align-items: flex-end;
@@ -163,6 +175,7 @@
         white-space: nowrap;
 
         @include breakpoint.laptop {
+            display: flex;
             translate: 0 -130%;
         }
 

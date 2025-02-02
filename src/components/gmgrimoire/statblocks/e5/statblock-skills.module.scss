@@ -1,3 +1,5 @@
+@use "../../../../_css/utilities/breakpoint";
+
 .heading {
     margin: 0;
     font-size: 1.5rem;
@@ -6,11 +8,15 @@
 
 .skills {
     display: grid;
-    grid-template-columns: 1fr 1fr;
     row-gap: 1px;
     padding-bottom: 20px;
-    padding-inline: 20px !important;
+    padding-inline: 5px !important;
     list-style: none;
+
+    @include breakpoint.laptop {
+        grid-template-columns: 1fr 1fr;
+        padding-inline: 20px !important;
+    }
 }
 
 .skill {
@@ -27,14 +33,16 @@
         padding-block: 4px 2px;
     }
 
-    &:nth-child(even) {
-        justify-self: flex-end;
-        :global {
-            .button-wrapper {
-                .dice-context-button {
-                    right: unset;
-                    left: 0;
-                    translate: -100% -50%;
+    @include breakpoint.laptop {
+        &:nth-child(even) {
+            justify-self: flex-end;
+            :global {
+                .button-wrapper {
+                    .dice-context-button {
+                        right: unset;
+                        left: 0;
+                        translate: -100% -50%;
+                    }
                 }
             }
         }

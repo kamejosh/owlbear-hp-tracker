@@ -4,7 +4,10 @@
     display: flex;
     flex-wrap: wrap;
     gap: 2px;
-    min-width: 206px;
+
+    @include breakpoint.tablet {
+        min-width: 206px;
+    }
 
     :global {
         .init-wrapper {
