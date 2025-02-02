@@ -1,5 +1,5 @@
 import OBR, { buildShape, buildText, Image, isShape, Item, Text, Shape, isText } from "@owlbear-rodeo/sdk";
-import { GMGMetadata, BarItemChanges, TextItemChanges, AttachmentMetadata } from "./types.ts";
+import { GMGMetadata, BarItemChanges, TextItemChanges, AttachmentMetadata, RoomMetadata } from "./types.ts";
 import {
     attachmentFilter,
     calculatePercentage,
@@ -86,9 +86,10 @@ export const createBar = async (percentage: number, tempHpPercentage: number, to
 const createText = async (text: string, token: Image) => {
     const bounds = await getImageBounds(token);
     const height = Math.abs(Math.ceil(bounds.height / 4.85));
-    const width = Math.abs(bounds.width);
+    const overflow = 100;
+    const width = Math.abs(bounds.width) + overflow;
     const position = {
-        x: bounds.width < 0 ? bounds.position.x - width : bounds.position.x,
+        x: bounds.width < 0 ? bounds.position.x - width - overflow / 2 : bounds.position.x - overflow / 2,
         y: bounds.position.y + bounds.height - height + (await getYOffset(bounds.height)),
     };
 
@@ -386,4 +387,21 @@ export const updateTextVisibility = async (tokens: Array<Item>) => {
         });
     }
     await updateTextChanges(textChanges);
+};
+
+export const updateTokenHp = async (data: GMGMetadata, value: number, item: Item, room?: RoomMetadata | null) => {
+    const newHp = data.hp + value;
+    if (newHp < data.hp && data.stats.tempHp && data.stats.tempHp > 0) {
+        data.stats.tempHp = Math.max(data.stats.tempHp - (data.hp - newHp), 0);
+    }
+    data.hp = Math.min(room?.allowNegativeNumbers ? newHp : Math.max(newHp, 0), data.maxHp + (data.stats.tempHp || 0));
+    if (item && itemMetadataKey in item.metadata) {
+        const uItemData = item.metadata[itemMetadataKey] as GMGMetadata;
+        await updateHp(item, {
+            ...uItemData,
+            hp: data.hp,
+            stats: { ...uItemData.stats, tempHp: data.stats.tempHp },
+        });
+    }
+    item.metadata[itemMetadataKey] = { ...data };
 };

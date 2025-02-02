@@ -1,0 +1,39 @@
+.token-ac {
+    display: grid;
+    grid-template-areas:
+        "icon ac"
+        ". map";
+    row-gap: 0.2ch;
+    grid-area: ac;
+    justify-content: start;
+    align-items: start;
+    height: 46px;
+
+    &.no-extras {
+        display: block;
+        height: auto;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+        padding-inline: 4px;
+        padding-block: 0;
+        width: 25px;
+        height: 18px;
+        text-align: right;
+    }
+
+    .ac-icon {
+        grid-area: icon;
+        fill: #808080;
+        height: 20px;
+    }
+
+    .ac-input {
+        grid-area: ac;
+    }
+
+    .map-button {
+        grid-area: map;
+    }
+}

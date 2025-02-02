@@ -1,0 +1,50 @@
+@use "../../../../_css/utilities/breakpoint";
+
+.heading {
+    margin: 0;
+    font-size: 1.5rem;
+    line-height: 1.1;
+}
+
+.skills {
+    display: grid;
+    row-gap: 1px;
+    padding-bottom: 20px;
+    padding-inline: 5px !important;
+    list-style: none;
+
+    @include breakpoint.laptop {
+        grid-template-columns: 1fr 1fr;
+        padding-inline: 20px !important;
+    }
+}
+
+.skill {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1ch;
+    border-radius: 2px;
+    padding-inline: 1ch;
+    width: 170px;
+    line-height: 1.3;
+
+    b {
+        padding-block: 4px 2px;
+    }
+
+    @include breakpoint.laptop {
+        &:nth-child(even) {
+            justify-self: flex-end;
+            :global {
+                .button-wrapper {
+                    .dice-context-button {
+                        right: unset;
+                        left: 0;
+                        translate: -100% -50%;
+                    }
+                }
+            }
+        }
+    }
+}

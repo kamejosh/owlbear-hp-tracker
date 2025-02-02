@@ -1,0 +1,69 @@
+.heading {
+    margin: 0;
+    font-size: 1.5rem;
+    line-height: 1.1;
+}
+
+.items {
+    list-style: none;
+
+    :global {
+        .about {
+            h3 {
+                margin-block: 4px;
+            }
+        }
+    }
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1ch;
+}
+
+.itemName {
+    margin: 0 0 4px;
+    font-size: 18px;
+    line-height: 1;
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+
+.info {
+    display: flex;
+    align-items: flex-end;
+    gap: 1ch;
+}
+
+.cost {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.5ch;
+}
+.gp {
+    color: darkgoldenrod;
+}
+
+.cp {
+    color: #b87333;
+}
+
+.sp {
+    color: silver;
+}
+
+.ep {
+    color: steelblue;
+}
+
+.pp {
+    color: #e5e4e2;
+}
+
+.equipmentOptions {
+    display: flex;
+    gap: 1ch;
+}

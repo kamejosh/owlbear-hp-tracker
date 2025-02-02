@@ -297,6 +297,8 @@ button,
         position: absolute;
         top: 50%;
         right: 0;
+        flex-direction: column;
+        align-items: flex-start;
         translate: 100% -50%;
         z-index: 10;
         border: 1px solid lightgrey;
@@ -306,8 +308,6 @@ button,
 
         &.visible {
             display: flex;
-            flex-direction: column;
-            align-items: flex-start;
         }
 
         button {
@@ -341,9 +341,9 @@ button,
 
 .sort-toggle {
     position: relative;
-    width: 20px;
-    border-width: 2px;
     outline: 3px solid transparent;
+    border-width: 2px;
+    width: 20px;
 
     &:hover,
     &:focus-visible {

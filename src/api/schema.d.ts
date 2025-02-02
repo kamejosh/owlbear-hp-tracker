@@ -880,6 +880,8 @@ export interface components {
             name: string;
             /** About */
             about?: string | null;
+            /** External Id */
+            external_id?: string | null;
             /** Size */
             size: string;
             /** Type */
@@ -958,6 +960,8 @@ export interface components {
             name: string;
             /** About */
             about?: string | null;
+            /** External Id */
+            external_id?: string | null;
             /** Size */
             size: string;
             /** Type */
@@ -1031,8 +1035,6 @@ export interface components {
             source?: string | null;
             /** Slug */
             slug: string;
-            /** External Id */
-            external_id: string | null;
             /** License */
             license?: string | null;
             /**
@@ -1339,30 +1341,30 @@ export interface components {
             skills?: components["schemas"]["Skill"][] | null;
             stats: components["schemas"]["src__types__pf__statblock__Stats"];
             /** Items */
-            items?: string[];
+            items?: string[] | null;
             armor_class: components["schemas"]["ArmorClass"];
             saving_throws: components["schemas"]["src__types__pf__statblock__SavingThrows"];
             hp: components["schemas"]["src__types__pf__statblock__Hitpoints"];
             /** Immunities */
-            immunities?: string[];
+            immunities?: string[] | null;
             /** Weaknesses */
-            weaknesses?: string[];
+            weaknesses?: string[] | null;
             /** Resistances */
-            resistances?: string[];
+            resistances?: string[] | null;
             /** Speed */
             speed: string;
             /** Actions */
-            actions?: components["schemas"]["src__types__pf__statblock__Action"][];
+            actions?: components["schemas"]["src__types__pf__statblock__Action"][] | null;
             /** Reactions */
-            reactions?: components["schemas"]["Reaction-Input"][];
+            reactions?: components["schemas"]["Reaction-Input"][] | null;
             /** Spells */
-            spells?: components["schemas"]["SpellCategory"][];
+            spells?: components["schemas"]["SpellCategory"][] | null;
             /** About */
             about?: string | null;
             /** Limits */
-            limits?: components["schemas"]["LimitedUse-Input"][];
+            limits?: components["schemas"]["LimitedUse-Input"][] | null;
             /** Special Abilities */
-            special_abilities?: components["schemas"]["SpecialAbility-Input"][];
+            special_abilities?: components["schemas"]["SpecialAbility-Input"][] | null;
         };
         /** PFStatblockOut */
         PFStatblockOut: {
@@ -1384,30 +1386,30 @@ export interface components {
             skills?: components["schemas"]["Skill"][] | null;
             stats: components["schemas"]["src__types__pf__statblock__Stats"];
             /** Items */
-            items?: string[];
+            items?: string[] | null;
             armor_class: components["schemas"]["ArmorClass"];
             saving_throws: components["schemas"]["src__types__pf__statblock__SavingThrows"];
             hp: components["schemas"]["src__types__pf__statblock__Hitpoints"];
             /** Immunities */
-            immunities?: string[];
+            immunities?: string[] | null;
             /** Weaknesses */
-            weaknesses?: string[];
+            weaknesses?: string[] | null;
             /** Resistances */
-            resistances?: string[];
+            resistances?: string[] | null;
             /** Speed */
             speed: string;
             /** Actions */
             actions: components["schemas"]["ActionOut"][];
             /** Reactions */
-            reactions?: components["schemas"]["Reaction-Output"][];
+            reactions?: components["schemas"]["Reaction-Output"][] | null;
             /** Spells */
             spells: components["schemas"]["SpellCategoryOut"][];
             /** About */
             about?: string | null;
             /** Limits */
-            limits?: components["schemas"]["src__types__base__LimitedUse"][];
+            limits?: components["schemas"]["src__types__base__LimitedUse"][] | null;
             /** Special Abilities */
-            special_abilities?: components["schemas"]["SpecialAbility-Output"][];
+            special_abilities?: components["schemas"]["SpecialAbility-Output"][] | null;
             /** Slug */
             slug: string;
             /** Active */
@@ -1586,7 +1588,7 @@ export interface components {
             /** Attack */
             attack?: number | null;
             /** Spell Lists */
-            spell_lists?: components["schemas"]["Spelllist"][];
+            spell_lists?: components["schemas"]["Spelllist"][] | null;
         };
         /** SpellCategoryOut */
         SpellCategoryOut: {
@@ -1748,6 +1750,8 @@ export interface components {
             attuned?: boolean | null;
             /** Loot */
             loot?: boolean | null;
+            /** Embedded */
+            embedded?: boolean | null;
             /** Proficient */
             proficient?: boolean | null;
             /** Item */
@@ -1765,6 +1769,8 @@ export interface components {
             loot: boolean;
             /** Proficient */
             proficient: boolean;
+            /** Embedded */
+            embedded: boolean;
             item: components["schemas"]["ItemOut"];
         };
         /** Tradition */
@@ -2650,6 +2656,8 @@ export interface components {
             loot: boolean;
             /** Proficient */
             proficient: boolean;
+            /** Embedded */
+            embedded: boolean;
             item?: components["schemas"]["e5_Item"] | null;
             statblock?: components["schemas"]["e5_StatBlock"] | null;
             /** E5 Itemid */

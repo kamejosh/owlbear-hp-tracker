@@ -3,7 +3,7 @@ import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useCallback, useRef, useState } from "react";
 import { diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
-import { parseRollEquation } from "dddice-js";
+import { IRoll, parseRollEquation } from "dddice-js";
 import { getDiceImage, getSvgForDiceType } from "../../../helper/previewHelpers.tsx";
 import { D20 } from "../../svgs/dice/D20.tsx";
 import Tippy from "@tippyjs/react";
@@ -13,6 +13,7 @@ import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import "./dice-button-wrapper.scss";
 import { startsWith } from "lodash";
+import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 
 export type Stats = {
     strength: number;
@@ -29,7 +30,7 @@ type DiceButtonProps = {
     context: string;
     stats: Stats;
     statblock?: string;
-    onRoll?: () => void;
+    onRoll?: (rollResult?: IRoll | DiceRoll | null) => void;
     limitReached?: boolean | null;
     damageDie?: boolean;
 };
@@ -45,7 +46,7 @@ export const DiceButton = (props: DiceButtonProps) => {
     const defaultHidden = playerContext.role === "GM" && !!taSettings.gm_rolls_hidden;
 
     const replaceStatWithMod = (text: string) => {
-        if (text.endsWith("STR")) {
+        if (text.includes("STR")) {
             return text.replace(
                 "STR",
                 (room?.ruleset === "pf"
@@ -53,7 +54,8 @@ export const DiceButton = (props: DiceButtonProps) => {
                     : Math.floor((props.stats.strength - 10) / 2)
                 ).toString(),
             );
-        } else if (text.endsWith("DEX")) {
+        }
+        if (text.includes("DEX")) {
             return text.replace(
                 "DEX",
                 (room?.ruleset === "pf"
@@ -61,7 +63,8 @@ export const DiceButton = (props: DiceButtonProps) => {
                     : Math.floor((props.stats.dexterity - 10) / 2)
                 ).toString(),
             );
-        } else if (text.endsWith("CON")) {
+        }
+        if (text.includes("CON")) {
             return text.replace(
                 "CON",
                 (room?.ruleset === "pf"
@@ -69,7 +72,8 @@ export const DiceButton = (props: DiceButtonProps) => {
                     : Math.floor((props.stats.constitution - 10) / 2)
                 ).toString(),
             );
-        } else if (text.endsWith("INT")) {
+        }
+        if (text.includes("INT")) {
             return text.replace(
                 "INT",
                 (room?.ruleset === "pf"
@@ -77,12 +81,14 @@ export const DiceButton = (props: DiceButtonProps) => {
                     : Math.floor((props.stats.intelligence - 10) / 2)
                 ).toString(),
             );
-        } else if (text.endsWith("WIS")) {
+        }
+        if (text.includes("WIS")) {
             return text.replace(
                 "WIS",
                 (room?.ruleset === "pf" ? props.stats.wisdom : Math.floor((props.stats.wisdom - 10) / 2)).toString(),
             );
-        } else if (text.endsWith("CHA")) {
+        }
+        if (text.includes("CHA")) {
             return text.replace(
                 "CHA",
                 (room?.ruleset === "pf"
@@ -163,11 +169,12 @@ export const DiceButton = (props: DiceButtonProps) => {
                 } catch {}
             }
 
+            let rollResult = null;
             if (theme && !room?.disableDiceRoller) {
                 const parsed = diceToRoll(modifiedDice, theme.id);
                 if (parsed && rollerApi) {
                     try {
-                        await rollWrapper(rollerApi, parsed.dice, {
+                        rollResult = await rollWrapper(rollerApi, parsed.dice, {
                             label: label,
                             operator: parsed.operator,
                             external_id: props.statblock,
@@ -178,10 +185,10 @@ export const DiceButton = (props: DiceButtonProps) => {
                     }
                 }
             } else {
-                await localRoll(modifiedDice, label, addRoll, modifier === "SELF", props.statblock);
+                rollResult = await localRoll(modifiedDice, label, addRoll, modifier === "SELF", props.statblock);
             }
             if (props.onRoll) {
-                props.onRoll();
+                props.onRoll(rollResult);
             }
             button.classList.remove("rolling");
             button.blur();

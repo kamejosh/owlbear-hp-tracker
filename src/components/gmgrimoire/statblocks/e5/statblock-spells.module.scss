@@ -1,0 +1,157 @@
+@use "../../../../_css/utilities/breakpoint";
+
+.heading {
+    margin: 0;
+    font-size: 1.5rem;
+    line-height: 1.1;
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.info {
+    display: flex;
+    flex-grow: 100;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1ch;
+    font-style: italic;
+    font-size: 0.9rem;
+    line-height: 1;
+}
+
+.spells {
+}
+
+.sticky {
+    display: flex;
+    position: sticky;
+    top: -5px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 4px 1ch;
+    z-index: 1;
+    background-color: var(--bg-color);
+    padding-block: 1px 5px;
+}
+
+.spellAttack {
+    display: flex;
+    align-items: center;
+    gap: 0.3ch;
+
+    :global {
+        .button-wrapper {
+            .dice-context-button {
+                right: unset;
+                left: 0;
+                translate: -100% -50%;
+            }
+        }
+    }
+}
+
+.spellList {
+    padding: 0;
+    list-style: none;
+}
+
+.spellMain {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 10px;
+}
+
+.spellInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.spellHeader {
+    display: flex;
+    align-items: center;
+    gap: 1ch;
+}
+
+.spellName {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1;
+    text-transform: capitalize;
+}
+
+.spellLevel {
+    color: lightgrey;
+    font-size: 12px;
+}
+
+.spellDamage {
+    font-size: 14px;
+}
+
+.spellComponents {
+    display: flex;
+    padding-right: 10px;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.materialDetails {
+    color: lightgray;
+    font-size: 12px;
+    hyphens: auto;
+}
+
+.spellMoreInfo {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: 0.25s ease-in-out;
+}
+
+.open {
+    grid-template-rows: 1fr;
+}
+
+.moreInfoContent {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    opacity: 0;
+    transition: 0.25s ease-in-out;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.micOpen {
+    opacity: 1;
+}
+
+.infoBits {
+    display: flex;
+    column-gap: 5px;
+    flex-direction: column;
+    flex-wrap: wrap;
+    column-fill: auto;
+    column-count: 2;
+    max-height: 150px;
+    color: white;
+
+    @include breakpoint.laptop {
+        column-gap: 20px;
+    }
+
+    span {
+        width: calc(50% - 5px);
+        text-overflow: ellipsis;
+
+        @include breakpoint.laptop {
+            width: calc(50% - 20px);
+        }
+    }
+}

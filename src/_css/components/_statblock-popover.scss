@@ -1,13 +1,11 @@
-body:has(.statblock-app) {
-    overflow-y: scroll;
-}
-
 .statblock-app {
     &:not(:has(.minimized)) {
         margin-bottom: 40px;
+        height: calc(100vh - 40px - 2rem);
     }
 
     .statblock-popover {
+        height: 100%;
         position: relative;
 
         &.minimized {
@@ -40,8 +38,8 @@ body:has(.statblock-app) {
             top: calc(30px + 1rem);
             z-index: 3;
             margin-top: calc(10px + 1rem);
+            margin-bottom: 2px;
             background-color: var(--bg-color);
-            padding: 0 0 20px;
             overflow: hidden;
             list-style: none;
 
@@ -50,7 +48,7 @@ body:has(.statblock-app) {
             }
 
             .swiper-slide {
-                border-bottom: 1px solid white;
+                border-bottom: 1px solid grey;
             }
 
             .pre,
@@ -92,7 +90,7 @@ body:has(.statblock-app) {
                 }
 
                 &.active {
-                    border: 1px solid white;
+                    border: 1px solid grey;
                     border-bottom: none;
                     color: white;
 

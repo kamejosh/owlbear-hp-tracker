@@ -1,7 +1,7 @@
 {
     "name": "game-masters-grimoire",
     "private": true,
-    "version": "3.2.1",
+    "version": "3.3.0",
     "type": "module",
     "scripts": {
         "dev": "vite",
@@ -12,9 +12,15 @@
         "node": ">=18"
     },
     "packageManager": "yarn@1.22.21",
-    "prettier": "@bitperfect-software/prettier-config",
+    "prettier": {
+        "$schema": "http://json.schemastore.org/prettierrc",
+        "tabWidth": 4,
+        "printWidth": 120,
+        "plugins": [
+            "prettier-plugin-css-order"
+        ]
+    },
     "devDependencies": {
-        "@bitperfect-software/prettier-config": "^2.0.1",
         "@types/lodash": "^4.17.13",
         "@types/node": "^22.9.0",
         "@types/react": "^18.3.12",
@@ -24,14 +30,14 @@
         "lodash": "^4.17.21",
         "openapi-typescript": "^7.4.3",
         "postcss": "^8.4.49",
-        "prettier": "^3.3.3",
+        "prettier": "^3.4.2",
         "prettier-plugin-css-order": "^2.1.2",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
         "rollup-plugin-copy": "^3.5.0",
         "sass": "^1.80.7",
         "typescript": "^5.6.3",
-        "vite": "^5.4.11",
+        "vite": "^6.0.11",
         "vite-plugin-mkcert": "^1.17.6",
         "yarn": "^1.22.22"
     },
@@ -44,7 +50,7 @@
         "axios": "^1.7.7",
         "axios-retry": "^4.5.0",
         "compare-versions": "^6.1.1",
-        "dddice-js": "^0.19.16",
+        "dddice-js": "^0.19.23",
         "react-loader-spinner": "^6.1.6",
         "react-markdown": "^9.0.1",
         "rehype-raw": "^7.0.0",

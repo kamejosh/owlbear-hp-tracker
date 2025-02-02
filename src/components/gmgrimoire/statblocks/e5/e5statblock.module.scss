@@ -1,0 +1,29 @@
+@use "../../../../_css/utilities/breakpoint";
+
+.statblock {
+    border: 2px solid grey;
+    border-top: none;
+    border-radius: 3px;
+    padding: 10px;
+    height: calc(100% - 20px);
+    overflow: hidden;
+    text-align: left;
+}
+
+.title {
+    display: flex;
+    justify-content: space-between;
+    gap: 2ch;
+    margin-bottom: 4px;
+}
+
+.name {
+    margin: 0;
+    font-weight: 800;
+}
+
+.note {
+    font-style: italic;
+    font-weight: 500;
+    font-size: 0.9rem;
+}

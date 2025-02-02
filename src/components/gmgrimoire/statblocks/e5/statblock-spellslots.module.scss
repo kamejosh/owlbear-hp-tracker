@@ -1,0 +1,25 @@
+.spellSlots {
+    transition: all 0.25s ease;
+}
+
+.spellSlotLimits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+}
+
+.spellSlotEntry {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border: 1px solid lightslategray;
+    border-radius: 8px;
+    background-color: var(--bg-color);
+    padding: 4px;
+}
+
+.spellSlotLevel {
+    font-weight: bold;
+    font-size: 0.8rem;
+    line-height: 1;
+}

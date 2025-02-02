@@ -1,0 +1,25 @@
+.spellFilters {
+    display: flex;
+    flex-grow: 1;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5ch;
+}
+
+.left {
+    justify-content: flex-start;
+}
+
+.spellFilter {
+    cursor: pointer;
+
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.7);
+        color: black;
+    }
+}
+
+.active {
+    background-color: rgba(255, 255, 255, 0.7);
+    color: black;
+}

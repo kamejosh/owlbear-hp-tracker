@@ -18,9 +18,10 @@ import diff_match_patch from "./diff/diff_match_patch.ts";
 import { E5Statblock } from "../api/e5/useE5Api.ts";
 import { PfStatblock } from "../api/pf/usePfApi.ts";
 import axiosRetry from "axios-retry";
-import { Ability } from "../components/hptracker/charactersheet/e5/E5Ability.tsx";
+import { Ability } from "../components/gmgrimoire/statblocks/e5/E5Ability.tsx";
 import { chunk } from "lodash";
 import { deleteItems, updateItems } from "./obrHelper.ts";
+import { getEquipmentBonuses } from "./equipmentHelpers.ts";
 
 export const getYOffset = async (height: number) => {
     const metadata = (await OBR.room.getMetadata()) as Metadata;
@@ -351,6 +352,34 @@ const getLimitsE5 = (statblock: E5Statblock) => {
         });
     });
 
+    statblock.equipment?.forEach((equipment) => {
+        if (equipment.item.charges) {
+            limits.push({
+                id: equipment.item.charges.name,
+                max: equipment.item.charges.uses,
+                used: 0,
+                resets: equipment.item.charges.resets ?? [],
+            });
+        }
+        getActionTypeLimits(equipment.item.bonus?.actions || []);
+        getActionTypeLimits(equipment.item.bonus?.bonus_actions || []);
+        getActionTypeLimits(equipment.item.bonus?.reactions || []);
+        getActionTypeLimits(equipment.item.bonus?.special_abilities || []);
+    });
+
+    if (statblock.hp.hit_dice) {
+        try {
+            const hitDice = statblock.hp.hit_dice.split("d");
+            const dice = parseInt(hitDice[0]);
+            limits.push({
+                id: "Hit Dice",
+                max: dice,
+                used: 0,
+                resets: ["Long Rest"],
+            });
+        } catch {}
+    }
+
     return limits;
 };
 
@@ -358,6 +387,15 @@ const getLimitsPf = (statblock: PfStatblock) => {
     if (!statblock) {
     }
     return [];
+};
+
+const getPfInitiativeBonus = (bonus?: string | null) => {
+    if (bonus) {
+        try {
+            return parseInt(bonus);
+        } catch {}
+    }
+    return 0;
 };
 
 export const updateTokenSheet = async (
@@ -378,13 +416,25 @@ export const updateTokenSheet = async (
                 maxHp: newValues ? statblock.hp.value : data.hp,
                 armorClass: newValues ? statblock.armor_class.value : data.armorClass,
                 hp: newValues ? statblock.hp.value : data.hp,
+                equipment: {
+                    equipped:
+                        ruleset === "e5"
+                            ? (statblock as E5Statblock).equipment?.filter((e) => e.equipped).map((e) => e.item.slug) ||
+                              []
+                            : [],
+                    attuned:
+                        ruleset === "e5"
+                            ? (statblock as E5Statblock).equipment?.filter((e) => e.attuned).map((e) => e.item.slug) ||
+                              []
+                            : [],
+                },
                 stats: {
                     ...data.stats,
                     initiativeBonus:
                         ruleset === "e5"
                             ? (statblock as E5Statblock).initiative ||
                               Math.floor(((statblock.stats.dexterity || 0) - 10) / 2)
-                            : (statblock as PfStatblock).perception,
+                            : getPfInitiativeBonus((statblock as PfStatblock).perception),
                     initial: false,
                     limits:
                         ruleset === "e5"
@@ -471,16 +521,26 @@ export const getInitialValues = async (items: Array<Image>) => {
                         const d = diff.diff_main(statblock.name, name);
                         const dist = diff.diff_levenshtein(d);
                         if (isBestMatch(dist, statblock, bestMatch)) {
+                            const equipmentBonuses = getEquipmentBonuses(statblock.stats, statblock.equipment || []);
+
                             bestMatch = {
                                 source: statblock.source,
                                 distance: dist,
                                 statblock: {
-                                    hp: statblock.hp.value,
-                                    ac: statblock.armor_class.value,
-                                    bonus: Math.floor(((statblock.stats.dexterity || 0) - 10) / 2),
+                                    hp: statblock.hp.value + equipmentBonuses.statblockBonuses.hpBonus,
+                                    ac: statblock.armor_class.value + equipmentBonuses.statblockBonuses.ac,
+                                    bonus:
+                                        statblock.initiative ?? Math.floor((equipmentBonuses.stats.dexterity - 10) / 2),
                                     slug: statblock.slug,
                                     ruleset: "e5",
                                     limits: getLimitsE5(statblock),
+                                    equipment: {
+                                        equipped:
+                                            statblock.equipment?.filter((e) => e.equipped).map((e) => e.item.slug) ||
+                                            [],
+                                        attuned:
+                                            statblock.equipment?.filter((e) => e.attuned).map((e) => e.item.slug) || [],
+                                    },
                                 },
                             };
                         }
@@ -539,7 +599,7 @@ export const getInitialValues = async (items: Array<Image>) => {
     return itemInitValues;
 };
 
-export const updateLimit = async (itemId: string, limitValues: Limit) => {
+export const updateLimit = async (itemId: string, limitValues: Limit, usage?: number) => {
     if (limitValues) {
         await updateItems([itemId], (items) => {
             items.forEach((item) => {
@@ -552,7 +612,7 @@ export const updateLimit = async (itemId: string, limitValues: Limit) => {
                         if (index !== undefined) {
                             // @ts-ignore
                             item.metadata[itemMetadataKey]["stats"]["limits"][index]["used"] = Math.min(
-                                limitValues.used + 1,
+                                limitValues.used + (usage || 1),
                                 limitValues.max,
                             );
                         }
@@ -617,6 +677,7 @@ export const prepareTokenForGrimoire = async (contextItems: Array<Image>) => {
                         defaultMetadata.stats.initiativeBonus = itemStatblocks[item.id].bonus;
                         defaultMetadata.stats.initial = true;
                         defaultMetadata.stats.limits = itemStatblocks[item.id].limits;
+                        defaultMetadata.equipment = itemStatblocks[item.id].equipment;
                     }
                     item.metadata[itemMetadataKey] = defaultMetadata;
                 }

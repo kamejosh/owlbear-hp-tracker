@@ -1,10 +1,10 @@
-import { Statblock } from "../hptracker/charactersheet/Statblock.tsx";
+import { Statblock } from "../gmgrimoire/statblocks/Statblock.tsx";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode, Mousewheel } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/mousewheel";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { itemMetadataKey } from "../../helper/variables.ts";
 import { GMGMetadata } from "../../helper/types.ts";
 import SwiperClass from "swiper/types/swiper-class";
@@ -30,7 +30,6 @@ export const StatblockList = (props: StatblockListProps) => {
     const { isReady } = SceneReadyContext();
     const [id, setId] = useState<string | undefined>();
     const [swiper, setSwiper] = useState<SwiperClass>();
-    const [scrollTargets, setScrollTargets] = useState<Array<{ name: string; target: string }>>([]);
     const items = useCallback(() => {
         if (tokens) {
             const itemList = [...tokens].map((t) => t[1].item).sort(sortItems);
@@ -42,16 +41,6 @@ export const StatblockList = (props: StatblockListProps) => {
         }
         return [];
     }, [tokens, playerContext])();
-    const [stickHeight, setStickyHeight] = useState<number>();
-    const jumpLinksRef = useRef<HTMLUListElement>(null);
-
-    useEffect(() => {
-        if (jumpLinksRef.current) {
-            setTimeout(() => {
-                setStickyHeight(jumpLinksRef.current?.getBoundingClientRect().height);
-            }, 1000);
-        }
-    }, [jumpLinksRef.current, id]);
 
     useEffect(() => {
         if ((!id || !items.map((i) => i.id).includes(id)) && items.length > 0) {
@@ -193,20 +182,7 @@ export const StatblockList = (props: StatblockListProps) => {
                 })}
                 <SwiperSlide className={"post"}> </SwiperSlide>
             </Swiper>
-            {props.minimized ? null : (
-                <div className={"statblock-sheet"} style={{ ["--sticky-height" as string]: `${stickHeight}px` }}>
-                    <ul className={"jump-links fixed"} ref={jumpLinksRef}>
-                        {scrollTargets.map((t) => {
-                            return (
-                                <li key={t.name} className={"button"}>
-                                    <a href={`#${t.target}`}>{t.name}</a>
-                                </li>
-                            );
-                        })}
-                    </ul>
-                    {id ? <Statblock id={id} setScrollTargets={setScrollTargets} /> : null}
-                </div>
-            )}
+            {props.minimized ? null : id ? <Statblock id={id} /> : null}
         </>
     ) : (
         <></>

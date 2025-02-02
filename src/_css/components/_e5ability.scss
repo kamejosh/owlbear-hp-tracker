@@ -4,13 +4,18 @@
 
     .ability-name {
         font-size: 1.2rem;
-        text-decoration: underline;
-        text-underline-offset: 2px;
     }
 
     .ability-extra-info {
         display: flex;
-        flex-direction: column;
-        padding-left: 2ch;
+        //justify-content: space-between;
+        gap: 1ch;
+        margin-top: 4px;
+        padding-left: 1ch;
+
+        .extra-info-with-button {
+            display: flex;
+            gap: 1ch;
+        }
     }
 }

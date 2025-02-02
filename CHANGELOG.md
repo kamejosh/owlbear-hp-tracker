@@ -1,3 +1,21 @@
+# 3.3.0
+
+## Big Things
+
++ Refactor Statblocks for 5e and PF to offer easier access to abilities and Spells
++ Integrate proficiency for custom statblocks and items
++ Fully integrate custom items including equipment toggle
+
+## Small Things
+
++ Color-gradient for players can be disabled in Settings
++ Fix multiselect does not work on unsorted tokens
++ GMG shapes are correctly ordered above the Token
++ Token names are hidden if players do not have full token access
++ Fix rolllog overflow
++ Inline Markdown with dice buttons
++ Fix stat modifier error
+
 # 3.2.1
 
 + Fix dddice login is not persisted

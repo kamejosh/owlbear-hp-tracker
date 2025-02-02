@@ -1,0 +1,23 @@
+@use "../../../../_css/utilities/breakpoint";
+
+.values {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+
+    @include breakpoint.tablet {
+        min-width: 206px;
+    }
+
+    :global {
+        .initiative-wrapper {
+            &:last-child {
+                .dice-context-button {
+                    right: unset;
+                    left: 0;
+                    translate: -100% -50%;
+                }
+            }
+        }
+    }
+}
