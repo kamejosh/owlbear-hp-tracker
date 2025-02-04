@@ -43,6 +43,7 @@ const Spell = ({
     attack?: string | null;
 }) => {
     const [open, setOpen] = useState<boolean>(false);
+    const statblockContext = useE5StatblockContext();
     const room = useMetadataContext(useShallow((state) => state.room));
 
     const getSpellLevel = () => {
@@ -107,6 +108,7 @@ const Spell = ({
                                                     }
                                                 }}
                                                 limitReached={limitReached}
+                                                proficiencyBonus={statblockContext.statblock.proficiency_bonus}
                                             />
                                         </>
                                     ) : (
@@ -135,6 +137,7 @@ const Spell = ({
                                 text={`DC ${dc}`}
                                 context={`${capitalize(spell.name)}: Attack`}
                                 stats={stats}
+                                proficiencyBonus={statblockContext.statblock.proficiency_bonus}
                             />
                         </span>
                     ) : null}
@@ -149,6 +152,7 @@ const Spell = ({
                                 statblock={statblock}
                                 limitReached={limitReached}
                                 damageDie={true}
+                                proficiencyBonus={statblockContext.statblock.proficiency_bonus}
                             />
                         </span>
                     ) : null}
@@ -217,6 +221,7 @@ const Spell = ({
                                 }
                             }}
                             limitReached={limitReached}
+                            proficiencyBonus={statblockContext.statblock.proficiency_bonus}
                         />
                     </div>
                     {!!spell.higher_level ? (
@@ -227,6 +232,7 @@ const Spell = ({
                                 stats={stats}
                                 context={`${capitalize(spell.name)}: Higher Level`}
                                 statblock={statblock}
+                                proficiencyBonus={statblockContext.statblock.proficiency_bonus}
                             />
                         </div>
                     ) : null}
@@ -301,6 +307,7 @@ export const E5Spells = () => {
                                 text={`+${statblock.spell_attack}`}
                                 context={"Spell Attack"}
                                 stats={stats}
+                                proficiencyBonus={statblock.proficiency_bonus}
                             />
                         </span>
                     ) : null}

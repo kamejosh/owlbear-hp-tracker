@@ -13,7 +13,7 @@
     padding-inline: 5px !important;
     list-style: none;
 
-    @include breakpoint.laptop {
+    @include breakpoint.tablet {
         grid-template-columns: 1fr 1fr;
         padding-inline: 20px !important;
     }

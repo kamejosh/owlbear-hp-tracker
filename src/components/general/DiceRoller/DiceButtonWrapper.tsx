@@ -12,7 +12,7 @@ import { useShallow } from "zustand/react/shallow";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import "./dice-button-wrapper.scss";
-import { startsWith } from "lodash";
+import { isNull, isUndefined, startsWith } from "lodash";
 import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 
 export type Stats = {
@@ -33,6 +33,7 @@ type DiceButtonProps = {
     onRoll?: (rollResult?: IRoll | DiceRoll | null) => void;
     limitReached?: boolean | null;
     damageDie?: boolean;
+    proficiencyBonus?: number | null;
 };
 export const DiceButton = (props: DiceButtonProps) => {
     const [room, taSettings] = useMetadataContext(useShallow((state) => [state.room, state.taSettings]));
@@ -46,6 +47,14 @@ export const DiceButton = (props: DiceButtonProps) => {
     const defaultHidden = playerContext.role === "GM" && !!taSettings.gm_rolls_hidden;
 
     const replaceStatWithMod = (text: string) => {
+        if (
+            room?.ruleset === "e5" &&
+            text.includes("PB") &&
+            !isUndefined(props.proficiencyBonus) &&
+            !isNull(props.proficiencyBonus)
+        ) {
+            return text.replace("PB", props.proficiencyBonus.toString());
+        }
         if (text.includes("STR")) {
             return text.replace(
                 "STR",
@@ -322,6 +331,7 @@ export const DiceButtonWrapper = ({
     onRoll,
     limitReached,
     damageDie,
+    proficiencyBonus,
 }: {
     text: string;
     context: string;
@@ -330,6 +340,7 @@ export const DiceButtonWrapper = ({
     onRoll?: () => void;
     limitReached?: boolean | null;
     damageDie?: boolean;
+    proficiencyBonus?: number | null;
 }) => {
     const regex = /`?((\d*?d\d+)(( ?[\+\-] ?((\d+)|([A-Z]{3})))?)|( [\+\-]\d+))`?/gi;
     const dice = text.match(regex);
@@ -373,6 +384,7 @@ export const DiceButtonWrapper = ({
                                 onRoll={onRoll}
                                 limitReached={limitReached}
                                 damageDie={damageDie}
+                                proficiencyBonus={proficiencyBonus}
                             />
                         );
                     }
@@ -401,6 +413,7 @@ export const DiceButtonWrapper = ({
                                                     onRoll={onRoll}
                                                     limitReached={limitReached}
                                                     damageDie={damageDie}
+                                                    proficiencyBonus={proficiencyBonus}
                                                 />
                                             );
                                         }

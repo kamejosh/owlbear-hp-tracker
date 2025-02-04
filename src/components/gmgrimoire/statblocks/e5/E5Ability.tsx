@@ -79,6 +79,7 @@ export const E5Ability = ({ ability, proficient }: { ability: Ability; proficien
                     statblock={tokenName}
                     stats={stats}
                     limitReached={!ability.attack_bonus ? limitReached : undefined}
+                    proficiencyBonus={statblock.proficiency_bonus}
                 />
             </div>
             <span className={"ability-extra-info"}>
@@ -97,6 +98,7 @@ export const E5Ability = ({ ability, proficient }: { ability: Ability; proficien
                                         await updateLimit(item.id, limitValues);
                                     }}
                                     limitReached={limitReached}
+                                    proficiencyBonus={statblock.proficiency_bonus}
                                 />
                             </span>
                         </Tippy>
@@ -123,6 +125,7 @@ export const E5Ability = ({ ability, proficient }: { ability: Ability; proficien
                                 }
                                 limitReached={!ability.attack_bonus ? limitReached : undefined}
                                 damageDie={true}
+                                proficiencyBonus={statblock.proficiency_bonus}
                             />
                         )}
                     </span>

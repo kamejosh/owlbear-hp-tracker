@@ -68,8 +68,8 @@ export const E5General = () => {
                     />
                     <div className={"dice-button-wrapper"}>
                         <DiceButton
-                            dice={`1d${hitDiceText}`}
-                            text={`1d${hitDiceText}`}
+                            dice={`1d${hitDiceText}+CON`}
+                            text={`1d${hitDiceText}+CON`}
                             context={"Hit Dice"}
                             stats={stats}
                             statblock={tokenName}
@@ -90,6 +90,7 @@ export const E5General = () => {
                                 await updateLimit(item.id, hitDice);
                             }}
                             limitReached={hitDiceLimit.uses === hitDice.used}
+                            proficiencyBonus={statblock.proficiency_bonus}
                         />
                     </div>
                     <LineBreak />
@@ -131,6 +132,7 @@ export const E5General = () => {
                                     stats={stats}
                                     context={`${capitalize(name)}: Check`}
                                     statblock={tokenName}
+                                    proficiencyBonus={statblock.proficiency_bonus}
                                 />
                                 <DiceButton
                                     dice={`d20${Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
@@ -142,6 +144,7 @@ export const E5General = () => {
                                     stats={stats}
                                     context={`${capitalize(name.substring(0, 3))}: Save`}
                                     statblock={tokenName}
+                                    proficiencyBonus={statblock.proficiency_bonus}
                                 />
                             </div>
                         </li>

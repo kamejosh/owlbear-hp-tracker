@@ -3,6 +3,7 @@ import { ID } from "../../../helper/variables.ts";
 import { DiceButtonWrapper, Stats } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { E5Statblock } from "../../../api/e5/useE5Api.ts";
 import { PfStatblock } from "../../../api/pf/usePfApi.ts";
+import { useMetadataContext } from "../../../context/MetadataContext.ts";
 
 export const About = ({
     about,
@@ -17,6 +18,7 @@ export const About = ({
     stats?: Stats;
     context?: string;
 }) => {
+    const room = useMetadataContext.getState().room;
     const [open, setOpen] = useLocalStorage<boolean>(`${ID}.about.${slug}`, false);
     return about ? (
         <div className={"about"}>
@@ -38,6 +40,7 @@ export const About = ({
                                 charisma: statblock?.stats.charisma || 0,
                             }
                         }
+                        proficiencyBonus={room?.ruleset === "e5" ? (statblock as E5Statblock).proficiency_bonus : null}
                     />
                 </div>
             </div>
