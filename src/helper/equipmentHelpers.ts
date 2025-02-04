@@ -185,7 +185,7 @@ export const getEquipmentBonuses = (
     const modifiers: Array<Modifier> = [];
 
     equipment?.forEach((item) => {
-        if (isItemAttuned(data, item) || isItemInUse(data, item)) {
+        if (isItemAttuned(data, item) || isItemEquipped(data, item)) {
             if (item.item.spells) {
                 bonuses.spells.push({ itemId: item.item.id, spells: item.item.spells });
             }
