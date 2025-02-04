@@ -117,7 +117,11 @@ const getStatValue = (stats: Stats, modifiers: Array<Modifier>): Stats => {
     return stats;
 };
 
-export const getEquipmentBonuses = (stats: StatblockStats, equipment: Array<StatblockItems>): EquipmentBonuses => {
+export const getEquipmentBonuses = (
+    data: GMGMetadata,
+    stats: StatblockStats,
+    equipment: Array<StatblockItems>,
+): EquipmentBonuses => {
     const bonuses: StatblockBonuses = {
         spells: [],
         hpBonus: 0,
@@ -181,10 +185,7 @@ export const getEquipmentBonuses = (stats: StatblockStats, equipment: Array<Stat
     const modifiers: Array<Modifier> = [];
 
     equipment?.forEach((item) => {
-        if (
-            (item.item.requires_attuning && item.attuned && item.equipped) ||
-            (!item.item.requires_attuning && item.equipped)
-        ) {
+        if (isItemAttuned(data, item) || isItemInUse(data, item)) {
             if (item.item.spells) {
                 bonuses.spells.push({ itemId: item.item.id, spells: item.item.spells });
             }
@@ -346,7 +347,7 @@ export const getEquipmentBonuses = (stats: StatblockStats, equipment: Array<Stat
             });
         }
 
-        if (item.equipped && item.item.bonus) {
+        if (isItemEquipped(data, item) && item.item.bonus) {
             actions.items.push({
                 itemId: item.item.id,
                 actions: item.item.bonus.actions,

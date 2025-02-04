@@ -521,7 +521,16 @@ export const getInitialValues = async (items: Array<Image>) => {
                         const d = diff.diff_main(statblock.name, name);
                         const dist = diff.diff_levenshtein(d);
                         if (isBestMatch(dist, statblock, bestMatch)) {
-                            const equipmentBonuses = getEquipmentBonuses(statblock.stats, statblock.equipment || []);
+                            const equipmentData = {
+                                equipped: statblock.equipment?.filter((e) => e.equipped).map((e) => e.item.slug) || [],
+                                attuned: statblock.equipment?.filter((e) => e.attuned).map((e) => e.item.slug) || [],
+                            };
+                            const equipmentBonuses = getEquipmentBonuses(
+                                // we only need the equipment data in this function
+                                { equipment: equipmentData } as GMGMetadata,
+                                statblock.stats,
+                                statblock.equipment || [],
+                            );
 
                             bestMatch = {
                                 source: statblock.source,
@@ -534,13 +543,7 @@ export const getInitialValues = async (items: Array<Image>) => {
                                     slug: statblock.slug,
                                     ruleset: "e5",
                                     limits: getLimitsE5(statblock),
-                                    equipment: {
-                                        equipped:
-                                            statblock.equipment?.filter((e) => e.equipped).map((e) => e.item.slug) ||
-                                            [],
-                                        attuned:
-                                            statblock.equipment?.filter((e) => e.attuned).map((e) => e.item.slug) || [],
-                                    },
+                                    equipment: equipmentData,
                                 },
                             };
                         }

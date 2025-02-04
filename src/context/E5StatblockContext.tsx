@@ -30,11 +30,11 @@ export const useE5StatblockContext = (): E5StatblockContextType => {
 
 export const E5StatblockContextProvider = (props: PropsWithChildren & { itemId: string; statblock: E5Statblock }) => {
     const token = useTokenListContext(useShallow((state) => state.tokens?.get(props.itemId)));
-    const equipmentBonuses = getEquipmentBonuses(props.statblock.stats, props.statblock.equipment || []);
 
     if (token) {
         const data = token.data;
         const item = token.item;
+        const equipmentBonuses = getEquipmentBonuses(data, props.statblock.stats, props.statblock.equipment || []);
         return (
             <E5StatblockContext.Provider
                 value={{
