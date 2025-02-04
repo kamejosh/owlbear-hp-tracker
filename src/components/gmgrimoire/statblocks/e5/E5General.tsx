@@ -211,7 +211,13 @@ export const E5General = () => {
                 ) : null}
             </ul>
             <LineBreak />
-            <About about={statblock.about} slug={statblock.slug} statblock={statblock} stats={stats} />
+            <About
+                about={statblock.about}
+                slug={statblock.slug}
+                statblock={statblock}
+                stats={stats}
+                context={statblock.name}
+            />
         </div>
     );
 };

@@ -9,11 +9,13 @@ export const About = ({
     slug,
     statblock,
     stats,
+    context,
 }: {
     about?: string | null;
     slug: string;
     statblock?: E5Statblock | PfStatblock;
     stats?: Stats;
+    context?: string;
 }) => {
     const [open, setOpen] = useLocalStorage<boolean>(`${ID}.about.${slug}`, false);
     return about ? (
@@ -24,7 +26,7 @@ export const About = ({
                 <div className={"about-content"}>
                     <DiceButtonWrapper
                         text={about}
-                        context={""}
+                        context={context || statblock?.name || "Custom Roll"}
                         statblock={statblock?.name}
                         stats={
                             stats || {

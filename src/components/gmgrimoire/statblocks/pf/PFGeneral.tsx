@@ -137,7 +137,13 @@ export const PFGeneral = () => {
                     <LineBreak />
                 </>
             ) : null}
-            <About slug={statblock.slug} about={statblock.about} stats={stats} statblock={statblock} />
+            <About
+                slug={statblock.slug}
+                about={statblock.about}
+                stats={stats}
+                statblock={statblock}
+                context={statblock.name}
+            />
         </div>
     );
 };

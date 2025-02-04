@@ -4,18 +4,12 @@ import styles from "./statblock-inventory.module.scss";
 import { ItemCharges } from "./ItemCharges.tsx";
 import Tippy from "@tippyjs/react";
 import { About } from "../About.tsx";
-import { isItemAttuned, isItemEquipped, isItemInUse, StatblockItems } from "../../../../helper/equipmentHelpers.ts";
+import { isItemAttuned, isItemEquipped, StatblockItems } from "../../../../helper/equipmentHelpers.ts";
 import { updateTokenMetadata } from "../../../../helper/tokenHelper.ts";
 
 export const E5Item = ({ equipment }: { equipment: StatblockItems }) => {
     const { statblock, stats, data, item } = useE5StatblockContext();
 
-    console.log(
-        equipment.item.name,
-        isItemInUse(data, equipment),
-        isItemEquipped(data, equipment),
-        isItemAttuned(data, equipment),
-    );
     return (
         <li key={equipment.id}>
             <div className={styles.top}>
@@ -112,7 +106,13 @@ export const E5Item = ({ equipment }: { equipment: StatblockItems }) => {
                 ) : null}
             </span>
             <ItemCharges equippedItem={equipment.item} />
-            <About slug={equipment.item.name} statblock={statblock} stats={stats} about={equipment.item.description} />
+            <About
+                slug={equipment.item.name}
+                statblock={statblock}
+                stats={stats}
+                about={equipment.item.description}
+                context={equipment.item.name}
+            />
             <LineBreak />
         </li>
     );
