@@ -78,13 +78,6 @@ export const E5Ability = ({ ability, proficient }: { ability: Ability; proficien
                     context={`${capitalize(ability.name)}`}
                     statblock={tokenName}
                     stats={stats}
-                    onRoll={
-                        !ability.attack_bonus
-                            ? async () => {
-                                  await updateLimit(item.id, limitValues);
-                              }
-                            : undefined
-                    }
                     limitReached={!ability.attack_bonus ? limitReached : undefined}
                 />
             </div>
