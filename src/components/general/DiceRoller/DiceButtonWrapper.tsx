@@ -47,16 +47,17 @@ export const DiceButton = (props: DiceButtonProps) => {
     const defaultHidden = playerContext.role === "GM" && !!taSettings.gm_rolls_hidden;
 
     const replaceStatWithMod = (text: string) => {
+        if (text.includes("PB")) console.log(text);
         if (
             room?.ruleset === "e5" &&
             text.includes("PB") &&
             !isUndefined(props.proficiencyBonus) &&
             !isNull(props.proficiencyBonus)
         ) {
-            return text.replace("PB", props.proficiencyBonus.toString());
+            text = text.replace("PB", props.proficiencyBonus.toString());
         }
         if (text.includes("STR")) {
-            return text.replace(
+            text = text.replace(
                 "STR",
                 (room?.ruleset === "pf"
                     ? props.stats.strength
@@ -65,7 +66,7 @@ export const DiceButton = (props: DiceButtonProps) => {
             );
         }
         if (text.includes("DEX")) {
-            return text.replace(
+            text = text.replace(
                 "DEX",
                 (room?.ruleset === "pf"
                     ? props.stats.dexterity
@@ -74,7 +75,7 @@ export const DiceButton = (props: DiceButtonProps) => {
             );
         }
         if (text.includes("CON")) {
-            return text.replace(
+            text = text.replace(
                 "CON",
                 (room?.ruleset === "pf"
                     ? props.stats.constitution
@@ -83,7 +84,7 @@ export const DiceButton = (props: DiceButtonProps) => {
             );
         }
         if (text.includes("INT")) {
-            return text.replace(
+            text = text.replace(
                 "INT",
                 (room?.ruleset === "pf"
                     ? props.stats.intelligence
@@ -92,13 +93,13 @@ export const DiceButton = (props: DiceButtonProps) => {
             );
         }
         if (text.includes("WIS")) {
-            return text.replace(
+            text = text.replace(
                 "WIS",
                 (room?.ruleset === "pf" ? props.stats.wisdom : Math.floor((props.stats.wisdom - 10) / 2)).toString(),
             );
         }
         if (text.includes("CHA")) {
-            return text.replace(
+            text = text.replace(
                 "CHA",
                 (room?.ruleset === "pf"
                     ? props.stats.charisma
@@ -405,8 +406,8 @@ export const DiceButtonWrapper = ({
                                         if (diceMatches) {
                                             return (
                                                 <DiceButton
-                                                    dice={diceMatches[0]}
-                                                    text={diceMatches[0]}
+                                                    dice={props.children?.toString() || ""}
+                                                    text={props.children?.toString() || ""}
                                                     context={context}
                                                     stats={stats}
                                                     statblock={statblock}
