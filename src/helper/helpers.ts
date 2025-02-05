@@ -409,25 +409,33 @@ export const updateTokenSheet = async (
             const newValues =
                 (data.stats.initial && data.sheet !== statblock.slug) ||
                 (data.hp === 0 && data.maxHp === 0 && data.armorClass === 0);
+            const equipmentData: { equipped: Array<string>; attuned: Array<string> } = { equipped: [], attuned: [] };
+            let newHP,
+                newAC = 0;
+            if (ruleset === "e5") {
+                const e5Statblock = statblock as E5Statblock;
+                equipmentData.equipped = e5Statblock.equipment?.filter((e) => e.equipped).map((e) => e.item.slug) || [];
+                equipmentData.attuned = e5Statblock.equipment?.filter((e) => e.attuned).map((e) => e.item.slug) || [];
+                const equipmentBonuses = getEquipmentBonuses(
+                    // we only need the equipment data in this function
+                    { equipment: equipmentData } as GMGMetadata,
+                    e5Statblock.stats,
+                    e5Statblock.equipment || [],
+                );
+                newHP = statblock.hp.value + equipmentBonuses.statblockBonuses.hpBonus;
+                newAC = statblock.armor_class.value + equipmentBonuses.statblockBonuses.ac;
+            } else {
+                newHP = statblock.hp.value;
+                newAC = statblock.armor_class.value;
+            }
             item.metadata[itemMetadataKey] = {
                 ...data,
                 sheet: statblock.slug,
                 ruleset: ruleset,
-                maxHp: newValues ? statblock.hp.value : data.hp,
-                armorClass: newValues ? statblock.armor_class.value : data.armorClass,
-                hp: newValues ? statblock.hp.value : data.hp,
-                equipment: {
-                    equipped:
-                        ruleset === "e5"
-                            ? (statblock as E5Statblock).equipment?.filter((e) => e.equipped).map((e) => e.item.slug) ||
-                              []
-                            : [],
-                    attuned:
-                        ruleset === "e5"
-                            ? (statblock as E5Statblock).equipment?.filter((e) => e.attuned).map((e) => e.item.slug) ||
-                              []
-                            : [],
-                },
+                maxHp: newValues ? newHP : data.hp,
+                armorClass: newValues ? newAC : data.armorClass,
+                hp: newValues ? newHP : data.hp,
+                equipment: equipmentData,
                 stats: {
                     ...data.stats,
                     initiativeBonus:
