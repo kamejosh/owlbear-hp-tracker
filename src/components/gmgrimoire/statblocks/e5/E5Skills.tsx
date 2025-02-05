@@ -15,7 +15,12 @@ export const E5Skills = () => {
                 {statblock.skills
                     ? Object.entries(statblock.skills).map(([skill, value]) => {
                           // @ts-ignore statblockBonuses always contain all skills
-                          const combinedValue: number = value + equipmentBonuses.statblockBonuses.skills[skill];
+                          const combinedValue: number =
+                              value +
+                              equipmentBonuses.statblockBonuses.skills[skill] +
+                              (equipmentBonuses.statblockBonuses.proficiencies.includes(skill)
+                                  ? statblock.proficiency_bonus
+                                  : 0);
                           return (
                               <li
                                   key={skill}
