@@ -27,7 +27,7 @@ export const PFSkills = () => {
                         >
                             <b>{capitalize(skill.name.replaceAll("_", " "))}</b>
                             <DiceButton
-                                dice={`d20${skillValue}`}
+                                dice={`d20+${skillValue}`}
                                 text={Intl.NumberFormat("en-US", { signDisplay: "always" }).format(
                                     Math.floor(skillValue),
                                 )}
