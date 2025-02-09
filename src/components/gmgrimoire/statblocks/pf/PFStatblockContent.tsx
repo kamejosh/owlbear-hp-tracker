@@ -7,6 +7,7 @@ import { PFSkills } from "./PFSkills.tsx";
 import { PFActionTabs } from "./PFActionTabs.tsx";
 import { PFAbilities } from "./PFAbilities.tsx";
 import { PfSpells } from "./PfSpells.tsx";
+import { PFInventory } from "./PFInventory.tsx";
 
 export const PFStatblockContent = () => {
     const { statblock, item } = usePFStatblockContext();
@@ -38,7 +39,7 @@ export const PFStatblockContent = () => {
         } else if (tab === "actions") {
             return <PFActionTabs />;
         } else if (tab === "inventory") {
-            return null;
+            return <PFInventory />;
         } else if (tab === "spells") {
             return <PfSpells spells={statblock.spells} statblock={statblock.name} stats={statblock.stats} />;
         } else if (tab === "special") {
