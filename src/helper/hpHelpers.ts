@@ -140,9 +140,11 @@ const handleHpOffsetUpdate = async (offset: number, hp: Item) => {
                     y: bounds.position.y + bounds.height - height + offset + border,
                 };
             } else if (hp.name === "hp-text") {
+                const overflow = 100;
+                const width = Math.abs(bounds.width) + overflow;
                 change.position = {
-                    x: x + 2,
-                    y: bounds.position.y + bounds.height - height + offset,
+                    x: bounds.width < 0 ? bounds.position.x - width + overflow / 2 : bounds.position.x - overflow / 2,
+                    y: bounds.position.y + bounds.height - height + (await getYOffset(bounds.height)),
                 };
             } else {
                 change.position = {

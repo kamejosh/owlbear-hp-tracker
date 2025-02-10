@@ -123,18 +123,11 @@ export const Settings = () => {
                         <div className={"hp-position setting"}>
                             Text and Bar Offset:{" "}
                             <input
-                                type={"text"}
+                                type={"number"}
                                 size={2}
                                 defaultValue={room?.hpBarOffset || 0}
                                 onChange={(e) => {
-                                    const factor = e.target.value.startsWith("-") ? -1 : 1;
-                                    const nValue = Number(e.target.value.replace(/[^0-9]/g, ""));
-                                    handleOffsetChange(nValue * factor);
-                                    if (factor < 0 && nValue === 0) {
-                                        e.currentTarget.value = "-";
-                                    } else {
-                                        e.currentTarget.value = String(nValue * factor);
-                                    }
+                                    handleOffsetChange(Number(e.currentTarget.value));
                                 }}
                                 onKeyDown={(e) => {
                                     if (e.key === "ArrowUp") {
@@ -152,24 +145,20 @@ export const Settings = () => {
                             <div>
                                 X{" "}
                                 <input
-                                    type={"text"}
+                                    type={"number"}
                                     size={2}
                                     value={room?.acOffset?.x || 0}
                                     onChange={(e) => {
-                                        const factor = e.target.value.startsWith("-") ? -1 : 1;
-                                        const nValue = Number(e.target.value.replace(/[^0-9]/g, ""));
-                                        handleAcOffsetChange(nValue * factor, room?.acOffset?.y || 0);
+                                        handleAcOffsetChange(Number(e.currentTarget.value), room?.acOffset?.x || 0);
                                     }}
                                 />
                                 Y{" "}
                                 <input
-                                    type={"text"}
+                                    type={"number"}
                                     size={2}
                                     value={room?.acOffset?.y || 0}
                                     onChange={(e) => {
-                                        const factor = e.target.value.startsWith("-") ? -1 : 1;
-                                        const nValue = Number(e.target.value.replace(/[^0-9]/g, ""));
-                                        handleAcOffsetChange(room?.acOffset?.x || 0, nValue * factor);
+                                        handleAcOffsetChange(Number(e.currentTarget.value), room?.acOffset?.y || 0);
                                     }}
                                 />
                             </div>
