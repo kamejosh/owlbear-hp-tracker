@@ -81,8 +81,16 @@ const Content = () => {
             }
         };
 
+        const initAction = async () => {
+            if (playerContext.role === "PLAYER") {
+                await OBR.action.setHeight(700);
+                await OBR.action.setWidth(560);
+            }
+        };
+
         if (isReady) {
-            initGrimoire();
+            void initGrimoire();
+            void initAction();
         }
     }, [isReady]);
 

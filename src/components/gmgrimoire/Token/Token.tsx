@@ -212,7 +212,7 @@ export const Token = (props: TokenProps) => {
             <Initiative id={props.id} />
             {props.popover ? null : playerContext.role === "GM" || item.createdUserId === playerContext.id ? (
                 <>
-                    <Sheet id={props.id} />
+                    {playerContext.role === "GM" || data.sheet ? <Sheet id={props.id} /> : null}
                     <Rest id={props.id} />
                 </>
             ) : null}

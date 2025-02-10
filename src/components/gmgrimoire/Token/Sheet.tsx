@@ -69,17 +69,19 @@ export const Sheet = ({ id }: { id: string }) => {
                             open
                         </button>
                     </Tippy>
-                    <Tippy content={"Remove statblock"}>
-                        <button
-                            className={"remove-statblock"}
-                            onClick={async () => {
-                                const newData = { ...data, sheet: "" };
-                                await updateTokenMetadata(newData, [id]);
-                            }}
-                        >
-                            <DeleteSvg />
-                        </button>
-                    </Tippy>
+                    {playerContext.role === "GM" ? (
+                        <Tippy content={"Remove statblock"}>
+                            <button
+                                className={"remove-statblock"}
+                                onClick={async () => {
+                                    const newData = { ...data, sheet: "" };
+                                    await updateTokenMetadata(newData, [id]);
+                                }}
+                            >
+                                <DeleteSvg />
+                            </button>
+                        </Tippy>
+                    ) : null}
                 </>
             ) : (
                 <Tippy content={"Assign statblock"}>
