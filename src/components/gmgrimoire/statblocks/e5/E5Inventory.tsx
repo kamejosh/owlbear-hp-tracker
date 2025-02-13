@@ -4,8 +4,12 @@ import styles from "./statblock-inventory.module.scss";
 import { ItemCharges } from "./ItemCharges.tsx";
 import Tippy from "@tippyjs/react";
 import { About } from "../About.tsx";
-import { isItemAttuned, isItemEquipped, StatblockItems } from "../../../../helper/equipmentHelpers.ts";
-import { updateTokenMetadata } from "../../../../helper/tokenHelper.ts";
+import {
+    handleEquipmentChange,
+    isItemAttuned,
+    isItemEquipped,
+    StatblockItems,
+} from "../../../../helper/equipmentHelpers.ts";
 
 export const E5Item = ({ equipment }: { equipment: StatblockItems }) => {
     const { statblock, stats, data, item } = useE5StatblockContext();
@@ -69,11 +73,7 @@ export const E5Item = ({ equipment }: { equipment: StatblockItems }) => {
                                         1,
                                     );
                                 }
-                                const newData = {
-                                    ...data,
-                                    equipment: { equipped: equipped, attuned: attuned },
-                                };
-                                await updateTokenMetadata(newData, [item.id]);
+                                await handleEquipmentChange(data, equipped, attuned, statblock, item);
                             }}
                         />
                     </label>
@@ -95,11 +95,7 @@ export const E5Item = ({ equipment }: { equipment: StatblockItems }) => {
                                         1,
                                     );
                                 }
-                                const newData = {
-                                    ...data,
-                                    equipment: { equipped: equipped, attuned: attuned },
-                                };
-                                await updateTokenMetadata(newData, [item.id]);
+                                await handleEquipmentChange(data, equipped, attuned, statblock, item);
                             }}
                         />
                     </label>

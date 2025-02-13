@@ -3,6 +3,11 @@ import { LimitType } from "../components/gmgrimoire/statblocks/LimitComponent.ts
 import { Ability } from "../components/gmgrimoire/statblocks/e5/E5Ability.tsx";
 import { Stats } from "../components/general/DiceRoller/DiceButtonWrapper.tsx";
 import { GMGMetadata } from "./types.ts";
+import { updateTokenMetadata } from "./tokenHelper.ts";
+import { updateHp } from "./hpHelpers.ts";
+import { updateAc } from "./acHelper.ts";
+import { E5Statblock } from "../api/e5/useE5Api.ts";
+import { Item } from "@owlbear-rodeo/sdk";
 
 export type ItemOut = components["schemas"]["ItemOut"];
 export type StatblockItems = components["schemas"]["StatblockItemOut"];
@@ -408,4 +413,27 @@ export const isItemEquipped = (data: GMGMetadata, item: StatblockItems) => {
 
 export const isItemAttuned = (data: GMGMetadata, item: StatblockItems) => {
     return !!(item.item.requires_attuning && data.equipment?.attuned.includes(item.item.slug));
+};
+
+export const handleEquipmentChange = async (
+    data: GMGMetadata,
+    equipped: Array<string>,
+    attuned: Array<string>,
+    statblock: E5Statblock,
+    item: Item,
+) => {
+    const newData = {
+        ...data,
+        equipment: { equipped: equipped, attuned: attuned },
+    };
+    if (statblock.equipment) {
+        const equipmentBonus = getEquipmentBonuses(newData, statblock.stats, statblock.equipment);
+        newData.maxHp = statblock.hp.value + equipmentBonus.statblockBonuses.hpBonus;
+        newData.hp = Math.min(newData.hp, newData.maxHp);
+        newData.armorClass = statblock.armor_class.value + equipmentBonus.statblockBonuses.ac;
+        newData.stats.initiativeBonus = statblock.initiative ?? Math.floor((equipmentBonus.stats.dexterity - 10) / 2);
+    }
+    await updateTokenMetadata(newData, [item.id]);
+    await updateHp(item, newData);
+    await updateAc(item, newData);
 };
