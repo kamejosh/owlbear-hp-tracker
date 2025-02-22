@@ -343,7 +343,7 @@ export const DiceButtonWrapper = ({
     damageDie?: boolean;
     proficiencyBonus?: number | null;
 }) => {
-    const regex = /`?((\d*?d\d+)(( ?[\+\-] ?((\d+)|([A-Z]{3})))?)|( [\+\-]\d+))`?/gi;
+    const regex = /`?((\d*?d\d+)(( ?[\+\-] ?((\d+)|([A-Z]{3})))?)|( [\+\-]\d+))`?/g;
     const dice = text.match(regex);
     if (dice) {
         const diceCopy = Array.from(dice);

@@ -1,3 +1,17 @@
+# 3.3.1
+
++ DnD Skills automatically get the base stat value when not explicitly defined
++ Tokens with line breaks in their names now correctly find the matching statblock from TA
++ Fix Limits are displayed correctly
++ Fix Dice Rolls ins About section
++ Disable Auto Limit decrease for none attack rolls
++ Add Inventory Equipment toggle
++ Add Stat (STR, DEX, CON, WIS, INT, CHA) and proficiency (PF) constants to use in custom statblocks/spells/items to automatically use correct value for dice rolls
++ Fix Statblock Bonuses get also applied when manually connecting a statblock
++ Fix offset handling
++ Reduce default GMG height for players
++ (Un)equipping Items also changes HP/AC/Init
+
 # 3.3.0
 
 ## Big Things

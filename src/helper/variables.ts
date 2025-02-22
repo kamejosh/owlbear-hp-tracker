@@ -13,7 +13,7 @@ export const rollLogPopoverId = `${ID}/dice-log`;
 export const shortRestPopoverId = `${ID}/short-rest`;
 export const rollMessageChannel = `${ID}.roll-event`;
 
-export const version = "3.3.0";
+export const version = "3.3.1";
 
 export const changelogModal: Modal = {
     id: modalId,
