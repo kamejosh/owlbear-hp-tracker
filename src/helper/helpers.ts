@@ -22,6 +22,7 @@ import { Ability } from "../components/gmgrimoire/statblocks/e5/E5Ability.tsx";
 import { chunk } from "lodash";
 import { deleteItems, updateItems } from "./obrHelper.ts";
 import { getEquipmentBonuses } from "./equipmentHelpers.ts";
+import { UserSettings } from "../api/tabletop-almanac/useUser.ts";
 
 export const getYOffset = async (height: number) => {
     const metadata = (await OBR.room.getMetadata()) as Metadata;
@@ -463,7 +464,34 @@ export const getSearchString = (name: string): string => {
     return name;
 };
 
-export const getInitialValues = async (items: Array<Image>) => {
+export const getTASettings = async (): Promise<UserSettings | null> => {
+    const roomData = await OBR.room.getMetadata();
+    let apiKey = undefined;
+    if (metadataKey in roomData) {
+        const room = roomData[metadataKey] as RoomMetadata;
+        apiKey = room.tabletopAlmanacAPIKey;
+        if (apiKey) {
+            const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
+            axiosRetry(axios, {
+                retries: 2,
+                retryDelay: (_) => 200,
+                retryCondition: (error) => error.message === "Network Error",
+            });
+
+            const response = await axios.request({
+                url: `${TTRPG_URL}/users/me/settings`,
+                method: "GET",
+                headers: headers,
+            });
+            if (response.status === 200) {
+                return response.data;
+            }
+        }
+    }
+    return null;
+};
+
+export const getInitialValues = async (items: Array<Image>, getDarkVision: boolean = false) => {
     const roomData = await OBR.room.getMetadata();
     let ruleset = "e5";
     let apiKey = undefined;
@@ -552,6 +580,13 @@ export const getInitialValues = async (items: Array<Image>) => {
                                     ruleset: "e5",
                                     limits: getLimitsE5(statblock),
                                     equipment: equipmentData,
+                                    darkvision: getDarkVision
+                                        ? Number(
+                                              statblock.senses
+                                                  ?.find((s) => s.includes("darkvision"))
+                                                  ?.replace(/\D/g, ""),
+                                          )
+                                        : null,
                                 },
                             };
                         }
@@ -594,6 +629,7 @@ export const getInitialValues = async (items: Array<Image>) => {
                                     slug: statblock.slug,
                                     ruleset: "pf",
                                     limits: getLimitsPf(statblock),
+                                    darkvision: null,
                                 },
                             };
                         }
@@ -648,7 +684,8 @@ export const getTokenName = (token: Image) => {
 
 export const prepareTokenForGrimoire = async (contextItems: Array<Image>) => {
     const tokenIds: Array<string> = [];
-    const itemStatblocks = await getInitialValues(contextItems as Array<Image>);
+    const settings = await getTASettings();
+    const itemStatblocks = await getInitialValues(contextItems as Array<Image>, settings?.assign_ss_darkvision);
     await updateItems(
         contextItems.map((i) => i.id),
         (items) => {
@@ -665,9 +702,9 @@ export const prepareTokenForGrimoire = async (contextItems: Array<Image>) => {
                         maxHp: 0,
                         armorClass: 0,
                         hpTrackerActive: true,
-                        hpOnMap: false,
-                        acOnMap: false,
-                        hpBar: false,
+                        hpOnMap: settings?.default_token_settings?.hpOnMap || false,
+                        acOnMap: settings?.default_token_settings?.acOnMap || false,
+                        hpBar: settings?.default_token_settings?.hpOnMap || false,
                         initiative: 0,
                         sheet: "",
                         stats: {
@@ -675,9 +712,10 @@ export const prepareTokenForGrimoire = async (contextItems: Array<Image>) => {
                             initial: true,
                         },
                         playerMap: {
-                            hp: false,
-                            ac: false,
+                            hp: settings?.default_token_settings?.playerMap?.hp || false,
+                            ac: settings?.default_token_settings?.playerMap?.ac || false,
                         },
+                        playerList: settings?.default_token_settings?.playerList || false,
                     };
                     if (item.id in itemStatblocks) {
                         defaultMetadata.sheet = itemStatblocks[item.id].slug;
@@ -691,6 +729,9 @@ export const prepareTokenForGrimoire = async (contextItems: Array<Image>) => {
                         defaultMetadata.equipment = itemStatblocks[item.id].equipment;
                     }
                     item.metadata[itemMetadataKey] = defaultMetadata;
+                    if (settings?.assign_ss_darkvision && itemStatblocks[item.id].darkvision) {
+                        item.metadata["com.battle-system.smoke/visionDark"] = itemStatblocks[item.id].darkvision;
+                    }
                 }
             });
         },

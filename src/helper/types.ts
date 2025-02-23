@@ -138,6 +138,7 @@ export type InitialStatblockData = {
         equipped: Array<string>;
         attuned: Array<string>;
     };
+    darkvision: number | undefined | null;
 };
 
 export type BestMatch = {

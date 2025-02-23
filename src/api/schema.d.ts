@@ -1226,8 +1226,8 @@ export interface components {
         };
         /** ItemSpellIn */
         ItemSpellIn: {
-            /** Slug */
-            slug: string;
+            /** Id */
+            id: string;
             /** Charges */
             charges: number;
         };
@@ -1424,6 +1424,19 @@ export interface components {
             /** Password */
             password: string;
         };
+        /** PlayerMapSettings */
+        PlayerMapSettings: {
+            /**
+             * Hp
+             * @default false
+             */
+            hp: boolean;
+            /**
+             * Ac
+             * @default false
+             */
+            ac: boolean;
+        };
         /** Reaction */
         "Reaction-Input": {
             /** Name */
@@ -1492,6 +1505,12 @@ export interface components {
             gm_rolls_hidden: boolean;
             /** Default Groups */
             default_groups?: string[];
+            /**
+             * Assign Ss Darkvision
+             * @default false
+             */
+            assign_ss_darkvision: boolean;
+            default_token_settings?: components["schemas"]["TokenSettings"] | null;
         };
         /** Skill */
         Skill: {
@@ -1772,6 +1791,25 @@ export interface components {
             /** Embedded */
             embedded: boolean;
             item: components["schemas"]["ItemOut"];
+        };
+        /** TokenSettings */
+        TokenSettings: {
+            /**
+             * Hponmap
+             * @default false
+             */
+            hpOnMap: boolean;
+            /**
+             * Aconmap
+             * @default false
+             */
+            acOnMap: boolean;
+            playerMap?: components["schemas"]["PlayerMapSettings"] | null;
+            /**
+             * Playerlist
+             * @default false
+             */
+            playerList: boolean;
         };
         /** Tradition */
         Tradition: {
@@ -3383,6 +3421,8 @@ export interface components {
             archetypes?: components["schemas"]["SpellArchetype"][];
             /** Circles */
             circles?: components["schemas"]["SpellCircle"][];
+            /** Id */
+            id: string;
             /** Slug */
             slug: string;
             /** Active */
