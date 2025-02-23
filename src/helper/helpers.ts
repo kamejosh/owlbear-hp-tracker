@@ -478,13 +478,17 @@ export const getTASettings = async (): Promise<UserSettings | null> => {
                 retryCondition: (error) => error.message === "Network Error",
             });
 
-            const response = await axios.request({
-                url: `${TTRPG_URL}/users/me/settings`,
-                method: "GET",
-                headers: headers,
-            });
-            if (response.status === 200) {
-                return response.data;
+            try {
+                const response = await axios.request({
+                    url: `${TTRPG_URL}/users/me/settings`,
+                    method: "GET",
+                    headers: headers,
+                });
+                if (response.status === 200) {
+                    return response.data;
+                }
+            } catch {
+                return null;
             }
         }
     }
