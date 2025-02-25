@@ -26,7 +26,7 @@ export const SearchResult5e = (props: SearchResultProps) => {
         }
     };
 
-    const searchQuery = useE5SearchStatblock(props.search, 100, 0, room?.tabletopAlmanacAPIKey);
+    const searchQuery = useE5SearchStatblock(props.search, 200, 0, room?.tabletopAlmanacAPIKey);
 
     useEffect(() => {
         if (searchQuery.isSuccess) {

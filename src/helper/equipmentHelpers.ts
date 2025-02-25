@@ -428,9 +428,9 @@ export const handleEquipmentChange = async (
     };
     if (statblock.equipment) {
         const equipmentBonus = getEquipmentBonuses(newData, statblock.stats, statblock.equipment);
-        newData.maxHp = statblock.hp.value + equipmentBonus.statblockBonuses.hpBonus;
+        newData.maxHp = Number(statblock.hp.value) + Number(equipmentBonus.statblockBonuses.hpBonus);
         newData.hp = Math.min(newData.hp, newData.maxHp);
-        newData.armorClass = statblock.armor_class.value + equipmentBonus.statblockBonuses.ac;
+        newData.armorClass = Number(statblock.armor_class.value) + Number(equipmentBonus.statblockBonuses.ac);
         newData.stats.initiativeBonus = statblock.initiative ?? Math.floor((equipmentBonus.stats.dexterity - 10) / 2);
     }
     await updateTokenMetadata(newData, [item.id]);
