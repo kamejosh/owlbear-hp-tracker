@@ -9,10 +9,11 @@ import { destroyIndicator, setIndicator } from "../../../helper/currentHelper.ts
 import { rest } from "../../../helper/multiTokenHelper.ts";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useShallow } from "zustand/react/shallow";
+import { setPrettySordidActive } from "../../../helper/prettySordidHelpers.ts";
 
 export const BattleRounds = () => {
     const tokens = useTokenListContext(useShallow((state) => state.tokens));
-    const scene = useMetadataContext(useShallow((state) => state.scene));
+    const [scene, taSettings] = useMetadataContext(useShallow((state) => [state.scene, state.taSettings]));
     const [hold, setHold] = useState<boolean>(false);
     const [groups, current, setCurrent, battle, setBattle] = useBattleContext(
         useShallow((state) => [state.groups, state.current, state.setCurrent, state.battle, state.setBattle]),
@@ -93,8 +94,9 @@ export const BattleRounds = () => {
             );
         }
         setCurrent(newCurrent.id);
-        await setIndicator(newCurrent);
         setHold(true);
+        await setIndicator(newCurrent);
+        await setPrettySordidActive(current, newCurrent.id, taSettings);
         setTimeout(() => {
             setHold(false);
         }, 500);

@@ -13,6 +13,8 @@ export const rollLogPopoverId = `${ID}/dice-log`;
 export const shortRestPopoverId = `${ID}/short-rest`;
 export const rollMessageChannel = `${ID}.roll-event`;
 
+export const prettySordidID = "com.pretty-initiative";
+
 export const version = "3.3.1";
 
 export const changelogModal: Modal = {

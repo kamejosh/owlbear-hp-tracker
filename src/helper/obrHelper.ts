@@ -2,7 +2,7 @@ import OBR, { Item, ItemFilter } from "@owlbear-rodeo/sdk";
 import { chunk, isObject } from "lodash";
 import { delay } from "./helpers.ts";
 
-const delayDelta = 500;
+export const delayDelta = 500;
 
 export const updateItems = async (list: ItemFilter<Item>, update: (items: Array<Item>) => void) => {
     try {

@@ -1503,13 +1503,18 @@ export interface components {
              * @default false
              */
             gm_rolls_hidden: boolean;
-            /** Default Groups */
-            default_groups?: string[];
             /**
              * Assign Ss Darkvision
              * @default false
              */
             assign_ss_darkvision: boolean;
+            /**
+             * Sync Pretty Sordid
+             * @default false
+             */
+            sync_pretty_sordid: boolean;
+            /** Default Groups */
+            default_groups?: string[];
             default_token_settings?: components["schemas"]["TokenSettings"] | null;
         };
         /** Skill */

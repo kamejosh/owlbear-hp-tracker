@@ -2,7 +2,7 @@ import { Droppable } from "@hello-pangea/dnd";
 import { DraggableTokenList } from "./TokenList.tsx";
 import OBR, { Image, Metadata } from "@owlbear-rodeo/sdk";
 import { GMGMetadata, SceneMetadata } from "../../helper/types.ts";
-import { itemMetadataKey, metadataKey } from "../../helper/variables.ts";
+import { itemMetadataKey, metadataKey, prettySordidID } from "../../helper/variables.ts";
 import {
     getAcForPlayers,
     getAcOnMap,
@@ -149,9 +149,13 @@ export const DropGroup = (props: DropGroupProps) => {
             (items) => {
                 items.forEach((item) => {
                     const bonus = (item.metadata[itemMetadataKey] as GMGMetadata).stats.initiativeBonus;
-                    (item.metadata[itemMetadataKey] as GMGMetadata).initiative =
+                    const initiative =
                         newInitiativeValues.get(item.id) ??
                         Math.floor(Math.random() * (room?.initiativeDice ?? 20)) + 1 + bonus;
+                    (item.metadata[itemMetadataKey] as GMGMetadata).initiative = initiative;
+                    if (taSettings.sync_pretty_sordid) {
+                        item.metadata[`${prettySordidID}/metadata`] = { count: String(initiative), active: false };
+                    }
                 });
             },
         );

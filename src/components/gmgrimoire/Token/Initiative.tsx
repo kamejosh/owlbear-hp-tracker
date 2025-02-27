@@ -14,8 +14,9 @@ import { PlayerButton } from "./PlayerButton.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import Tippy from "@tippyjs/react";
 import { Image } from "@owlbear-rodeo/sdk";
-import { getTokenName } from "../../../helper/helpers.ts";
+import { delay, getTokenName } from "../../../helper/helpers.ts";
 import { useShallow } from "zustand/react/shallow";
+import { setPrettySordidInitiative } from "../../../helper/prettySordidHelpers.ts";
 export const Initiative = ({ id }: { id: string }) => {
     const playerContext = usePlayerContext();
     const initRef = useRef<HTMLInputElement>(null);
@@ -111,6 +112,7 @@ export const Initiative = ({ id }: { id: string }) => {
                     onChange={async (e) => {
                         const newData = { ...data, initiative: Number(e.target.value) };
                         await updateTokenMetadata(newData, [id]);
+                        await setPrettySordidInitiative(id, taSettings, Number(e.target.value));
                     }}
                     className={"initiative"}
                 />
@@ -130,6 +132,7 @@ export const Initiative = ({ id }: { id: string }) => {
                         const value = await rollInitiative(defaultHidden);
                         const newData = { ...data, initiative: value };
                         await updateTokenMetadata(newData, [id]);
+                        await setPrettySordidInitiative(id, taSettings, value);
                     }}
                 >
                     <div className={"dice-preview"}>{getDicePreview()}</div>
@@ -143,6 +146,7 @@ export const Initiative = ({ id }: { id: string }) => {
                             const value = await rollInitiative(defaultHidden, true);
                             const newData = { ...data, initiative: value };
                             await updateTokenMetadata(newData, [id]);
+                            await setPrettySordidInitiative(id, taSettings, value);
                         }}
                     >
                         {"ADV"}
@@ -153,6 +157,7 @@ export const Initiative = ({ id }: { id: string }) => {
                             const value = await rollInitiative(defaultHidden, false, true);
                             const newData = { ...data, initiative: value };
                             await updateTokenMetadata(newData, [id]);
+                            await setPrettySordidInitiative(id, taSettings, value);
                         }}
                     >
                         DIS
@@ -163,6 +168,7 @@ export const Initiative = ({ id }: { id: string }) => {
                             const value = await rollInitiative(!defaultHidden);
                             const newData = { ...data, initiative: value };
                             await updateTokenMetadata(newData, [id]);
+                            await setPrettySordidInitiative(id, taSettings, value);
                         }}
                     >
                         {defaultHidden ? "SHOW" : "HIDE"}
