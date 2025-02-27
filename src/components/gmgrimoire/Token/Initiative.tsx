@@ -14,7 +14,7 @@ import { PlayerButton } from "./PlayerButton.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import Tippy from "@tippyjs/react";
 import { Image } from "@owlbear-rodeo/sdk";
-import { delay, getTokenName } from "../../../helper/helpers.ts";
+import { getTokenName } from "../../../helper/helpers.ts";
 import { useShallow } from "zustand/react/shallow";
 import { setPrettySordidInitiative } from "../../../helper/prettySordidHelpers.ts";
 export const Initiative = ({ id }: { id: string }) => {
