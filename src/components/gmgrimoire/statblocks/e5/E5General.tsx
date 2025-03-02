@@ -158,16 +158,15 @@ export const E5General = () => {
                     {statblock.limits.map((limit, i) => {
                         const limitValues = data.stats.limits?.find((l) => l.id === limit!.name);
                         return limitValues ? (
-                            <>
+                            <div key={i}>
                                 <LimitComponent
-                                    key={i}
                                     limit={limit}
                                     title={"name"}
                                     limitValues={data.stats.limits?.find((l) => l.id === limit!.name)!}
                                     itemId={item.id}
                                 />
                                 <LineBreak />
-                            </>
+                            </div>
                         ) : null;
                     })}
                 </div>

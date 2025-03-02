@@ -9,7 +9,7 @@ import {
     RoomMetadata,
     SceneMetadata,
 } from "./types.ts";
-import { isEqual, isObject, isUndefined } from "lodash";
+import { isEqual, isNull, isObject, isUndefined } from "lodash";
 import { IRoll, IRoomParticipant } from "dddice-js";
 import { RollLogEntryType } from "../context/RollLogContext.tsx";
 import { TTRPG_URL } from "../config.ts";
@@ -23,6 +23,8 @@ import { chunk } from "lodash";
 import { deleteItems, updateItems } from "./obrHelper.ts";
 import { getEquipmentBonuses } from "./equipmentHelpers.ts";
 import { UserSettings } from "../api/tabletop-almanac/useUser.ts";
+import { updateHp } from "./hpHelpers.ts";
+import { updateAc } from "./acHelper.ts";
 
 export const getYOffset = async (height: number) => {
     const metadata = (await OBR.room.getMetadata()) as Metadata;
@@ -452,6 +454,75 @@ export const updateTokenSheet = async (
                 },
             };
         });
+    });
+};
+
+export const resyncToken = async (statblock: E5Statblock | PfStatblock, characterId: string, ruleset: "e5" | "pf") => {
+    await updateItems([characterId], (items) => {
+        items.forEach((item) => {
+            const data = item.metadata[itemMetadataKey] as GMGMetadata;
+            const equipmentData: { equipped: Array<string>; attuned: Array<string> } = { equipped: [], attuned: [] };
+            let newHP,
+                newAC = 0;
+            if (ruleset === "e5") {
+                const e5Statblock = statblock as E5Statblock;
+                equipmentData.equipped =
+                    e5Statblock.equipment
+                        ?.filter((e) => e.equipped || data.equipment?.equipped.includes(e.item.slug))
+                        .map((e) => e.item.slug) || [];
+                equipmentData.attuned =
+                    e5Statblock.equipment
+                        ?.filter((e) => e.attuned || data.equipment?.attuned.includes(e.item.slug))
+                        .map((e) => e.item.slug) || [];
+                const equipmentBonuses = getEquipmentBonuses(
+                    // we only need the equipment data in this function
+                    { equipment: equipmentData } as GMGMetadata,
+                    e5Statblock.stats,
+                    e5Statblock.equipment || [],
+                );
+                newHP = statblock.hp.value + equipmentBonuses.statblockBonuses.hpBonus;
+                newAC = statblock.armor_class.value + equipmentBonuses.statblockBonuses.ac;
+            } else {
+                newHP = statblock.hp.value;
+                newAC = statblock.armor_class.value;
+            }
+            item.metadata[itemMetadataKey] = {
+                ...data,
+                sheet: statblock.slug,
+                ruleset: ruleset,
+                maxHp: newHP,
+                armorClass: newAC,
+                hp: data.hp === data.maxHp ? newHP : Math.min(data.hp, newHP),
+                equipment: equipmentData,
+                stats: {
+                    ...data.stats,
+                    initiativeBonus:
+                        ruleset === "e5"
+                            ? (statblock as E5Statblock).initiative ||
+                              Math.floor(((statblock.stats.dexterity || 0) - 10) / 2)
+                            : getPfInitiativeBonus((statblock as PfStatblock).perception),
+                    initial: false,
+                    limits:
+                        ruleset === "e5"
+                            ? getLimitsE5(statblock as E5Statblock)
+                                  .map((limit) => {
+                                      const current = data.stats.limits?.find((l) => l.id === limit.id);
+                                      if (current) {
+                                          return { ...limit, used: Math.min(current.used, limit.max) };
+                                      }
+                                      return limit;
+                                  })
+                                  .filter((e) => !isNull(e))
+                            : getLimitsPf(statblock as PfStatblock),
+                },
+            };
+        });
+    });
+    const items = await OBR.scene.items.getItems([characterId]);
+    items.forEach((item) => {
+        const data = item.metadata[itemMetadataKey] as GMGMetadata;
+        updateHp(item, data);
+        updateAc(item, data);
     });
 };
 

@@ -5,6 +5,26 @@
     height: 46px;
     overflow: hidden;
 
+    &::after {
+        position: absolute;
+        top: 0;
+        left: 0;
+        scale: 0;
+        opacity: 1;
+        border-radius: 50%;
+        background-color: white;
+        width: 100%;
+        height: 100%;
+        content: "";
+    }
+
+    &.mouse-down {
+        &::after {
+            scale: 1;
+            transition: scale 1s linear;
+        }
+    }
+
     img {
         width: 100%;
         overflow: hidden;
@@ -76,13 +96,13 @@
         }
 
         .preview-value {
-            text-align: center;
             position: absolute;
             top: 3px;
-            width: 15px;
             left: 2px;
+            width: 15px;
             font-weight: 600;
             font-size: 0.8rem;
+            text-align: center;
             text-shadow: 0 0 1px black;
         }
     }

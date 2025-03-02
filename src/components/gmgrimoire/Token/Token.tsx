@@ -23,6 +23,7 @@ type TokenProps = {
     popover: boolean;
     selected: boolean;
     tokenLists?: Map<string, Array<Item>>;
+    isDragging?: boolean;
 };
 
 export const Token = (props: TokenProps) => {
@@ -206,6 +207,7 @@ export const Token = (props: TokenProps) => {
                     handleOnPlayerClick(e, true);
                 }}
                 hideName={!display()}
+                isDragging={props.isDragging}
             />
             <HP id={props.id} />
             <AC id={props.id} />

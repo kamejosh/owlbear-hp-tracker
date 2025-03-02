@@ -1,4 +1,4 @@
-import React, { CSSProperties } from "react";
+import React, { CSSProperties, useEffect, useState } from "react";
 import { ShieldSvg } from "../../svgs/ShieldSvg.tsx";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
@@ -8,17 +8,21 @@ import "./token-icon.scss";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useUISettingsContext } from "../../../context/UISettingsContext.ts";
 import Tippy from "@tippyjs/react";
-import { getTokenName } from "../../../helper/helpers.ts";
+import { getTokenName, resyncToken } from "../../../helper/helpers.ts";
 import { useShallow } from "zustand/react/shallow";
+import { useE5GetStatblockMutation } from "../../../api/e5/useE5Api.ts";
+import { usePFGetStatblockMutation } from "../../../api/pf/usePfApi.ts";
 
 export const TokenIcon = ({
     id,
     onClick,
     hideName,
+    isDragging,
 }: {
     id: string;
     onClick?: (e: React.MouseEvent<HTMLDivElement>) => Promise<void>;
     hideName?: boolean;
+    isDragging?: boolean;
 }) => {
     const playerPreview = useUISettingsContext(useShallow((state) => state.playerPreview));
     const playerContext = usePlayerContext();
@@ -26,6 +30,11 @@ export const TokenIcon = ({
     const token = useTokenListContext(useShallow((state) => state.tokens?.get(id)));
     const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
+    const [mouseDown, setMouseDown] = useState<boolean>(false);
+    let timeout: number | undefined = undefined;
+
+    const getE5Statblock = useE5GetStatblockMutation();
+    const getPFStatblock = usePFGetStatblockMutation();
 
     const handleOnPlayerDoubleClick = async () => {
         const bounds = await OBR.scene.items.getItemBounds([id]);
@@ -36,10 +45,55 @@ export const TokenIcon = ({
             max: { x: bounds.max.x + 1000, y: bounds.max.y + 1000 },
         });
     };
+    const resync = async () => {
+        if (data.sheet && room?.ruleset) {
+            const statblock = await (room.ruleset === "e5" ? getE5Statblock : getPFStatblock).mutateAsync({
+                slug: data.sheet,
+                apiKey: room?.tabletopAlmanacAPIKey,
+            });
+            if (statblock) {
+                await resyncToken(statblock, id, room.ruleset);
+                const notification = await OBR.notification.show(
+                    "Don't forget to close and reopen the Statblock Popover",
+                    "SUCCESS",
+                );
+                setTimeout(async () => {
+                    await OBR.notification.close(notification);
+                }, 3000);
+            }
+        }
+        setMouseDown(false);
+    };
+
+    useEffect(() => {
+        if (isDragging) {
+            setMouseDown(false);
+            clearTimeout(timeout);
+        }
+    }, [isDragging]);
 
     return (
-        <Tippy content={getTokenName(item)} className={"token-name-tooltip"} disabled={hideName}>
-            <div className={"token-icon"} onDoubleClick={handleOnPlayerDoubleClick} onClick={onClick}>
+        <Tippy
+            content={mouseDown ? "Resyncing Statblock..." : getTokenName(item)}
+            hideOnClick={!mouseDown}
+            className={"token-name-tooltip"}
+            disabled={hideName}
+        >
+            <div
+                className={`token-icon ${mouseDown ? "mouse-down" : ""}`}
+                onDoubleClick={handleOnPlayerDoubleClick}
+                onClick={onClick}
+                onPointerDown={() => {
+                    if (playerContext.role === "GM") {
+                        setMouseDown(true);
+                        timeout = setTimeout(() => resync(), 1000);
+                    }
+                }}
+                onPointerUp={() => {
+                    setMouseDown(false);
+                    clearTimeout(timeout);
+                }}
+            >
                 <img
                     src={item.image.url}
                     alt={""}

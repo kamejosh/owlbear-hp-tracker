@@ -21,13 +21,14 @@ export const DraggableTokenList = React.memo(function DraggableTokenList(props: 
                             {props.tokens?.map((token, index) => {
                                 return (
                                     <Draggable key={token.id} draggableId={token.id} index={index}>
-                                        {(provided) => (
+                                        {(provided, snapshot) => (
                                             <div
                                                 ref={provided.innerRef}
                                                 {...provided.draggableProps}
                                                 {...provided.dragHandleProps}
                                             >
                                                 <Token
+                                                    isDragging={snapshot.isDragging}
                                                     id={token.id}
                                                     popover={false}
                                                     selected={props.selected.includes(token.id)}

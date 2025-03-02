@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { components } from "../schema";
 import { TTRPG_URL } from "../../config.ts";
@@ -99,5 +99,17 @@ export const usePfGetSpell = (slug: string, apiKey?: string) => {
         queryKey: [slug, "slug"],
         queryFn: () => fetchPfSpell(slug, apiKey),
         enabled: slug !== "",
+    });
+};
+
+export const usePFGetStatblockMutation = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationKey: [],
+        mutationFn: ({ slug, apiKey }: { slug: string; apiKey?: string }) => fetchPfStatblock(slug, apiKey),
+        onSuccess: (data, variables) => {
+            queryClient.invalidateQueries({ queryKey: ["slug", variables.slug], refetchType: "all" });
+            return data;
+        },
     });
 };

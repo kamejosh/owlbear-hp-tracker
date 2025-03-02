@@ -32,7 +32,10 @@ export const StatblockList = (props: StatblockListProps) => {
     const [swiper, setSwiper] = useState<SwiperClass>();
     const items = useCallback(() => {
         if (tokens) {
-            const itemList = [...tokens].map((t) => t[1].item).sort(sortItems);
+            const itemList = [...tokens]
+                .filter((t) => t[1].data.sheet !== "")
+                .map((t) => t[1].item)
+                .sort(sortItems);
             if (playerContext.role === "GM") {
                 return itemList;
             } else if (playerContext.role === "PLAYER") {

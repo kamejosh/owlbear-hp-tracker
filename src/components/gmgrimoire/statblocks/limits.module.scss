@@ -1,0 +1,19 @@
+.box {
+    display: flex;
+    cursor: pointer;
+    border: 2px solid var(--limit-color);
+    border-radius: 4px;
+    width: 250px;
+    height: 25px;
+}
+
+.used {
+    background-color: var(--limit-color);
+    min-width: 12px;
+    text-align: center;
+}
+
+.unused {
+    min-width: 12px;
+    text-align: center;
+}
