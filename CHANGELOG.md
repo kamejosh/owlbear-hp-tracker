@@ -1,3 +1,12 @@
+# 3.3.2
+
++ Patreons can set default settings for Tokens on Tabletop Almanac, for HP Bar, HP/AC visibility, Player List, ...
++ Patreons can now sync Pretty Sordid automatically with GMG's initiative and round tracking
++ Add a Resync-functionality (long-press the token icon) to resync changes made on Tabletop Almanac without having to reload OBR and creating a new Token
++ Make Limits that exceed 10 entries displayed as a Bar instead of boxes to not clutter the statblocks
++ Fix an issue where action tabs where cached between statblocks
++ Fix that search results were not scrollable
+
 # 3.3.1
 
 + DnD Skills automatically get the base stat value when not explicitly defined

@@ -68,7 +68,7 @@ export const E5ActionTabs = () => {
         } else {
             return <></>;
         }
-    }, [tab]);
+    }, [tab, statblock]);
 
     return (
         <>

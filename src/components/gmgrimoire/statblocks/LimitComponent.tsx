@@ -5,6 +5,7 @@ import { updateItems } from "../../../helper/obrHelper.ts";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import styles from "./limits.module.scss";
+import Tippy from "@tippyjs/react";
 
 export type LimitType = components["schemas"]["src__types__base__LimitedUse"];
 
@@ -70,26 +71,30 @@ const BarLimits = ({ limit, limitValues, itemId }: { limit: LimitType; limitValu
     return (
         <div className={styles.box}>
             {limitValues.used > 0 ? (
-                <div
-                    className={styles.used}
-                    style={{ flexGrow: limitValues.used }}
-                    onClick={async () => {
-                        await update(-1);
-                    }}
-                >
-                    {limitValues.used}
-                </div>
+                <Tippy content={"Click to reduce uses by one"}>
+                    <div
+                        className={styles.used}
+                        style={{ flexGrow: limitValues.used }}
+                        onClick={async () => {
+                            await update(-1);
+                        }}
+                    >
+                        {limitValues.used}
+                    </div>
+                </Tippy>
             ) : null}
             {unused > 0 ? (
-                <div
-                    className={styles.unused}
-                    style={{ flexGrow: unused }}
-                    onClick={async () => {
-                        await update(1);
-                    }}
-                >
-                    {unused}
-                </div>
+                <Tippy content={"Click to mark on use"}>
+                    <div
+                        className={styles.unused}
+                        style={{ flexGrow: unused }}
+                        onClick={async () => {
+                            await update(1);
+                        }}
+                    >
+                        {unused}
+                    </div>
+                </Tippy>
             ) : null}
         </div>
     );

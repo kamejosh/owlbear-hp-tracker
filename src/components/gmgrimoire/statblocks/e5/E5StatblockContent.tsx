@@ -78,7 +78,7 @@ export const E5StatblockContent = () => {
         } else {
             return <></>;
         }
-    }, [tab]);
+    }, [tab, statblock]);
 
     return (
         <div className={styles.wrapper}>
