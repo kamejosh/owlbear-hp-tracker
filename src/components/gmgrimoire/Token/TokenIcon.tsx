@@ -13,6 +13,8 @@ import { useShallow } from "zustand/react/shallow";
 import { useE5GetStatblockMutation } from "../../../api/e5/useE5Api.ts";
 import { usePFGetStatblockMutation } from "../../../api/pf/usePfApi.ts";
 
+let timeout: number | undefined = undefined;
+
 export const TokenIcon = ({
     id,
     onClick,
@@ -31,7 +33,6 @@ export const TokenIcon = ({
     const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
     const [mouseDown, setMouseDown] = useState<boolean>(false);
-    let timeout: number | undefined = undefined;
 
     const getE5Statblock = useE5GetStatblockMutation();
     const getPFStatblock = usePFGetStatblockMutation();
