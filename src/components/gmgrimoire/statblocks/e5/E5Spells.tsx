@@ -13,7 +13,7 @@ import { useE5StatblockContext } from "../../../../context/E5StatblockContext.ts
 import { FancyLineBreak, LineBreak } from "../../../general/LineBreak.tsx";
 import styles from "./statblock-spells.module.scss";
 import { SpellSlots } from "./E5SpellSlots.tsx";
-import { LimitType } from "../LimitComponent.tsx";
+import { LimitComponent, LimitType } from "../LimitComponent.tsx";
 import { ItemCharges } from "./ItemCharges.tsx";
 import { isItemInUse } from "../../../../helper/equipmentHelpers.ts";
 
@@ -30,6 +30,7 @@ const Spell = ({
     itemId,
     dc,
     attack,
+    embedded,
 }: {
     spell: Spell;
     statblock: string;
@@ -41,6 +42,7 @@ const Spell = ({
     itemId?: string;
     dc?: string | null;
     attack?: string | null;
+    embedded?: boolean;
 }) => {
     const [open, setOpen] = useState<boolean>(false);
     const statblockContext = useE5StatblockContext();
@@ -62,10 +64,10 @@ const Spell = ({
 
     const damage = spell.desc ? getDamage(spell.desc) : null;
     const spellLevelLimit = useMemo(() => {
-        if (spellSlots) {
-            return spellSlots?.find((s) => s.level === spell.level)?.limit;
-        } else if (charges) {
+        if (charges) {
             return charges;
+        } else if (spellSlots) {
+            return spellSlots?.find((s) => s.level === spell.level)?.limit;
         }
         return undefined;
     }, [spellSlots, spell, charges]);
@@ -86,6 +88,16 @@ const Spell = ({
                     <div className={styles.spellHeader}>
                         <h4 className={styles.spellName}>{spell.name}</h4>
                         <span className={styles.spellLevel}>({getSpellLevel()})</span>
+                        {embedded && charges && limitValues && itemId ? (
+                            <LimitComponent
+                                limit={charges}
+                                title={"none"}
+                                limitValues={limitValues}
+                                itemId={itemId}
+                                hideDescription={true}
+                                hideReset={true}
+                            />
+                        ) : null}
                         {chargesUsed ? <span className={styles.spellLevel}>(uses {chargesUsed} charges)</span> : null}
                         {(spellSlots && spellSlots.length > 0) || charges ? (
                             <Tippy content={"No more spellslots"} disabled={!limitReached}>
@@ -247,6 +259,15 @@ export const E5Spells = () => {
     const { stats, data, item, tokenName, statblock, equipmentBonuses } = useE5StatblockContext();
 
     const spells = statblock.spells || [];
+    const equipmentSpells: Array<{ item: number; spells: Array<{ spell: Spell; charges: number }> }> =
+        equipmentBonuses.statblockBonuses.spells.flatMap((itemSpell) => {
+            return {
+                item: itemSpell.itemId,
+                spells: itemSpell.spells.map((spell) => {
+                    return { spell: spell.spell, charges: spell.charges };
+                }),
+            };
+        });
 
     const filters = ["All"]
         .concat(
@@ -264,6 +285,23 @@ export const E5Spells = () => {
                 }
             }),
         )
+        .concat(
+            equipmentSpells.flatMap((eSpells) => {
+                return eSpells.spells.map((spell) => {
+                    if (spell.spell.level === 0) {
+                        return "Cant";
+                    } else if (spell.spell.level === 1) {
+                        return "1st";
+                    } else if (spell.spell.level === 2) {
+                        return "2nd";
+                    } else if (spell.spell.level === 3) {
+                        return "3rd";
+                    } else {
+                        return `${spell.spell.level}th`;
+                    }
+                });
+            }),
+        )
         .filter((value, index, self) => {
             return self.indexOf(value) === index;
         })
@@ -279,14 +317,6 @@ export const E5Spells = () => {
             } else {
                 return parseInt(a) - parseInt(b);
             }
-        });
-
-    const equipmentSpells: Array<{ item: number; spells: Array<Spell> }> =
-        equipmentBonuses.statblockBonuses.spells.flatMap((itemSpell) => {
-            return {
-                item: itemSpell.itemId,
-                spells: itemSpell.spells.map((spell) => spell.spell),
-            };
         });
 
     return (
@@ -345,23 +375,31 @@ export const E5Spells = () => {
                         return equipmentSpells
                             .filter((itemSpells) => itemSpells.item === e.item.id)
                             .map((itemSpells) => {
-                                return itemSpells.spells.map((spell, index) => {
-                                    return (
-                                        <li key={`${spell.name}${index}`}>
-                                            <Spell
-                                                spell={spell}
-                                                statblock={tokenName}
-                                                stats={stats}
-                                                spellSlots={statblock.spell_slots}
-                                                tokenData={data}
-                                                itemId={item.id}
-                                                dc={statblock.spell_dc}
-                                                attack={statblock.spell_attack}
-                                            />
-                                            <LineBreak />
-                                        </li>
-                                    );
-                                });
+                                return itemSpells.spells
+                                    .filter(
+                                        (spell) =>
+                                            spellFilter.indexOf(spell.spell.level) >= 0 || spellFilter.length === 0,
+                                    )
+                                    .map((spell, index) => {
+                                        return (
+                                            <li key={`${spell.spell.name}${index}`}>
+                                                <Spell
+                                                    spell={spell.spell}
+                                                    statblock={tokenName}
+                                                    stats={stats}
+                                                    spellSlots={statblock.spell_slots}
+                                                    charges={e.item.charges}
+                                                    chargesUsed={spell.charges}
+                                                    tokenData={data}
+                                                    itemId={item.id}
+                                                    dc={statblock.spell_dc}
+                                                    attack={statblock.spell_attack}
+                                                    embedded={true}
+                                                />
+                                                <LineBreak />
+                                            </li>
+                                        );
+                                    });
                             });
                     })}
                 {statblock.equipment
@@ -376,23 +414,30 @@ export const E5Spells = () => {
                                         <h4 className={styles.heading}>{e.item.name}</h4>
                                         <ItemCharges equippedItem={e.item} />
                                         <FancyLineBreak />
-                                        {itemSpells.spells.map((spell, index) => {
-                                            return (
-                                                <div key={`${spell.name}${index}`}>
-                                                    <Spell
-                                                        spell={spell}
-                                                        statblock={tokenName}
-                                                        stats={stats}
-                                                        spellSlots={statblock.spell_slots}
-                                                        tokenData={data}
-                                                        itemId={item.id}
-                                                        dc={statblock.spell_dc}
-                                                        attack={statblock.spell_attack}
-                                                    />
-                                                    <LineBreak />
-                                                </div>
-                                            );
-                                        })}
+                                        {itemSpells.spells
+                                            .filter(
+                                                (spell) =>
+                                                    spellFilter.indexOf(spell.spell.level) >= 0 ||
+                                                    spellFilter.length === 0,
+                                            )
+                                            .map((spell, index) => {
+                                                return (
+                                                    <div key={`${spell.spell.name}${index}`}>
+                                                        <Spell
+                                                            spell={spell.spell}
+                                                            statblock={tokenName}
+                                                            stats={stats}
+                                                            tokenData={data}
+                                                            charges={e.item.charges}
+                                                            chargesUsed={spell.charges}
+                                                            itemId={item.id}
+                                                            dc={statblock.spell_dc}
+                                                            attack={statblock.spell_attack}
+                                                        />
+                                                        <LineBreak />
+                                                    </div>
+                                                );
+                                            })}
                                     </li>
                                 );
                             });
