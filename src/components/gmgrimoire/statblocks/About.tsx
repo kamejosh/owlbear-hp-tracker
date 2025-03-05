@@ -11,18 +11,22 @@ export const About = ({
     statblock,
     stats,
     context,
+    defaultOpen,
+    hideTitle,
 }: {
     about?: string | null;
     slug: string;
     statblock?: E5Statblock | PfStatblock;
     stats?: Stats;
     context?: string;
+    defaultOpen?: boolean;
+    hideTitle?: boolean;
 }) => {
     const room = useMetadataContext.getState().room;
-    const [open, setOpen] = useLocalStorage<boolean>(`${ID}.about.${slug}`, false);
+    const [open, setOpen] = useLocalStorage<boolean>(`${ID}.about.${slug}`, !!defaultOpen);
     return about ? (
-        <div className={"about"}>
-            <h3>About</h3>
+        <div className={`about ${hideTitle ? "no-title" : ""}`}>
+            {!hideTitle ? <h3>About</h3> : null}
             <button className={`expand ${open ? "open" : null}`} onClick={() => setOpen(!open)}></button>
             <div className={`about-content-wrapper ${open ? "open" : "hidden"}`}>
                 <div className={"about-content"}>
