@@ -6,6 +6,7 @@ import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import styles from "./limits.module.scss";
 import Tippy from "@tippyjs/react";
+import { useLongPress } from "../../../helper/hooks.ts";
 
 export type LimitType = components["schemas"]["src__types__base__LimitedUse"];
 
@@ -60,7 +61,10 @@ const BarLimits = ({ limit, limitValues, itemId }: { limit: LimitType; limitValu
                         });
                         if (index !== undefined) {
                             // @ts-ignore
-                            item.metadata[itemMetadataKey]["stats"]["limits"][index]["used"] = limitValues.used + mod;
+                            item.metadata[itemMetadataKey]["stats"]["limits"][index]["used"] = Math.max(
+                                Math.min(limitValues.used + mod, limitValues.max),
+                                0,
+                            );
                         }
                     }
                 }
@@ -68,30 +72,29 @@ const BarLimits = ({ limit, limitValues, itemId }: { limit: LimitType; limitValu
         });
     };
 
+    const onLongPressAdd = useLongPress(
+        async () => await update(5),
+        async () => await update(1),
+        500,
+    );
+    const onLongPressRemove = useLongPress(
+        async () => await update(-5),
+        async () => await update(-1),
+        500,
+    );
+
     return (
-        <div className={styles.box}>
+        <div className={`${styles.box} limit-box`}>
             {limitValues.used > 0 ? (
                 <Tippy content={"Click to reduce uses by one"}>
-                    <div
-                        className={styles.used}
-                        style={{ flexGrow: limitValues.used }}
-                        onClick={async () => {
-                            await update(-1);
-                        }}
-                    >
+                    <div className={styles.used} style={{ flexGrow: limitValues.used }} {...onLongPressRemove}>
                         {limitValues.used}
                     </div>
                 </Tippy>
             ) : null}
             {unused > 0 ? (
                 <Tippy content={"Click to mark on use"}>
-                    <div
-                        className={styles.unused}
-                        style={{ flexGrow: unused }}
-                        onClick={async () => {
-                            await update(1);
-                        }}
-                    >
+                    <div className={styles.unused} style={{ flexGrow: unused }} {...onLongPressAdd}>
                         {unused}
                     </div>
                 </Tippy>

@@ -1,5 +1,6 @@
 .box {
     display: flex;
+    position: relative;
     cursor: pointer;
     border: 2px solid var(--limit-color);
     border-radius: 4px;

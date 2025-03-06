@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { isArray } from "lodash";
 
 // See https://usehooks.com/useLocalStorage
 export const useLocalStorage = <T>(key: string, initialValue: T) => {
@@ -96,4 +97,70 @@ export const withStorageDOMEvents = (store: any) => {
     return () => {
         window.removeEventListener("storage", storageEventCallback);
     };
+};
+
+export const useLongPress = (
+    onLongPress: (e: Event) => void,
+    onClick: (e: Event) => void,
+    delay: number = 300,
+    shouldPreventDefault: boolean = true,
+) => {
+    const [longPressTriggered, setLongPressTriggered] = useState<boolean>(false);
+    const [longPressStarted, setLongPressStarted] = useState<boolean>(false);
+    const timeout = useRef<number>();
+    const target = useRef<EventTarget>();
+
+    const start = useCallback(
+        (event: Event) => {
+            setLongPressStarted(true);
+            if (shouldPreventDefault && event.target) {
+                event.target.addEventListener("touchend", preventDefault, {
+                    passive: false,
+                });
+                (event.target as HTMLElement).classList.add("pressing");
+                target.current = event.target;
+            }
+            timeout.current = setTimeout(() => {
+                onLongPress(event);
+                (event.target as HTMLElement).classList.remove("pressing");
+                setLongPressTriggered(true);
+                setLongPressStarted(false);
+            }, delay);
+        },
+        [onLongPress, delay, shouldPreventDefault],
+    );
+
+    const clear = useCallback(
+        (event: Event, shouldTriggerClick = true) => {
+            timeout.current && clearTimeout(timeout.current);
+            shouldTriggerClick && !longPressTriggered && longPressStarted && onClick(event);
+            setLongPressTriggered(false);
+            setLongPressStarted(false);
+            (event.target as HTMLElement).classList.remove("pressing");
+            if (shouldPreventDefault && target.current) {
+                target.current.removeEventListener("touchend", preventDefault);
+            }
+        },
+        [shouldPreventDefault, onClick, longPressTriggered],
+    );
+
+    return {
+        onMouseDown: (e: Event) => start(e),
+        onTouchStart: (e: Event) => start(e),
+        onMouseUp: (e: Event) => clear(e),
+        onMouseLeave: (e: Event) => clear(e, false),
+        onTouchEnd: (e: Event) => clear(e),
+    };
+};
+
+const isTouchEvent = (event: Event) => {
+    return "touches" in event;
+};
+
+const preventDefault = (event: Event) => {
+    if (!isTouchEvent(event)) return;
+
+    if (isArray(event.touches) && event.touches.length < 2 && event.preventDefault) {
+        event.preventDefault();
+    }
 };
