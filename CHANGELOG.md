@@ -1,3 +1,9 @@
+# 3.3.3
+
++ Fix action tabs get cached when changing characters
++ Fix spells use the correct limit
++ Add long press event to bar limits to add or remove 5 uses at once
+
 # 3.3.2
 
 + Patreons can set default settings for Tokens on Tabletop Almanac, for HP Bar, HP/AC visibility, Player List, ...
