@@ -86,14 +86,14 @@ const BarLimits = ({ limit, limitValues, itemId }: { limit: LimitType; limitValu
     return (
         <div className={`${styles.box} limit-box`}>
             {limitValues.used > 0 ? (
-                <Tippy content={"Click to reduce uses by one"}>
+                <Tippy content={"Click to reduce uses by one (Long press for -5)"}>
                     <div className={styles.used} style={{ flexGrow: limitValues.used }} {...onLongPressRemove}>
                         {limitValues.used}
                     </div>
                 </Tippy>
             ) : null}
             {unused > 0 ? (
-                <Tippy content={"Click to mark on use"}>
+                <Tippy content={"Click to mark on use (Long press for +5)"}>
                     <div className={styles.unused} style={{ flexGrow: unused }} {...onLongPressAdd}>
                         {unused}
                     </div>

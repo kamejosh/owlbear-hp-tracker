@@ -1,5 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { MouseEvent, useCallback, useEffect, useRef, useState } from "react";
 import { isArray } from "lodash";
+
+export type LongpressEvent = MouseEvent | React.TouchEvent;
 
 // See https://usehooks.com/useLocalStorage
 export const useLocalStorage = <T>(key: string, initialValue: T) => {
@@ -100,8 +102,8 @@ export const withStorageDOMEvents = (store: any) => {
 };
 
 export const useLongPress = (
-    onLongPress: (e: Event) => void,
-    onClick: (e: Event) => void,
+    onLongPress: (e: LongpressEvent) => void,
+    onClick: (e: LongpressEvent) => void,
     delay: number = 300,
     shouldPreventDefault: boolean = true,
 ) => {
@@ -111,7 +113,7 @@ export const useLongPress = (
     const target = useRef<EventTarget>();
 
     const start = useCallback(
-        (event: Event) => {
+        (event: LongpressEvent) => {
             setLongPressStarted(true);
             if (shouldPreventDefault && event.target) {
                 event.target.addEventListener("touchend", preventDefault, {
@@ -131,7 +133,7 @@ export const useLongPress = (
     );
 
     const clear = useCallback(
-        (event: Event, shouldTriggerClick = true) => {
+        (event: LongpressEvent, shouldTriggerClick = true) => {
             timeout.current && clearTimeout(timeout.current);
             shouldTriggerClick && !longPressTriggered && longPressStarted && onClick(event);
             setLongPressTriggered(false);
@@ -145,11 +147,11 @@ export const useLongPress = (
     );
 
     return {
-        onMouseDown: (e: Event) => start(e),
-        onTouchStart: (e: Event) => start(e),
-        onMouseUp: (e: Event) => clear(e),
-        onMouseLeave: (e: Event) => clear(e, false),
-        onTouchEnd: (e: Event) => clear(e),
+        onMouseDown: (e: MouseEvent) => start(e),
+        onTouchStart: (e: React.TouchEvent) => start(e),
+        onMouseUp: (e: MouseEvent) => clear(e),
+        onMouseLeave: (e: MouseEvent) => clear(e, false),
+        onTouchEnd: (e: React.TouchEvent) => clear(e),
     };
 };
 
