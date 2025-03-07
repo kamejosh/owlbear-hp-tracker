@@ -11,6 +11,7 @@ export type BattleContextType = {
 export type BattleContextActions = {
     addGroup: (group: string) => void;
     removeGroup: (group: string) => void;
+    setGroups: (groups: string[]) => void;
     setCurrent: (id: string | null) => void;
     setBattle: (battle: boolean) => void;
 };
@@ -40,6 +41,10 @@ export const useBattleContext = create<BattleContextType & BattleContextActions>
                     if (index >= 0) {
                         groups.splice(index, 1);
                     }
+                    return { groups: groups };
+                }),
+            setGroups: (groups) =>
+                set(() => {
                     return { groups: groups };
                 }),
             setBattle: (battle) =>

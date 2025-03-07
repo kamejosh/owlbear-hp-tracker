@@ -1,10 +1,10 @@
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useBattleContext } from "../../../context/BattleContext.tsx";
 import Tippy from "@tippyjs/react";
 import { GMGMetadata, SORT } from "../../../helper/types.ts";
 import OBR, { Image } from "@owlbear-rodeo/sdk";
-import { isUndefined } from "lodash";
+import { isEqual, isUndefined } from "lodash";
 import { destroyIndicator, setIndicator } from "../../../helper/currentHelper.ts";
 import { rest } from "../../../helper/multiTokenHelper.ts";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
@@ -15,14 +15,30 @@ export const BattleRounds = () => {
     const tokens = useTokenListContext(useShallow((state) => state.tokens));
     const [scene, taSettings] = useMetadataContext(useShallow((state) => [state.scene, state.taSettings]));
     const [hold, setHold] = useState<boolean>(false);
-    const [groups, current, setCurrent, battle, setBattle] = useBattleContext(
-        useShallow((state) => [state.groups, state.current, state.setCurrent, state.battle, state.setBattle]),
+    const [groups, setGroups, current, setCurrent, battle, setBattle] = useBattleContext(
+        useShallow((state) => [
+            state.groups,
+            state.setGroups,
+            state.current,
+            state.setCurrent,
+            state.battle,
+            state.setBattle,
+        ]),
     );
     const tokensData: Array<{ data: GMGMetadata; item: Image }> = tokens
         ? [...tokens].map((t) => {
               return { data: t[1].data, item: t[1].item };
           })
         : [];
+
+    useEffect(() => {
+        if (scene?.groups) {
+            const validGroups = groups.filter((g) => scene.groups?.includes(g));
+            if (!isEqual(groups, validGroups)) {
+                setGroups(validGroups);
+            }
+        }
+    }, [scene?.groups]);
 
     const battleTokens = useMemo(() => {
         const tokens = tokensData
@@ -118,18 +134,20 @@ export const BattleRounds = () => {
                     content={"no groups or tokens selected for battle"}
                     disabled={groups.length > 0 || battleTokens.length > 0}
                 >
-                    <button
-                        disabled={groups.length === 0 || battleTokens.length === 0}
-                        className={"button"}
-                        onClick={async () => {
-                            if (battleTokens.length > 0) {
-                                await changeCurrent(0);
-                                setBattle(true);
-                            }
-                        }}
-                    >
-                        Start Battle
-                    </button>
+                    <div>
+                        <button
+                            disabled={groups.length === 0 || battleTokens.length === 0}
+                            className={"button"}
+                            onClick={async () => {
+                                if (battleTokens.length > 0) {
+                                    await changeCurrent(0);
+                                    setBattle(true);
+                                }
+                            }}
+                        >
+                            Start Battle
+                        </button>
+                    </div>
                 </Tippy>
             ) : (
                 <>

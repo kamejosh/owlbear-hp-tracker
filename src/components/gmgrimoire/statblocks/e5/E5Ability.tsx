@@ -1,11 +1,12 @@
 import { components } from "../../../../api/schema";
-import { DiceButton, DiceButtonWrapper } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { DiceButton } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { capitalize, isInteger } from "lodash";
 import { LimitComponent } from "../LimitComponent.tsx";
 import { updateLimit } from "../../../../helper/helpers.ts";
 import { useMemo } from "react";
 import { useE5StatblockContext } from "../../../../context/E5StatblockContext.tsx";
 import Tippy from "@tippyjs/react";
+import { About } from "../About.tsx";
 
 export type Ability = components["schemas"]["Action-Output"];
 
@@ -72,16 +73,15 @@ export const E5Ability = ({ ability, proficient }: { ability: Ability; proficien
                     <LimitComponent limit={ability.limit} title={"uses"} limitValues={limitValues} itemId={item.id} />
                 ) : null}
             </span>
-            <div>
-                <DiceButtonWrapper
-                    text={ability.desc || ""}
-                    context={`${capitalize(ability.name)}`}
-                    statblock={tokenName}
-                    stats={stats}
-                    limitReached={!ability.attack_bonus ? limitReached : undefined}
-                    proficiencyBonus={statblock.proficiency_bonus}
-                />
-            </div>
+            <About
+                slug={ability.name}
+                statblock={statblock}
+                stats={stats}
+                about={ability.desc || ""}
+                context={capitalize(ability.name)}
+                defaultOpen={true}
+                hideTitle={true}
+            />
             <span className={"ability-extra-info"}>
                 {bonus > 0 ? (
                     <span className={"extra-info-with-button"}>
