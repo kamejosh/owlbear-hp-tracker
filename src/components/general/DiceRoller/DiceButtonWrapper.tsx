@@ -1,6 +1,6 @@
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { IRoll, parseRollEquation } from "dddice-js";
@@ -14,6 +14,7 @@ import remarkGfm from "remark-gfm";
 import "./dice-button-wrapper.scss";
 import { isNull, isUndefined, startsWith } from "lodash";
 import { DiceRoll } from "@dice-roller/rpg-dice-roller";
+import { autoPlacement, safePolygon, useFloating, useHover, useInteractions } from "@floating-ui/react";
 
 export type Stats = {
     strength: number;
@@ -34,6 +35,7 @@ type DiceButtonProps = {
     limitReached?: boolean | null;
     damageDie?: boolean;
     proficiencyBonus?: number | null;
+    classes?: string;
 };
 export const DiceButton = (props: DiceButtonProps) => {
     const [room, taSettings] = useMetadataContext(useShallow((state) => [state.room, state.taSettings]));
@@ -41,13 +43,27 @@ export const DiceButton = (props: DiceButtonProps) => {
     const [rollerApi, initialized, theme] = useDiceRoller(
         useShallow((state) => [state.rollerApi, state.initialized, state.theme]),
     );
-    const [context, setContext] = useState<boolean>(false);
-    const rollButton = useRef<HTMLButtonElement>(null);
+    const [isOpen, setIsOpen] = useState<boolean>(false);
     const playerContext = usePlayerContext();
     const defaultHidden = playerContext.role === "GM" && !!taSettings.gm_rolls_hidden;
 
+    const { refs, floatingStyles, context } = useFloating({
+        open: isOpen,
+        onOpenChange: setIsOpen,
+        middleware: [
+            autoPlacement({
+                autoAlignment: true,
+                crossAxis: true,
+                allowedPlacements: ["left", "right"],
+            }),
+        ],
+    });
+
+    const hover = useHover(context, { handleClose: safePolygon() });
+
+    const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
+
     const replaceStatWithMod = (text: string) => {
-        if (text.includes("PB")) console.log(text);
         if (
             room?.ruleset === "e5" &&
             text.includes("PB") &&
@@ -124,7 +140,7 @@ export const DiceButton = (props: DiceButtonProps) => {
     };
 
     const roll = async (modifier?: "ADV" | "DIS" | "SELF" | "CRIT") => {
-        const button = rollButton.current;
+        const button = refs.domReference.current;
         if (button) {
             button.classList.add("rolling");
             let label = props.context;
@@ -201,7 +217,9 @@ export const DiceButton = (props: DiceButtonProps) => {
                 props.onRoll(rollResult);
             }
             button.classList.remove("rolling");
-            button.blur();
+            try {
+                (button as HTMLElement).blur();
+            } catch {}
         }
     };
 
@@ -244,16 +262,17 @@ export const DiceButton = (props: DiceButtonProps) => {
             disabled={!(!initialized && !room?.disableDiceRoller) && !props.limitReached}
         >
             <span
-                className={`button-wrapper ${isEnabled() ? "enabled" : "disabled"} ${
+                className={`button-wrapper ${props.classes} ${isEnabled() ? "enabled" : "disabled"} ${
                     room?.disableDiceRoller ? "calculated" : "three-d-dice"
                 }`}
                 onMouseEnter={() => {
-                    setContext(true);
+                    setIsOpen(true);
                 }}
-                onMouseLeave={() => setContext(false)}
+                onMouseLeave={() => setIsOpen(false)}
             >
                 <button
-                    ref={rollButton}
+                    ref={refs.setReference}
+                    {...getReferenceProps()}
                     disabled={!isEnabled()}
                     className={`dice-button button ${props.limitReached ? "limit" : ""}`}
                     onClick={async () => {
@@ -263,62 +282,67 @@ export const DiceButton = (props: DiceButtonProps) => {
                     <div className={"dice-preview"}>{getDicePreview()}</div>
                     {text.replace(/\s/g, "").replace("&nbsp", " ")}
                 </button>
-                <span
-                    className={`dice-context-button ${context && isEnabled() ? "visible" : ""} ${
-                        dice.startsWith("1d20") ||
+                {isOpen && isEnabled ? (
+                    <span
+                        ref={refs.setFloating}
+                        {...getFloatingProps()}
+                        style={floatingStyles}
+                        className={`dice-context-button visible ${
+                            dice.startsWith("1d20") ||
+                            dice.startsWith("d20") ||
+                            dice.startsWith("+") ||
+                            dice.startsWith("-")
+                                ? "full"
+                                : "reduced"
+                        }`}
+                    >
+                        {dice.startsWith("1d20") ||
                         dice.startsWith("d20") ||
                         dice.startsWith("+") ||
-                        dice.startsWith("-")
-                            ? "full"
-                            : "reduced"
-                    }`}
-                >
-                    {dice.startsWith("1d20") ||
-                    dice.startsWith("d20") ||
-                    dice.startsWith("+") ||
-                    dice.startsWith("-") ? (
-                        <>
+                        dice.startsWith("-") ? (
+                            <>
+                                <button
+                                    className={"advantage"}
+                                    disabled={!isEnabled()}
+                                    onClick={async () => {
+                                        await roll("ADV");
+                                    }}
+                                >
+                                    ADV
+                                </button>
+                                <button
+                                    className={"disadvantage"}
+                                    disabled={!isEnabled()}
+                                    onClick={async () => {
+                                        await roll("DIS");
+                                    }}
+                                >
+                                    DIS
+                                </button>
+                            </>
+                        ) : null}
+                        {props.damageDie && taSettings.crit_rules !== "none" ? (
                             <button
-                                className={"advantage"}
+                                className={"crit"}
                                 disabled={!isEnabled()}
                                 onClick={async () => {
-                                    await roll("ADV");
+                                    await roll("CRIT");
                                 }}
                             >
-                                ADV
+                                CRIT
                             </button>
-                            <button
-                                className={"disadvantage"}
-                                disabled={!isEnabled()}
-                                onClick={async () => {
-                                    await roll("DIS");
-                                }}
-                            >
-                                DIS
-                            </button>
-                        </>
-                    ) : null}
-                    {props.damageDie && taSettings.crit_rules !== "none" ? (
+                        ) : null}
                         <button
-                            className={"crit"}
+                            className={"self"}
                             disabled={!isEnabled()}
                             onClick={async () => {
-                                await roll("CRIT");
+                                await roll(defaultHidden ? undefined : "SELF");
                             }}
                         >
-                            CRIT
+                            {defaultHidden ? "SHOW" : "HIDE"}
                         </button>
-                    ) : null}
-                    <button
-                        className={"self"}
-                        disabled={!isEnabled()}
-                        onClick={async () => {
-                            await roll(defaultHidden ? undefined : "SELF");
-                        }}
-                    >
-                        {defaultHidden ? "SHOW" : "HIDE"}
-                    </button>
-                </span>
+                    </span>
+                ) : null}
             </span>
         </Tippy>
     );

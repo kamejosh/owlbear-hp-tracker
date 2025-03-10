@@ -36,18 +36,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-
-    &:last-child {
-        :global {
-            .button-wrapper {
-                .dice-context-button {
-                    right: unset;
-                    left: 0;
-                    translate: -100% -50%;
-                }
-            }
-        }
-    }
 }
 
 .name {

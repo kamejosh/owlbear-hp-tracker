@@ -149,7 +149,7 @@ export const Settings = () => {
                                     size={2}
                                     value={room?.acOffset?.x || 0}
                                     onChange={(e) => {
-                                        handleAcOffsetChange(Number(e.currentTarget.value), room?.acOffset?.x || 0);
+                                        handleAcOffsetChange(Number(e.currentTarget.value), room?.acOffset?.y || 0);
                                     }}
                                 />
                                 Y{" "}
@@ -158,7 +158,7 @@ export const Settings = () => {
                                     size={2}
                                     value={room?.acOffset?.y || 0}
                                     onChange={(e) => {
-                                        handleAcOffsetChange(Number(e.currentTarget.value), room?.acOffset?.y || 0);
+                                        handleAcOffsetChange(room?.acOffset?.x || 0, Number(e.currentTarget.value));
                                     }}
                                 />
                             </div>

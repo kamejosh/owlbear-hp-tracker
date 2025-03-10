@@ -3,6 +3,7 @@ import { Image, Item } from "@owlbear-rodeo/sdk";
 import { create } from "zustand";
 import { itemMetadataKey } from "../helper/variables.ts";
 import { objectsEqual } from "../helper/helpers.ts";
+import { isEqual } from "lodash";
 
 type TokenChange = {
     changeType: string;
@@ -48,6 +49,13 @@ export const useTokenListContext = create<TokenListContextType>()((set) => ({
                         } else if (item.visible !== state.tokens.get(item.id)!.item.visible) {
                             changes.push({
                                 changeType: "visibility-changed",
+                                id: item.id,
+                                oldData: null,
+                                newData: null,
+                            });
+                        } else if (!isEqual(item.position, state.tokens.get(item.id)!.item.position)) {
+                            changes.push({
+                                changeType: "position-changed",
                                 id: item.id,
                                 oldData: null,
                                 newData: null,

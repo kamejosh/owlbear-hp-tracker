@@ -6,6 +6,7 @@ import { Loader } from "../../../general/Loader.tsx";
 import styles from "./e5statblock.module.scss";
 import { E5StatblockValues } from "./E5StatblockValues.tsx";
 import { E5StatblockContent } from "./E5StatblockContent.tsx";
+import Tippy from "@tippyjs/react";
 
 export const E5StatBlock = () => {
     const { statblock } = useE5StatblockContext();
@@ -14,7 +15,9 @@ export const E5StatBlock = () => {
         <div className={styles.statblock}>
             <div className={styles.title}>
                 <div>
-                    <h1 className={styles.name}>{statblock.name}</h1>
+                    <Tippy content={`${statblock.size} ${statblock.type}, ${statblock.alignment}`}>
+                        <h1 className={styles.name}>{statblock.name}</h1>
+                    </Tippy>
                     <div className={styles.note}>
                         {statblock.size} {statblock.type}, {statblock.alignment}
                     </div>

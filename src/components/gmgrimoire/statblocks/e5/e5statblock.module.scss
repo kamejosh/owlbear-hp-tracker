@@ -15,11 +15,15 @@
     justify-content: space-between;
     gap: 2ch;
     margin-bottom: 4px;
+    max-height: 46px;
+    overflow: hidden;
 }
 
 .name {
     margin: 0;
     font-weight: 800;
+    font-size: 1.5rem;
+    line-height: 1;
 }
 
 .note {

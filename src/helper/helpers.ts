@@ -285,7 +285,7 @@ export const dddiceRollToRollLog = async (
         }
     }
 
-    if (roll.user.name === "Guest User" && !roll.external_id) {
+    if ((roll.user.name === "Guest User" && !roll.external_id) || username.includes("dndb")) {
         username = participantName;
     }
 

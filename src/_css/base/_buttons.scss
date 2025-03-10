@@ -11,9 +11,11 @@ button,
     background-color: var(--bg-color);
     color: var(--text-color);
 
-    &:hover,
-    &:focus-visible {
-        outline: 1px solid lightgrey;
+    &:not([class]) {
+        &:hover,
+        &:focus-visible {
+            outline: 1px solid lightgrey;
+        }
     }
 
     &:disabled {
@@ -252,7 +254,8 @@ button,
         align-items: center;
         gap: 2px;
         padding: 2px 2px;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
+        font-family: monospace;
 
         .dice-preview {
             display: flex;
@@ -293,22 +296,14 @@ button,
     }
 
     .dice-context-button {
-        display: none;
-        position: absolute;
-        top: 50%;
-        right: 0;
+        display: flex;
         flex-direction: column;
-        align-items: flex-start;
-        translate: 100% -50%;
         z-index: 10;
         border: 1px solid lightgrey;
         border-radius: 4px;
         background-color: var(--bg-color);
         padding: 1px;
-
-        &.visible {
-            display: flex;
-        }
+        width: min-content;
 
         button {
             --hover-color: lightgrey;

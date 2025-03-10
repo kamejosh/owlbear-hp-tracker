@@ -1,3 +1,12 @@
+# Unversioned
+
++ Fix issue where UI elements get placed on a previous position of the Token
++ Fix issue where AC offset was not working correctly
++ Fixed issue with long statblock names that would hide Spells/Actions
++ Fixed issues that context elements of dice roll buttons would not show when placed in a ``overflow: hidden`` container
++ Fixed issue that DnD Beyond rolls would get the wrong character name
++ Add red outline around current token to make it more visible when playing on white background
+
 # 3.3.3
 
 + Fix action tabs get cached when changing characters
