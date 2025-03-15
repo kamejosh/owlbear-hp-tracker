@@ -225,11 +225,15 @@ const setupContextMenu = async () => {
                 (i) => (i.layer === "CHARACTER" || i.layer === "MOUNT") && i.type === "IMAGE",
             );
 
+            console.log("start");
             const tokenIds = await prepareTokenForGrimoire(contextItems as Array<Image>);
+            console.log(tokenIds);
             const tokens = await OBR.scene.items.getItems(tokenIds);
             for (const token of tokens) {
+                console.log(token);
                 if (itemMetadataKey in token.metadata) {
                     const metadata = token.metadata[itemMetadataKey] as GMGMetadata;
+                    console.log(metadata);
                     await updateHp(token, metadata);
                     await updateAc(token, metadata);
                 }
