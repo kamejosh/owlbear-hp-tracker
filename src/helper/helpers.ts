@@ -805,7 +805,6 @@ export const prepareTokenForGrimoire = async (contextItems: Array<Image>) => {
                         defaultMetadata.stats.limits = itemStatblocks[item.id].limits;
                         defaultMetadata.equipment = itemStatblocks[item.id].equipment;
                     }
-                    console.log(item.metadata, defaultMetadata);
                     item.metadata[itemMetadataKey] = defaultMetadata;
                     if (settings?.assign_ss_darkvision && itemStatblocks[item.id]?.darkvision) {
                         item.metadata["com.battle-system.smoke/visionDark"] = itemStatblocks[item.id].darkvision;
