@@ -407,6 +407,29 @@ export const localRoll = async (
     } catch {}
 };
 
+export const addSpellToRollLog = async (
+    label: string,
+    addRoll: (entry: RollLogEntryType) => void,
+    statblock?: string,
+) => {
+    const logEntry = {
+        uuid: v4(),
+        created_at: new Date().toISOString(),
+        equation: "",
+        label: label,
+        is_hidden: false,
+        total_value: [],
+        username: statblock || "",
+        values: [],
+        owlbear_user_id: OBR.player.id,
+    };
+
+    await OBR.broadcast.sendMessage(rollMessageChannel, logEntry, { destination: "REMOTE" });
+
+    await handleNewRoll(addRoll, logEntry);
+    rollLogStore.persist.rehydrate();
+};
+
 export const rollWrapper = async (
     api: ThreeDDiceAPI | null,
     dice: Array<IDiceRoll>,

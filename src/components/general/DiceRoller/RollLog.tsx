@@ -121,24 +121,28 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
     }, [props.entry.label]);
 
     const detail = getDetailedResult();
+    console.log(detail, props.entry.total_value);
 
     return (
         <li className={`roll-log-entry ${props.classes} ${ownRoll ? "self" : ""}`}>
             <div className={"roll-time"}>{rollTimeText}</div>
             <div className={"roll-context"}>{formatLabel()}</div>
             <div className={"username"}>{props.entry.username}</div>
-            <DiceButton
-                dice={props.entry.equation}
-                text={props.entry.equation}
-                stats={{ strength: 0, dexterity: 0, constitution: 0, intelligence: 0, wisdom: 0, charisma: 0 }}
-                context={props.entry.label || "re-roll"}
-                statblock={props.entry.username}
-            />
+            {props.entry.equation ? (
+                <DiceButton
+                    dice={props.entry.equation}
+                    text={props.entry.equation}
+                    stats={{ strength: 0, dexterity: 0, constitution: 0, intelligence: 0, wisdom: 0, charisma: 0 }}
+                    context={props.entry.label || "re-roll"}
+                    statblock={props.entry.username}
+                />
+            ) : null}
             <div className={"roll-equation"}>{props.entry.equation}</div>
             <Tippy content={detail} maxWidth={"100vw"}>
                 <div className={"detailed-result"}>{detail}</div>
             </Tippy>
-            <div className={"divider"}>=</div>
+
+            {detail.length > 0 || props.entry.total_value.length > 0 ? <div className={"divider"}>=</div> : null}
             <div className={"total"}>{hidden ? "?" : String(props.entry.total_value)}</div>
             {props.entry.is_hidden && ownRoll ? (
                 <button

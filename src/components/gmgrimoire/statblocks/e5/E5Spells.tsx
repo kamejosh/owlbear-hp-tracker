@@ -16,6 +16,8 @@ import { SpellSlots } from "./E5SpellSlots.tsx";
 import { LimitComponent, LimitType } from "../LimitComponent.tsx";
 import { ItemCharges } from "./ItemCharges.tsx";
 import { isItemInUse } from "../../../../helper/equipmentHelpers.ts";
+import { addSpellToRollLog } from "../../../../helper/diceHelper.ts";
+import { useRollLogContext } from "../../../../context/RollLogContext.tsx";
 
 type Spell = components["schemas"]["src__types__e5__spell__Spell"];
 
@@ -47,6 +49,7 @@ const Spell = ({
     const [open, setOpen] = useState<boolean>(false);
     const statblockContext = useE5StatblockContext();
     const room = useMetadataContext(useShallow((state) => state.room));
+    const addRoll = useRollLogContext(useShallow((state) => state.addRoll));
 
     const getSpellLevel = () => {
         if (spell.level === 0) {
@@ -130,11 +133,10 @@ const Spell = ({
                                                 if (itemId && limitValues) {
                                                     await updateLimit(itemId, limitValues, chargesUsed);
                                                 }
+                                                await addSpellToRollLog(`${spell.name}: Cast`, addRoll, statblock);
                                             }}
                                         >
-                                            <div className={"dice-preview"}></div>
                                             cast
-                                            <div className={"dice-preview"}></div>
                                         </button>
                                     )}
                                 </div>

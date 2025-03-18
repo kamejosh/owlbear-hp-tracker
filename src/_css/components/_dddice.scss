@@ -197,8 +197,8 @@
                         overflow: hidden;
 
                         .select-current {
-                            max-width: 178px;
                             background: var(--bg-color);
+                            max-width: 178px;
 
                             .current {
                                 width: 100%;
@@ -707,7 +707,8 @@
                 text-transform: capitalize;
 
                 &.to-hit,
-                &.attack {
+                &.attack,
+                &.cast {
                     color: #1b9af0;
                 }
 
@@ -730,6 +731,10 @@
                 &.roll {
                     color: #f5a623;
                 }
+            }
+
+            .label-name {
+                text-transform: capitalize;
             }
         }
 
