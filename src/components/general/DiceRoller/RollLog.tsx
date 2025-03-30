@@ -121,7 +121,6 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
     }, [props.entry.label]);
 
     const detail = getDetailedResult();
-    console.log(detail, props.entry.total_value);
 
     return (
         <li className={`roll-log-entry ${props.classes} ${ownRoll ? "self" : ""}`}>
