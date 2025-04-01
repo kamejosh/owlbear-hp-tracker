@@ -1,4 +1,4 @@
-# Unversioned
+# 3.3.4
 
 + Fix issue where UI elements get placed on a previous position of the Token
 + Fix issue where AC offset was not working correctly
@@ -6,6 +6,8 @@
 + Fixed issues that context elements of dice roll buttons would not show when placed in a ``overflow: hidden`` container
 + Fixed issue that DnD Beyond rolls would get the wrong character name
 + Add red outline around current token to make it more visible when playing on white background
++ Fix dddice theme selector loading when no themes are available
++ Add a function to move a token to a group by right clicking the token icon
 
 # 3.3.3
 

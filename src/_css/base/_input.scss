@@ -1,6 +1,7 @@
 input[type="text"],
 input[type="password"],
-input[type="number"] {
+input[type="number"],
+select {
     border: 1px solid grey;
     border-radius: 4px;
     background-color: #2b2a33;

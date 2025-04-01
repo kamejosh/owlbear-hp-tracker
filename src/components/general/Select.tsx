@@ -8,7 +8,7 @@ type Option = {
 
 export type SelectProps = {
     options: Array<Option>;
-    current?: Option;
+    current?: Option | undefined;
     setTheme: (themeId: string) => void;
 };
 

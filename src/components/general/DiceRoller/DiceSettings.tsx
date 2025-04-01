@@ -76,9 +76,11 @@ export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean)
             >
                 X
             </button>
-            <div className={`setting dice-theme ${validTheme ? "valid" : "invalid"} ${searching ? "searching" : ""}`}>
-                <span className={"setting-name"}>dice theme:</span>
-                {theme ? (
+            {rollerApi ? (
+                <div
+                    className={`setting dice-theme ${validTheme ? "valid" : "invalid"} ${searching ? "searching" : ""}`}
+                >
+                    <span className={"setting-name"}>dice theme:</span>
                     <Select
                         options={
                             !isNull(themes)
@@ -89,17 +91,22 @@ export const DiceSettings = ({ setSettings }: { setSettings: (settings: boolean)
                                       })
                                 : []
                         }
-                        current={{
-                            value: theme.id,
-                            name: theme.name!,
-                            icon: getThemePreview(theme),
-                        }}
+                        // @ts-ignore
+                        current={
+                            theme
+                                ? {
+                                      value: theme.id,
+                                      name: theme.name,
+                                      icon: getThemePreview(theme),
+                                  }
+                                : undefined
+                        }
                         setTheme={findAndSetTheme}
                     />
-                ) : (
-                    <Loader className={"theme-loader"} />
-                )}
-            </div>
+                </div>
+            ) : (
+                <span>Unable to connect with dddice</span>
+            )}
             {error ? <span>{error}</span> : null}
             {playerContext.role === "GM" ? (
                 <div className={`setting dice-room-select valid`}>

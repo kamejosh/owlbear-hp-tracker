@@ -16,7 +16,7 @@ export const rollMessageChannel = `${ID}.roll-event`;
 
 export const prettySordidID = "com.pretty-initiative";
 
-export const version = "3.3.3";
+export const version = "3.3.4";
 
 export const changelogModal: Modal = {
     id: modalId,
