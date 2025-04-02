@@ -10,7 +10,15 @@ import { About } from "../About.tsx";
 
 export type Ability = components["schemas"]["Action-Output"];
 
-export const E5Ability = ({ ability, proficient }: { ability: Ability; proficient?: boolean }) => {
+export const E5Ability = ({
+    ability,
+    proficient,
+    range,
+}: {
+    ability: Ability;
+    proficient?: boolean;
+    range?: string;
+}) => {
     const { item, stats, data, tokenName, statblock } = useE5StatblockContext();
     const limitValues = data.stats.limits?.find((l) => l.id === ability.limit?.name)!;
 
@@ -69,6 +77,12 @@ export const E5Ability = ({ ability, proficient }: { ability: Ability; proficien
         <li key={ability.name} className={"e5-ability"}>
             <span className={"ability-info"}>
                 <b className={"ability-name"}>{ability.name}</b>
+                {range ? (
+                    <div>
+                        <b>Range: </b>
+                        <span>{range.replace("units", "ft")}</span>
+                    </div>
+                ) : null}
                 {ability.limit && data.stats.limits && limitValues ? (
                     <LimitComponent limit={ability.limit} title={"uses"} limitValues={limitValues} itemId={item.id} />
                 ) : null}

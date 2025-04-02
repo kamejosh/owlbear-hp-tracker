@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { DiceButton, DiceButtonWrapper, Stats } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { getDamage, updateLimit } from "../../../../helper/helpers.ts";
 import { SpellFilter } from "../SpellFilter.tsx";
-import { capitalize } from "lodash";
+import { capitalize, isUndefined } from "lodash";
 import { E5SpellSlot } from "../../../../api/e5/useE5Api.ts";
 import { GMGMetadata } from "../../../../helper/types.ts";
 import { useMetadataContext } from "../../../../context/MetadataContext.ts";
@@ -67,7 +67,7 @@ const Spell = ({
 
     const damage = spell.desc ? getDamage(spell.desc) : null;
     const spellLevelLimit = useMemo(() => {
-        if (charges) {
+        if (!isUndefined(charges)) {
             return charges;
         } else if (spellSlots) {
             return spellSlots?.find((s) => s.level === spell.level)?.limit;
@@ -382,6 +382,7 @@ export const E5Spells = () => {
                                         (spell) =>
                                             spellFilter.indexOf(spell.spell.level) >= 0 || spellFilter.length === 0,
                                     )
+                                    .sort((a, b) => a.spell.level - b.spell.level)
                                     .map((spell, index) => {
                                         return (
                                             <li key={`${spell.spell.name}${index}`}>
@@ -422,6 +423,7 @@ export const E5Spells = () => {
                                                     spellFilter.indexOf(spell.spell.level) >= 0 ||
                                                     spellFilter.length === 0,
                                             )
+                                            .sort((a, b) => a.spell.level - b.spell.level)
                                             .map((spell, index) => {
                                                 return (
                                                     <div key={`${spell.spell.name}${index}`}>

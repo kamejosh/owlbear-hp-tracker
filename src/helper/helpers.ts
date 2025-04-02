@@ -736,7 +736,7 @@ export const updateLimit = async (itemId: string, limitValues: Limit, usage?: nu
                         if (index !== undefined) {
                             // @ts-ignore
                             item.metadata[itemMetadataKey]["stats"]["limits"][index]["used"] = Math.min(
-                                limitValues.used + (usage || 1),
+                                limitValues.used + (isUndefined(usage) ? 1 : usage),
                                 limitValues.max,
                             );
                         }

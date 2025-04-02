@@ -68,7 +68,18 @@ export const E5Abilities = ({
                                     {itemAction.abilities.map((ability, index) => {
                                         return (
                                             <div key={index}>
-                                                <E5Ability ability={ability} proficient={e.proficient} />
+                                                <E5Ability
+                                                    ability={ability}
+                                                    proficient={e.proficient}
+                                                    range={
+                                                        (e.item.tags &&
+                                                            e.item.tags.includes("throw") &&
+                                                            e.item.range) ||
+                                                        e.item.range
+                                                            ? e.item.range
+                                                            : undefined
+                                                    }
+                                                />
                                                 <LineBreak />
                                             </div>
                                         );
