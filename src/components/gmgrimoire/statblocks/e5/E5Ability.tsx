@@ -1,6 +1,6 @@
 import { components } from "../../../../api/schema";
 import { DiceButton } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
-import { capitalize, isInteger } from "lodash";
+import { capitalize, isInteger, isUndefined } from "lodash";
 import { LimitComponent } from "../LimitComponent.tsx";
 import { updateLimit } from "../../../../helper/helpers.ts";
 import { useMemo } from "react";
@@ -17,13 +17,13 @@ export const E5Ability = ({ ability, proficient }: { ability: Ability; proficien
     const limitReached = limitValues && limitValues.max === limitValues.used;
 
     const statBonus = useMemo(() => {
-        let statBonus = {
-            bonus: 0,
+        let statBonus: { bonus?: number; stat: string } = {
+            bonus: undefined,
             stat: "",
         };
-        const getStatBonus = (statName: string, statValue: number, current: { bonus: number; stat: string }) => {
+        const getStatBonus = (statName: string, statValue: number, current: { bonus?: number; stat: string }) => {
             const bonus = Math.floor((statValue - 10) / 2);
-            if (bonus > current.bonus) {
+            if (isUndefined(current.bonus) || bonus > current.bonus) {
                 return { bonus, stat: statName };
             }
             return current;
@@ -49,7 +49,7 @@ export const E5Ability = ({ ability, proficient }: { ability: Ability; proficien
     }, [ability, stats]);
     const attackBonus = ability.attack_bonus || 0;
     const profBonus = proficient && statblock.proficiency_bonus ? statblock.proficiency_bonus : 0;
-    const bonus = statBonus.bonus + attackBonus + profBonus;
+    const bonus = (statBonus.bonus || 0) + attackBonus + profBonus;
 
     const attackTooltipContent = useMemo(() => {
         const tooltips = [];
