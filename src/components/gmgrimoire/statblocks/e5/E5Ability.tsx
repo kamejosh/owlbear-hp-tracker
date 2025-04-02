@@ -68,7 +68,7 @@ export const E5Ability = ({ ability, proficient }: { ability: Ability; proficien
     return (
         <li key={ability.name} className={"e5-ability"}>
             <span className={"ability-info"}>
-                <b className={"ability-name"}>{ability.name}.</b>
+                <b className={"ability-name"}>{ability.name}</b>
                 {ability.limit && data.stats.limits && limitValues ? (
                     <LimitComponent limit={ability.limit} title={"uses"} limitValues={limitValues} itemId={item.id} />
                 ) : null}
@@ -83,7 +83,7 @@ export const E5Ability = ({ ability, proficient }: { ability: Ability; proficien
                 hideTitle={true}
             />
             <span className={"ability-extra-info"}>
-                {bonus > 0 ? (
+                {(ability.stat_bonus && ability.stat_bonus.length > 0) || attackBonus != 0 ? (
                     <span className={"extra-info-with-button"}>
                         <i>Hit:</i>
                         <Tippy content={attackTooltipContent} duration={200} delay={1000}>

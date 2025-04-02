@@ -10,10 +10,10 @@ import { useLongPress } from "../../../helper/hooks.ts";
 
 export type LimitType = components["schemas"]["src__types__base__LimitedUse"];
 
-const BoxLimits = ({ limit, limitValues, itemId }: { limit: LimitType; limitValues: Limit; itemId: string }) => {
+const BoxLimits = ({ limitValues, itemId }: { limitValues: Limit; itemId: string }) => {
     return (
         <>
-            {Array(limit.uses)
+            {Array(limitValues.max)
                 .fill(0)
                 .map((_, i) => {
                     const used = i < limitValues.used;
@@ -47,8 +47,8 @@ const BoxLimits = ({ limit, limitValues, itemId }: { limit: LimitType; limitValu
     );
 };
 
-const BarLimits = ({ limit, limitValues, itemId }: { limit: LimitType; limitValues: Limit; itemId: string }) => {
-    const unused = limit.uses - limitValues.used;
+const BarLimits = ({ limitValues, itemId }: { limitValues: Limit; itemId: string }) => {
+    const unused = limitValues.max - limitValues.used;
 
     const update = async (mod: number) => {
         await updateItems([itemId], (items) => {
@@ -132,10 +132,10 @@ export const LimitComponent = ({
             <div className={"limit-heading"}>
                 {getTitle()}
                 <div className={"limit-uses"}>
-                    {limit.uses > 10 ? (
-                        <BarLimits limit={limit} limitValues={limitValues} itemId={itemId} />
+                    {limitValues.max > 10 ? (
+                        <BarLimits limitValues={limitValues} itemId={itemId} />
                     ) : (
-                        <BoxLimits limit={limit} limitValues={limitValues} itemId={itemId} />
+                        <BoxLimits limitValues={limitValues} itemId={itemId} />
                     )}
                 </div>
             </div>
