@@ -73,6 +73,10 @@ export const E5Ability = ({
         return tooltips.join(", ");
     }, [attackBonus, statBonus, profBonus]);
 
+    if (ability.needs_proficiency && !proficient) {
+        return null;
+    }
+
     return (
         <li key={ability.name} className={"e5-ability"}>
             <span className={"ability-info"}>

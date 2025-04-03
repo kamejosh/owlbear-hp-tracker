@@ -263,6 +263,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/me/patreon": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set User Patreon */
+        put: operations["set_user_patreon_api_v1_users_me_patreon_put"];
+        /** Refresh Patreon */
+        post: operations["refresh_patreon_api_v1_users_me_patreon_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/pf/statblock/": {
         parameters: {
             query?: never;
@@ -652,7 +670,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/users/{username}": {
+    "/admin/users/{user_id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -661,7 +679,7 @@ export interface paths {
         };
         get?: never;
         /** Update User */
-        put: operations["update_user_admin_users__username__put"];
+        put: operations["update_user_admin_users__user_id__put"];
         post?: never;
         delete?: never;
         options?: never;
@@ -685,6 +703,8 @@ export interface components {
             stat_bonus?: ("STR" | "DEX" | "CON" | "INT" | "WIS" | "CHA")[] | null;
             /** Use Proficiency */
             use_proficiency?: boolean | null;
+            /** Needs Proficiency */
+            needs_proficiency?: boolean | null;
             /** Damage Dice */
             damage_dice?: string | null;
             limit?: components["schemas"]["src__types__base__LimitedUse"] | null;
@@ -1145,9 +1165,11 @@ export interface components {
             /** Description */
             description?: string | null;
             /** Rarity */
-            rarity?: ("Common" | "Uncommon" | "Rare" | "Very Rare" | "Legendary") | null;
+            rarity?: ("Common" | "Uncommon" | "Rare" | "Very Rare" | "Legendary" | "Artifact") | null;
             /** Sentient */
             sentient?: boolean | null;
+            /** Consumable */
+            consumable?: boolean | null;
             /** Can Equip */
             can_equip?: boolean | null;
             /** Requires Attuning */
@@ -1162,6 +1184,8 @@ export interface components {
             charges?: components["schemas"]["LimitedUse-Input"] | null;
             stats?: components["schemas"]["ItemStatsIn"] | null;
             bonus?: components["schemas"]["ItemBonusIn"] | null;
+            /** Ac */
+            ac?: number | null;
             modifiers?: components["schemas"]["ItemModifiersIn"] | null;
         };
         /** ItemModifiersIn */
@@ -1187,9 +1211,11 @@ export interface components {
             /** Description */
             description?: string | null;
             /** Rarity */
-            rarity?: ("Common" | "Uncommon" | "Rare" | "Very Rare" | "Legendary") | null;
+            rarity?: ("Common" | "Uncommon" | "Rare" | "Very Rare" | "Legendary" | "Artifact") | null;
             /** Sentient */
             sentient?: boolean | null;
+            /** Consumable */
+            consumable?: boolean | null;
             /** Can Equip */
             can_equip?: boolean | null;
             /** Requires Attuning */
@@ -1204,6 +1230,8 @@ export interface components {
             charges?: components["schemas"]["src__types__base__LimitedUse"] | null;
             stats?: components["schemas"]["ItemStatsOut"] | null;
             bonus?: components["schemas"]["ItemBonusOut"] | null;
+            /** Ac */
+            ac?: number | null;
             modifiers?: components["schemas"]["ItemModifiersOut"] | null;
             /** Id */
             id: number;
@@ -1301,6 +1329,8 @@ export interface components {
             uses: number;
             /** Resets */
             resets?: string[];
+            /** Formula */
+            formula?: string | null;
         };
         /** ModifierStats */
         ModifierStats: {
@@ -1315,6 +1345,30 @@ export interface components {
             decrease: boolean;
             /** Value */
             value: number;
+        };
+        /**
+         * Money
+         * @description Represents a Money record
+         */
+        Money: {
+            /** Id */
+            id: number;
+            /** Cp */
+            cp?: number | null;
+            /** Sp */
+            sp?: number | null;
+            /** Ep */
+            ep?: number | null;
+            /** Gp */
+            gp?: number | null;
+            /** Pp */
+            pp?: number | null;
+            party?: components["schemas"]["Party"] | null;
+            e5Statblock?: components["schemas"]["e5_StatBlock"] | null;
+            /** Partyid */
+            partyId?: number | null;
+            /** E5 Statblockid */
+            e5_StatBlockId?: string | null;
         };
         /** Mystery */
         Mystery: {
@@ -1416,6 +1470,52 @@ export interface components {
             active: boolean;
             /** Source */
             source?: string | null;
+        };
+        /**
+         * Party
+         * @description Represents a Party record
+         */
+        Party: {
+            /** Id */
+            id: number;
+            /** Pfstatblocks */
+            pfstatblocks?: components["schemas"]["pf_StatBlock"][] | null;
+            /** E5Statblocks */
+            e5statblocks?: components["schemas"]["e5_StatBlock"][] | null;
+            user?: components["schemas"]["User"] | null;
+            /** Userid */
+            userId: string;
+            Money?: components["schemas"]["Money"] | null;
+            PartyInventory?: components["schemas"]["PartyInventory"] | null;
+        };
+        /**
+         * PartyInventory
+         * @description Represents a PartyInventory record
+         */
+        PartyInventory: {
+            /** Id */
+            id: number;
+            party?: components["schemas"]["Party"] | null;
+            /** Party Items */
+            Party_Items?: components["schemas"]["Party_Item"][] | null;
+            /** Partyid */
+            partyId: number;
+        };
+        /**
+         * Party_Item
+         * @description Represents a Party_Item record
+         */
+        Party_Item: {
+            /** Id */
+            id: number;
+            /** Count */
+            count: number;
+            item?: components["schemas"]["e5_Item"] | null;
+            partyInventory?: components["schemas"]["PartyInventory"] | null;
+            /** E5 Itemid */
+            e5_ItemId: number;
+            /** Partyinventoryid */
+            partyInventoryId: number;
         };
         /** PasswordResetIn */
         PasswordResetIn: {
@@ -1778,8 +1878,12 @@ export interface components {
             embedded?: boolean | null;
             /** Proficient */
             proficient?: boolean | null;
+            /** Consumable */
+            consumable?: boolean | null;
             /** Item */
             item: number;
+            /** Count */
+            count?: number | null;
         };
         /** StatblockItemOut */
         StatblockItemOut: {
@@ -1795,7 +1899,11 @@ export interface components {
             proficient: boolean;
             /** Embedded */
             embedded: boolean;
+            /** Consumable */
+            consumable: boolean;
             item: components["schemas"]["ItemOut"];
+            /** Count */
+            count: number;
         };
         /** TokenSettings */
         TokenSettings: {
@@ -1869,6 +1977,13 @@ export interface components {
             pf_Spell?: components["schemas"]["pf_Spell"][] | null;
             /** E5 Item */
             e5_Item?: components["schemas"]["e5_Item"][] | null;
+            patreon?: components["schemas"]["prisma__models__Patreon"] | null;
+            /** Custom Tier */
+            custom_tier?: string | null;
+            /** Custom Tier End */
+            custom_tier_end?: string | null;
+            /** Party */
+            Party?: components["schemas"]["Party"][] | null;
         };
         /** UserAdminInfo */
         UserAdminInfo: {
@@ -1878,12 +1993,34 @@ export interface components {
             email: string;
             /** Scopes */
             scopes: string[];
+            /** Custom Tier */
+            custom_tier?: string | null;
+            /** Custom Tier End */
+            custom_tier_end?: string | null;
+            patreon?: components["schemas"]["src__types__types__Patreon"] | null;
+            /** Id */
+            id: string;
             /** Active */
             active: boolean;
             /** Statblocks */
             statblocks: number;
             /** Spells */
             spells: number;
+            /** Items */
+            items: number;
+        };
+        /** UserAdminUpdate */
+        UserAdminUpdate: {
+            /** Username */
+            username?: string | null;
+            /** Email */
+            email?: string | null;
+            /** Patreon Email */
+            patreon_email?: string | null;
+            /** Custom Tier */
+            custom_tier?: ("Goblin" | "Quartermaster" | "Free" | "Beholder" | "Moderator" | "Admin") | null;
+            /** Custom Tier End */
+            custom_tier_end?: string | null;
         };
         /** UserIn */
         UserIn: {
@@ -1937,6 +2074,11 @@ export interface components {
             email: string;
             /** Scopes */
             scopes: string[];
+            /** Custom Tier */
+            custom_tier?: string | null;
+            /** Custom Tier End */
+            custom_tier_end?: string | null;
+            patreon?: components["schemas"]["src__types__types__Patreon"] | null;
         };
         /** ValidationError */
         ValidationError: {
@@ -1966,6 +2108,8 @@ export interface components {
             damage_dice?: string | null;
             /** Use Proficiency */
             use_proficiency: boolean;
+            /** Needs Proficiency */
+            needs_proficiency: boolean;
             limit?: components["schemas"]["prisma__models__LimitedUse"] | null;
             e5_StatBlock?: components["schemas"]["e5_StatBlock"] | null;
             /** E5 Statblockid */
@@ -2015,6 +2159,8 @@ export interface components {
             damage_dice?: string | null;
             /** Use Proficiency */
             use_proficiency: boolean;
+            /** Needs Proficiency */
+            needs_proficiency: boolean;
             limit?: components["schemas"]["prisma__models__LimitedUse"] | null;
             e5_StatBlock?: components["schemas"]["e5_StatBlock"] | null;
             /** E5 Statblockid */
@@ -2069,12 +2215,16 @@ export interface components {
             description?: string | null;
             /** Rarity */
             rarity?: string | null;
+            /** Consumable */
+            consumable?: boolean | null;
             /** Sentient */
             sentient?: boolean | null;
             /** Can Equip */
             can_equip?: boolean | null;
             /** Requires Attuning */
             requires_attuning?: boolean | null;
+            /** Ac */
+            ac?: number | null;
             cost?: components["schemas"]["Cost"] | null;
             /** Weight */
             weight?: number | null;
@@ -2099,6 +2249,8 @@ export interface components {
             costId?: number | null;
             /** E5 Statblock Item */
             e5_StatBlock_Item?: components["schemas"]["e5_StatBlock_Item"][] | null;
+            /** Party Items */
+            Party_Items?: components["schemas"]["Party_Item"][] | null;
         };
         /**
          * e5_ItemBonus
@@ -2220,6 +2372,8 @@ export interface components {
             damage_dice?: string | null;
             /** Use Proficiency */
             use_proficiency: boolean;
+            /** Needs Proficiency */
+            needs_proficiency: boolean;
             limit?: components["schemas"]["prisma__models__LimitedUse"] | null;
             e5_StatBlock?: components["schemas"]["e5_StatBlock"] | null;
             /** E5 Statblockid */
@@ -2246,6 +2400,8 @@ export interface components {
             damage_dice?: string | null;
             /** Use Proficiency */
             use_proficiency: boolean;
+            /** Needs Proficiency */
+            needs_proficiency: boolean;
             limit?: components["schemas"]["prisma__models__LimitedUse"] | null;
             e5_StatBlock?: components["schemas"]["e5_StatBlock"] | null;
             /** E5 Statblockid */
@@ -2272,6 +2428,8 @@ export interface components {
             damage_dice?: string | null;
             /** Use Proficiency */
             use_proficiency: boolean;
+            /** Needs Proficiency */
+            needs_proficiency: boolean;
             limit?: components["schemas"]["prisma__models__LimitedUse"] | null;
             e5_StatBlock?: components["schemas"]["e5_StatBlock"] | null;
             /** E5 Statblockid */
@@ -2298,6 +2456,8 @@ export interface components {
             damage_dice?: string | null;
             /** Use Proficiency */
             use_proficiency: boolean;
+            /** Needs Proficiency */
+            needs_proficiency: boolean;
             limit?: components["schemas"]["prisma__models__LimitedUse"] | null;
             e5_StatBlock?: components["schemas"]["e5_StatBlock"] | null;
             /** E5 Statblockid */
@@ -2410,6 +2570,8 @@ export interface components {
             damage_dice?: string | null;
             /** Use Proficiency */
             use_proficiency: boolean;
+            /** Needs Proficiency */
+            needs_proficiency: boolean;
             limit?: components["schemas"]["prisma__models__LimitedUse"] | null;
             e5_StatBlock?: components["schemas"]["e5_StatBlock"] | null;
             /** E5 Statblockid */
@@ -2683,6 +2845,9 @@ export interface components {
             e5_ArmorClassId: string;
             /** E5 Statsid */
             e5_StatsId: string;
+            /** Party */
+            Party?: components["schemas"]["Party"][] | null;
+            Money?: components["schemas"]["Money"] | null;
         };
         /**
          * e5_StatBlock_Item
@@ -2701,12 +2866,16 @@ export interface components {
             proficient: boolean;
             /** Embedded */
             embedded: boolean;
+            /** Consumable */
+            consumable: boolean;
             item?: components["schemas"]["e5_Item"] | null;
             statblock?: components["schemas"]["e5_StatBlock"] | null;
             /** E5 Itemid */
             e5_ItemId: number;
             /** E5 Statblockid */
             e5_StatBlockId: string;
+            /** Count */
+            count: number;
         };
         /**
          * e5_Stats
@@ -3208,6 +3377,8 @@ export interface components {
             pf_ArmorClassId: string;
             /** Pf Statsid */
             pf_StatsId: string;
+            /** Party */
+            Party?: components["schemas"]["Party"][] | null;
         };
         /**
          * pf_Stats
@@ -3260,6 +3431,8 @@ export interface components {
             uses: number;
             /** Resets */
             resets: string[];
+            /** Formula */
+            formula?: string | null;
             pf_StatBlock?: components["schemas"]["pf_StatBlock"] | null;
             /** Pf Statblockid */
             pf_StatBlockId?: string | null;
@@ -3295,6 +3468,23 @@ export interface components {
             e5_ItemId?: number | null;
         };
         /**
+         * Patreon
+         * @description Represents a Patreon record
+         */
+        prisma__models__Patreon: {
+            /** Id */
+            id: number;
+            /** Email */
+            email?: string | null;
+            /** Tier */
+            tier: string;
+            /** Note */
+            note?: string | null;
+            user?: components["schemas"]["User"] | null;
+            /** Userid */
+            userId: string;
+        };
+        /**
          * Stats
          * @description Represents a Stats record
          */
@@ -3327,6 +3517,8 @@ export interface components {
             uses: number;
             /** Resets */
             resets?: string[];
+            /** Formula */
+            formula?: string | null;
         };
         /** Action */
         "src__types__e5__base__Action-Input": {
@@ -3340,6 +3532,8 @@ export interface components {
             stat_bonus?: ("STR" | "DEX" | "CON" | "INT" | "WIS" | "CHA")[] | null;
             /** Use Proficiency */
             use_proficiency?: boolean | null;
+            /** Needs Proficiency */
+            needs_proficiency?: boolean | null;
             /** Damage Dice */
             damage_dice?: string | null;
             limit?: components["schemas"]["LimitedUse-Input"] | null;
@@ -3619,6 +3813,17 @@ export interface components {
             wisdom: number;
             /** Charisma */
             charisma: number;
+        };
+        /** Patreon */
+        src__types__types__Patreon: {
+            /** Id */
+            id: number;
+            /** Email */
+            email?: string | null;
+            /** Tier */
+            tier: string;
+            /** Note */
+            note?: string | null;
         };
         /** Stats */
         src__types__types__Stats: {
@@ -4131,6 +4336,57 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_user_patreon_api_v1_users_me_patreon_put: {
+        parameters: {
+            query: {
+                patreon_email: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    refresh_patreon_api_v1_users_me_patreon_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
         };
@@ -5302,6 +5558,7 @@ export interface operations {
                 email?: string | null;
                 username?: string | null;
                 scopes?: string | null;
+                patreon?: boolean | null;
             };
             header?: never;
             path?: never;
@@ -5329,18 +5586,18 @@ export interface operations {
             };
         };
     };
-    update_user_admin_users__username__put: {
+    update_user_admin_users__user_id__put: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                username: string;
+                user_id: string;
             };
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": string[];
+                "application/json": components["schemas"]["UserAdminUpdate"];
             };
         };
         responses: {
