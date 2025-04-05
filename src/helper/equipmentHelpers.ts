@@ -442,7 +442,9 @@ export const handleEquipmentChange = async (
         const equipmentBonus = getEquipmentBonuses(newData, statblock.stats, statblock.equipment);
         newData.maxHp = Number(statblock.hp.value) + Number(equipmentBonus.statblockBonuses.hpBonus);
         newData.hp = Math.min(newData.hp, newData.maxHp);
-        newData.armorClass = Number(statblock.armor_class.value) + Number(equipmentBonus.statblockBonuses.ac);
+        const combinedAC = equipmentBonus.ac || statblock.armor_class.value;
+
+        newData.armorClass = combinedAC + equipmentBonus.statblockBonuses.ac;
         newData.stats.initiativeBonus = statblock.initiative ?? Math.floor((equipmentBonus.stats.dexterity - 10) / 2);
     }
     await updateTokenMetadata(newData, [item.id]);
