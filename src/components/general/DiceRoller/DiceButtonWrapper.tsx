@@ -12,7 +12,7 @@ import { useShallow } from "zustand/react/shallow";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import "./dice-button-wrapper.scss";
-import { isNull, isUndefined, startsWith } from "lodash";
+import { endsWith, isNull, isUndefined, startsWith } from "lodash";
 import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 import { autoPlacement, safePolygon, useFloating, useHover, useInteractions } from "@floating-ui/react";
 
@@ -373,7 +373,8 @@ export const DiceButtonWrapper = ({
         const diceCopy = Array.from(dice);
         diceCopy?.forEach((die) => {
             if (!die.startsWith("`")) {
-                text = text.split(die).join("|||");
+                const diceSplitter = new RegExp("[^`]" + die + "[^`]");
+                text = text.split(diceSplitter).join("|||");
             } else {
                 dice.splice(
                     dice.findIndex((d) => d === die),
