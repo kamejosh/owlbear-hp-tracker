@@ -382,8 +382,22 @@ const getLimitsE5 = (statblock: E5Statblock) => {
             });
         } catch {}
     }
-
-    return limits;
+    const uniqueLimits: Array<Limit> = [];
+    limits.forEach((limit) => {
+        const foundLimit = uniqueLimits.find((l) => l.id === limit.id);
+        if (foundLimit) {
+            if (limit.max > foundLimit.max) {
+                uniqueLimits.splice(
+                    uniqueLimits.findIndex((l) => l.id === limit.id),
+                    1,
+                    limit,
+                );
+            }
+        } else {
+            uniqueLimits.push(limit);
+        }
+    });
+    return uniqueLimits;
 };
 
 const getLimitsPf = (statblock: PfStatblock) => {
@@ -425,8 +439,10 @@ export const updateTokenSheet = async (
                     e5Statblock.stats,
                     e5Statblock.equipment || [],
                 );
+
+                const combinedAC = equipmentBonuses.ac || statblock.armor_class.value;
                 newHP = statblock.hp.value + equipmentBonuses.statblockBonuses.hpBonus;
-                newAC = statblock.armor_class.value + equipmentBonuses.statblockBonuses.ac;
+                newAC = combinedAC + equipmentBonuses.statblockBonuses.ac;
             } else {
                 newHP = statblock.hp.value;
                 newAC = statblock.armor_class.value;
@@ -480,8 +496,9 @@ export const resyncToken = async (statblock: E5Statblock | PfStatblock, characte
                     e5Statblock.stats,
                     e5Statblock.equipment || [],
                 );
+                const combinedAC = equipmentBonuses.ac || statblock.armor_class.value;
                 newHP = statblock.hp.value + equipmentBonuses.statblockBonuses.hpBonus;
-                newAC = statblock.armor_class.value + equipmentBonuses.statblockBonuses.ac;
+                newAC = combinedAC + equipmentBonuses.statblockBonuses.ac;
             } else {
                 newHP = statblock.hp.value;
                 newAC = statblock.armor_class.value;
@@ -643,12 +660,14 @@ export const getInitialValues = async (items: Array<Image>, getDarkVision: boole
                                 statblock.equipment || [],
                             );
 
+                            const combinedAC = equipmentBonuses.ac || statblock.armor_class.value;
+
                             bestMatch = {
                                 source: statblock.source,
                                 distance: dist,
                                 statblock: {
                                     hp: statblock.hp.value + equipmentBonuses.statblockBonuses.hpBonus,
-                                    ac: statblock.armor_class.value + equipmentBonuses.statblockBonuses.ac,
+                                    ac: combinedAC + equipmentBonuses.statblockBonuses.ac,
                                     bonus:
                                         statblock.initiative ?? Math.floor((equipmentBonuses.stats.dexterity - 10) / 2),
                                     slug: statblock.slug,

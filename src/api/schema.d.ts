@@ -1090,6 +1090,13 @@ export interface components {
             /** Level */
             level: number;
         };
+        /** ItemAC */
+        ItemAC: {
+            /** Value */
+            value: number;
+            /** Max Dex */
+            max_dex?: number | null;
+        };
         /** ItemBonusIn */
         ItemBonusIn: {
             /** Hp */
@@ -1184,9 +1191,8 @@ export interface components {
             charges?: components["schemas"]["LimitedUse-Input"] | null;
             stats?: components["schemas"]["ItemStatsIn"] | null;
             bonus?: components["schemas"]["ItemBonusIn"] | null;
-            /** Ac */
-            ac?: number | null;
             modifiers?: components["schemas"]["ItemModifiersIn"] | null;
+            ac?: components["schemas"]["ItemAC"] | null;
         };
         /** ItemModifiersIn */
         ItemModifiersIn: {
@@ -1230,9 +1236,8 @@ export interface components {
             charges?: components["schemas"]["src__types__base__LimitedUse"] | null;
             stats?: components["schemas"]["ItemStatsOut"] | null;
             bonus?: components["schemas"]["ItemBonusOut"] | null;
-            /** Ac */
-            ac?: number | null;
             modifiers?: components["schemas"]["ItemModifiersOut"] | null;
+            ac?: components["schemas"]["ItemAC"] | null;
             /** Id */
             id: number;
             /** Slug */
@@ -2223,8 +2228,6 @@ export interface components {
             can_equip?: boolean | null;
             /** Requires Attuning */
             requires_attuning?: boolean | null;
-            /** Ac */
-            ac?: number | null;
             cost?: components["schemas"]["Cost"] | null;
             /** Weight */
             weight?: number | null;
@@ -2251,6 +2254,22 @@ export interface components {
             e5_StatBlock_Item?: components["schemas"]["e5_StatBlock_Item"][] | null;
             /** Party Items */
             Party_Items?: components["schemas"]["Party_Item"][] | null;
+            ac?: components["schemas"]["e5_ItemAC"] | null;
+        };
+        /**
+         * e5_ItemAC
+         * @description Represents a e5_ItemAC record
+         */
+        e5_ItemAC: {
+            /** Id */
+            id: number;
+            /** Value */
+            value: number;
+            /** Max Dex */
+            max_dex?: number | null;
+            e5_Item?: components["schemas"]["e5_Item"] | null;
+            /** E5 Itemid */
+            e5_ItemId?: number | null;
         };
         /**
          * e5_ItemBonus

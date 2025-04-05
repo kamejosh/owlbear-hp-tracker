@@ -8,6 +8,7 @@ import { updateHp } from "./hpHelpers.ts";
 import { updateAc } from "./acHelper.ts";
 import { E5Statblock } from "../api/e5/useE5Api.ts";
 import { Item } from "@owlbear-rodeo/sdk";
+import { isNull, isUndefined } from "lodash";
 
 export type ItemOut = components["schemas"]["ItemOut"];
 export type StatblockItems = components["schemas"]["StatblockItemOut"];
@@ -16,6 +17,7 @@ export type Speed = components["schemas"]["Speed"];
 export type SavingThrows = components["schemas"]["src__types__e5__base__SavingThrows"];
 export type Skills = components["schemas"]["Skills"];
 export type Modifier = components["schemas"]["ModifierStats"];
+export type ItemAC = components["schemas"]["ItemAC"];
 export type StatblockStats = components["schemas"]["src__types__e5__base__Stats"];
 
 export type StatblockBonuses = {
@@ -55,6 +57,7 @@ export type EquipmentBonuses = {
     itemActions: ItemActions;
     charges: Array<ItemCharges>;
     stats: Stats;
+    ac: number | null;
 };
 
 const getStatValue = (stats: Stats, modifiers: Array<Modifier>): Stats => {
@@ -186,6 +189,7 @@ export const getEquipmentBonuses = (
     const actions: ItemActions = {
         items: [],
     };
+    const itemACs: Array<number> = [];
     const charges: Array<ItemCharges> = [];
     const modifiers: Array<Modifier> = [];
 
@@ -193,6 +197,13 @@ export const getEquipmentBonuses = (
         if (isItemAttuned(data, item) || isItemEquipped(data, item)) {
             if (item.item.spells) {
                 bonuses.spells.push({ itemId: item.item.id, spells: item.item.spells });
+            }
+            if (item.item.ac) {
+                let acValue = item.item.ac.value;
+                if (!isNull(item.item.ac.max_dex) && !isUndefined(item.item.ac.max_dex) && stats.dexterity) {
+                    acValue += Math.min(item.item.ac.max_dex, Math.floor((stats.dexterity - 10) / 2));
+                }
+                itemACs.push(acValue);
             }
             if (item.item.bonus) {
                 const itemBonus = item.item.bonus;
@@ -385,6 +396,7 @@ export const getEquipmentBonuses = (
         itemActions: actions,
         charges: charges,
         stats: totalStats,
+        ac: Math.max(...itemACs),
     };
 };
 
