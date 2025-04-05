@@ -202,6 +202,8 @@ export const getEquipmentBonuses = (
                 let acValue = item.item.ac.value;
                 if (!isNull(item.item.ac.max_dex) && !isUndefined(item.item.ac.max_dex) && stats.dexterity) {
                     acValue += Math.min(item.item.ac.max_dex, Math.floor((stats.dexterity - 10) / 2));
+                } else if (isNull(item.item.ac.max_dex) && stats.dexterity) {
+                    acValue += Math.floor((stats.dexterity - 10) / 2);
                 }
                 itemACs.push(acValue);
             }
@@ -396,7 +398,7 @@ export const getEquipmentBonuses = (
         itemActions: actions,
         charges: charges,
         stats: totalStats,
-        ac: Math.max(...itemACs),
+        ac: itemACs.length === 0 ? null : Math.max(...itemACs),
     };
 };
 
