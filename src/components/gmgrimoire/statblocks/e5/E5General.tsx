@@ -106,14 +106,15 @@ export const E5General = () => {
                     const savingThrowKey = `${name}_save`;
                     // @ts-ignore name is always in stats
                     const statValue = equipmentBonuses.stats[name];
+                    const statBonus = Math.floor((statValue - 10) / 2);
+                    // @ts-ignore
+                    const saveBonus = statblock.saving_throws[savingThrowKey] || statBonus;
                     // @ts-ignore name is always in stats
                     const saveValue = Object.hasOwn(equipmentBonuses.statblockBonuses.savingThrows, savingThrowKey)
-                        ? // @ts-ignore
-                          statblock.saving_throws[savingThrowKey] +
+                        ? saveBonus +
                           // @ts-ignore
                           equipmentBonuses.statblockBonuses.savingThrows[savingThrowKey]
-                        : // @ts-ignore
-                          statblock.saving_throws[savingThrowKey];
+                        : saveBonus;
 
                     return (
                         <li className={styles.stat} key={name}>
