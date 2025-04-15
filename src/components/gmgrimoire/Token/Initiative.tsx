@@ -54,8 +54,8 @@ export const Initiative = ({ id }: { id: string }) => {
                 />
             </Tippy>
             <DiceButton
-                dice={`1d${room?.initiativeDice || 20}+${data.stats.initiativeBonus}`}
-                text={`+${data.stats.initiativeBonus}`}
+                dice={`1d${room?.initiativeDice || 20}${Intl.NumberFormat("en-US", { signDisplay: "always" }).format(data.stats.initiativeBonus)}`}
+                text={Intl.NumberFormat("en-US", { signDisplay: "always" }).format(data.stats.initiativeBonus)}
                 context={"Initiative: Roll"}
                 stats={defaultStats}
                 statblock={data.sheet || getTokenName(item)}
