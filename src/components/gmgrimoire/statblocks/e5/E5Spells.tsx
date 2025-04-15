@@ -19,7 +19,7 @@ import { isItemInUse } from "../../../../helper/equipmentHelpers.ts";
 import { addSpellToRollLog } from "../../../../helper/diceHelper.ts";
 import { useRollLogContext } from "../../../../context/RollLogContext.tsx";
 
-type Spell = components["schemas"]["src__types__e5__spell__Spell"];
+type Spell = components["schemas"]["src__model_types__e5__spell__Spell"];
 
 const Spell = ({
     spell,

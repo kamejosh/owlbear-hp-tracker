@@ -12,6 +12,7 @@
 
 .spellFilter {
     cursor: pointer;
+    height: 22px;
 
     &:hover {
         background-color: rgba(255, 255, 255, 0.7);
@@ -22,4 +23,17 @@
 .active {
     background-color: rgba(255, 255, 255, 0.7) !important;
     color: black;
+}
+
+.sticky {
+    display: flex;
+    position: sticky;
+    top: -5px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 4px 1ch;
+    z-index: 1;
+    background-color: var(--bg-color);
+    padding-block: 1px 5px;
 }

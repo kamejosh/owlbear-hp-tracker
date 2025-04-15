@@ -707,7 +707,7 @@ export interface components {
             needs_proficiency?: boolean | null;
             /** Damage Dice */
             damage_dice?: string | null;
-            limit?: components["schemas"]["src__types__base__LimitedUse"] | null;
+            limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
         };
         /** ActionOut */
         ActionOut: {
@@ -736,7 +736,7 @@ export interface components {
             critical_failure?: string | null;
             /** Constant */
             constant?: string | null;
-            limit?: components["schemas"]["src__types__base__LimitedUse"] | null;
+            limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
         };
         /**
          * ActionTypeEnum
@@ -910,16 +910,13 @@ export interface components {
             subtype?: string | null;
             /** Group */
             group?: string | null;
-            /**
-             * Alignment
-             * @default
-             */
-            alignment: string;
+            /** Alignment */
+            alignment?: string | null;
             armor_class: components["schemas"]["ArmorClass"];
-            hp: components["schemas"]["src__types__e5__base__Hitpoints"];
+            hp: components["schemas"]["src__model_types__e5__base__Hitpoints"];
             speed: components["schemas"]["Speed"];
-            stats: components["schemas"]["src__types__e5__base__Stats"];
-            saving_throws: components["schemas"]["src__types__e5__base__SavingThrows"];
+            stats: components["schemas"]["src__model_types__e5__base__Stats"];
+            saving_throws: components["schemas"]["src__model_types__e5__base__SavingThrows"];
             /** Initiative */
             initiative?: number | null;
             /** Proficiency Bonus */
@@ -946,21 +943,21 @@ export interface components {
             /** Cr */
             cr?: number | null;
             /** Actions */
-            actions?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
+            actions?: components["schemas"]["src__model_types__e5__base__Action-Input"][] | null;
             /** Bonus Actions */
-            bonus_actions?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
+            bonus_actions?: components["schemas"]["src__model_types__e5__base__Action-Input"][] | null;
             /** Lair Actions */
-            lair_actions?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
+            lair_actions?: components["schemas"]["src__model_types__e5__base__Action-Input"][] | null;
             /** Mythic Actions */
-            mythic_actions?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
+            mythic_actions?: components["schemas"]["src__model_types__e5__base__Action-Input"][] | null;
             /** Reactions */
-            reactions?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
+            reactions?: components["schemas"]["src__model_types__e5__base__Action-Input"][] | null;
             /** Legendary Desc */
             legendary_desc?: string | null;
             /** Legendary Actions */
-            legendary_actions?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
+            legendary_actions?: components["schemas"]["src__model_types__e5__base__Action-Input"][] | null;
             /** Special Abilities */
-            special_abilities?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
+            special_abilities?: components["schemas"]["src__model_types__e5__base__Action-Input"][] | null;
             /** Spell Slots */
             spell_slots?: components["schemas"]["SpellSlots-Input"][] | null;
             /** Spells */
@@ -973,6 +970,7 @@ export interface components {
             limits?: components["schemas"]["LimitedUse-Input"][] | null;
             /** Source */
             source?: string | null;
+            money?: components["schemas"]["MoneyIn"] | null;
         };
         /** E5StatblockOut */
         E5StatblockOut: {
@@ -990,16 +988,13 @@ export interface components {
             subtype?: string | null;
             /** Group */
             group?: string | null;
-            /**
-             * Alignment
-             * @default
-             */
-            alignment: string;
+            /** Alignment */
+            alignment?: string | null;
             armor_class: components["schemas"]["ArmorClass"];
-            hp: components["schemas"]["src__types__e5__base__Hitpoints"];
+            hp: components["schemas"]["src__model_types__e5__base__Hitpoints"];
             speed: components["schemas"]["Speed"];
-            stats: components["schemas"]["src__types__e5__base__Stats"];
-            saving_throws: components["schemas"]["src__types__e5__base__SavingThrows"];
+            stats: components["schemas"]["src__model_types__e5__base__Stats"];
+            saving_throws: components["schemas"]["src__model_types__e5__base__SavingThrows"];
             /** Initiative */
             initiative?: number | null;
             /** Proficiency Bonus */
@@ -1044,15 +1039,16 @@ export interface components {
             /** Spell Slots */
             spell_slots?: components["schemas"]["SpellSlots-Output"][] | null;
             /** Spells */
-            spells?: components["schemas"]["src__types__e5__spell__Spell"][];
+            spells?: components["schemas"]["src__model_types__e5__spell__Spell"][];
             /** Spell Dc */
             spell_dc?: string | null;
             /** Spell Attack */
             spell_attack?: string | null;
             /** Limits */
-            limits?: components["schemas"]["src__types__base__LimitedUse"][] | null;
+            limits?: components["schemas"]["src__model_types__base__LimitedUse"][] | null;
             /** Source */
             source?: string | null;
+            money?: components["schemas"]["MoneyOut"] | null;
             /** Slug */
             slug: string;
             /** License */
@@ -1116,16 +1112,16 @@ export interface components {
             /** Proficiency */
             proficiency?: string[] | null;
             /** Actions */
-            actions?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
+            actions?: components["schemas"]["src__model_types__e5__base__Action-Input"][] | null;
             /** Bonus Actions */
-            bonus_actions?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
+            bonus_actions?: components["schemas"]["src__model_types__e5__base__Action-Input"][] | null;
             /** Reactions */
-            reactions?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
+            reactions?: components["schemas"]["src__model_types__e5__base__Action-Input"][] | null;
             /** Special Abilities */
-            special_abilities?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
-            stats?: components["schemas"]["src__types__e5__base__Stats"] | null;
+            special_abilities?: components["schemas"]["src__model_types__e5__base__Action-Input"][] | null;
+            stats?: components["schemas"]["src__model_types__e5__base__Stats"] | null;
             speed?: components["schemas"]["Speed"] | null;
-            saving_throws?: components["schemas"]["src__types__e5__base__SavingThrows"] | null;
+            saving_throws?: components["schemas"]["src__model_types__e5__base__SavingThrows"] | null;
             skills?: components["schemas"]["Skills"] | null;
         };
         /** ItemBonusOut */
@@ -1154,9 +1150,9 @@ export interface components {
             reactions?: components["schemas"]["Action-Output"][] | null;
             /** Special Abilities */
             special_abilities?: components["schemas"]["Action-Output"][] | null;
-            stats?: components["schemas"]["src__types__e5__base__Stats"] | null;
+            stats?: components["schemas"]["src__model_types__e5__base__Stats"] | null;
             speed?: components["schemas"]["Speed"] | null;
-            saving_throws?: components["schemas"]["src__types__e5__base__SavingThrows"] | null;
+            saving_throws?: components["schemas"]["src__model_types__e5__base__SavingThrows"] | null;
             skills?: components["schemas"]["Skills"] | null;
             /** Id */
             id: number;
@@ -1233,7 +1229,7 @@ export interface components {
             range?: string | null;
             /** Spells */
             spells?: components["schemas"]["ItemSpellOut"][];
-            charges?: components["schemas"]["src__types__base__LimitedUse"] | null;
+            charges?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
             stats?: components["schemas"]["ItemStatsOut"] | null;
             bonus?: components["schemas"]["ItemBonusOut"] | null;
             modifiers?: components["schemas"]["ItemModifiersOut"] | null;
@@ -1268,39 +1264,39 @@ export interface components {
         ItemSpellOut: {
             /** Id */
             id: number;
-            spell: components["schemas"]["src__types__e5__spell__Spell"];
+            spell: components["schemas"]["src__model_types__e5__spell__Spell"];
             /** Charges */
             charges: number;
         };
         /** ItemStatsIn */
         ItemStatsIn: {
             armor_class?: components["schemas"]["ArmorClass"] | null;
-            hp?: components["schemas"]["src__types__e5__base__Hitpoints"] | null;
+            hp?: components["schemas"]["src__model_types__e5__base__Hitpoints"] | null;
             /** Senses */
             senses?: string[] | null;
             /** Languages */
             languages?: string[] | null;
             /** Actions */
-            actions?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
+            actions?: components["schemas"]["src__model_types__e5__base__Action-Input"][] | null;
             /** Bonus Actions */
-            bonus_actions?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
+            bonus_actions?: components["schemas"]["src__model_types__e5__base__Action-Input"][] | null;
             /** Reactions */
-            reactions?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
+            reactions?: components["schemas"]["src__model_types__e5__base__Action-Input"][] | null;
             /** Special Abilities */
-            special_abilities?: components["schemas"]["src__types__e5__base__Action-Input"][] | null;
+            special_abilities?: components["schemas"]["src__model_types__e5__base__Action-Input"][] | null;
             /** Spell Dc */
             spell_dc?: string | null;
             /** Spell Attack */
             spell_attack?: string | null;
-            stats?: components["schemas"]["src__types__e5__base__Stats"] | null;
+            stats?: components["schemas"]["src__model_types__e5__base__Stats"] | null;
             speed?: components["schemas"]["Speed"] | null;
-            saving_throws?: components["schemas"]["src__types__e5__base__SavingThrows"] | null;
+            saving_throws?: components["schemas"]["src__model_types__e5__base__SavingThrows"] | null;
             skills?: components["schemas"]["Skills"] | null;
         };
         /** ItemStatsOut */
         ItemStatsOut: {
             armor_class?: components["schemas"]["ArmorClass"] | null;
-            hp?: components["schemas"]["src__types__e5__base__Hitpoints"] | null;
+            hp?: components["schemas"]["src__model_types__e5__base__Hitpoints"] | null;
             /** Senses */
             senses?: string[] | null;
             /** Languages */
@@ -1317,9 +1313,9 @@ export interface components {
             spell_dc?: string | null;
             /** Spell Attack */
             spell_attack?: string | null;
-            stats?: components["schemas"]["src__types__e5__base__Stats"] | null;
+            stats?: components["schemas"]["src__model_types__e5__base__Stats"] | null;
             speed?: components["schemas"]["Speed"] | null;
-            saving_throws?: components["schemas"]["src__types__e5__base__SavingThrows"] | null;
+            saving_throws?: components["schemas"]["src__model_types__e5__base__SavingThrows"] | null;
             skills?: components["schemas"]["Skills"] | null;
             /** Id */
             id: number;
@@ -1375,6 +1371,34 @@ export interface components {
             /** E5 Statblockid */
             e5_StatBlockId?: string | null;
         };
+        /** MoneyIn */
+        MoneyIn: {
+            /** Cp */
+            cp?: number | null;
+            /** Sp */
+            sp?: number | null;
+            /** Ep */
+            ep?: number | null;
+            /** Gp */
+            gp?: number | null;
+            /** Pp */
+            pp?: number | null;
+        };
+        /** MoneyOut */
+        MoneyOut: {
+            /** Id */
+            id: number;
+            /** Cp */
+            cp: number;
+            /** Sp */
+            sp: number;
+            /** Ep */
+            ep: number;
+            /** Gp */
+            gp: number;
+            /** Pp */
+            pp: number;
+        };
         /** Mystery */
         Mystery: {
             /** Name */
@@ -1398,12 +1422,12 @@ export interface components {
             languages?: string[] | null;
             /** Skills */
             skills?: components["schemas"]["Skill"][] | null;
-            stats: components["schemas"]["src__types__pf__statblock__Stats"];
+            stats: components["schemas"]["src__model_types__pf__statblock__Stats"];
             /** Items */
             items?: string[] | null;
             armor_class: components["schemas"]["ArmorClass"];
-            saving_throws: components["schemas"]["src__types__pf__statblock__SavingThrows"];
-            hp: components["schemas"]["src__types__pf__statblock__Hitpoints"];
+            saving_throws: components["schemas"]["src__model_types__pf__statblock__SavingThrows"];
+            hp: components["schemas"]["src__model_types__pf__statblock__Hitpoints"];
             /** Immunities */
             immunities?: string[] | null;
             /** Weaknesses */
@@ -1413,7 +1437,7 @@ export interface components {
             /** Speed */
             speed: string;
             /** Actions */
-            actions?: components["schemas"]["src__types__pf__statblock__Action"][] | null;
+            actions?: components["schemas"]["src__model_types__pf__statblock__Action"][] | null;
             /** Reactions */
             reactions?: components["schemas"]["Reaction-Input"][] | null;
             /** Spells */
@@ -1443,12 +1467,12 @@ export interface components {
             languages?: string[] | null;
             /** Skills */
             skills?: components["schemas"]["Skill"][] | null;
-            stats: components["schemas"]["src__types__pf__statblock__Stats"];
+            stats: components["schemas"]["src__model_types__pf__statblock__Stats"];
             /** Items */
             items?: string[] | null;
             armor_class: components["schemas"]["ArmorClass"];
-            saving_throws: components["schemas"]["src__types__pf__statblock__SavingThrows"];
-            hp: components["schemas"]["src__types__pf__statblock__Hitpoints"];
+            saving_throws: components["schemas"]["src__model_types__pf__statblock__SavingThrows"];
+            hp: components["schemas"]["src__model_types__pf__statblock__Hitpoints"];
             /** Immunities */
             immunities?: string[] | null;
             /** Weaknesses */
@@ -1466,7 +1490,7 @@ export interface components {
             /** About */
             about?: string | null;
             /** Limits */
-            limits?: components["schemas"]["src__types__base__LimitedUse"][] | null;
+            limits?: components["schemas"]["src__model_types__base__LimitedUse"][] | null;
             /** Special Abilities */
             special_abilities?: components["schemas"]["SpecialAbility-Output"][] | null;
             /** Slug */
@@ -1588,7 +1612,7 @@ export interface components {
             failure?: string | null;
             /** Critical Failure */
             critical_failure?: string | null;
-            limit?: components["schemas"]["src__types__base__LimitedUse"] | null;
+            limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
         };
         /** Settings */
         Settings: {
@@ -1682,7 +1706,7 @@ export interface components {
             name: string;
             /** Description */
             description: string;
-            limit?: components["schemas"]["src__types__base__LimitedUse"] | null;
+            limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
         };
         /** Speed */
         Speed: {
@@ -1802,7 +1826,7 @@ export interface components {
         "SpellSlots-Output": {
             /** Level */
             level: number;
-            limit: components["schemas"]["src__types__base__LimitedUse"];
+            limit: components["schemas"]["src__model_types__base__LimitedUse"];
         };
         /** SpellStatblockOut */
         SpellStatblockOut: {
@@ -1869,7 +1893,7 @@ export interface components {
             level: string;
             /** Spells */
             spells: components["schemas"]["SpellStatblockOut"][];
-            limit?: components["schemas"]["src__types__base__LimitedUse"] | null;
+            limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
         };
         /** StatblockItemIn */
         StatblockItemIn: {
@@ -1883,8 +1907,6 @@ export interface components {
             embedded?: boolean | null;
             /** Proficient */
             proficient?: boolean | null;
-            /** Consumable */
-            consumable?: boolean | null;
             /** Item */
             item: number;
             /** Count */
@@ -1904,11 +1926,9 @@ export interface components {
             proficient: boolean;
             /** Embedded */
             embedded: boolean;
-            /** Consumable */
-            consumable: boolean;
             item: components["schemas"]["ItemOut"];
             /** Count */
-            count: number;
+            count?: number | null;
         };
         /** TokenSettings */
         TokenSettings: {
@@ -2002,7 +2022,7 @@ export interface components {
             custom_tier?: string | null;
             /** Custom Tier End */
             custom_tier_end?: string | null;
-            patreon?: components["schemas"]["src__types__types__Patreon"] | null;
+            patreon?: components["schemas"]["src__model_types__types__Patreon"] | null;
             /** Id */
             id: string;
             /** Active */
@@ -2051,7 +2071,7 @@ export interface components {
         /** UserSpells */
         UserSpells: {
             /** E5 */
-            e5: components["schemas"]["src__types__e5__spell__Spell"][];
+            e5: components["schemas"]["src__model_types__e5__spell__Spell"][];
             /** Pf */
             pf: components["schemas"]["SpellOut"][];
         };
@@ -2083,7 +2103,7 @@ export interface components {
             custom_tier?: string | null;
             /** Custom Tier End */
             custom_tier_end?: string | null;
-            patreon?: components["schemas"]["src__types__types__Patreon"] | null;
+            patreon?: components["schemas"]["src__model_types__types__Patreon"] | null;
         };
         /** ValidationError */
         ValidationError: {
@@ -2865,8 +2885,8 @@ export interface components {
             /** E5 Statsid */
             e5_StatsId: string;
             /** Party */
-            Party?: components["schemas"]["Party"][] | null;
-            Money?: components["schemas"]["Money"] | null;
+            party?: components["schemas"]["Party"][] | null;
+            money?: components["schemas"]["Money"] | null;
         };
         /**
          * e5_StatBlock_Item
@@ -2885,8 +2905,6 @@ export interface components {
             proficient: boolean;
             /** Embedded */
             embedded: boolean;
-            /** Consumable */
-            consumable: boolean;
             item?: components["schemas"]["e5_Item"] | null;
             statblock?: components["schemas"]["e5_StatBlock"] | null;
             /** E5 Itemid */
@@ -2894,7 +2912,7 @@ export interface components {
             /** E5 Statblockid */
             e5_StatBlockId: string;
             /** Count */
-            count: number;
+            count?: number | null;
         };
         /**
          * e5_Stats
@@ -3527,7 +3545,7 @@ export interface components {
             userId: string;
         };
         /** LimitedUse */
-        src__types__base__LimitedUse: {
+        src__model_types__base__LimitedUse: {
             /** Name */
             name: string;
             /** Description */
@@ -3540,7 +3558,7 @@ export interface components {
             formula?: string | null;
         };
         /** Action */
-        "src__types__e5__base__Action-Input": {
+        "src__model_types__e5__base__Action-Input": {
             /** Name */
             name: string;
             /** Desc */
@@ -3558,14 +3576,14 @@ export interface components {
             limit?: components["schemas"]["LimitedUse-Input"] | null;
         };
         /** Hitpoints */
-        src__types__e5__base__Hitpoints: {
+        src__model_types__e5__base__Hitpoints: {
             /** Value */
             value: number;
             /** Hit Dice */
             hit_dice?: string | null;
         };
         /** SavingThrows */
-        src__types__e5__base__SavingThrows: {
+        src__model_types__e5__base__SavingThrows: {
             /** Strength Save */
             strength_save?: number | null;
             /** Dexterity Save */
@@ -3580,7 +3598,7 @@ export interface components {
             charisma_save?: number | null;
         };
         /** Stats */
-        src__types__e5__base__Stats: {
+        src__model_types__e5__base__Stats: {
             /** Strength */
             strength?: number | null;
             /** Dexterity */
@@ -3595,7 +3613,7 @@ export interface components {
             charisma?: number | null;
         };
         /** Spell */
-        src__types__e5__spell__Spell: {
+        src__model_types__e5__spell__Spell: {
             /** Name */
             name: string;
             /**
@@ -3649,7 +3667,7 @@ export interface components {
             source?: string | null;
         };
         /** SpellIn */
-        src__types__e5__spell__SpellIn: {
+        src__model_types__e5__spell__SpellIn: {
             /** Name */
             name: string;
             /**
@@ -3696,7 +3714,7 @@ export interface components {
             circles?: string[] | null;
         };
         /** Spell */
-        src__types__pf__spell__Spell: {
+        src__model_types__pf__spell__Spell: {
             /** Name */
             name: string;
             info: components["schemas"]["Info"];
@@ -3738,7 +3756,7 @@ export interface components {
             source?: string | null;
         };
         /** SpellIn */
-        src__types__pf__spell__SpellIn: {
+        src__model_types__pf__spell__SpellIn: {
             /** Name */
             name: string;
             info: components["schemas"]["Info"];
@@ -3772,7 +3790,7 @@ export interface components {
             heightened?: components["schemas"]["Heightened"][] | null;
         };
         /** Action */
-        src__types__pf__statblock__Action: {
+        src__model_types__pf__statblock__Action: {
             /** Name */
             name: string;
             type: components["schemas"]["ActionTypeEnum"];
@@ -3801,14 +3819,14 @@ export interface components {
             limit?: components["schemas"]["LimitedUse-Input"] | null;
         };
         /** Hitpoints */
-        src__types__pf__statblock__Hitpoints: {
+        src__model_types__pf__statblock__Hitpoints: {
             /** Value */
             value: number;
             /** Special */
             special?: string | null;
         };
         /** SavingThrows */
-        src__types__pf__statblock__SavingThrows: {
+        src__model_types__pf__statblock__SavingThrows: {
             /** Fortitude */
             fortitude: number;
             /** Reflex */
@@ -3819,7 +3837,7 @@ export interface components {
             special?: string | null;
         };
         /** Stats */
-        src__types__pf__statblock__Stats: {
+        src__model_types__pf__statblock__Stats: {
             /** Strength */
             strength: number;
             /** Dexterity */
@@ -3834,7 +3852,7 @@ export interface components {
             charisma: number;
         };
         /** Patreon */
-        src__types__types__Patreon: {
+        src__model_types__types__Patreon: {
             /** Id */
             id: number;
             /** Email */
@@ -3845,7 +3863,7 @@ export interface components {
             note?: string | null;
         };
         /** Stats */
-        src__types__types__Stats: {
+        src__model_types__types__Stats: {
             /** Users */
             users: number;
             /** Statblocks */
@@ -3996,7 +4014,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["src__types__types__Stats"];
+                    "application/json": components["schemas"]["src__model_types__types__Stats"];
                 };
             };
         };
@@ -4657,7 +4675,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["src__types__pf__spell__Spell"][];
+                    "application/json": components["schemas"]["src__model_types__pf__spell__Spell"][];
                 };
             };
             /** @description Validation Error */
@@ -4680,7 +4698,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["src__types__pf__spell__SpellIn"];
+                "application/json": components["schemas"]["src__model_types__pf__spell__SpellIn"];
             };
         };
         responses: {
@@ -4690,7 +4708,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["src__types__pf__spell__Spell"];
+                    "application/json": components["schemas"]["src__model_types__pf__spell__Spell"];
                 };
             };
             /** @description Validation Error */
@@ -4723,7 +4741,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["src__types__pf__spell__Spell"][];
+                    "application/json": components["schemas"]["src__model_types__pf__spell__Spell"][];
                 };
             };
             /** @description Validation Error */
@@ -4754,7 +4772,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["src__types__pf__spell__Spell"];
+                    "application/json": components["schemas"]["src__model_types__pf__spell__Spell"];
                 };
             };
             /** @description Validation Error */
@@ -4779,7 +4797,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["src__types__pf__spell__SpellIn"];
+                "application/json": components["schemas"]["src__model_types__pf__spell__SpellIn"];
             };
         };
         responses: {
@@ -5113,7 +5131,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["src__types__e5__spell__Spell"][];
+                    "application/json": components["schemas"]["src__model_types__e5__spell__Spell"][];
                 };
             };
             /** @description Validation Error */
@@ -5136,7 +5154,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["src__types__e5__spell__SpellIn"];
+                "application/json": components["schemas"]["src__model_types__e5__spell__SpellIn"];
             };
         };
         responses: {
@@ -5146,7 +5164,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["src__types__e5__spell__Spell"];
+                    "application/json": components["schemas"]["src__model_types__e5__spell__Spell"];
                 };
             };
             /** @description Validation Error */
@@ -5179,7 +5197,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["src__types__e5__spell__Spell"][];
+                    "application/json": components["schemas"]["src__model_types__e5__spell__Spell"][];
                 };
             };
             /** @description Validation Error */
@@ -5210,7 +5228,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["src__types__e5__spell__Spell"];
+                    "application/json": components["schemas"]["src__model_types__e5__spell__Spell"];
                 };
             };
             /** @description Validation Error */
@@ -5235,7 +5253,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["src__types__e5__spell__SpellIn"];
+                "application/json": components["schemas"]["src__model_types__e5__spell__SpellIn"];
             };
         };
         responses: {

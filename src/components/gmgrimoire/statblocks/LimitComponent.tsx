@@ -8,7 +8,7 @@ import styles from "./limits.module.scss";
 import Tippy from "@tippyjs/react";
 import { useLongPress } from "../../../helper/hooks.ts";
 
-export type LimitType = components["schemas"]["src__types__base__LimitedUse"];
+export type LimitType = components["schemas"]["src__model_types__base__LimitedUse"];
 
 const BoxLimits = ({ limitValues, itemId }: { limitValues: Limit; itemId: string }) => {
     return (

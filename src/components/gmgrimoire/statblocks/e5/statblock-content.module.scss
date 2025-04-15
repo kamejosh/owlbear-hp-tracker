@@ -60,8 +60,12 @@
 }
 
 .wrapper {
-    height: calc(100% - var(--header-size));
+    height: 100%;
     overflow: hidden;
+
+    @include breakpoint.tablet {
+        height: calc(100% - var(--header-size));
+    }
 }
 
 .actionWrapper {
