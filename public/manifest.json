@@ -13,5 +13,11 @@
         "height": 1000,
         "width": 579
     },
-    "background_url": "/background.html"
+    "background_url": "/background.html",
+    "permissions": [
+        {
+            "name": "clipboard-write",
+            "reason": "copying the dddice room url for sharing with others"
+        }
+    ]
 }
