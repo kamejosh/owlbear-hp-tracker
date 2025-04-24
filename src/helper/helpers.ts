@@ -677,7 +677,7 @@ export const getInitialValues = async (items: Array<Image>, getDarkVision: boole
                                     darkvision: getDarkVision
                                         ? Number(
                                               statblock.senses
-                                                  ?.find((s) => s.includes("darkvision"))
+                                                  ?.find((s) => s.toLowerCase().includes("darkvision"))
                                                   ?.replace(/\D/g, ""),
                                           )
                                         : null,
