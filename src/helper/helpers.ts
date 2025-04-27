@@ -826,7 +826,12 @@ export const prepareTokenForGrimoire = async (contextItems: Array<Image>) => {
                     }
                     item.metadata[itemMetadataKey] = defaultMetadata;
                     if (settings?.assign_ss_darkvision && itemStatblocks[item.id]?.darkvision) {
-                        item.metadata["com.battle-system.smoke/visionDark"] = itemStatblocks[item.id].darkvision;
+                        item.metadata["com.battle-system.smoke/visionDark"] = String(
+                            itemStatblocks[item.id].darkvision,
+                        );
+                        item.metadata["com.battle-system.smoke/visionRange"] = String(
+                            itemStatblocks[item.id].darkvision,
+                        );
                     }
                 }
             });
