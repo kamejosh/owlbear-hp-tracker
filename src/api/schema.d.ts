@@ -72,6 +72,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v2/e5/statblock/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Statblocks */
+        get: operations["list_statblocks_api_v2_e5_statblock__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/e5/spell/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Spells */
+        get: operations["list_spells_api_v2_e5_spell__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/stats/": {
         parameters: {
             query?: never;
@@ -1049,8 +1083,12 @@ export interface components {
             /** Source */
             source?: string | null;
             money?: components["schemas"]["MoneyOut"] | null;
+            /** Id */
+            id: string;
             /** Slug */
             slug: string;
+            /** Version */
+            version?: string | null;
             /** License */
             license?: string | null;
             /**
@@ -1063,6 +1101,28 @@ export interface components {
         ExternalIn: {
             /** Id */
             id: string;
+        };
+        /** Filter[SpellFields] */
+        Filter_SpellFields_: {
+            filter_field: components["schemas"]["SpellFields"];
+            /**
+             * Filter Function
+             * @enum {string}
+             */
+            filter_function: "equals" | "lt" | "lte" | "gt" | "gte" | "contains" | "not";
+            /** Filter Value */
+            filter_value: string | number | boolean;
+        };
+        /** Filter[StatblockFields] */
+        Filter_StatblockFields_: {
+            filter_field: components["schemas"]["StatblockFields"];
+            /**
+             * Filter Function
+             * @enum {string}
+             */
+            filter_function: "equals" | "lt" | "lte" | "gt" | "gte" | "contains" | "not";
+            /** Filter Value */
+            filter_value: string | number | boolean;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -1500,6 +1560,20 @@ export interface components {
             /** Source */
             source?: string | null;
         };
+        /** Pagination[E5StatblockOut] */
+        Pagination_E5StatblockOut_: {
+            /** Page */
+            page: components["schemas"]["E5StatblockOut"][];
+            /** Total */
+            total: number;
+        };
+        /** Pagination[Spell] */
+        Pagination_Spell_: {
+            /** Page */
+            page: components["schemas"]["src__model_types__e5__spell__Spell"][];
+            /** Total */
+            total: number;
+        };
         /**
          * Party
          * @description Represents a Party record
@@ -1692,6 +1766,18 @@ export interface components {
             /** Survival */
             survival?: number | null;
         };
+        /** Sort[SpellFields] */
+        Sort_SpellFields_: {
+            sort_field?: components["schemas"]["SpellFields"] | null;
+            /** Sort Order */
+            sort_order?: ("asc" | "desc") | null;
+        };
+        /** Sort[StatblockFields] */
+        Sort_StatblockFields_: {
+            sort_field?: components["schemas"]["StatblockFields"] | null;
+            /** Sort Order */
+            sort_order?: ("asc" | "desc") | null;
+        };
         /** SpecialAbility */
         "SpecialAbility-Input": {
             /** Name */
@@ -1764,6 +1850,11 @@ export interface components {
             /** Name */
             name: string;
         };
+        /**
+         * SpellFields
+         * @enum {string}
+         */
+        SpellFields: "name" | "desc" | "slug" | "active" | "about" | "level" | "school" | "alignment" | "version";
         /** SpellInfo */
         SpellInfo: {
             /** Name */
@@ -1875,6 +1966,15 @@ export interface components {
             /** Name */
             name: string;
         };
+        /** SpellUpcast */
+        SpellUpcast: {
+            /** Level */
+            level: number;
+            /** Description */
+            description?: string | null;
+            /** Damage */
+            damage?: string | null;
+        };
         /** Spelllist */
         Spelllist: {
             /** Type */
@@ -1895,6 +1995,11 @@ export interface components {
             spells: components["schemas"]["SpellStatblockOut"][];
             limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
         };
+        /**
+         * StatblockFields
+         * @enum {string}
+         */
+        StatblockFields: "name" | "about" | "size" | "type" | "alignment" | "cr" | "challenge_rating" | "version" | "active";
         /** StatblockItemIn */
         StatblockItemIn: {
             /** Equipped */
@@ -2232,6 +2337,8 @@ export interface components {
             created_at: string;
             /** Tags */
             tags: string[];
+            /** Rules */
+            rules: string[];
             /** Name */
             name: string;
             /** Type */
@@ -2667,6 +2774,11 @@ export interface components {
             slug: string;
             /** Active */
             active: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
             /** Name */
             name: string;
             /** Desc */
@@ -2695,6 +2807,8 @@ export interface components {
             dc?: string | null;
             /** Is Attack */
             is_attack?: boolean | null;
+            /** Damage */
+            damage?: string | null;
             /** Level */
             level: number;
             user?: components["schemas"]["User"] | null;
@@ -2707,8 +2821,12 @@ export interface components {
             archetypes?: components["schemas"]["e5_SpellArchetype"][] | null;
             /** Circles */
             circles?: components["schemas"]["e5_SpellCircle"][] | null;
+            /** Upcasts */
+            upcasts?: components["schemas"]["e5_SpellUpcast"][] | null;
             /** License */
             license?: string | null;
+            /** Version */
+            version: string;
             /** E5 Spellschoolid */
             e5_SpellSchoolId: string;
             /** Statblock */
@@ -2781,6 +2899,23 @@ export interface components {
             e5_StatBlockId?: string | null;
             /** Limiteduseid */
             limitedUseId: string;
+        };
+        /**
+         * e5_SpellUpcast
+         * @description Represents a e5_SpellUpcast record
+         */
+        e5_SpellUpcast: {
+            /** Id */
+            id: number;
+            /** Level */
+            level: number;
+            /** Description */
+            description?: string | null;
+            /** Damage */
+            damage?: string | null;
+            spell?: components["schemas"]["e5_Spell"] | null;
+            /** E5 Spellid */
+            e5_SpellId: string;
         };
         /**
          * e5_StatBlock
@@ -2867,6 +3002,8 @@ export interface components {
             source?: string | null;
             /** License */
             license?: string | null;
+            /** Version */
+            version: string;
             /** Active */
             active?: boolean | null;
             user?: components["schemas"]["User"] | null;
@@ -3648,6 +3785,8 @@ export interface components {
             level: number;
             /** Is Attack */
             is_attack?: boolean | null;
+            /** Damage */
+            damage?: string | null;
             /** Dc */
             dc?: string | null;
             school: components["schemas"]["SpellSchool"];
@@ -3657,6 +3796,8 @@ export interface components {
             archetypes?: components["schemas"]["SpellArchetype"][];
             /** Circles */
             circles?: components["schemas"]["SpellCircle"][];
+            /** Upcasts */
+            upcasts?: components["schemas"]["SpellUpcast"][];
             /** Id */
             id: string;
             /** Slug */
@@ -3665,6 +3806,8 @@ export interface components {
             active: boolean;
             /** Source */
             source?: string | null;
+            /** License */
+            license?: string | null;
         };
         /** SpellIn */
         src__model_types__e5__spell__SpellIn: {
@@ -3702,6 +3845,8 @@ export interface components {
             level: number;
             /** Is Attack */
             is_attack?: boolean | null;
+            /** Damage */
+            damage?: string | null;
             /** Dc */
             dc?: string | null;
             /** School */
@@ -3712,6 +3857,8 @@ export interface components {
             archetypes?: string[] | null;
             /** Circles */
             circles?: string[] | null;
+            /** Upcasts */
+            upcasts?: components["schemas"]["SpellUpcast"][] | null;
         };
         /** Spell */
         src__model_types__pf__spell__Spell: {
@@ -3986,6 +4133,74 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_statblocks_api_v2_e5_statblock__get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                sort?: components["schemas"]["Sort_StatblockFields_"][] | null;
+                filter?: components["schemas"]["Filter_StatblockFields_"][] | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Pagination_E5StatblockOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_spells_api_v2_e5_spell__get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                sort?: components["schemas"]["Sort_SpellFields_"][] | null;
+                filter?: components["schemas"]["Filter_SpellFields_"][] | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Pagination_Spell_"];
                 };
             };
             /** @description Validation Error */

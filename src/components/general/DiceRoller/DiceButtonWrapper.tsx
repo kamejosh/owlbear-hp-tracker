@@ -36,6 +36,7 @@ type DiceButtonProps = {
     damageDie?: boolean;
     proficiencyBonus?: number | null;
     classes?: string;
+    spellCastingModifier?: number;
 };
 export const DiceButton = (props: DiceButtonProps) => {
     const [room, taSettings] = useMetadataContext(useShallow((state) => [state.room, state.taSettings]));
@@ -64,13 +65,19 @@ export const DiceButton = (props: DiceButtonProps) => {
     const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
 
     const replaceStatWithMod = (text: string) => {
-        if (
-            room?.ruleset === "e5" &&
-            text.includes("PB") &&
-            !isUndefined(props.proficiencyBonus) &&
-            !isNull(props.proficiencyBonus)
-        ) {
-            text = text.replace("PB", props.proficiencyBonus.toString());
+        if (room?.ruleset === "e5" && text.includes("PB")) {
+            if (!isUndefined(props.proficiencyBonus) && !isNull(props.proficiencyBonus)) {
+                text = text.replace("PB", props.proficiencyBonus.toString());
+            } else {
+                text = text.replace("PB", "0");
+            }
+        }
+        if (room?.ruleset === "e5" && text.includes("SCM")) {
+            if (props.spellCastingModifier) {
+                text = text.replace("SCM", props.spellCastingModifier.toString());
+            } else {
+                text = text.replace("SCM", "0");
+            }
         }
         if (text.includes("STR")) {
             text = text.replace(

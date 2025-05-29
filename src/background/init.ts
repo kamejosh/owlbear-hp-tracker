@@ -31,6 +31,7 @@ import { migrateTo160 } from "../migrations/v160.ts";
 import { migrateTo200 } from "../migrations/v200.ts";
 import { migrateTo300 } from "../migrations/v300.ts";
 import { updateItems } from "../helper/obrHelper.ts";
+import { updateTokenMetadata } from "../helper/tokenHelper.ts";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -84,6 +85,7 @@ const initRoom = async () => {
             ruleset: "e5",
             ignoreUpdateNotification: false,
             disableDiceRoller: false,
+            showUpcast: true,
         };
         ownMetadata[metadataKey] = roomData;
     } else {
@@ -269,6 +271,47 @@ const setupContextMenu = async () => {
                     updateAc(token, metadata);
                 }
             });
+        },
+    });
+
+    await OBR.contextMenu.create({
+        id: `${ID}/gmg-end-turn`,
+        icons: [
+            {
+                icon: "/icon.svg",
+                label: "End Turn",
+                filter: {
+                    every: [
+                        { key: ["metadata", `${itemMetadataKey}`, "hpTrackerActive"], value: true, coordinator: "&&" },
+                        { key: ["metadata", `${itemMetadataKey}`, "isCurrent"], value: true, coordinator: "&&" },
+                        {
+                            key: ["createdUserId"],
+                            value: OBR.player.id,
+                        },
+                    ],
+                    roles: ["PLAYER", "GM"],
+                },
+            },
+            {
+                icon: "/iconPopover.svg",
+                label: "End Turn",
+                filter: {
+                    every: [
+                        { key: ["metadata", `${itemMetadataKey}`, "hp"], value: 0, coordinator: "&&" },
+                        { key: ["metadata", `${itemMetadataKey}`, "isCurrent"], value: true },
+                    ],
+                },
+            },
+        ],
+        onClick: async (context) => {
+            const tokens = context.items;
+            for (const token of tokens) {
+                if (itemMetadataKey in token.metadata) {
+                    const metadata = token.metadata[itemMetadataKey] as GMGMetadata;
+                    metadata.endRound = true;
+                    await updateTokenMetadata(metadata, [token.id]);
+                }
+            }
         },
     });
 };

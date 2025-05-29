@@ -40,6 +40,7 @@ export type GMGMetadata = {
     group?: string;
     playerList?: boolean;
     isCurrent?: boolean;
+    endRound?: boolean;
 };
 
 /**
@@ -72,6 +73,7 @@ export type SceneMetadata = {
     statblockPopoverOpen?: { [key: string]: boolean };
     sortMethod?: SORT;
     enableAutoSort?: boolean;
+    battle?: boolean;
 };
 
 export type DiceUser = {
@@ -99,6 +101,7 @@ export type RoomMetadata = {
     tabletopAlmanacAPIKey?: string;
     disableHpBar?: boolean;
     disableColorGradient?: boolean;
+    showUpcast?: boolean;
 };
 
 export type AttachmentMetadata = {
