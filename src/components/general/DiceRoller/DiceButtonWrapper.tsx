@@ -15,6 +15,7 @@ import "./dice-button-wrapper.scss";
 import { isNull, isUndefined, startsWith } from "lodash";
 import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 import { autoPlacement, safePolygon, useFloating, useHover, useInteractions } from "@floating-ui/react";
+import remarkBreaks from "remark-breaks";
 
 export type Stats = {
     strength: number;
@@ -36,6 +37,7 @@ type DiceButtonProps = {
     damageDie?: boolean;
     proficiencyBonus?: number | null;
     classes?: string;
+    spellCastingModifier?: number;
 };
 export const DiceButton = (props: DiceButtonProps) => {
     const [room, taSettings] = useMetadataContext(useShallow((state) => [state.room, state.taSettings]));
@@ -64,13 +66,19 @@ export const DiceButton = (props: DiceButtonProps) => {
     const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
 
     const replaceStatWithMod = (text: string) => {
-        if (
-            room?.ruleset === "e5" &&
-            text.includes("PB") &&
-            !isUndefined(props.proficiencyBonus) &&
-            !isNull(props.proficiencyBonus)
-        ) {
-            text = text.replace("PB", props.proficiencyBonus.toString());
+        if (room?.ruleset === "e5" && text.includes("PB")) {
+            if (!isUndefined(props.proficiencyBonus) && !isNull(props.proficiencyBonus)) {
+                text = text.replace("PB", props.proficiencyBonus.toString());
+            } else {
+                text = text.replace("PB", "0");
+            }
+        }
+        if (room?.ruleset === "e5" && text.includes("SCM")) {
+            if (props.spellCastingModifier) {
+                text = text.replace("SCM", props.spellCastingModifier.toString());
+            } else {
+                text = text.replace("SCM", "0");
+            }
         }
         if (text.includes("STR")) {
             text = text.replace(
@@ -420,7 +428,7 @@ export const DiceButtonWrapper = ({
                     <div key={index} className={"dice-button-wrapper-part"} style={{ paddingRight: "0.5ch" }}>
                         <Markdown
                             className={"inline-markdown"}
-                            remarkPlugins={[remarkGfm]}
+                            remarkPlugins={[remarkGfm, remarkBreaks]}
                             components={{
                                 p: ({ node, ...props }) => {
                                     return <p style={{ paddingRight: "0.5ch" }}>{props.children}</p>;

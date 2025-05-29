@@ -19,7 +19,7 @@ export type BattleContextActions = {
 export const useBattleContext = create<BattleContextType & BattleContextActions>()(
     persist(
         (set) => ({
-            groups: [],
+            groups: [] as Array<string>,
             current: null,
             battle: false,
             setCurrent: (id) =>

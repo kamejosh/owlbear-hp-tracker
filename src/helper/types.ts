@@ -40,6 +40,7 @@ export type GMGMetadata = {
     group?: string;
     playerList?: boolean;
     isCurrent?: boolean;
+    endRound?: boolean;
 };
 
 /**

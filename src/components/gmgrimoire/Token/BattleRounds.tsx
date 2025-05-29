@@ -10,6 +10,8 @@ import { rest } from "../../../helper/multiTokenHelper.ts";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useShallow } from "zustand/react/shallow";
 import { setPrettySordidActive } from "../../../helper/prettySordidHelpers.ts";
+import { updateTokenMetadata } from "../../../helper/tokenHelper.ts";
+import { delay } from "../../../helper/helpers.ts";
 
 export const BattleRounds = () => {
     const tokens = useTokenListContext(useShallow((state) => state.tokens));
@@ -39,6 +41,22 @@ export const BattleRounds = () => {
             }
         }
     }, [scene?.groups]);
+
+    useEffect(() => {
+        const triggerNext = async () => {
+            if (tokens && current) {
+                const currentData = tokens.get(current);
+                if (currentData && currentData.data.endRound) {
+                    await delay(200); //delay is necessary because of Rate limits
+                    await changeCurrent(1);
+                    await updateTokenMetadata({ ...currentData.data, endRound: false, isCurrent: false }, [
+                        currentData.item.id,
+                    ]);
+                }
+            }
+        };
+        triggerNext();
+    }, [tokens, current]);
 
     const battleTokens = useMemo(() => {
         const tokens = tokensData
