@@ -1,3 +1,19 @@
+# 3.4.0
+
+This update Enables some changes that were made for the SRD 5.2. Statblocks. This wouldn't have been possible without my awesome supporters:
+
++ mpope
++ Bardy McFly
++ Andrew
++ Baron von DM
++ Simple Jack
++ Llfealert
++ somewhatcyclops
+
+Because all the SRD 5.2. Statblocks and Spells were converted by hand it's now possible to upcast spells (only SRD 5.2.) and the statblocks come prepared with limited abilities to track automatically what can be used during the current round.
+
+This update also includes a new features that allows Players to end their turn by right clicking a token they own and selecting "End Turn". Also anybody can end a turn for tokens with 0 HP. This makes it easier to run Play by Post games.
+
 # 3.3.4
 
 + Fix issue where UI elements get placed on a previous position of the Token

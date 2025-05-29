@@ -73,7 +73,6 @@ export type SceneMetadata = {
     statblockPopoverOpen?: { [key: string]: boolean };
     sortMethod?: SORT;
     enableAutoSort?: boolean;
-    battle?: boolean;
 };
 
 export type DiceUser = {
