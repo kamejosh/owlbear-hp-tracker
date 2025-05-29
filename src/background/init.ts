@@ -85,7 +85,6 @@ const initRoom = async () => {
             ruleset: "e5",
             ignoreUpdateNotification: false,
             disableDiceRoller: false,
-            showUpcast: true,
         };
         ownMetadata[metadataKey] = roomData;
     } else {

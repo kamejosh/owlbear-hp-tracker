@@ -15,6 +15,7 @@ import "./dice-button-wrapper.scss";
 import { isNull, isUndefined, startsWith } from "lodash";
 import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 import { autoPlacement, safePolygon, useFloating, useHover, useInteractions } from "@floating-ui/react";
+import remarkBreaks from "remark-breaks";
 
 export type Stats = {
     strength: number;
@@ -427,7 +428,7 @@ export const DiceButtonWrapper = ({
                     <div key={index} className={"dice-button-wrapper-part"} style={{ paddingRight: "0.5ch" }}>
                         <Markdown
                             className={"inline-markdown"}
-                            remarkPlugins={[remarkGfm]}
+                            remarkPlugins={[remarkGfm, remarkBreaks]}
                             components={{
                                 p: ({ node, ...props }) => {
                                     return <p style={{ paddingRight: "0.5ch" }}>{props.children}</p>;

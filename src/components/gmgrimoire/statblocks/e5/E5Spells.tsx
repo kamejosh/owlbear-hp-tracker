@@ -20,6 +20,78 @@ import { addSpellToRollLog } from "../../../../helper/diceHelper.ts";
 import { useRollLogContext } from "../../../../context/RollLogContext.tsx";
 
 type Spell = components["schemas"]["src__model_types__e5__spell__Spell"];
+type Upcast = components["schemas"]["SpellUpcast"];
+
+const Upcast = ({
+    upcastSpell,
+    stats,
+    spell,
+    statblock,
+    spellSlots,
+    tokenData,
+    itemId,
+}: {
+    upcastSpell: Upcast;
+    stats: Stats;
+    spell: Spell;
+    statblock: string;
+    spellSlots?: Array<E5SpellSlot> | null;
+    tokenData?: GMGMetadata;
+    itemId?: string;
+}) => {
+    const statblockContext = useE5StatblockContext();
+
+    const spellLevelLimit = useMemo(() => {
+        if (spellSlots) {
+            return spellSlots?.find((s) => s.level === upcastSpell.level)?.limit;
+        }
+        return undefined;
+    }, [spellSlots, spell]);
+
+    const limitValues = tokenData?.stats.limits?.find((l) => l.id === spellLevelLimit?.name);
+    const limitReached = useMemo(() => {
+        return upcastSpell.level === 0
+            ? false
+            : (limitValues && limitValues.max < limitValues.used + 1) ||
+                  (spellSlots && spellSlots.length > 0 && !spellLevelLimit);
+    }, [spell, limitValues, spellSlots, spellLevelLimit]);
+    return (
+        <>
+            <b>Level {upcastSpell.level}</b>
+            <div>
+                <DiceButtonWrapper
+                    text={upcastSpell.description || ""}
+                    stats={stats}
+                    context={`${capitalize(spell.name)}: Upcast Level ${upcastSpell.level}`}
+                    statblock={statblock}
+                    proficiencyBonus={statblockContext.statblock.proficiency_bonus}
+                />
+            </div>
+            {upcastSpell.damage ? (
+                <div>
+                    <i>Effect:</i>{" "}
+                    {
+                        <DiceButton
+                            dice={upcastSpell.damage}
+                            text={upcastSpell.damage}
+                            context={`${capitalize(spell.name)}: (Level ${upcastSpell.level}) Damage`}
+                            stats={stats}
+                            statblock={statblock}
+                            limitReached={limitReached}
+                            damageDie={true}
+                            onRoll={async () => {
+                                if (itemId && limitValues) {
+                                    await updateLimit(itemId, limitValues);
+                                }
+                            }}
+                            proficiencyBonus={statblockContext.statblock.proficiency_bonus}
+                        />
+                    }
+                </div>
+            ) : null}
+        </>
+    );
+};
 
 const Spell = ({
     spell,
@@ -47,6 +119,7 @@ const Spell = ({
     embedded?: boolean;
 }) => {
     const [open, setOpen] = useState<boolean>(false);
+    const [upcast, setUpcast] = useState<boolean>(false);
     const statblockContext = useE5StatblockContext();
     const room = useMetadataContext(useShallow((state) => state.room));
     const addRoll = useRollLogContext(useShallow((state) => state.addRoll));
@@ -65,7 +138,7 @@ const Spell = ({
         }
     };
 
-    const damage = spell.desc ? getDamage(spell.desc) : null;
+    const damage = spell.damage ?? (spell.desc ? getDamage(spell.desc) : null);
     const spellLevelLimit = useMemo(() => {
         if (!isUndefined(charges)) {
             return charges;
@@ -157,7 +230,7 @@ const Spell = ({
                     ) : null}
                     {damage ? (
                         <span className={styles.spellDamage}>
-                            Damage:{" "}
+                            Effect:{" "}
                             <DiceButton
                                 dice={damage}
                                 text={damage}
@@ -252,6 +325,37 @@ const Spell = ({
                     ) : null}
                 </div>
             </div>
+            {spell.upcasts && spell.upcasts.length > 0 ? (
+                <div>
+                    <div className={styles.upcast}>
+                        <b>Upcast</b>
+                        <button
+                            className={`expand ${upcast ? "open" : null}`}
+                            onClick={() => setUpcast(!upcast)}
+                        ></button>
+                    </div>
+                    <div className={`${styles.spellMoreInfo} ${upcast ? styles.open : null}`}>
+                        <div className={`${styles.moreInfoContent} ${upcast ? styles.micOpen : null}`}>
+                            {spell.upcasts
+                                .sort((a, b) => a.level - b.level)
+                                .map((upcastSpell, index) => {
+                                    return (
+                                        <Upcast
+                                            key={index}
+                                            upcastSpell={upcastSpell}
+                                            stats={stats}
+                                            spell={spell}
+                                            statblock={statblock}
+                                            spellSlots={spellSlots}
+                                            tokenData={tokenData}
+                                            itemId={itemId}
+                                        />
+                                    );
+                                })}
+                        </div>
+                    </div>
+                </div>
+            ) : null}
         </>
     );
 };

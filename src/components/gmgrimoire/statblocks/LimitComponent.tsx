@@ -7,6 +7,7 @@ import remarkGfm from "remark-gfm";
 import styles from "./limits.module.scss";
 import Tippy from "@tippyjs/react";
 import { useLongPress } from "../../../helper/hooks.ts";
+import remarkBreaks from "remark-breaks";
 
 export type LimitType = components["schemas"]["src__model_types__base__LimitedUse"];
 
@@ -140,7 +141,7 @@ export const LimitComponent = ({
                 </div>
             </div>
             {limit.description && !hideDescription ? (
-                <Markdown remarkPlugins={[remarkGfm]}>{limit.description}</Markdown>
+                <Markdown remarkPlugins={[remarkGfm, remarkBreaks]}>{limit.description}</Markdown>
             ) : null}
             {limit.resets && !hideReset ? (
                 <div>

@@ -101,7 +101,6 @@ export type RoomMetadata = {
     tabletopAlmanacAPIKey?: string;
     disableHpBar?: boolean;
     disableColorGradient?: boolean;
-    showUpcast?: boolean;
 };
 
 export type AttachmentMetadata = {
