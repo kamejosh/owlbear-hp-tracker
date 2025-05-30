@@ -75,9 +75,8 @@ export const DiceButton = (props: DiceButtonProps) => {
         if (room?.ruleset === "e5" && text.includes("SCM")) {
             text = text.replace(
                 "SCM",
-                (
-                    Math.max(props.stats.intelligence, props.stats.wisdom, props.stats.charisma) -
-                    (props.proficiencyBonus || 0)
+                Math.floor(
+                    (Math.max(props.stats.intelligence, props.stats.wisdom, props.stats.charisma) - 10) / 2,
                 ).toString(),
             );
         }
