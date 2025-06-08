@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { DiceButton, DiceButtonWrapper, Stats } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { getDamage, updateLimit } from "../../../../helper/helpers.ts";
 import { SpellFilter } from "../SpellFilter.tsx";
-import { capitalize, isUndefined } from "lodash";
+import { capitalize, isNull, isUndefined } from "lodash";
 import { E5SpellSlot } from "../../../../api/e5/useE5Api.ts";
 import { GMGMetadata } from "../../../../helper/types.ts";
 import { useMetadataContext } from "../../../../context/MetadataContext.ts";
@@ -140,7 +140,7 @@ const Spell = ({
 
     const damage = spell.damage ?? (spell.desc ? getDamage(spell.desc) : null);
     const spellLevelLimit = useMemo(() => {
-        if (!isUndefined(charges)) {
+        if (!isUndefined(charges) && !isNull(charges)) {
             return charges;
         } else if (spellSlots) {
             return spellSlots?.find((s) => s.level === spell.level)?.limit;
