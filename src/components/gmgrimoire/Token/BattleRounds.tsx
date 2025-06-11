@@ -5,7 +5,7 @@ import Tippy from "@tippyjs/react";
 import { GMGMetadata, SORT } from "../../../helper/types.ts";
 import OBR, { Image } from "@owlbear-rodeo/sdk";
 import { isEqual, isUndefined } from "lodash";
-import { destroyIndicator, setIndicator } from "../../../helper/currentHelper.ts";
+import { destroyIndicator, notifyNextPlayer, setIndicator } from "../../../helper/currentHelper.ts";
 import { rest } from "../../../helper/multiTokenHelper.ts";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useShallow } from "zustand/react/shallow";
@@ -17,7 +17,7 @@ export const BattleRounds = () => {
     const tokens = useTokenListContext(useShallow((state) => state.tokens));
     const [scene, taSettings] = useMetadataContext(useShallow((state) => [state.scene, state.taSettings]));
     const [hold, setHold] = useState<boolean>(false);
-    const [groups, setGroups, current, setCurrent, battle, setBattle] = useBattleContext(
+    const [groups, setGroups, current, setCurrent, battle, setBattle, setNext] = useBattleContext(
         useShallow((state) => [
             state.groups,
             state.setGroups,
@@ -25,6 +25,7 @@ export const BattleRounds = () => {
             state.setCurrent,
             state.battle,
             state.setBattle,
+            state.setNext,
         ]),
     );
     const tokensData: Array<{ data: GMGMetadata; item: Image }> = tokens
@@ -49,9 +50,10 @@ export const BattleRounds = () => {
                 if (currentData && currentData.data.endRound) {
                     await delay(200); //delay is necessary because of Rate limits
                     await changeCurrent(1);
-                    await updateTokenMetadata({ ...currentData.data, endRound: false, isCurrent: false }, [
-                        currentData.item.id,
-                    ]);
+                    await updateTokenMetadata(
+                        { ...currentData.data, endRound: false, isCurrent: false, isNext: false },
+                        [currentData.item.id],
+                    );
                 }
             }
         };
@@ -98,6 +100,7 @@ export const BattleRounds = () => {
         setBattle(false);
         setBattleRound(1);
         setCurrent(null);
+        setNext(null);
         destroyIndicator();
         rest(
             battleTokens.map((b) => b.item),
@@ -131,6 +134,7 @@ export const BattleRounds = () => {
         setHold(true);
         await setIndicator(newCurrent);
         await setPrettySordidActive(current, newCurrent.id, taSettings);
+        setNext(await notifyNextPlayer(nextIndex + 1, battleTokens, taSettings));
         setTimeout(() => {
             setHold(false);
         }, 500);

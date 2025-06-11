@@ -1,3 +1,10 @@
+# 3.4.1
+
++ Fix Spell Casting Modifier calculation
+  + You can now use SCM as variable in your dice notation to reference the statblocks spell casting modifier
++ Fix embedded spells now correctly use spell slots or charges depending on item settings
++ Add option to notify the next player in the initiative order (Setting on Tabletop Almanac)
+
 # 3.4.0
 
 This update Enables some changes that were made for the SRD 5.2. Statblocks. This wouldn't have been possible without my awesome supporters:

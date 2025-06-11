@@ -5,6 +5,7 @@ import { ID } from "../helper/variables.ts";
 export type BattleContextType = {
     groups: Array<string>;
     current: string | null;
+    next: string | null;
     battle: boolean;
 };
 
@@ -13,6 +14,7 @@ export type BattleContextActions = {
     removeGroup: (group: string) => void;
     setGroups: (groups: string[]) => void;
     setCurrent: (id: string | null) => void;
+    setNext: (id: string | null) => void;
     setBattle: (battle: boolean) => void;
 };
 
@@ -21,10 +23,15 @@ export const useBattleContext = create<BattleContextType & BattleContextActions>
         (set) => ({
             groups: [] as Array<string>,
             current: null,
+            next: null,
             battle: false,
             setCurrent: (id) =>
                 set(() => {
                     return { current: id };
+                }),
+            setNext: (id) =>
+                set(() => {
+                    return { next: id };
                 }),
             addGroup: (group) =>
                 set((state) => {

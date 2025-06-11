@@ -1,6 +1,9 @@
 import OBR, { buildShape, Image, Shape } from "@owlbear-rodeo/sdk";
-import { getImageBounds } from "./helpers.ts";
+import { getImageBounds, modulo } from "./helpers.ts";
 import { addItems, deleteItems, updateItems } from "./obrHelper.ts";
+import { UserSettings } from "../api/tabletop-almanac/useUser.ts";
+import { GMGMetadata } from "./types.ts";
+import { nextTurnChannel } from "./variables.ts";
 
 const indicatorName = "GM's Grimoire - Indicator";
 
@@ -59,4 +62,29 @@ export const destroyIndicator = async () => {
     if (items.length > 0) {
         await deleteItems(items.map((i) => i.id));
     }
+};
+
+export const notifyNextPlayer = async (
+    nextIndex: number,
+    battleTokens: Array<{ data: GMGMetadata; item: Image }>,
+    taSettings: UserSettings,
+) => {
+    if (taSettings.notify_next_turn) {
+        let nextToken: { data: GMGMetadata; item: Image };
+        if (nextIndex >= 0 && nextIndex < battleTokens.length) {
+            nextToken = battleTokens[nextIndex];
+        } else if (nextIndex < 0) {
+            nextToken = battleTokens[battleTokens.length - 1];
+        } else {
+            nextToken = battleTokens[modulo(nextIndex, battleTokens.length)];
+        }
+        if (nextToken.item.createdUserId !== OBR.player.id) {
+            await OBR.broadcast.sendMessage(nextTurnChannel, {
+                name: await OBR.player.getName(),
+                playerId: nextToken.item.createdUserId,
+            });
+            return nextToken.item.id;
+        }
+    }
+    return null;
 };

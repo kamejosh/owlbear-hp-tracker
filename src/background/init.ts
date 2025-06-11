@@ -1,5 +1,5 @@
 import OBR, { Image, Metadata } from "@owlbear-rodeo/sdk";
-import { ID, itemMetadataKey, metadataKey, version } from "../helper/variables.ts";
+import { ID, itemMetadataKey, metadataKey, nextTurnChannel, version } from "../helper/variables.ts";
 import { compare } from "compare-versions";
 import {
     ACItemChanges,
@@ -380,12 +380,26 @@ const initTokens = async () => {
     });
 };
 
+const initMessageBus = async () => {
+    OBR.broadcast.onMessage(nextTurnChannel, (event) => {
+        const data = event.data as { name: string; playerId: string };
+        if (data.playerId === OBR.player.id) {
+            OBR.notification.show(`Heads up ${data.name}! You're next in initiative!`, "WARNING");
+        }
+    });
+};
+
 OBR.onReady(async () => {
     console.info(`GM's Grimoire - version ${version} initializing`);
     try {
         await setupContextMenu();
     } catch (e) {
         console.warn("GM's Grimoire - error while setting up context menu");
+    }
+    try {
+        await initMessageBus();
+    } catch (e) {
+        console.warn("GM's Grimoire - error while setting up message bus");
     }
 
     if ((await OBR.player.getRole()) === "GM") {

@@ -34,7 +34,8 @@ export const Token = (props: TokenProps) => {
     const token = useTokenListContext(useShallow((state) => state.tokens?.get(props.id)));
     const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
-    const current = useBattleContext(useShallow((state) => state.current));
+    const [current, next] = useBattleContext(useShallow((state) => [state.current, state.next]));
+    const showNext = item.createdUserId === playerContext.id && data.isNext;
     const start = useRef<number>(0);
 
     useEffect(() => {
@@ -52,11 +53,14 @@ export const Token = (props: TokenProps) => {
     useEffect(() => {
         if (
             playerContext.role === "GM" &&
-            ((!data.isCurrent && current === item.id) || (!!data.isCurrent && current !== item.id))
+            ((!data.isCurrent && current === item.id) ||
+                (!!data.isCurrent && current !== item.id) ||
+                (!data.isNext && next === item.id) ||
+                (!!data.isNext && next !== item.id))
         ) {
-            updateTokenMetadata({ ...data, isCurrent: current === item.id }, [props.id]);
+            updateTokenMetadata({ ...data, isCurrent: current === item.id, isNext: next === item.id }, [props.id]);
         }
-    }, [current, playerContext]);
+    }, [current, next, playerContext]);
 
     useEffect(() => {
         if (data.isCurrent && containerRef.current) {
@@ -182,7 +186,7 @@ export const Token = (props: TokenProps) => {
             ref={containerRef}
             className={`token ${playerContext.role === "PLAYER" ? "player" : ""} ${
                 props.selected ? "selected" : ""
-            } ${component} ${data.isCurrent ? "current" : ""}`}
+            } ${component} ${data.isCurrent ? "current" : ""} ${showNext ? "next" : ""}`}
             style={{
                 background: `linear-gradient(to right, ${getBgColor(data)}, #1C1B22 50%, #1C1B22 )`,
             }}

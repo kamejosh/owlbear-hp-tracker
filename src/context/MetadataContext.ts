@@ -21,6 +21,7 @@ export const useMetadataContext = create<MetadataContextType>()((set) => ({
         sync_pretty_sordid: false,
         default_groups: [],
         assign_ss_darkvision: false,
+        notify_next_turn: false,
         default_token_settings: {
             hpOnMap: false,
             acOnMap: false,

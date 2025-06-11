@@ -39,6 +39,10 @@
         outline: 1px solid #ffffff88;
     }
 
+    &.next {
+        outline: 1px solid yellow;
+    }
+
     &.current {
         outline: 1px solid red;
     }

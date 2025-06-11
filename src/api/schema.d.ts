@@ -1719,6 +1719,11 @@ export interface components {
             /** Default Groups */
             default_groups?: string[];
             default_token_settings?: components["schemas"]["TokenSettings"] | null;
+            /**
+             * Notify Next Turn
+             * @default false
+             */
+            notify_next_turn: boolean;
         };
         /** Skill */
         Skill: {
@@ -2926,6 +2931,11 @@ export interface components {
             id: string;
             /** Slug */
             slug: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
             /** External Id */
             external_id?: string | null;
             /** Name */
