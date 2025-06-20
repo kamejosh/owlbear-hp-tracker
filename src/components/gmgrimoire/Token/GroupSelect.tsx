@@ -3,6 +3,9 @@ import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { GMGMetadata } from "../../../helper/types.ts";
 import { updateTokenMetadata } from "../../../helper/tokenHelper.ts";
 import style from "./group-select.module.scss";
+import OBR from "@owlbear-rodeo/sdk";
+import { updateItems } from "../../../helper/obrHelper.ts";
+import { itemMetadataKey } from "../../../helper/variables.ts";
 
 export const GroupSelect = ({ id, onSelect, data }: { id: string; onSelect: () => void; data: GMGMetadata }) => {
     const [scene] = useMetadataContext(useShallow((state) => [state.scene]));
@@ -12,9 +15,21 @@ export const GroupSelect = ({ id, onSelect, data }: { id: string; onSelect: () =
             <b>Select Group for Token</b>
             <select
                 value={data.group || "Default"}
-                onChange={(e) => {
+                onChange={async (e) => {
+                    const targetGroup = e.currentTarget.value;
+                    const playerSelection = await OBR.player.getSelection();
+                    if (playerSelection && playerSelection.length > 0) {
+                        await updateItems(playerSelection, (items) => {
+                            items.forEach((item) => {
+                                const data = item.metadata[itemMetadataKey] as GMGMetadata;
+                                data.group = targetGroup;
+                                item.metadata[itemMetadataKey] = { ...data };
+                            });
+                        });
+                    } else {
+                        void updateTokenMetadata({ ...data, group: targetGroup }, [id]);
+                    }
                     onSelect();
-                    void updateTokenMetadata({ ...data, group: e.currentTarget.value }, [id]);
                 }}
             >
                 {scene?.groups?.map((option, index) => {
