@@ -22,8 +22,10 @@ export const GroupSelect = ({ id, onSelect, data }: { id: string; onSelect: () =
                         await updateItems(playerSelection, (items) => {
                             items.forEach((item) => {
                                 const data = item.metadata[itemMetadataKey] as GMGMetadata;
-                                data.group = targetGroup;
-                                item.metadata[itemMetadataKey] = { ...data };
+                                if (data && data.hpTrackerActive) {
+                                    data.group = targetGroup;
+                                    item.metadata[itemMetadataKey] = { ...data };
+                                }
                             });
                         });
                     } else {
