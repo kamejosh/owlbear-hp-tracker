@@ -80,7 +80,7 @@ export const notifyNextPlayer = async (
         }
         if (nextToken.item.createdUserId !== OBR.player.id) {
             await OBR.broadcast.sendMessage(nextTurnChannel, {
-                name: await OBR.player.getName(),
+                name: (await OBR.party.getPlayers()).find((p) => p.id === nextToken.item.createdUserId)?.name ?? "",
                 playerId: nextToken.item.createdUserId,
             });
             return nextToken.item.id;
