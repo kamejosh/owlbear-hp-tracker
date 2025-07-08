@@ -381,7 +381,7 @@ export const DiceButtonWrapper = ({
         const diceCopy = Array.from(dice);
         diceCopy?.forEach((die) => {
             if (!die.startsWith("`")) {
-                const diceSplitter = new RegExp("[^`]" + die + "[^`]");
+                const diceSplitter = new RegExp("(?<!`)" + die.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(?!`)");
                 text = text.split(diceSplitter).join("|||");
             } else {
                 dice.splice(
@@ -392,7 +392,6 @@ export const DiceButtonWrapper = ({
         });
     }
     const parts = text.split("|||");
-
     return (
         <div className={"dice-button-wrapper"}>
             {parts.map((part, index) => {
