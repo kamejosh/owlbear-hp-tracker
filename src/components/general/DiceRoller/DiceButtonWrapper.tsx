@@ -12,7 +12,7 @@ import { useShallow } from "zustand/react/shallow";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import "./dice-button-wrapper.scss";
-import { isNull, isUndefined, startsWith } from "lodash";
+import { isNull, isUndefined, startsWith, toNumber } from "lodash";
 import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 import { autoPlacement, safePolygon, useFloating, useHover, useInteractions } from "@floating-ui/react";
 import remarkBreaks from "remark-breaks";
@@ -194,6 +194,15 @@ export const DiceButton = (props: DiceButtonProps) => {
                                 const maxRoll = Number(dc) * Number(dices[index]);
                                 modifiedDice += `${dc}d${dices[index]} + ${maxRoll} `;
                             });
+                        } else if (taSettings.crit_rules === "savage_roll") {
+                            modifiedDice = "2*(";
+                            diceCounts.forEach((dc, index) => {
+                                if (index > 0) {
+                                    modifiedDice += "+";
+                                }
+                                modifiedDice += `${toNumber(dc) * 2}d${dices[index]}kh${dc}`;
+                            });
+                            modifiedDice += ")";
                         }
 
                         if (modifiers) {

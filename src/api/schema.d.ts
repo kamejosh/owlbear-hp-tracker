@@ -1695,7 +1695,7 @@ export interface components {
              * @default none
              * @enum {string}
              */
-            crit_rules: "none" | "double_dice" | "double_role" | "max_roll";
+            crit_rules: "none" | "double_dice" | "double_role" | "max_roll" | "savage_roll";
             /**
              * Death Saves
              * @default false
