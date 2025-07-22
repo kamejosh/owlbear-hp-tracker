@@ -159,12 +159,23 @@ export const DiceButton = (props: DiceButtonProps) => {
                 modifiedDice = addModifier(dice, "2d20dh1");
             } else if (modifier && modifier === "CRIT") {
                 label = label.substring(0, label.indexOf(":")) + ": Critical Damage";
-                const diceCountsRegx = /\d+(?=d\d)/gi;
-                const dicesRegx = /(?<=\dd)(\d+)/gi;
-                const modifierRegx = /(?<=d\d+( ?))([+-]{1}( ?)\d+)(?!d\d)/gi;
-                const diceCounts = modifiedDice.match(diceCountsRegx);
-                const dices = modifiedDice.match(dicesRegx);
+                const diceCounts: Array<string> = [];
+                const dices: Array<string> = [];
+                const diceRegx = /(?:\d+)?d\d+/gi;
+                const modifierRegx = /(?<=[d\d\s])([+-]\s*\d+)(?!\s*d\d)/gi;
+                const fullDice = modifiedDice.match(diceRegx);
+                fullDice?.forEach((fullDie) => {
+                    const parts = fullDie.split("d");
+                    if (parts.length === 2) {
+                        diceCounts.push(parts[0] === "" ? "1" : parts[0]);
+                        dices.push(parts[1]);
+                    } else {
+                        diceCounts.push("1");
+                        dices.push(parts[0]);
+                    }
+                });
                 const modifiers = modifiedDice.match(modifierRegx);
+
                 try {
                     if (diceCounts && dices && diceCounts.length === dices.length) {
                         if (taSettings.crit_rules === "double_dice") {
@@ -209,7 +220,9 @@ export const DiceButton = (props: DiceButtonProps) => {
                             modifiedDice += " " + modifiers.join(" ");
                         }
                     }
-                } catch {}
+                } catch (e) {
+                    console.error(e);
+                }
             }
 
             let rollResult = null;
