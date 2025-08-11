@@ -144,6 +144,38 @@
                 font-weight: bold;
                 line-height: 1;
             }
+
+            .battle-round-button {
+                position: relative;
+
+                &.back,
+                &.next {
+                    &::after {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        opacity: 0.3;
+                        background-color: lightgray;
+                        width: 0;
+                        height: 100%;
+                        pointer-events: none;
+                        content: "";
+                    }
+                    &.pressing {
+                        &::after {
+                            transition: width 0.5s;
+                            width: 100%;
+                        }
+                    }
+                }
+
+                &.back {
+                    &::after {
+                        right: 0;
+                        left: auto;
+                    }
+                }
+            }
         }
     }
 

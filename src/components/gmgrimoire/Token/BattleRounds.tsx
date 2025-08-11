@@ -12,6 +12,7 @@ import { useShallow } from "zustand/react/shallow";
 import { setPrettySordidActive } from "../../../helper/prettySordidHelpers.ts";
 import { updateTokenMetadata } from "../../../helper/tokenHelper.ts";
 import { delay } from "../../../helper/helpers.ts";
+import { useLongPress } from "../../../helper/hooks.ts";
 
 export const BattleRounds = () => {
     const tokens = useTokenListContext(useShallow((state) => state.tokens));
@@ -120,11 +121,11 @@ export const BattleRounds = () => {
         if (nextIndex >= 0 && nextIndex < battleTokens.length) {
             newCurrent = battleTokens[currentTokenIndex + mod].item;
         } else if (nextIndex < 0) {
-            newCurrent = battleTokens[battleTokens.length - 1].item;
-            setBattleRound(battleRound + mod);
+            newCurrent = battleTokens[(nextIndex % battleTokens.length) + battleTokens.length].item;
+            setBattleRound(battleRound - 1);
         } else {
-            newCurrent = battleTokens[0].item;
-            setBattleRound(battleRound + mod);
+            newCurrent = battleTokens[nextIndex % battleTokens.length].item;
+            setBattleRound(battleRound + 1);
             await rest(
                 battleTokens.map((b) => b.item),
                 "Round",
@@ -139,6 +140,17 @@ export const BattleRounds = () => {
             setHold(false);
         }, 500);
     };
+
+    const onLongPressNext = useLongPress(
+        async () => await changeCurrent(battleTokens.length),
+        async () => await changeCurrent(1),
+        500,
+    );
+    const onLongPressBack = useLongPress(
+        async () => await changeCurrent(-battleTokens.length),
+        async () => await changeCurrent(-1),
+        500,
+    );
 
     return (
         <div
@@ -173,23 +185,11 @@ export const BattleRounds = () => {
                 </Tippy>
             ) : (
                 <>
-                    <button
-                        className={"button"}
-                        disabled={hold}
-                        onClick={async () => {
-                            await changeCurrent(-1);
-                        }}
-                    >
+                    <button className={"button battle-round-button back"} disabled={hold} {...onLongPressBack}>
                         Back
                     </button>
                     <span className={"battle-round"}>{battleRound}</span>
-                    <button
-                        className={"button"}
-                        disabled={hold}
-                        onClick={async () => {
-                            await changeCurrent(+1);
-                        }}
-                    >
+                    <button className={"button battle-round-button next"} disabled={hold} {...onLongPressNext}>
                         Next
                     </button>
                     <button
