@@ -58,7 +58,7 @@ export const Initiative = ({ id }: { id: string }) => {
                 text={Intl.NumberFormat("en-US", { signDisplay: "always" }).format(data.stats.initiativeBonus)}
                 context={"Initiative: Roll"}
                 stats={defaultStats}
-                statblock={data.sheet || getTokenName(item)}
+                statblock={getTokenName(item) ?? data.sheet}
                 onRoll={async (rollResult) => {
                     let initiative = 0;
                     try {

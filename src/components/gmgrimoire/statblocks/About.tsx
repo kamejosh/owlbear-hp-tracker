@@ -4,6 +4,7 @@ import { DiceButtonWrapper, Stats } from "../../general/DiceRoller/DiceButtonWra
 import { E5Statblock } from "../../../api/e5/useE5Api.ts";
 import { PfStatblock } from "../../../api/pf/usePfApi.ts";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
+import { useE5StatblockContext } from "../../../context/E5StatblockContext.tsx";
 
 export const About = ({
     about,
@@ -23,6 +24,7 @@ export const About = ({
     hideTitle?: boolean;
 }) => {
     const room = useMetadataContext.getState().room;
+    const { tokenName } = useE5StatblockContext();
     const [open, setOpen] = useLocalStorage<boolean>(`${ID}.about.${slug}`, !!defaultOpen);
     return about ? (
         <div className={`about ${hideTitle ? "no-title" : ""}`}>
@@ -33,7 +35,7 @@ export const About = ({
                     <DiceButtonWrapper
                         text={about}
                         context={context || statblock?.name || "Custom Roll"}
-                        statblock={statblock?.name}
+                        statblock={tokenName ?? statblock?.name}
                         stats={
                             stats || {
                                 strength: statblock?.stats.strength || 0,
