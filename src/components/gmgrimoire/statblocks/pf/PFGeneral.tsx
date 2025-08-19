@@ -4,7 +4,7 @@ import { capitalize } from "lodash";
 import styles from "./statblock-general.module.scss";
 import { AC } from "../../Token/AC.tsx";
 import { usePFStatblockContext } from "../../../../context/PFStatblockContext.tsx";
-import { About } from "../About.tsx";
+import { PFAbout } from "../About.tsx";
 
 const statList = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 const saveList = ["reflex", "will", "fortitude"];
@@ -137,7 +137,7 @@ export const PFGeneral = () => {
                     <LineBreak />
                 </>
             ) : null}
-            <About
+            <PFAbout
                 slug={statblock.slug}
                 about={statblock.about}
                 stats={stats}
