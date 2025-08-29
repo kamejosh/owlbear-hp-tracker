@@ -9,7 +9,7 @@ tags:
   - tool
   - automation
   - dice
-manifest: https://hp-tracker.bitperfect-software.com/manifest.json
+manifest: https://gmg.tabletop-almanac.com/manifest.json
 learn-more: https://github.com/kamejosh/owlbear-hp-tracker
 ---
 
