@@ -1,6 +1,6 @@
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { IRoll, parseRollEquation } from "dddice-js";
@@ -12,7 +12,7 @@ import { useShallow } from "zustand/react/shallow";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import "./dice-button-wrapper.scss";
-import { isNull, isUndefined, startsWith, toNumber } from "lodash";
+import { isNull, isUndefined, toNumber } from "lodash";
 import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 import { autoPlacement, safePolygon, useFloating, useHover, useInteractions } from "@floating-ui/react";
 import remarkBreaks from "remark-breaks";
@@ -287,9 +287,8 @@ export const DiceButton = (props: DiceButtonProps) => {
                     ? "Dice Roller is not initialized"
                     : props.limitReached
                       ? "You have reached your limits for this ability"
-                      : ""
+                      : props.text
             }
-            disabled={!(!initialized && !room?.disableDiceRoller) && !props.limitReached}
         >
             <span
                 className={`button-wrapper ${props.classes} ${isEnabled() ? "enabled" : "disabled"} ${
@@ -378,6 +377,28 @@ export const DiceButton = (props: DiceButtonProps) => {
     );
 };
 
+const wrapDiceWithBackticks = (input: string): string => {
+    // Match full dice expressions OR standalone modifiers like +1/-2
+    // const diceRegex = /\d+d\d+(?:\s*[+\-]\s*(?:\d+d\d+|\d+|[A-Za-z]{2,3}))*|[+\-]\d+/g;
+    const diceRegex =
+        /(?:\d+d\d+|[A-Z]{2,3}d\d+|[A-Z]{2,3})(?:\s*[+\-]\s*(?:\d+d\d+|[A-Z]{2,3}d\d+|[A-Z]{2,3}|\d+))*|\b[+\-]\d+\b|[+\-]\d+/g;
+    // Split into code spans and non-code spans. Keep code spans in the result.
+    // This also captures fenced blocks ```...``` so we don't touch them.
+    const splitRe = /(```[\s\S]*?```|`[^`]*`)/g;
+
+    return input
+        .split(splitRe)
+        .map((part) => {
+            // If this is a code span or fenced block, leave unchanged
+            if (!part) return part;
+            if (part.startsWith("`") && part.endsWith("`")) return part;
+
+            // Non-code: wrap matches with backticks
+            return part.replace(diceRegex, (m) => `\`${m}\``);
+        })
+        .join("");
+};
+
 export const DiceButtonWrapper = ({
     text,
     context,
@@ -397,91 +418,39 @@ export const DiceButtonWrapper = ({
     damageDie?: boolean;
     proficiencyBonus?: number | null;
 }) => {
-    const regex = /`?((\d*?d\d+)(( ?[\+\-] ?((\d+)|([A-Z]{3})))?)|( [\+\-]\d+))`?/g;
-    const dice = text.match(regex);
-    if (dice) {
-        const diceCopy = Array.from(dice);
-        diceCopy?.forEach((die) => {
-            if (!die.startsWith("`")) {
-                const diceSplitter = new RegExp("(?<!`)" + die.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(?!`)");
-                text = text.split(diceSplitter).join("|||");
-            } else {
-                dice.splice(
-                    dice.findIndex((d) => d === die),
-                    1,
-                );
-            }
-        });
-    }
-    const parts = text.split("|||");
+    const processed = useMemo(() => wrapDiceWithBackticks(text), [text]);
     return (
         <div className={"dice-button-wrapper"}>
-            {parts.map((part, index) => {
-                let diceField = null;
-                if (dice && dice.length >= index && dice[index]) {
-                    if (startsWith(dice[index], "`")) {
-                        part += dice[index];
-                    } else {
-                        let die = dice[index];
-                        const text = die.replace(" ", "");
-                        if (text.startsWith("DC")) {
-                            die = `1d20>${parseInt(die.substring(3))}`;
-                        } else if (text.startsWith("+") || text.startsWith("-")) {
-                            die = `1d20${die}`;
-                        }
-                        diceField = (
-                            <DiceButton
-                                dice={die}
-                                text={text}
-                                context={context}
-                                stats={stats}
-                                statblock={statblock}
-                                onRoll={onRoll}
-                                limitReached={limitReached}
-                                damageDie={damageDie}
-                                proficiencyBonus={proficiencyBonus}
-                            />
-                        );
-                    }
-                }
-
-                return (
-                    <div key={index} className={"dice-button-wrapper-part"} style={{ paddingRight: "0.5ch" }}>
-                        <Markdown
-                            className={"inline-markdown"}
-                            remarkPlugins={[remarkGfm, remarkBreaks]}
-                            components={{
-                                p: ({ node, ...props }) => {
-                                    return <p style={{ paddingRight: "0.5ch" }}>{props.children}</p>;
-                                },
-                                code: ({ node, ...props }) => {
-                                    try {
-                                        const diceMatches = String(props.children).match(regex);
-                                        if (diceMatches) {
-                                            return (
-                                                <DiceButton
-                                                    dice={props.children?.toString() || ""}
-                                                    text={props.children?.toString() || ""}
-                                                    context={context}
-                                                    stats={stats}
-                                                    statblock={statblock}
-                                                    onRoll={onRoll}
-                                                    limitReached={limitReached}
-                                                    damageDie={damageDie}
-                                                    proficiencyBonus={proficiencyBonus}
-                                                />
-                                            );
-                                        }
-                                    } catch {}
-                                },
-                            }}
-                        >
-                            {part}
-                        </Markdown>
-                        {diceField}
-                    </div>
-                );
-            })}
+            <div className={"dice-button-wrapper-part"} style={{ paddingRight: "0.5ch" }}>
+                <Markdown
+                    className={"inline-markdown"}
+                    remarkPlugins={[remarkGfm, remarkBreaks]}
+                    components={{
+                        p: ({ node, ...props }) => {
+                            return <p style={{ paddingRight: "0.5ch" }}>{props.children}</p>;
+                        },
+                        code: ({ node, ...props }) => {
+                            try {
+                                return (
+                                    <DiceButton
+                                        dice={props.children?.toString() || ""}
+                                        text={props.children?.toString() || ""}
+                                        context={context}
+                                        stats={stats}
+                                        statblock={statblock}
+                                        onRoll={onRoll}
+                                        limitReached={limitReached}
+                                        damageDie={damageDie}
+                                        proficiencyBonus={proficiencyBonus}
+                                    />
+                                );
+                            } catch {}
+                        },
+                    }}
+                >
+                    {processed}
+                </Markdown>
+            </div>
         </div>
     );
 };
