@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
 import { GMGMetadata } from "../../../helper/types.ts";
@@ -14,6 +14,7 @@ import { useShallow } from "zustand/react/shallow";
 import { setPrettySordidInitiative } from "../../../helper/prettySordidHelpers.ts";
 import { DiceButton } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { defaultStats } from "../../../helper/variables.ts";
+
 export const Initiative = ({ id }: { id: string }) => {
     const playerContext = usePlayerContext();
     const initRef = useRef<HTMLInputElement>(null);
@@ -22,6 +23,16 @@ export const Initiative = ({ id }: { id: string }) => {
     const token = useTokenListContext(useShallow((state) => state.tokens?.get(id)));
     const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
+
+    const customDiceTheme = useMemo(() => {
+        if (item.createdUserId != playerContext.id) {
+            const diceUser = room?.diceUser?.find((u) => u.playerId == item.createdUserId);
+            if (diceUser) {
+                return diceUser.diceTheme;
+            }
+            return undefined;
+        }
+    }, [item, playerContext, room]);
 
     useEffect(() => {
         if (initRef && initRef.current) {
@@ -73,6 +84,7 @@ export const Initiative = ({ id }: { id: string }) => {
                     await setPrettySordidInitiative(id, taSettings, initiative);
                 }}
                 classes={"init-wrapper"}
+                customDiceThemeId={customDiceTheme}
             />
 
             <Tippy content={"Set initiative bonus"}>

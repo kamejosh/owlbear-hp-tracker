@@ -17,7 +17,7 @@ export const nextTurnChannel = `${ID}.next-turn`;
 
 export const prettySordidID = "com.pretty-initiative";
 
-export const version = "3.4.1";
+export const version = "3.4.2";
 
 export const changelogModal: Modal = {
     id: modalId,

@@ -39,6 +39,7 @@ import { BattleSvg } from "../svgs/BattleSvg.tsx";
 import "./drop-group.scss";
 import { updateItems } from "../../helper/obrHelper.ts";
 import { useShallow } from "zustand/react/shallow";
+import { isUndefined } from "lodash";
 
 type DropGroupProps = {
     title: string;
@@ -51,8 +52,8 @@ export const DropGroup = (props: DropGroupProps) => {
     const [room, scene, taSettings] = useMetadataContext(
         useShallow((state) => [state.room, state.scene, state.taSettings]),
     );
-    const [rollerApi, initialized, theme] = useDiceRoller(
-        useShallow((state) => [state.rollerApi, state.initialized, state.theme]),
+    const [rollerApi, initialized, theme, themes] = useDiceRoller(
+        useShallow((state) => [state.rollerApi, state.initialized, state.theme, state.themes]),
     );
     const [groups, addGroup, removeGroup] = useBattleContext(
         useShallow((state) => [state.groups, state.addGroup, state.removeGroup]),
@@ -97,9 +98,12 @@ export const DropGroup = (props: DropGroupProps) => {
         }
     };
 
-    const roll = async (dice: string, statblock: string, hidden: boolean, id: string) => {
+    const roll = async (dice: string, statblock: string, hidden: boolean, id: string, customThemeId?: string) => {
         if (room && theme) {
-            let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined = diceToRoll(dice, theme.id);
+            let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined = diceToRoll(
+                dice,
+                customThemeId ?? theme.id,
+            );
             if (parsed) {
                 const r = await rollerApi?.roll.create(parsed.dice, {
                     operator: parsed.operator,
@@ -131,7 +135,14 @@ export const DropGroup = (props: DropGroupProps) => {
             const data = item.metadata[itemMetadataKey] as GMGMetadata;
             const dice = `1d${room?.initiativeDice ?? 20}+${data.stats.initiativeBonus}`;
             if (getRoomDiceUser(room, OBR.player.id)?.diceRendering && !room?.disableDiceRoller) {
-                promises.push(roll(dice, getTokenName(item), hidden, item.id));
+                let customThemeId = undefined;
+                if (OBR.player.id !== item.createdUserId) {
+                    const diceUser = room?.diceUser?.find((u) => u.playerId == item.createdUserId);
+                    if (diceUser && !isUndefined(themes?.findIndex((t) => t.id === diceUser.diceTheme))) {
+                        customThemeId = diceUser.diceTheme;
+                    }
+                }
+                promises.push(roll(dice, getTokenName(item), hidden, item.id, customThemeId));
             } else {
                 promises.push(diceLessRoll(dice, getTokenName(item), hidden, item.id));
             }

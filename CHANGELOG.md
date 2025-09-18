@@ -1,3 +1,18 @@
+# 3.4.2
+
++ Allow group select for multiple selected tokens
++ Fix wrong name is shown when notifying a player that they are next
++ Add option for savage criticals
++ Add long press to skip a round
++ Rolls now show token names and not statblock names
++ Fix About parsing for pathfinder
++ Update extension url
++ Improve dice parsing to allow more dice options like STRd4 to roll as many d4s as you strenght bonus
++ Improve initiative rolling
+  + Rolls for groups take player dice themes into account if they selected a different dice theme
+  + Initiative Button is now bigger to make it easier to find
+  + Initiative Button shows player dice theme if a token is assigned to a player
+
 # 3.4.1
 
 + Fix Spell Casting Modifier calculation

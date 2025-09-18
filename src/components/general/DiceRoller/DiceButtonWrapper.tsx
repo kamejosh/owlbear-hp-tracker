@@ -16,6 +16,7 @@ import { isNull, isUndefined, toNumber } from "lodash";
 import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 import { autoPlacement, safePolygon, useFloating, useHover, useInteractions } from "@floating-ui/react";
 import remarkBreaks from "remark-breaks";
+import { useComponentContext } from "../../../context/ComponentContext.tsx";
 
 export type Stats = {
     strength: number;
@@ -37,16 +38,28 @@ type DiceButtonProps = {
     damageDie?: boolean;
     proficiencyBonus?: number | null;
     classes?: string;
+    customDiceThemeId?: string;
 };
 export const DiceButton = (props: DiceButtonProps) => {
+    const { component } = useComponentContext();
     const [room, taSettings] = useMetadataContext(useShallow((state) => [state.room, state.taSettings]));
     const addRoll = useRollLogContext(useShallow((state) => state.addRoll));
-    const [rollerApi, initialized, theme] = useDiceRoller(
-        useShallow((state) => [state.rollerApi, state.initialized, state.theme]),
+    const [rollerApi, initialized, theme, themes] = useDiceRoller(
+        useShallow((state) => [state.rollerApi, state.initialized, state.theme, state.themes]),
     );
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const playerContext = usePlayerContext();
     const defaultHidden = playerContext.role === "GM" && !!taSettings.gm_rolls_hidden;
+
+    const customTheme = useMemo(() => {
+        if (props.customDiceThemeId) {
+            const foundTheme = themes?.find((t) => t.id === props.customDiceThemeId);
+            if (foundTheme) {
+                return foundTheme;
+            }
+        }
+        return theme;
+    }, [props.customDiceThemeId, theme, themes]);
 
     const { refs, floatingStyles, context } = useFloating({
         open: isOpen,
@@ -226,8 +239,8 @@ export const DiceButton = (props: DiceButtonProps) => {
             }
 
             let rollResult = null;
-            if (theme && !room?.disableDiceRoller) {
-                const parsed = diceToRoll(modifiedDice, theme.id);
+            if (customTheme && !room?.disableDiceRoller) {
+                const parsed = diceToRoll(modifiedDice, customTheme.id);
                 if (parsed && rollerApi) {
                     try {
                         rollResult = await rollWrapper(rollerApi, parsed.dice, {
@@ -261,8 +274,8 @@ export const DiceButton = (props: DiceButtonProps) => {
                 if (room?.disableDiceRoller) {
                     return getSvgForDiceType(die.type);
                 } else {
-                    if (theme) {
-                        const image = getDiceImage(theme, die.type, 0);
+                    if (customTheme) {
+                        const image = getDiceImage(customTheme, die.type, 0);
                         return image ?? <D20 />;
                     } else {
                         return <D20 />;
@@ -277,13 +290,13 @@ export const DiceButton = (props: DiceButtonProps) => {
     };
 
     const isEnabled = useCallback(() => {
-        return (initialized && !room?.disableDiceRoller) || room?.disableDiceRoller;
-    }, [initialized, room?.disableDiceRoller]);
+        return (initialized && !room?.disableDiceRoller) || room?.disableDiceRoller || component === "popover";
+    }, [initialized, room?.disableDiceRoller, component]);
 
     return (
         <Tippy
             content={
-                !initialized && !room?.disableDiceRoller
+                !initialized && !room?.disableDiceRoller && component !== "popover"
                     ? "Dice Roller is not initialized"
                     : props.limitReached
                       ? "You have reached your limits for this ability"

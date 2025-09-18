@@ -64,7 +64,7 @@ const Content = () => {
         const initGrimoire = async () => {
             if (
                 playerContext.role === "GM" &&
-                (!room?.ignoreUpdateNotification || compare(version, "3.0.0", "=")) &&
+                !room?.ignoreUpdateNotification &&
                 scene?.version &&
                 compare(scene.version, version, "<")
             ) {
@@ -79,6 +79,7 @@ const Content = () => {
                 setIgnoredChanges(true);
                 await OBR.notification.show(`GM's Grimoire has been updated to version ${version}`, "SUCCESS");
             }
+            await updateSceneMetadata(scene, { version: version });
         };
 
         const initAction = async () => {
