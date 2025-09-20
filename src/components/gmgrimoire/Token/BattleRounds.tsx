@@ -66,7 +66,11 @@ export const BattleRounds = () => {
             .filter((td) => {
                 if (groups.includes(td.data.group ?? "")) {
                     return true;
-                } else if (groups.includes("Default") && isUndefined(td.data.group)) {
+                } else if (
+                    groups.includes("Default") &&
+                    (isUndefined(td.data.group) || !scene?.groups?.includes(td.data.group))
+                ) {
+                    // || !scene?.groups?.includes(td.data.group)) is necessary because if a group has been deleted, the group is still in the token data
                     return true;
                 } else {
                     return false;
