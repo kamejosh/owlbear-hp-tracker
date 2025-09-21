@@ -79,7 +79,9 @@ const Content = () => {
                 setIgnoredChanges(true);
                 await OBR.notification.show(`GM's Grimoire has been updated to version ${version}`, "SUCCESS");
             }
-            await updateSceneMetadata(scene, { version: version });
+            if (scene && scene?.version && compare(scene.version, version, "<")) {
+                await updateSceneMetadata(scene, { version: version });
+            }
         };
 
         const initAction = async () => {
