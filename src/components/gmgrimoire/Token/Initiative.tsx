@@ -14,6 +14,7 @@ import { useShallow } from "zustand/react/shallow";
 import { setPrettySordidInitiative } from "../../../helper/prettySordidHelpers.ts";
 import { DiceButton } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { defaultStats } from "../../../helper/variables.ts";
+import { isNumber, toInteger } from "lodash";
 
 export const Initiative = ({ id }: { id: string }) => {
     const playerContext = usePlayerContext();
@@ -75,6 +76,8 @@ export const Initiative = ({ id }: { id: string }) => {
                     try {
                         if (rollResult && "total" in rollResult) {
                             initiative = rollResult.total;
+                        } else if (rollResult && "total_value" in rollResult && isNumber(rollResult.total_value)) {
+                            initiative = toInteger(rollResult.total_value);
                         } else if (rollResult && "values" in rollResult) {
                             initiative = rollResult.values.map((v) => v.value).reduce((a, b) => a + b, 0);
                         }
