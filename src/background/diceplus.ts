@@ -86,19 +86,19 @@ export const setupDicePlus = async () => {
     const metadata = await OBR.room.getMetadata();
     const roomData = metadataKey in metadata ? (metadata[metadataKey] as RoomMetadata) : null;
 
-    if (roomData?.diceRoller === DICE_ROLLER.DICE_PLUS) {
-        let isDicePlusReady = await checkDicePlusReady();
-        if (!isDicePlusReady) {
-            await delay(5000);
-            isDicePlusReady = await checkDicePlusReady();
-        }
+    let isDicePlusReady = await checkDicePlusReady();
+    if (!isDicePlusReady) {
+        await delay(5000);
+        isDicePlusReady = await checkDicePlusReady();
+    }
 
-        if (isDicePlusReady) {
-            window.localStorage.setItem(dicePlusAvailableKey, "true");
-            console.info("Dice Plus Roller initialized");
-        } else {
-            window.localStorage.setItem(dicePlusAvailableKey, "false");
+    if (isDicePlusReady) {
+        window.localStorage.setItem(dicePlusAvailableKey, "true");
+        console.info("Dice Plus Roller initialized");
+    } else {
+        window.localStorage.setItem(dicePlusAvailableKey, "false");
 
+        if (roomData?.diceRoller === DICE_ROLLER.DICE_PLUS) {
             await updateRoomMetadata(roomData, { diceRoller: DICE_ROLLER.SIMPLE });
         }
     }
