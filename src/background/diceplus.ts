@@ -46,8 +46,8 @@ export type DicePlusRollErrorData = {
 };
 
 export const dicePlusRequestChannel = "dice-plus/roll-request";
-// export const dicePlusResponseChannel = `${GMG_ID}/roll-result`;
-export const dicePlusResponseChannel = `dice-plus/roll-result`;
+export const dicePlusResponseChannel = `${GMG_ID}/roll-result`;
+// export const dicePlusResponseChannel = `dice-plus/roll-result`;
 export const dicePlusErrorChannel = `${GMG_ID}/roll-error`;
 
 async function checkDicePlusReady(): Promise<boolean> {
