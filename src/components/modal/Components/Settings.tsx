@@ -1,4 +1,10 @@
-import { diceTrayModal, diceTrayModalId, itemMetadataKey, modalId } from "../../../helper/variables.ts";
+import {
+    dicePlusAvailableKey,
+    diceTrayModal,
+    diceTrayModalId,
+    itemMetadataKey,
+    modalId,
+} from "../../../helper/variables.ts";
 import OBR from "@owlbear-rodeo/sdk";
 import { updateHp, updateHpOffset } from "../../../helper/hpHelpers.ts";
 import { Groups } from "./Groups.tsx";
@@ -11,10 +17,12 @@ import { useTokenListContext } from "../../../context/TokenContext.tsx";
 import { useShallow } from "zustand/react/shallow";
 import { updateList } from "../../../helper/obrHelper.ts";
 import { DICE_ROLLER, GMGMetadata } from "../../../helper/types.ts";
+import { useLocalStorage } from "../../../helper/hooks.ts";
 
 export const Settings = () => {
     const tokens = useTokenListContext(useShallow((state) => state.tokens));
     const [room, scene] = useMetadataContext(useShallow((state) => [state.room, state.scene]));
+    const [dicePlusAvailable] = useLocalStorage(dicePlusAvailableKey, false);
 
     const handleOffsetChange = (value: number) => {
         updateHpOffset(value);
@@ -170,7 +178,6 @@ export const Settings = () => {
                             value={room?.diceRoller || DICE_ROLLER.DDDICE}
                             onChange={async (e) => {
                                 const diceRoller = Number(e.currentTarget.value) as DICE_ROLLER;
-                                console.log(diceRoller);
                                 await updateRoomMetadata(room, { diceRoller });
                                 if (diceRoller === DICE_ROLLER.DDDICE) {
                                     const diceRoomUser = getRoomDiceUser(room, OBR.player.id);
@@ -189,7 +196,7 @@ export const Settings = () => {
                         >
                             <option value={DICE_ROLLER.DDDICE}>dddice</option>
                             <option value={DICE_ROLLER.SIMPLE}>Calculated</option>
-                            <option value={DICE_ROLLER.DICE_PLUS}>Dice+</option>
+                            {dicePlusAvailable ? <option value={DICE_ROLLER.DICE_PLUS}>Dice+</option> : null}
                         </select>
                     </div>
                     <div className={"negative-numbers setting"}>

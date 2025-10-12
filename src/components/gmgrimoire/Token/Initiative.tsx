@@ -80,6 +80,8 @@ export const Initiative = ({ id }: { id: string }) => {
                             initiative = toInteger(rollResult.total_value);
                         } else if (rollResult && "values" in rollResult) {
                             initiative = rollResult.values.map((v) => v.value).reduce((a, b) => a + b, 0);
+                        } else if (rollResult && "result" in rollResult) {
+                            initiative = rollResult.result.totalValue;
                         }
                     } catch {}
                     const newData = { ...data, initiative: initiative };

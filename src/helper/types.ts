@@ -103,7 +103,6 @@ export type RoomMetadata = {
     ignoreUpdateNotification?: boolean;
     diceRoom?: { slug: string | undefined };
     diceUser?: Array<DiceUser>;
-    // disableDiceRoller?: boolean; // deprecated
     diceRoller?: DICE_ROLLER;
     tabletopAlmanacAPIKey?: string;
     disableHpBar?: boolean;

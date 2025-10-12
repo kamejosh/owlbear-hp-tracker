@@ -19,7 +19,7 @@ import {
 import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { useDiceRoller } from "../../context/DDDiceContext.tsx";
 import { IDiceRoll, Operator } from "dddice-js";
-import { diceToRoll, getUserUuid, localRoll } from "../../helper/diceHelper.ts";
+import { dicePlusRoll, diceToRoll, getUserUuid, localRoll } from "../../helper/diceHelper.ts";
 import { getRoomDiceUser, getTokenName } from "../../helper/helpers.ts";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import { useRollLogContext } from "../../context/RollLogContext.tsx";
@@ -120,7 +120,12 @@ export const DropGroup = (props: DropGroupProps) => {
     };
 
     const diceLessRoll = async (dice: string, statblock: string, hidden: boolean, id: string) => {
-        const result = await localRoll(dice, "Initiative: Roll", addRoll, hidden, statblock);
+        let result;
+        if (room?.diceRoller === DICE_ROLLER.SIMPLE) {
+            result = await localRoll(dice, "Initiative: Roll", addRoll, hidden, statblock);
+        } else if (room?.diceRoller === DICE_ROLLER.DICE_PLUS) {
+            result = await dicePlusRoll(dice, "Initiative: Roll", addRoll, hidden, statblock);
+        }
         if (result) {
             return { value: result.total, id: id };
         }

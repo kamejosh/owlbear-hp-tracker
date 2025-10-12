@@ -1,7 +1,7 @@
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useCallback, useMemo, useState } from "react";
-import { diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
+import { dicePlusRoll, diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { IRoll, parseRollEquation } from "dddice-js";
 import { getDiceImage, getSvgForDiceType } from "../../../helper/previewHelpers.tsx";
@@ -18,6 +18,7 @@ import { autoPlacement, safePolygon, useFloating, useHover, useInteractions } fr
 import remarkBreaks from "remark-breaks";
 import { useComponentContext } from "../../../context/ComponentContext.tsx";
 import { DICE_ROLLER } from "../../../helper/types.ts";
+import { DicePlusRollResultData } from "../../../background/diceplus.ts";
 
 export type Stats = {
     strength: number;
@@ -34,7 +35,7 @@ type DiceButtonProps = {
     context: string;
     stats: Stats;
     statblock?: string;
-    onRoll?: (rollResult?: IRoll | DiceRoll | null) => void;
+    onRoll?: (rollResult?: IRoll | DiceRoll | DicePlusRollResultData | null) => void;
     limitReached?: boolean | null;
     damageDie?: boolean;
     proficiencyBonus?: number | null;
@@ -254,8 +255,10 @@ export const DiceButton = (props: DiceButtonProps) => {
                         console.warn("error in dice roll", parsed.dice, parsed.operator);
                     }
                 }
-            } else {
+            } else if (room?.diceRoller === DICE_ROLLER.SIMPLE) {
                 rollResult = await localRoll(modifiedDice, label, addRoll, modifier === "SELF", props.statblock);
+            } else if (room?.diceRoller === DICE_ROLLER.DICE_PLUS) {
+                await dicePlusRoll(modifiedDice, label, addRoll, modifier === "SELF", props.statblock, props.onRoll);
             }
             if (props.onRoll) {
                 props.onRoll(rollResult);

@@ -17,11 +17,19 @@ import {
     ThreeDDiceRollEvent,
 } from "dddice-js";
 import { RollLogEntryType, rollLogStore } from "../context/RollLogContext.tsx";
-import { rollLogPopover, rollLogPopoverId, rollMessageChannel } from "./variables.ts";
+import { GMG_ID, rollLogPopover, rollLogPopoverId, rollMessageChannel } from "./variables.ts";
 import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 import { v4 } from "uuid";
 import { diceRollerStore } from "../context/DDDiceContext.tsx";
 import { CustomDieNotation, diceButtonsStore } from "../context/DiceButtonContext.tsx";
+import {
+    dicePlusErrorChannel,
+    dicePlusRequestChannel,
+    dicePlusResponseChannel,
+    DicePlusRollErrorData,
+    DicePlusRollRequestData,
+    DicePlusRollResultData,
+} from "../background/diceplus.ts";
 
 let rollLogTimeOut: number;
 
@@ -413,32 +421,64 @@ export const dicePlusRoll = async (
     addRoll: (entry: RollLogEntryType) => void,
     hidden: boolean = false,
     statblock?: string,
+    onRoll?: (rollResult?: IRoll | DiceRoll | DicePlusRollResultData | null) => void,
 ) => {
-    try {
-        const roll = new DiceRoll(diceEquation.replaceAll(" ", ""));
-        const name = await OBR.player.getName();
-        const logEntry = {
-            uuid: v4(),
-            created_at: new Date().toISOString(),
-            equation: diceEquation,
-            label: label,
-            is_hidden: false,
-            total_value: String(roll.total),
-            username: statblock ?? name,
-            values: [roll.output.substring(roll.output.indexOf(":") + 1, roll.output.indexOf("=") - 1)],
-            owlbear_user_id: OBR.player.id,
-            participantUsername: name,
-        };
+    const rollRequest: DicePlusRollRequestData = {
+        source: GMG_ID,
+        showResults: false,
+        rollId: crypto.randomUUID(),
+        playerName: label,
+        rollTarget: hidden ? "self" : "everyone",
+        diceNotation: diceEquation,
+        timestamp: Date.now(),
+        playerId: OBR.player.id,
+    };
 
-        if (!hidden) {
-            await OBR.broadcast.sendMessage(rollMessageChannel, logEntry, { destination: "REMOTE" });
+    const unsubscribeMessage = OBR.broadcast.onMessage(dicePlusResponseChannel, async (message) => {
+        const data = message.data as DicePlusRollResultData;
+        // because we don't want to handle rolls multiple times we check if the rollId is the same
+        if (data.rollId === rollRequest.rollId) {
+            const name = await OBR.player.getName();
+            const logEntry = {
+                uuid: rollRequest.rollId,
+                created_at: new Date().toISOString(),
+                equation: diceEquation,
+                label: label,
+                is_hidden: false,
+                total_value: String(data.result.totalValue),
+                username: statblock ?? name,
+                values: data.result.individualResults.map((r) => String(r.value)),
+                owlbear_user_id: OBR.player.id,
+                participantUsername: name,
+            };
+
+            if (!hidden) {
+                await OBR.broadcast.sendMessage(rollMessageChannel, logEntry, { destination: "REMOTE" });
+            }
+
+            await handleNewRoll(addRoll, logEntry);
+            rollLogStore.persist.rehydrate();
+
+            if (onRoll) {
+                onRoll(data);
+            }
+
+            unsubscribeMessage();
+            unsubscribeError();
         }
+    });
 
-        await handleNewRoll(addRoll, logEntry);
-        rollLogStore.persist.rehydrate();
+    const unsubscribeError = OBR.broadcast.onMessage(dicePlusErrorChannel, async (message) => {
+        const data = message.data as DicePlusRollErrorData;
+        // because we don't want to handle rolls multiple times we check if the rollId is the same
+        if (data.rollId === rollRequest.rollId) {
+            await OBR.notification.show(`${data.error} for: ${data.notation}`, "ERROR");
+            unsubscribeMessage();
+            unsubscribeError();
+        }
+    });
 
-        return roll;
-    } catch {}
+    await OBR.broadcast.sendMessage(dicePlusRequestChannel, rollRequest, { destination: "ALL" });
 };
 
 export const addSpellToRollLog = async (

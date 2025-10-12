@@ -80,6 +80,8 @@ export const E5General = () => {
                                         heal = rollResult.total;
                                     } else if (rollResult && "values" in rollResult) {
                                         heal = rollResult.values.map((v) => v.value).reduce((a, b) => a + b, 0);
+                                    } else if (rollResult && "result" in rollResult) {
+                                        heal = rollResult.result.totalValue;
                                     }
                                 } catch {}
                                 if (heal) {

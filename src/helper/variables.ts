@@ -3,6 +3,7 @@ import { Popover } from "@owlbear-rodeo/sdk";
 import { Stats } from "../components/general/DiceRoller/DiceButtonWrapper.tsx";
 
 export const ID = "com.bitperfect-software.hp-tracker";
+export const GMG_ID = "com.tabletop-almanac.gmg";
 export const metadataKey = `${ID}/metadata`;
 export const itemMetadataKey = `${ID}/data`;
 export const infoMetadataKey = `${ID}/text`;
@@ -17,7 +18,9 @@ export const nextTurnChannel = `${ID}.next-turn`;
 
 export const prettySordidID = "com.pretty-initiative";
 
-export const version = "3.4.2";
+export const dicePlusAvailableKey = `${GMG_ID}/dice-plus-available`;
+
+export const version = "3.5.0";
 
 export const changelogModal: Modal = {
     id: modalId,

@@ -34,6 +34,7 @@ import { migrateTo300 } from "../migrations/v300.ts";
 import { updateItems } from "../helper/obrHelper.ts";
 import { updateTokenMetadata } from "../helper/tokenHelper.ts";
 import { migrateTo350 } from "../migrations/v350.ts";
+import { setupDicePlus } from "./diceplus.ts";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -432,12 +433,13 @@ OBR.onReady(async () => {
     }
     try {
         await setupDddice();
+        await setupDicePlus();
     } catch (e) {
         await OBR.notification.show(
             "GM's Grimoire dice roller initialization error. Check browser logs for more info.",
             "ERROR",
         );
-        console.warn("GM's Grimoire - error while intializing dddice", e);
+        console.warn("GM's Grimoire - error while intializing diceroller", e);
     }
     console.info(`GM's Grimoire - initialization done`);
 });
