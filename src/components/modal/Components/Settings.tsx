@@ -10,7 +10,7 @@ import { getRoomDiceUser, updateRoomMetadata } from "../../../helper/helpers.ts"
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
 import { useShallow } from "zustand/react/shallow";
 import { updateList } from "../../../helper/obrHelper.ts";
-import { GMGMetadata } from "../../../helper/types.ts";
+import { DICE_ROLLER, GMGMetadata } from "../../../helper/types.ts";
 
 export const Settings = () => {
     const tokens = useTokenListContext(useShallow((state) => state.tokens));
@@ -165,19 +165,19 @@ export const Settings = () => {
                         </div>
                     </div>
                     <div className={"dice-roller-enabled setting"}>
-                        Use calculated rolls (no 3D dice):
-                        <input
-                            type={"checkbox"}
-                            checked={room?.disableDiceRoller || false}
-                            onChange={async () => {
-                                const disableDiceRoller = !room?.disableDiceRoller;
-                                await updateRoomMetadata(room, { disableDiceRoller: disableDiceRoller });
-                                if (!disableDiceRoller) {
+                        Select Dice Roller:
+                        <select
+                            value={room?.diceRoller || DICE_ROLLER.DDDICE}
+                            onChange={async (e) => {
+                                const diceRoller = Number(e.currentTarget.value) as DICE_ROLLER;
+                                console.log(diceRoller);
+                                await updateRoomMetadata(room, { diceRoller });
+                                if (diceRoller === DICE_ROLLER.DDDICE) {
                                     const diceRoomUser = getRoomDiceUser(room, OBR.player.id);
                                     if (diceRoomUser) {
                                         await OBR.modal.open({
                                             ...diceTrayModal,
-                                            url: `https://dddice.com/room/${room.diceRoom!.slug}/stream?key=${
+                                            url: `https://dddice.com/room/${room?.diceRoom!.slug}/stream?key=${
                                                 diceRoomUser.apiKey
                                             }`,
                                         });
@@ -186,7 +186,11 @@ export const Settings = () => {
                                     await OBR.modal.close(diceTrayModalId);
                                 }
                             }}
-                        />
+                        >
+                            <option value={DICE_ROLLER.DDDICE}>dddice</option>
+                            <option value={DICE_ROLLER.SIMPLE}>Calculated</option>
+                            <option value={DICE_ROLLER.DICE_PLUS}>Dice+</option>
+                        </select>
                     </div>
                     <div className={"negative-numbers setting"}>
                         Allow negative HP/AC:

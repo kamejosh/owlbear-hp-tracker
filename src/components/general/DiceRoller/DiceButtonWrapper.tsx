@@ -17,6 +17,7 @@ import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 import { autoPlacement, safePolygon, useFloating, useHover, useInteractions } from "@floating-ui/react";
 import remarkBreaks from "remark-breaks";
 import { useComponentContext } from "../../../context/ComponentContext.tsx";
+import { DICE_ROLLER } from "../../../helper/types.ts";
 
 export type Stats = {
     strength: number;
@@ -239,7 +240,7 @@ export const DiceButton = (props: DiceButtonProps) => {
             }
 
             let rollResult = null;
-            if (customTheme && !room?.disableDiceRoller) {
+            if (customTheme && room?.diceRoller === DICE_ROLLER.DDDICE) {
                 const parsed = diceToRoll(modifiedDice, customTheme.id);
                 if (parsed && rollerApi) {
                     try {
@@ -271,7 +272,7 @@ export const DiceButton = (props: DiceButtonProps) => {
             const parsed = parseRollEquation(dice, "dddice-bees");
             const die = parsed.dice.find((d) => d.type !== "mod");
             if (die) {
-                if (room?.disableDiceRoller) {
+                if (room?.diceRoller !== DICE_ROLLER.DDDICE) {
                     return getSvgForDiceType(die.type);
                 } else {
                     if (customTheme) {
@@ -290,13 +291,17 @@ export const DiceButton = (props: DiceButtonProps) => {
     };
 
     const isEnabled = useCallback(() => {
-        return (initialized && !room?.disableDiceRoller) || room?.disableDiceRoller || component === "popover";
-    }, [initialized, room?.disableDiceRoller, component]);
+        return (
+            (initialized && room?.diceRoller === DICE_ROLLER.DDDICE) ||
+            room?.diceRoller !== DICE_ROLLER.DDDICE ||
+            component === "popover"
+        );
+    }, [initialized, room?.diceRoller, component]);
 
     return (
         <Tippy
             content={
-                !initialized && !room?.disableDiceRoller && component !== "popover"
+                !initialized && room?.diceRoller === DICE_ROLLER.DDDICE && component !== "popover"
                     ? "Dice Roller is not initialized"
                     : props.limitReached
                       ? "You have reached your limits for this ability"
@@ -305,7 +310,7 @@ export const DiceButton = (props: DiceButtonProps) => {
         >
             <span
                 className={`button-wrapper ${props.classes} ${isEnabled() ? "enabled" : "disabled"} ${
-                    room?.disableDiceRoller ? "calculated" : "three-d-dice"
+                    room?.diceRoller === DICE_ROLLER.SIMPLE ? "calculated" : "three-d-dice"
                 }`}
                 onMouseEnter={() => {
                     setIsOpen(true);

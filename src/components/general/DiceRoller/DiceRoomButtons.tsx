@@ -4,7 +4,7 @@ import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { IAvailableDie, IDiceRoll, IDieType, ITheme, Operator, parseRollEquation } from "dddice-js";
 import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { AddSvg } from "../../svgs/AddSvg.tsx";
-import { diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
+import { dicePlusRoll, diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
 import { RollLogSvg } from "../../svgs/RollLogSvg.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
@@ -15,6 +15,7 @@ import { isNull, isString } from "lodash";
 import Tippy from "@tippyjs/react";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { useShallow } from "zustand/react/shallow";
+import { DICE_ROLLER } from "../../../helper/types.ts";
 
 type DiceRoomButtonsProps = {
     open: boolean;
@@ -55,7 +56,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
     };
 
     const getDicePreview = useCallback(() => {
-        if (props.customDice && theme && !room?.disableDiceRoller) {
+        if (props.customDice && theme && room?.diceRoller === DICE_ROLLER.DDDICE) {
             try {
                 const parsed = parseRollEquation(props.customDice.dice, props.customDice.theme ?? theme.id);
                 return (
@@ -126,11 +127,11 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
             }
         }
         return <DiceSvg />;
-    }, [theme, props.customDice, room?.disableDiceRoller, themes, rollerApi]);
+    }, [theme, props.customDice, room?.diceRoller, themes, rollerApi]);
 
     const roll = async (button: HTMLButtonElement, hide: boolean = false) => {
         button.classList.add("rolling");
-        if (!room?.disableDiceRoller && rollerApi && theme && props.customDice) {
+        if (room?.diceRoller === DICE_ROLLER.DDDICE && rollerApi && theme && props.customDice) {
             let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined = diceToRoll(
                 props.customDice.dice,
                 props.customDice.theme ?? theme.id,
@@ -142,16 +143,18 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                     whisper: hide ? await getUserUuid(room, rollerApi) : undefined,
                 });
             }
-        } else if (props.customDice) {
+        } else if (room?.diceRoller === DICE_ROLLER.SIMPLE && props.customDice) {
             await localRoll(props.customDice.dice, "Roll: Custom", addRoll, hide);
+        } else if (room?.diceRoller === DICE_ROLLER.DICE_PLUS && props.customDice) {
+            await dicePlusRoll(props.customDice.dice, "Roll: Custom", addRoll, hide);
         }
         button.classList.remove("rolling");
         button.blur();
     };
 
     const isEnabled = useCallback(() => {
-        return (initialized && !room?.disableDiceRoller) || room?.disableDiceRoller;
-    }, [initialized, room?.disableDiceRoller]);
+        return (initialized && room?.diceRoller === DICE_ROLLER.DDDICE) || room?.diceRoller !== DICE_ROLLER.DDDICE;
+    }, [initialized, room?.diceRoller]);
 
     return (
         <div
@@ -184,7 +187,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
             </Tippy>
             {addCustom ? (
                 <div className={"add-custom-dice"}>
-                    {!room?.disableDiceRoller ? (
+                    {room?.diceRoller === DICE_ROLLER.DDDICE ? (
                         <div className={`setting dice-theme valid searching`}>
                             <Select
                                 options={
@@ -214,7 +217,7 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
                             onChange={(e) => {
                                 const value = e.currentTarget.value;
                                 try {
-                                    if (currentCustomTheme && !room?.disableDiceRoller) {
+                                    if (currentCustomTheme && room?.diceRoller === DICE_ROLLER.DDDICE) {
                                         const parsed = parseRollEquation(value, currentCustomTheme);
                                         if (parsed) {
                                             setValidCustom(true);
@@ -335,7 +338,7 @@ const QuickButtons = ({ open }: { open: boolean }) => {
 
     const roll = async (element: HTMLElement, dice: string, hide: boolean = false) => {
         element.classList.add("rolling");
-        if (theme && dice && !room?.disableDiceRoller) {
+        if (theme && dice && room?.diceRoller === DICE_ROLLER.DDDICE) {
             let parsed: { dice: IDiceRoll[]; operator: Operator | undefined } | undefined = diceToRoll(dice, theme.id);
             if (parsed && rollerApi) {
                 await rollWrapper(rollerApi, parsed.dice, {
@@ -344,8 +347,10 @@ const QuickButtons = ({ open }: { open: boolean }) => {
                     whisper: hide ? await getUserUuid(room, rollerApi) : undefined,
                 });
             }
-        } else {
+        } else if (room?.diceRoller === DICE_ROLLER.SIMPLE) {
             await localRoll(dice, "Roll: Custom", addRoll, hide);
+        } else if (room?.diceRoller === DICE_ROLLER.DICE_PLUS) {
+            await dicePlusRoll(dice, "Roll: Custom", addRoll, hide);
         }
         element.classList.remove("rolling");
         element.blur();
@@ -378,7 +383,7 @@ const QuickButtons = ({ open }: { open: boolean }) => {
             );
         };
 
-        if (theme && !room?.disableDiceRoller) {
+        if (theme && room?.diceRoller === DICE_ROLLER.DDDICE) {
             return theme.available_dice.map((die, index) => {
                 let preview = "";
                 let name = "";
@@ -439,7 +444,7 @@ const QuickButtons = ({ open }: { open: boolean }) => {
                                 return;
                             }
                             try {
-                                if (theme && !room?.disableDiceRoller) {
+                                if (theme && room?.diceRoller === DICE_ROLLER.DDDICE) {
                                     const parsed = parseRollEquation(e.currentTarget.value, theme.id);
                                     if (parsed) {
                                         setValidCustom(true);

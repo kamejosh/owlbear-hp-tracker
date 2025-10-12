@@ -407,6 +407,40 @@ export const localRoll = async (
     } catch {}
 };
 
+export const dicePlusRoll = async (
+    diceEquation: string,
+    label: string,
+    addRoll: (entry: RollLogEntryType) => void,
+    hidden: boolean = false,
+    statblock?: string,
+) => {
+    try {
+        const roll = new DiceRoll(diceEquation.replaceAll(" ", ""));
+        const name = await OBR.player.getName();
+        const logEntry = {
+            uuid: v4(),
+            created_at: new Date().toISOString(),
+            equation: diceEquation,
+            label: label,
+            is_hidden: false,
+            total_value: String(roll.total),
+            username: statblock ?? name,
+            values: [roll.output.substring(roll.output.indexOf(":") + 1, roll.output.indexOf("=") - 1)],
+            owlbear_user_id: OBR.player.id,
+            participantUsername: name,
+        };
+
+        if (!hidden) {
+            await OBR.broadcast.sendMessage(rollMessageChannel, logEntry, { destination: "REMOTE" });
+        }
+
+        await handleNewRoll(addRoll, logEntry);
+        rollLogStore.persist.rehydrate();
+
+        return roll;
+    } catch {}
+};
+
 export const addSpellToRollLog = async (
     label: string,
     addRoll: (entry: RollLogEntryType) => void,
