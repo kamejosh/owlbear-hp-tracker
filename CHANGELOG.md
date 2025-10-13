@@ -1,3 +1,10 @@
+# 3.5.0
+
++ Added [Dice+](https://owlbear.rogue.pub/extension/https://dice-plus.missinglinkdev.com/manifest.json) to supported Dice Rollers
+  + If you have this extension installed and refresh OBR you can select it from the settings menu
++ Fixes Tokens are not added to battles if they are part of a deleted group
++ Fix Initiative for Statblocks with long names is hidden in statblock popover
+
 # 3.4.2
 
 + Allow group select for multiple selected tokens

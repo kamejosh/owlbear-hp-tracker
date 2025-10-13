@@ -185,7 +185,7 @@ The following settings are available:
 + Disable HP Bar: In case you don't want to display any HP Bar you can check this setting here.
 + Text and Bar Offset: To have a more flexible positioning of the HP Bar and Text, a value can be entered (negative or positive number) and the position of the HP Bar and Text is then adjusted by this value.
 + Armorclass Icon and Text Offset: To have a more flexible positioning of the AC Background and Text an offset for the X- and Y-Axis can be added. This value is scaled considering the Token size. 
-+ Use calculated rolls (no 3D dice): By default the dice roller is enabled if you don't want to use dddice for dice rolling you can activate this option and an integrated dice roller will be used. This makes dice rolling faster because the calculation is done locally but you will not see beautiful 3D rendered dice.
++ Dice Roller: You can select which Dice Roller you want to use. By default the dddice roller is selected but you can also use the Simple Dice Roller or the [Dice+](https://owlbear.rogue.pub/extension/https://dice-plus.missinglinkdev.com/manifest.json) extension.
 + Allow negative HP/AC: By default negative HP and AC are not allowed but when this settings is checked then HP and AC can be set to negative numbers. The HP Bar will always display negative HP the same as when it is 0.
 + Sort Tokens in Player View: When active, the [Player Action Window](#player-action-window) will display Tokens ordered by their initiative value. If not active, Tokens will have the same order as they were added to the scene (so kind of random).
 + Set Initiative Dice: This setting decides with which "dice" the roll initiative button in the groups and the token works. The default is 20, meaning a value from 1 to 20 (excl. modifiers) can be rolled. By setting it to 10 the value can only range from 1 to 10. When using 3D dice only values that are available in the selected theme should be used.
@@ -524,3 +524,8 @@ Using dddice you can roll dice in your DnD Beyond Character Sheets and see those
 When in the [Settings](#room-settings) the option "Use calculated rolls" is activated, dddice is disabled. GMG will then use a local script to calculate the result of the chosen dice-roll and use the OBR broadcast API to notify all connected players of the result.
 
 The simple dice-calculator uses the [rpg-dice-roller](https://dice-roller.github.io/documentation/) package under the hood. Available dice notations for custom dice buttons and the quickroll function can be found [here](https://dice-roller.github.io/documentation/guide/notation/).
+
+<h2 id="dice-plus">Dice Plus</h2>
+
+Since version 3.5.0 GMG supports [Dice+](https://owlbear.rogue.pub/extension/https://dice-plus.missinglinkdev.com/manifest.json) as a dice roller.  
+After installing the extension, you have to reload website (so that GMG ad Dice+ can exchange setup data with each other) and select the Dice+ extension as you dice roller in the settings.

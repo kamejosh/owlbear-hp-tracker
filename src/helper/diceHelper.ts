@@ -472,7 +472,7 @@ export const dicePlusRoll = async (
         const data = message.data as DicePlusRollErrorData;
         // because we don't want to handle rolls multiple times we check if the rollId is the same
         if (data.rollId === rollRequest.rollId) {
-            await OBR.notification.show(`${data.error} for: ${data.notation}`, "ERROR");
+            console.warn(`${data.error} for: ${data.notation}`);
             unsubscribeMessage();
             unsubscribeError();
         }

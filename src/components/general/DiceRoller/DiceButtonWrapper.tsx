@@ -171,7 +171,7 @@ export const DiceButton = (props: DiceButtonProps) => {
             if (modifier && modifier === "ADV") {
                 modifiedDice = addModifier(dice, "2d20kh1");
             } else if (modifier && modifier === "DIS") {
-                modifiedDice = addModifier(dice, "2d20dh1");
+                modifiedDice = addModifier(dice, "2d20kl1");
             } else if (modifier && modifier === "CRIT") {
                 label = label.substring(0, label.indexOf(":")) + ": Critical Damage";
                 const diceCounts: Array<string> = [];
