@@ -447,7 +447,7 @@ export const dicePlusRoll = async (
                 is_hidden: false,
                 total_value: String(data.result.totalValue),
                 username: statblock ?? name,
-                values: data.result.individualResults.map((r) => String(r.value)),
+                values: data.result.groups.flatMap((group) => group.dice.map((die) => String(die.value))),
                 owlbear_user_id: OBR.player.id,
                 participantUsername: name,
             };

@@ -23,6 +23,13 @@ export type DicePlusRollDiceResult = {
     kept: boolean;
 };
 
+export type DicePlusRollGroup = {
+    diceType: string;
+    dice: Array<DicePlusRollDiceResult>;
+    total: number;
+    isNegative: boolean;
+};
+
 export type DicePlusRollResultData = {
     rollId: string;
     playerId: string;
@@ -34,8 +41,7 @@ export type DicePlusRollResultData = {
         diceNotation: string;
         totalValue: number;
         rollSummary: string;
-        individualResults: Array<DicePlusRollDiceResult>;
-        finalResults: Array<DicePlusRollDiceResult>;
+        groups: Array<DicePlusRollGroup>;
     };
 };
 
