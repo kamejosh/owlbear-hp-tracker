@@ -35,6 +35,7 @@ import { updateItems } from "../helper/obrHelper.ts";
 import { updateTokenMetadata } from "../helper/tokenHelper.ts";
 import { migrateTo350 } from "../migrations/v350.ts";
 import { setupDicePlus } from "./diceplus.ts";
+import { registerMessageHandlers } from "./api.ts";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -434,6 +435,7 @@ OBR.onReady(async () => {
     try {
         await setupDddice();
         await setupDicePlus();
+        await registerMessageHandlers();
     } catch (e) {
         await OBR.notification.show(
             "GM's Grimoire dice roller initialization error. Check browser logs for more info.",
