@@ -10,7 +10,7 @@ import {
     updateRoomMetadataDiceUser,
 } from "../../../helper/diceHelper.ts";
 import { IRoom, ITheme, IUser, ThreeDDiceAPI } from "dddice-js";
-import { DiceUser } from "../../../helper/types.ts";
+import { DICE_ROLLER, DiceUser } from "../../../helper/types.ts";
 import { getRoomDiceUser } from "../../../helper/helpers.ts";
 import { useListRooms, useListThemes } from "../../../api/dddiceApi.ts";
 import OBR from "@owlbear-rodeo/sdk";
@@ -112,16 +112,16 @@ export const DiceTray = (props: DiceTrayProps) => {
         };
 
         if ((diceUser && diceUser.apiKey !== undefined) || !diceUser) {
-            if (!room?.disableDiceRoller && diceUser?.apiKey) {
-                initDice();
+            if (room?.diceRoller === DICE_ROLLER.DDDICE && diceUser?.apiKey) {
+                void initDice();
             }
         }
 
         if (rollerApi && room?.diceRoom?.slug && room?.diceRoom?.slug !== roomSlug) {
             setRoomSlug(room.diceRoom.slug);
-            connectToDddiceRoom(rollerApi, room, dddiceUser);
+            void connectToDddiceRoom(rollerApi, room, dddiceUser);
         }
-    }, [diceUser, room?.disableDiceRoller, room?.diceRoom?.slug]);
+    }, [diceUser, room?.diceRoller, room?.diceRoom?.slug]);
 
     useEffect(() => {
         const resetDiceTheme = async () => {

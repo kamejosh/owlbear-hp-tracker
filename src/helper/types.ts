@@ -3,6 +3,12 @@ export enum SORT {
     ASC,
 }
 
+export enum DICE_ROLLER {
+    DDDICE,
+    SIMPLE,
+    DICE_PLUS,
+}
+
 export type Limit = {
     id: string;
     max: number;
@@ -97,7 +103,7 @@ export type RoomMetadata = {
     ignoreUpdateNotification?: boolean;
     diceRoom?: { slug: string | undefined };
     diceUser?: Array<DiceUser>;
-    disableDiceRoller?: boolean;
+    diceRoller?: DICE_ROLLER;
     tabletopAlmanacAPIKey?: string;
     disableHpBar?: boolean;
     disableColorGradient?: boolean;

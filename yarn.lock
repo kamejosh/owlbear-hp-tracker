@@ -354,10 +354,10 @@
   dependencies:
     "@octokit/openapi-types" "^22.2.0"
 
-"@owlbear-rodeo/sdk@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@owlbear-rodeo/sdk/-/sdk-3.0.0.tgz#e9a57b648fc630ae6784f26d09e06cbc853fdc3e"
-  integrity sha512-yva59caipyuv+/+reRhYFCimPGy/5pInGcPFTtZHa46tX7dnGlnfrKjQNWCvJJICeK+OUyEsDKRea9JTSOd4uQ==
+"@owlbear-rodeo/sdk@^3.1.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@owlbear-rodeo/sdk/-/sdk-3.1.0.tgz#5cda6383775e712edcbae66a0e1c59b17d413dc0"
+  integrity sha512-iepvr522qlG4HDqBrt9yEFwpQk544kLnxmnojFwtd9qhzwcOS1nP/mfwhDHKucVINfNbVA5RWu2pE3VGRmHTDQ==
   dependencies:
     events "^3.3.0"
     immer "^10.1.1"

@@ -1,7 +1,7 @@
 import { Droppable } from "@hello-pangea/dnd";
 import { DraggableTokenList } from "./TokenList.tsx";
 import OBR, { Image, Metadata } from "@owlbear-rodeo/sdk";
-import { GMGMetadata, SceneMetadata } from "../../helper/types.ts";
+import { DICE_ROLLER, GMGMetadata, SceneMetadata } from "../../helper/types.ts";
 import { itemMetadataKey, metadataKey, prettySordidID } from "../../helper/variables.ts";
 import {
     getAcForPlayers,
@@ -19,7 +19,7 @@ import {
 import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { useDiceRoller } from "../../context/DDDiceContext.tsx";
 import { IDiceRoll, Operator } from "dddice-js";
-import { diceToRoll, getUserUuid, localRoll } from "../../helper/diceHelper.ts";
+import { dicePlusRoll, diceToRoll, getUserUuid, localRoll } from "../../helper/diceHelper.ts";
 import { getRoomDiceUser, getTokenName } from "../../helper/helpers.ts";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import { useRollLogContext } from "../../context/RollLogContext.tsx";
@@ -83,8 +83,8 @@ export const DropGroup = (props: DropGroupProps) => {
         try {
             const initiativeDice = room?.initiativeDice ?? 20;
             const dieType = `d${initiativeDice}`;
-            if (room?.disableDiceRoller) {
-                return getSvgForDiceType(`d${room.initiativeDice}`);
+            if (room?.diceRoller !== DICE_ROLLER.DDDICE) {
+                return getSvgForDiceType(`d${room?.initiativeDice}`);
             } else {
                 if (theme) {
                     const image = getDiceImage(theme, dieType, 0);
@@ -120,7 +120,12 @@ export const DropGroup = (props: DropGroupProps) => {
     };
 
     const diceLessRoll = async (dice: string, statblock: string, hidden: boolean, id: string) => {
-        const result = await localRoll(dice, "Initiative: Roll", addRoll, hidden, statblock);
+        let result;
+        if (room?.diceRoller === DICE_ROLLER.SIMPLE) {
+            result = await localRoll(dice, "Initiative: Roll", addRoll, hidden, statblock);
+        } else if (room?.diceRoller === DICE_ROLLER.DICE_PLUS) {
+            result = await dicePlusRoll(dice, "Initiative: Roll", addRoll, hidden, statblock);
+        }
         if (result) {
             return { value: result.total, id: id };
         }
@@ -134,7 +139,7 @@ export const DropGroup = (props: DropGroupProps) => {
         for (const item of props.list) {
             const data = item.metadata[itemMetadataKey] as GMGMetadata;
             const dice = `1d${room?.initiativeDice ?? 20}+${data.stats.initiativeBonus}`;
-            if (getRoomDiceUser(room, OBR.player.id)?.diceRendering && !room?.disableDiceRoller) {
+            if (getRoomDiceUser(room, OBR.player.id)?.diceRendering && room?.diceRoller === DICE_ROLLER.DDDICE) {
                 let customThemeId = undefined;
                 if (OBR.player.id !== item.createdUserId) {
                     const diceUser = room?.diceUser?.find((u) => u.playerId == item.createdUserId);
@@ -253,7 +258,7 @@ export const DropGroup = (props: DropGroupProps) => {
                                 disabled={
                                     getRoomDiceUser(room, playerContext.id)?.diceRendering &&
                                     !initialized &&
-                                    !room?.disableDiceRoller
+                                    room?.diceRoller === DICE_ROLLER.DDDICE
                                 }
                                 onPointerDown={async (e) => {
                                     e.preventDefault();
@@ -287,7 +292,7 @@ export const DropGroup = (props: DropGroupProps) => {
                                 disabled={
                                     getRoomDiceUser(room, playerContext.id)?.diceRendering &&
                                     !initialized &&
-                                    !room?.disableDiceRoller
+                                    room?.diceRoller === DICE_ROLLER.DDDICE
                                 }
                                 onClick={async () => {
                                     await setInitiative(!defaultHidden);

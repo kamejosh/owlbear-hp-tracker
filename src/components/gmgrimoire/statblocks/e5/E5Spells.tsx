@@ -5,7 +5,7 @@ import { getDamage, updateLimit } from "../../../../helper/helpers.ts";
 import { SpellFilter } from "../SpellFilter.tsx";
 import { capitalize, isNull, isUndefined } from "lodash";
 import { E5SpellSlot } from "../../../../api/e5/useE5Api.ts";
-import { GMGMetadata } from "../../../../helper/types.ts";
+import { DICE_ROLLER, GMGMetadata } from "../../../../helper/types.ts";
 import { useMetadataContext } from "../../../../context/MetadataContext.ts";
 import Tippy from "@tippyjs/react";
 import { useShallow } from "zustand/react/shallow";
@@ -179,7 +179,7 @@ const Spell = ({
                             <Tippy content={"No more spellslots"} disabled={!limitReached}>
                                 <div
                                     className={`button-wrapper enabled ${
-                                        room?.disableDiceRoller ? "calculated" : "three-d-dice"
+                                        room?.diceRoller === DICE_ROLLER.SIMPLE ? "calculated" : "three-d-dice"
                                     }`}
                                 >
                                     {spell.is_attack && attack ? (

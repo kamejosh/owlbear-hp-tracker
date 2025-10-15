@@ -1,7 +1,7 @@
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useCallback, useMemo, useState } from "react";
-import { diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
+import { dicePlusRoll, diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { IRoll, parseRollEquation } from "dddice-js";
 import { getDiceImage, getSvgForDiceType } from "../../../helper/previewHelpers.tsx";
@@ -17,6 +17,8 @@ import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 import { autoPlacement, safePolygon, useFloating, useHover, useInteractions } from "@floating-ui/react";
 import remarkBreaks from "remark-breaks";
 import { useComponentContext } from "../../../context/ComponentContext.tsx";
+import { DICE_ROLLER } from "../../../helper/types.ts";
+import { DicePlusRollResultData } from "../../../background/diceplus.ts";
 
 export type Stats = {
     strength: number;
@@ -33,7 +35,7 @@ type DiceButtonProps = {
     context: string;
     stats: Stats;
     statblock?: string;
-    onRoll?: (rollResult?: IRoll | DiceRoll | null) => void;
+    onRoll?: (rollResult?: IRoll | DiceRoll | DicePlusRollResultData | null) => void;
     limitReached?: boolean | null;
     damageDie?: boolean;
     proficiencyBonus?: number | null;
@@ -169,7 +171,7 @@ export const DiceButton = (props: DiceButtonProps) => {
             if (modifier && modifier === "ADV") {
                 modifiedDice = addModifier(dice, "2d20kh1");
             } else if (modifier && modifier === "DIS") {
-                modifiedDice = addModifier(dice, "2d20dh1");
+                modifiedDice = addModifier(dice, "2d20kl1");
             } else if (modifier && modifier === "CRIT") {
                 label = label.substring(0, label.indexOf(":")) + ": Critical Damage";
                 const diceCounts: Array<string> = [];
@@ -239,7 +241,7 @@ export const DiceButton = (props: DiceButtonProps) => {
             }
 
             let rollResult = null;
-            if (customTheme && !room?.disableDiceRoller) {
+            if (customTheme && room?.diceRoller === DICE_ROLLER.DDDICE) {
                 const parsed = diceToRoll(modifiedDice, customTheme.id);
                 if (parsed && rollerApi) {
                     try {
@@ -253,8 +255,10 @@ export const DiceButton = (props: DiceButtonProps) => {
                         console.warn("error in dice roll", parsed.dice, parsed.operator);
                     }
                 }
-            } else {
+            } else if (room?.diceRoller === DICE_ROLLER.SIMPLE) {
                 rollResult = await localRoll(modifiedDice, label, addRoll, modifier === "SELF", props.statblock);
+            } else if (room?.diceRoller === DICE_ROLLER.DICE_PLUS) {
+                await dicePlusRoll(modifiedDice, label, addRoll, modifier === "SELF", props.statblock, props.onRoll);
             }
             if (props.onRoll) {
                 props.onRoll(rollResult);
@@ -271,7 +275,7 @@ export const DiceButton = (props: DiceButtonProps) => {
             const parsed = parseRollEquation(dice, "dddice-bees");
             const die = parsed.dice.find((d) => d.type !== "mod");
             if (die) {
-                if (room?.disableDiceRoller) {
+                if (room?.diceRoller !== DICE_ROLLER.DDDICE) {
                     return getSvgForDiceType(die.type);
                 } else {
                     if (customTheme) {
@@ -290,13 +294,17 @@ export const DiceButton = (props: DiceButtonProps) => {
     };
 
     const isEnabled = useCallback(() => {
-        return (initialized && !room?.disableDiceRoller) || room?.disableDiceRoller || component === "popover";
-    }, [initialized, room?.disableDiceRoller, component]);
+        return (
+            (initialized && room?.diceRoller === DICE_ROLLER.DDDICE) ||
+            room?.diceRoller !== DICE_ROLLER.DDDICE ||
+            component === "popover"
+        );
+    }, [initialized, room?.diceRoller, component]);
 
     return (
         <Tippy
             content={
-                !initialized && !room?.disableDiceRoller && component !== "popover"
+                !initialized && room?.diceRoller === DICE_ROLLER.DDDICE && component !== "popover"
                     ? "Dice Roller is not initialized"
                     : props.limitReached
                       ? "You have reached your limits for this ability"
@@ -305,7 +313,7 @@ export const DiceButton = (props: DiceButtonProps) => {
         >
             <span
                 className={`button-wrapper ${props.classes} ${isEnabled() ? "enabled" : "disabled"} ${
-                    room?.disableDiceRoller ? "calculated" : "three-d-dice"
+                    room?.diceRoller === DICE_ROLLER.SIMPLE ? "calculated" : "three-d-dice"
                 }`}
                 onMouseEnter={() => {
                     setIsOpen(true);
