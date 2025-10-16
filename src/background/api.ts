@@ -1,9 +1,9 @@
 import { GMG_ID, itemMetadataKey, metadataKey } from "../helper/variables.ts";
-import OBR from "@owlbear-rodeo/sdk";
+import OBR, { Image } from "@owlbear-rodeo/sdk";
 import { DICE_ROLLER, GMGMetadata, RoomMetadata } from "../helper/types.ts";
 import { updateHp } from "../helper/hpHelpers.ts";
 import { updateAc } from "../helper/acHelper.ts";
-import { updateTokenMetadata } from "../helper/tokenHelper.ts";
+import { changeTempHp, updateTokenMetadata } from "../helper/tokenHelper.ts";
 import { rollLogStore } from "../context/RollLogContext.tsx";
 import { dicePlusRoll, diceToRoll, getUserUuid, localRoll, rollWrapper } from "../helper/diceHelper.ts";
 import { diceRollerStore } from "../context/DDDiceContext.tsx";
@@ -12,6 +12,7 @@ import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 import { IRoll } from "dddice-js";
 
 const hpRoute = `${GMG_ID}/api/hp`;
+const tempHpRoute = `${GMG_ID}/api/temp-hp`;
 const acRoute = `${GMG_ID}/api/ac`;
 const initRoute = `${GMG_ID}/api/initiative`;
 const diceRoute = `${GMG_ID}/api/roll`;
@@ -34,6 +35,15 @@ type HPRequest = Request & {
 
 type HPResponse = Response & {
     hp: number;
+};
+
+type TempHPRequest = Request & {
+    itemId: string;
+    tempHP: number;
+};
+
+type TempHPResponse = Response & {
+    tempHP?: number;
 };
 
 type ACRequest = Request & {
@@ -97,6 +107,24 @@ export const registerMessageHandlers = async () => {
         }
     });
 
+    OBR.broadcast.onMessage(hpRoute, async (message) => {
+        const request = message.data as TempHPRequest;
+        try {
+            const items = await OBR.scene.items.getItems([request.itemId]);
+            if (items) {
+                const item = items[0];
+                const data = item.metadata[itemMetadataKey] as GMGMetadata;
+
+                await changeTempHp(request.tempHP, data, item as Image);
+
+                const newData = item.metadata[itemMetadataKey] as GMGMetadata;
+                sendResponse(request, { tempHP: newData.stats.tempHp } as TempHPResponse);
+            }
+        } catch {
+            sendError(request, "Error updating TempHP");
+        }
+    });
+
     OBR.broadcast.onMessage(acRoute, async (message) => {
         const request = message.data as ACRequest;
         try {
@@ -104,7 +132,7 @@ export const registerMessageHandlers = async () => {
             if (items) {
                 const item = items[0];
                 const data = item.metadata[itemMetadataKey] as GMGMetadata;
-                const ac = Math.max(Math.min(request.ac, data.armorClass), 0);
+                const ac = Math.max(request.ac, 0);
                 await updateAc(item, { ...data, armorClass: ac });
                 sendResponse(request, { ac: ac } as ACResponse);
             }
