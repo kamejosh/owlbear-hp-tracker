@@ -107,7 +107,7 @@ export const registerMessageHandlers = async () => {
         }
     });
 
-    OBR.broadcast.onMessage(hpRoute, async (message) => {
+    OBR.broadcast.onMessage(tempHpRoute, async (message) => {
         const request = message.data as TempHPRequest;
         try {
             const items = await OBR.scene.items.getItems([request.itemId]);
