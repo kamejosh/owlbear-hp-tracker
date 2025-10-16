@@ -10,6 +10,8 @@ import { diceRollerStore } from "../context/DDDiceContext.tsx";
 import { DicePlusRollResultData } from "./diceplus.ts";
 import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 import { IRoll } from "dddice-js";
+import { isNaN, isUndefined } from "lodash";
+import { getRoomDiceUser } from "../helper/helpers.ts";
 
 const hpRoute = `${GMG_ID}/api/hp`;
 const tempHpRoute = `${GMG_ID}/api/temp-hp`;
@@ -95,12 +97,20 @@ export const registerMessageHandlers = async () => {
     OBR.broadcast.onMessage(hpRoute, async (message) => {
         const request = message.data as HPRequest;
         try {
-            const items = await OBR.scene.items.getItems([request.itemId]);
-            if (items) {
-                const item = items[0];
-                const data = item.metadata[itemMetadataKey] as GMGMetadata;
-                await updateHp(item, { ...data, hp: Math.min(request.hp, data.maxHp) });
-                sendResponse(request, { hp: Math.min(request.hp, data.maxHp) } as HPResponse);
+            if (isNaN(request.hp) || isUndefined(request.hp)) {
+                sendError(request, `Error updating HP - Invalid HP value ${request.hp}`);
+            } else {
+                const items = await OBR.scene.items.getItems([request.itemId]);
+                if (items) {
+                    const item = items[0];
+                    const data = item.metadata[itemMetadataKey] as GMGMetadata;
+                    const newData = { ...data, hp: Math.min(Number(request.hp), data.maxHp) };
+                    await updateTokenMetadata(newData, [item.id]);
+                    await updateHp(item, newData);
+                    sendResponse(request, { hp: Math.min(request.hp, data.maxHp) } as HPResponse);
+                } else {
+                    sendError(request, "Error updating HP - Item not found");
+                }
             }
         } catch {
             sendError(request, "Error updating HP");
@@ -110,15 +120,22 @@ export const registerMessageHandlers = async () => {
     OBR.broadcast.onMessage(tempHpRoute, async (message) => {
         const request = message.data as TempHPRequest;
         try {
-            const items = await OBR.scene.items.getItems([request.itemId]);
-            if (items) {
-                const item = items[0];
-                const data = item.metadata[itemMetadataKey] as GMGMetadata;
+            if (isNaN(request.tempHP) || isUndefined(request.tempHP)) {
+                sendError(request, `Error updating Temp HP - Invalid Temp HP value ${request.tempHP}`);
+                return;
+            } else {
+                const items = await OBR.scene.items.getItems([request.itemId]);
+                if (items) {
+                    const item = items[0];
+                    const data = item.metadata[itemMetadataKey] as GMGMetadata;
 
-                await changeTempHp(request.tempHP, data, item as Image);
+                    await changeTempHp(Number(request.tempHP), data, item as Image);
 
-                const newData = item.metadata[itemMetadataKey] as GMGMetadata;
-                sendResponse(request, { tempHP: newData.stats.tempHp } as TempHPResponse);
+                    const newData = item.metadata[itemMetadataKey] as GMGMetadata;
+                    sendResponse(request, { tempHP: newData.stats.tempHp } as TempHPResponse);
+                } else {
+                    sendError(request, "Error updating Temp HP - Item not found");
+                }
             }
         } catch {
             sendError(request, "Error updating TempHP");
@@ -128,13 +145,21 @@ export const registerMessageHandlers = async () => {
     OBR.broadcast.onMessage(acRoute, async (message) => {
         const request = message.data as ACRequest;
         try {
-            const items = await OBR.scene.items.getItems([request.itemId]);
-            if (items) {
-                const item = items[0];
-                const data = item.metadata[itemMetadataKey] as GMGMetadata;
-                const ac = Math.max(request.ac, 0);
-                await updateAc(item, { ...data, armorClass: ac });
-                sendResponse(request, { ac: ac } as ACResponse);
+            if (isNaN(request.ac) || isUndefined(request.ac)) {
+                sendError(request, `Error updating AC - Invalid AC value ${request.ac}`);
+            } else {
+                const items = await OBR.scene.items.getItems([request.itemId]);
+                if (items) {
+                    const item = items[0];
+                    const data = item.metadata[itemMetadataKey] as GMGMetadata;
+                    const ac = Math.max(Number(request.ac), 0);
+                    const newData = { ...data, armorClass: ac };
+                    await updateTokenMetadata(newData, [item.id]);
+                    await updateAc(item, newData);
+                    sendResponse(request, { ac: ac } as ACResponse);
+                } else {
+                    sendError(request, "Error updating AC - Item not found");
+                }
             }
         } catch {
             sendError(request, "Error updating AC");
@@ -144,13 +169,19 @@ export const registerMessageHandlers = async () => {
     OBR.broadcast.onMessage(initRoute, async (message) => {
         const request = message.data as InitRequest;
         try {
-            const items = await OBR.scene.items.getItems([request.itemId]);
-            if (items) {
-                const item = items[0];
-                const data = item.metadata[itemMetadataKey] as GMGMetadata;
-                const newData = { ...data, initiative: request.initiative };
-                await updateTokenMetadata(newData, [item.id]);
-                sendResponse(request, { initiative: newData.initiative } as InitResponse);
+            if (isNaN(request.initiative) || isUndefined(request.initiative)) {
+                sendError(request, `Error updating Initiative - Invalid Initiative value ${request.initiative}`);
+            } else {
+                const items = await OBR.scene.items.getItems([request.itemId]);
+                if (items) {
+                    const item = items[0];
+                    const data = item.metadata[itemMetadataKey] as GMGMetadata;
+                    const newData = { ...data, initiative: request.initiative };
+                    await updateTokenMetadata(newData, [item.id]);
+                    sendResponse(request, { initiative: newData.initiative } as InitResponse);
+                } else {
+                    sendError(request, "Error updating Initiative - Item not found");
+                }
             }
         } catch {
             sendError(request, "Error updating Initiative");
@@ -161,7 +192,6 @@ export const registerMessageHandlers = async () => {
         const request = message.data as DiceRequest;
         const room = await OBR.room.getMetadata();
         const dddiceApi = diceRollerStore.getState().rollerApi;
-        const theme = diceRollerStore.getState().theme;
         const addRoll = rollLogStore.getState().addRoll;
 
         try {
@@ -179,8 +209,9 @@ export const registerMessageHandlers = async () => {
                 } else {
                     sendError(request, "Error rolling dice");
                 }
-            } else if (roomData.diceRoller === DICE_ROLLER.DDDICE && dddiceApi && theme) {
-                const parsed = diceToRoll(request.notation, theme.id);
+            } else if (roomData.diceRoller === DICE_ROLLER.DDDICE && dddiceApi) {
+                const dddiceRoomUser = getRoomDiceUser(roomData, OBR.player.id);
+                const parsed = diceToRoll(request.notation, dddiceRoomUser?.diceTheme ?? "dddice-bees");
                 if (parsed) {
                     const dddiceResult = await rollWrapper(dddiceApi, parsed.dice, {
                         label: request.label,
