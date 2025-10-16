@@ -35,6 +35,8 @@ import { updateItems } from "../helper/obrHelper.ts";
 import { updateTokenMetadata } from "../helper/tokenHelper.ts";
 import { migrateTo350 } from "../migrations/v350.ts";
 import { setupDicePlus } from "./diceplus.ts";
+import { registerMessageHandlers } from "./api.ts";
+import { isNull, isUndefined } from "lodash";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -94,6 +96,9 @@ const initRoom = async () => {
         const roomData = metadata[metadataKey] as RoomMetadata;
         if (roomData.ruleset !== "pf" && roomData.ruleset !== "e5") {
             roomData.ruleset = "e5";
+        }
+        if (isNull(roomData.diceRoller) || isUndefined(roomData.diceRoller)) {
+            roomData.diceRoller = DICE_ROLLER.SIMPLE;
         }
     }
     await OBR.room.setMetadata(ownMetadata);
@@ -434,6 +439,7 @@ OBR.onReady(async () => {
     try {
         await setupDddice();
         await setupDicePlus();
+        await registerMessageHandlers();
     } catch (e) {
         await OBR.notification.show(
             "GM's Grimoire dice roller initialization error. Check browser logs for more info.",
