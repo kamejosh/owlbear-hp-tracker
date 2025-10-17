@@ -451,10 +451,14 @@ export const DiceButtonWrapper = ({
                             return <p style={{ paddingRight: "0.5ch" }}>{props.children}</p>;
                         },
                         code: ({ node, ...props }) => {
+                            let dice = props.children?.toString() || "";
                             try {
+                                if (dice.startsWith("+") || dice.startsWith("-")) {
+                                    dice = "1d20" + dice;
+                                }
                                 return (
                                     <DiceButton
-                                        dice={props.children?.toString() || ""}
+                                        dice={dice}
                                         text={props.children?.toString() || ""}
                                         context={context}
                                         stats={stats}
