@@ -36,15 +36,6 @@
     @include breakpoint.laptop {
         &:nth-child(even) {
             justify-self: flex-end;
-            :global {
-                .button-wrapper {
-                    .dice-context-button {
-                        right: unset;
-                        left: 0;
-                        translate: -100% -50%;
-                    }
-                }
-            }
         }
     }
 }
