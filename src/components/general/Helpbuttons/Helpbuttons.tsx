@@ -15,6 +15,8 @@ import { StatblockSvg } from "../../svgs/StatblockSvg.tsx";
 import { updateSceneMetadata } from "../../../helper/helpers.ts";
 import { useMemo } from "react";
 import { useShallow } from "zustand/react/shallow";
+import { useAbilityShareStore } from "../../../context/AbilityShareStore.tsx";
+import styles from "./help-buttons.module.scss";
 
 type HelpButtonsProps = {
     ignoredChanges?: boolean;
@@ -23,6 +25,9 @@ type HelpButtonsProps = {
 
 export const Helpbuttons = (props: HelpButtonsProps) => {
     const [room, scene] = useMetadataContext(useShallow((state) => [state.room, state.scene]));
+    const [abilities, lastReadCount] = useAbilityShareStore(
+        useShallow((state) => [state.abilities, state.lastReadCount]),
+    );
     const playerContext = usePlayerContext();
 
     const playerStatblockPopoverOpen = useMemo(() => {
@@ -85,6 +90,13 @@ export const Helpbuttons = (props: HelpButtonsProps) => {
                     <StatblockSvg />
                 </button>
             </Tippy>
+            {abilities.length > 0 && lastReadCount < abilities.length ? (
+                <Tippy content={`${abilities.length - lastReadCount} new shared abilities`}>
+                    <div className={`shared-abilities-notification ${styles.shareAbilityNotification}`}>
+                        {abilities.length - lastReadCount}
+                    </div>
+                </Tippy>
+            ) : null}
             {playerContext.role == "GM" ? (
                 <Tippy content={"Open Settings"}>
                     <button

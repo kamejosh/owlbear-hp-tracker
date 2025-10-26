@@ -25,7 +25,7 @@ export type RollLogContextType = {
 };
 
 export const rollLogStore = createStore<RollLogContextType>()(
-    persist(
+    persist<RollLogContextType>(
         (set) => ({
             log: [],
             addRoll: (roll) =>

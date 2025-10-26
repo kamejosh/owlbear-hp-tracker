@@ -12,12 +12,14 @@ import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 import { IRoll } from "dddice-js";
 import { isNaN, isUndefined } from "lodash";
 import { getRoomDiceUser } from "../helper/helpers.ts";
+import { AbilityShareEntry, abilityShareStore } from "../context/AbilityShareStore.tsx";
 
-const hpRoute = `${GMG_ID}/api/hp`;
-const tempHpRoute = `${GMG_ID}/api/temp-hp`;
-const acRoute = `${GMG_ID}/api/ac`;
-const initRoute = `${GMG_ID}/api/initiative`;
-const diceRoute = `${GMG_ID}/api/roll`;
+export const hpRoute = `${GMG_ID}/api/hp`;
+export const tempHpRoute = `${GMG_ID}/api/temp-hp`;
+export const acRoute = `${GMG_ID}/api/ac`;
+export const initRoute = `${GMG_ID}/api/initiative`;
+export const diceRoute = `${GMG_ID}/api/roll`;
+export const abilityShareRoute = `${GMG_ID}/api/ability-share`;
 
 const responseChannel = `${GMG_ID}/api/response`;
 const errorChannel = `${GMG_ID}/api/error`;
@@ -246,5 +248,16 @@ export const registerMessageHandlers = async () => {
         } catch {
             sendError(request, "Error rolling dice");
         }
+    });
+
+    OBR.broadcast.onMessage(abilityShareRoute, async (message) => {
+        const request = message.data as AbilityShareEntry;
+        try {
+            const state = abilityShareStore.getState();
+            const playerId = OBR.player.id;
+            if (request.visibleFor?.includes(playerId)) {
+                state.addAbility(request);
+            }
+        } catch {}
     });
 };

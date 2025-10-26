@@ -7,6 +7,8 @@ import { useMemo } from "react";
 import { useE5StatblockContext } from "../../../../context/E5StatblockContext.tsx";
 import Tippy from "@tippyjs/react";
 import { About } from "../About.tsx";
+import { ShareAbilityButton } from "../../../general/ShareAbilityButton.tsx";
+import { usePlayerContext } from "../../../../context/PlayerContext.ts";
 
 export type Ability = components["schemas"]["Action-Output"];
 
@@ -14,12 +16,15 @@ export const E5Ability = ({
     ability,
     proficient,
     range,
+    hideShare,
 }: {
     ability: Ability;
     proficient?: boolean;
     range?: string;
+    hideShare?: boolean;
 }) => {
     const { item, stats, data, tokenName, statblock } = useE5StatblockContext();
+    const playerContext = usePlayerContext();
     const limitValues = data.stats.limits?.find((l) => l.id === ability.limit?.name)!;
 
     const limitReached = limitValues && limitValues.max === limitValues.used;
@@ -80,7 +85,23 @@ export const E5Ability = ({
     return (
         <li key={ability.name} className={"e5-ability"}>
             <span className={"ability-info"}>
-                <b className={"ability-name"}>{ability.name}</b>
+                <div className={"name-and-share"}>
+                    <b className={"ability-name"}>{ability.name}</b>
+                    {hideShare ? null : (
+                        <ShareAbilityButton
+                            entry={{
+                                id: "", // id is set by the button function
+                                itemId: item.id,
+                                username: playerContext.name ?? "",
+                                statblockName: statblock.name,
+                                name: ability.name,
+                                e5Action: ability,
+                                statblockStats: stats,
+                                proficient: proficient,
+                            }}
+                        />
+                    )}
+                </div>
                 {range ? (
                     <div>
                         <b>Range: </b>

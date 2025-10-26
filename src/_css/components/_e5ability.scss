@@ -2,13 +2,20 @@
     display: flex;
     flex-direction: column;
 
-    .ability-name {
-        font-size: 1.2rem;
+    .name-and-share {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-bottom: 4px;
+
+        .ability-name {
+            font-size: 1.2rem;
+        }
     }
 
     .ability-extra-info {
         display: flex;
-        //justify-content: space-between;
+        justify-content: space-between;
         gap: 1ch;
         margin-top: 4px;
         padding-left: 1ch;

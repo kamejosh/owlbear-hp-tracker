@@ -18,6 +18,8 @@ import { ItemCharges } from "./ItemCharges.tsx";
 import { isItemInUse } from "../../../../helper/equipmentHelpers.ts";
 import { addSpellToRollLog } from "../../../../helper/diceHelper.ts";
 import { useRollLogContext } from "../../../../context/RollLogContext.tsx";
+import { ShareAbilityButton } from "../../../general/ShareAbilityButton.tsx";
+import { usePlayerContext } from "../../../../context/PlayerContext.ts";
 
 type Spell = components["schemas"]["src__model_types__e5__spell__Spell"];
 type Upcast = components["schemas"]["SpellUpcast"];
@@ -93,18 +95,17 @@ const Upcast = ({
     );
 };
 
-const Spell = ({
+export const Spell = ({
     spell,
     statblock,
     stats,
     spellSlots,
     charges,
     chargesUsed,
-    tokenData,
-    itemId,
     dc,
     attack,
     embedded,
+    hideShare,
 }: {
     spell: Spell;
     statblock: string;
@@ -112,17 +113,19 @@ const Spell = ({
     spellSlots?: Array<E5SpellSlot> | null;
     charges?: LimitType | null;
     chargesUsed?: number;
-    tokenData?: GMGMetadata;
-    itemId?: string;
     dc?: string | null;
     attack?: string | null;
     embedded?: boolean;
+    hideShare?: boolean;
 }) => {
     const [open, setOpen] = useState<boolean>(false);
     const [upcast, setUpcast] = useState<boolean>(false);
     const statblockContext = useE5StatblockContext();
+    const playerContext = usePlayerContext();
     const room = useMetadataContext(useShallow((state) => state.room));
     const addRoll = useRollLogContext(useShallow((state) => state.addRoll));
+
+    const itemId = statblockContext.item.id;
 
     const getSpellLevel = () => {
         if (spell.level === 0) {
@@ -148,7 +151,7 @@ const Spell = ({
         return undefined;
     }, [spellSlots, spell, charges]);
 
-    const limitValues = tokenData?.stats.limits?.find((l) => l.id === spellLevelLimit?.name);
+    const limitValues = statblockContext.data.stats.limits?.find((l) => l.id === spellLevelLimit?.name);
 
     const limitReached = useMemo(() => {
         return spell.level === 0
@@ -254,7 +257,22 @@ const Spell = ({
                         </span>
                     </div>
                 </div>
-                <button className={`expand ${open ? "open" : null}`} onClick={() => setOpen(!open)}></button>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5ch" }}>
+                    {hideShare ? null : (
+                        <ShareAbilityButton
+                            entry={{
+                                id: "", // id is set by the button function
+                                itemId: statblockContext.item.id,
+                                username: playerContext.name ?? "",
+                                statblockName: statblock,
+                                name: spell.name,
+                                e5Spell: spell,
+                                statblockStats: stats,
+                            }}
+                        />
+                    )}
+                    <button className={`expand ${open ? "open" : null}`} onClick={() => setOpen(!open)}></button>
+                </div>
             </div>
             <div className={`${styles.spellMoreInfo} ${open ? styles.open : null}`}>
                 <div className={`${styles.moreInfoContent} ${open ? styles.micOpen : null}`}>
@@ -347,7 +365,7 @@ const Spell = ({
                                             spell={spell}
                                             statblock={statblock}
                                             spellSlots={spellSlots}
-                                            tokenData={tokenData}
+                                            tokenData={statblockContext.data}
                                             itemId={itemId}
                                         />
                                     );
@@ -362,7 +380,7 @@ const Spell = ({
 
 export const E5Spells = () => {
     const [spellFilter, setSpellFilter] = useState<Array<number>>([]);
-    const { stats, data, item, tokenName, statblock, equipmentBonuses } = useE5StatblockContext();
+    const { stats, data, tokenName, statblock, equipmentBonuses } = useE5StatblockContext();
 
     const spells = statblock.spells || [];
     const equipmentSpells: Array<{ item: number; spells: Array<{ spell: Spell; charges: number }> }> =
@@ -466,8 +484,6 @@ export const E5Spells = () => {
                                     statblock={tokenName}
                                     stats={stats}
                                     spellSlots={statblock.spell_slots}
-                                    tokenData={data}
-                                    itemId={item.id}
                                     dc={statblock.spell_dc}
                                     attack={statblock.spell_attack}
                                 />
@@ -497,8 +513,6 @@ export const E5Spells = () => {
                                                     spellSlots={statblock.spell_slots}
                                                     charges={e.item.charges}
                                                     chargesUsed={spell.charges}
-                                                    tokenData={data}
-                                                    itemId={item.id}
                                                     dc={statblock.spell_dc}
                                                     attack={statblock.spell_attack}
                                                     embedded={true}
@@ -535,10 +549,8 @@ export const E5Spells = () => {
                                                             spell={spell.spell}
                                                             statblock={tokenName}
                                                             stats={stats}
-                                                            tokenData={data}
                                                             charges={e.item.charges}
                                                             chargesUsed={spell.charges}
-                                                            itemId={item.id}
                                                             dc={statblock.spell_dc}
                                                             attack={statblock.spell_attack}
                                                         />

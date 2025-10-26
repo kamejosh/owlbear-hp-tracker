@@ -25,6 +25,8 @@ import { getEquipmentBonuses } from "./equipmentHelpers.ts";
 import { UserSettings } from "../api/tabletop-almanac/useUser.ts";
 import { updateHp } from "./hpHelpers.ts";
 import { updateAc } from "./acHelper.ts";
+import { AbilityShareEntry } from "../context/AbilityShareStore.tsx";
+import { abilityShareRoute } from "../background/api.ts";
 
 export const getYOffset = async (height: number) => {
     const metadata = (await OBR.room.getMetadata()) as Metadata;
@@ -889,4 +891,8 @@ export const modulo = (n: number, m: number) => {
 
 export const delay = (ms: number) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
+export const shareAbility = async (entry: AbilityShareEntry) => {
+    await OBR.broadcast.sendMessage(abilityShareRoute, entry, { destination: "ALL" });
 };

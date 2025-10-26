@@ -2,6 +2,9 @@ import { components } from "../../../../api/schema";
 import { useState } from "react";
 import { DiceButtonWrapper, Stats } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { capitalize, isString } from "lodash";
+import { ShareAbilityButton } from "../../../general/ShareAbilityButton.tsx";
+import { usePFStatblockContext } from "../../../../context/PFStatblockContext.tsx";
+import { usePlayerContext } from "../../../../context/PlayerContext.ts";
 
 export type Action = components["schemas"]["ActionOut"];
 export type Reaction = components["schemas"]["Reaction-Output"];
@@ -11,11 +14,15 @@ export const PfAbility = ({
     ability,
     statblock,
     stats,
+    hideShare,
 }: {
     ability: Action | Reaction | SpecialAbility;
     statblock: string;
     stats: Stats;
+    hideShare?: boolean;
 }) => {
+    const statblockContext = usePFStatblockContext();
+    const playerContext = usePlayerContext();
     const [open, setOpen] = useState<boolean>(false);
 
     const entries = Object.entries(ability);
@@ -62,17 +69,44 @@ export const PfAbility = ({
         <div key={ability.name} className={`pf-ability ${open ? "open" : ""}`}>
             <div className={"main-info"}>
                 <div className={"name-and-description"}>
-                    <b className={"ability-name"}>{ability.name}</b> {actionTypeConvert(ability)}
-                    {Object.keys(ability).includes("description") && (ability as Action).description !== "" ? (
-                        <div className={`ability-description ${isAction(ability) ? "action" : "ability"}`}>
-                            <DiceButtonWrapper
-                                text={(ability as Action).description!}
-                                context={`${capitalize(ability.name)}`}
-                                statblock={statblock}
-                                stats={stats}
+                    <div
+                        style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            gap: "0.5ch",
+                            alignItems: "center",
+                        }}
+                    >
+                        <b className={"ability-name"} style={{ flexShrink: 1 }}>
+                            {ability.name}
+                        </b>{" "}
+                        <span style={{ flexGrow: 1, justifySelf: "flex-start" }}>{actionTypeConvert(ability)}</span>
+                        {hideShare ? null : (
+                            <ShareAbilityButton
+                                entry={{
+                                    id: "", // id is set by the button function
+                                    itemId: statblockContext.item.id,
+                                    username: playerContext.name ?? "",
+                                    statblockName: statblock,
+                                    name: ability.name,
+                                    pfAction: ability,
+                                    statblockStats: stats,
+                                }}
                             />
-                        </div>
-                    ) : null}
+                        )}
+                    </div>
+                    <>
+                        {Object.keys(ability).includes("description") && (ability as Action).description !== "" ? (
+                            <div className={`ability-description ${isAction(ability) ? "action" : "ability"}`}>
+                                <DiceButtonWrapper
+                                    text={(ability as Action).description!}
+                                    context={`${capitalize(ability.name)}`}
+                                    statblock={statblock}
+                                    stats={stats}
+                                />
+                            </div>
+                        ) : null}
+                    </>
                 </div>
                 {hasDetails() ? (
                     <button className={`expand ${open ? "open" : ""}`} onClick={() => setOpen(!open)}></button>

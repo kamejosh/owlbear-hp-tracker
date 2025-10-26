@@ -14,6 +14,9 @@ import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import { useShallow } from "zustand/react/shallow";
+import Tippy from "@tippyjs/react";
+import { SharedAbilities } from "./SharedAbilities.tsx";
+import { useAbilityShareStore } from "../../context/AbilityShareStore.tsx";
 
 type StatblockListProps = {
     minimized: boolean;
@@ -21,11 +24,15 @@ type StatblockListProps = {
     setPinned: (pinned: boolean) => void;
     selection?: string;
 };
+
 export const StatblockList = (props: StatblockListProps) => {
     const tokens = useTokenListContext(useShallow((state) => state.tokens));
     const playerContext = usePlayerContext();
     const [scene, collapsedStatblocks, openStatblocks] = useMetadataContext(
         useShallow((state) => [state.scene, state.scene?.collapsedStatblocks, state.scene?.openStatblocks]),
+    );
+    const [abilities, lastReadCount, setLastReadCount] = useAbilityShareStore(
+        useShallow((state) => [state.abilities, state.lastReadCount, state.setLastReadCount]),
     );
     const { isReady } = SceneReadyContext();
     const [id, setId] = useState<string | undefined>();
@@ -46,8 +53,9 @@ export const StatblockList = (props: StatblockListProps) => {
     }, [tokens, playerContext])();
 
     useEffect(() => {
-        if ((!id || !items.map((i) => i.id).includes(id)) && items.length > 0) {
-            setId(items[0].id);
+        if ((!id || (!items.map((i) => i.id).includes(id) && id !== "shared-abilities")) && items.length > 0) {
+            // setId(items[0].id);
+            setId("shared-abilities"); //TODO remove after development
             if (swiper) {
                 swiper.slideTo(0, 100, false);
             }
@@ -80,6 +88,17 @@ export const StatblockList = (props: StatblockListProps) => {
         updateSwiper();
     }, [scene?.openGroups, openStatblocks, collapsedStatblocks]);
 
+    const renderContent = useCallback(() => {
+        if (props.minimized || !id) {
+            return null;
+        }
+        if (id === "shared-abilities") {
+            return <SharedAbilities />;
+        } else {
+            return <Statblock id={id} />;
+        }
+    }, [props.minimized, id]);
+
     return isReady && scene ? (
         <>
             <Swiper
@@ -93,6 +112,28 @@ export const StatblockList = (props: StatblockListProps) => {
                 mousewheel={{ enabled: true, releaseOnEdges: true }}
             >
                 <SwiperSlide className={"pre"}> </SwiperSlide>
+                <SwiperSlide
+                    className={`statblock-name ${id === "shared-abilities" ? "active" : ""} shared-abilities`}
+                    onClick={() => {
+                        setId("shared-abilities");
+                        setLastReadCount(abilities.length);
+                    }}
+                    title={"Abilities"}
+                    style={{
+                        background: `linear-gradient(to right, #ffffff88 80%, #1C1B22 100%, #1C1B22 )`,
+                        color: "black",
+                        width: "fit-content",
+                    }}
+                >
+                    <Tippy content={"Select to see shared Abilites"}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.5ch" }}>
+                            <span>Abilities</span>
+                            <span style={{ fontWeight: 400, fontSize: "0.8rem" }}>
+                                ({Math.max(abilities.length - lastReadCount, 0)} new)
+                            </span>
+                        </div>
+                    </Tippy>
+                </SwiperSlide>
                 {items.map((item) => {
                     const tokenData = item.metadata[itemMetadataKey] as GMGMetadata;
 
@@ -185,7 +226,7 @@ export const StatblockList = (props: StatblockListProps) => {
                 })}
                 <SwiperSlide className={"post"}> </SwiperSlide>
             </Swiper>
-            {props.minimized ? null : id ? <Statblock id={id} /> : null}
+            {renderContent()}
         </>
     ) : (
         <></>
