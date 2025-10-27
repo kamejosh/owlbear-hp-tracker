@@ -31,6 +31,7 @@
         <li><a href="#multi-selection">Multi Selection</a></li>
       </ul>
       <li><a href="#statblock-popover">Statblock Popover</a></li>
+      <li><a href="#shared-abilits">Shared Abilites</a></li>
     </ul>
     <li><a href="#custom-statblocks">Custom Statblocks</a></li>
     <li><a href="#dice-roller">Dice Roller</a></li>
@@ -384,7 +385,7 @@ This can be used to do AoE damage or healing without entering the values for eac
 
 ![Popover Multiselect](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/multiselect_demo.gif)
 
-<h3 id="game-masters-grimoire-statblock-popover">Game Master's Grimoire statblock popover</h3>
+<h3 id="statblock-popover">Statblock Popover</h3>
 
 Every Token that has a statblock assigned automatically shows up in the Statblock Popover. For Players only the tokens which they own show up in the Statblock Popover.
 
