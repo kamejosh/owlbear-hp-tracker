@@ -21,6 +21,8 @@ export type AbilityShareEntry = {
     itemId: string;
     statblockStats?: Stats;
     proficient?: boolean;
+    spellDc?: string | null;
+    spellAttack?: string | null;
     e5Action?: E5Ability;
     e5Spell?: E5Spell;
     pfAction?: Action | Reaction | SpecialAbility;

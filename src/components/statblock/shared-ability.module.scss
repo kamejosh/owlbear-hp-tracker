@@ -1,7 +1,7 @@
 .abilitiesWrapper {
     border: 2px solid grey;
     border-radius: 3px;
-    padding: 10px 8px 0;
+    padding: 0 8px;
     height: calc(100% - 75px);
     overflow: auto;
     list-style: none;
@@ -15,6 +15,19 @@
         -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
         border-radius: 10px;
         background-color: rgba(255, 255, 255, 0.5);
+    }
+}
+
+.filterWrapper {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background-color: var(--bg-color);
+    padding: 4px 0;
+    width: 100%;
+
+    input {
+        display: flex;
     }
 }
 

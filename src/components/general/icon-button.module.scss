@@ -20,3 +20,8 @@
         background-color: var(--bg-color);
     }
 }
+
+.shareTargetButton {
+    display: flex;
+    flex-direction: column;
+}

@@ -5,7 +5,7 @@ import { Spell as E5Spell } from "../gmgrimoire/statblocks/e5/E5Spells.tsx";
 import { Spell as PFSpell } from "../gmgrimoire/statblocks/pf/PfSpells.tsx";
 import { PfAbility } from "../gmgrimoire/statblocks/pf/PfAbility.tsx";
 import { E5StatblockContext, E5StatblockContextType } from "../../context/E5StatblockContext.tsx";
-import { PropsWithChildren, useMemo } from "react";
+import { PropsWithChildren, useMemo, useState } from "react";
 import { getTokenName } from "../../helper/helpers.ts";
 import { useTokenListContext } from "../../context/TokenContext.tsx";
 import { defaultStats } from "../../helper/variables.ts";
@@ -14,6 +14,7 @@ import { getEquipmentBonuses } from "../../helper/equipmentHelpers.ts";
 import styles from "./shared-ability.module.scss";
 import { usePinnedAbilitiesStore } from "../../context/PinnedAbilitiesStore.tsx";
 import { PFStatblockContext, PFStatblockContextType } from "../../context/PFStatblockContext.tsx";
+import { useDebounce } from "ahooks";
 
 const defaultData: GMGMetadata = {
     hp: 0,
@@ -138,24 +139,33 @@ export const SharedAbilities = () => {
     const [pinnedAbilities, pinAbility, unpinAbility] = usePinnedAbilitiesStore(
         useShallow((state) => [state.pinnedAbilities, state.pinAbility, state.unPinAbility]),
     );
+    const [filter, setFilter] = useState<string>("");
+    const debounceFilter = useDebounce(filter, { wait: 500 });
 
     const sortedAbilities = useMemo(() => {
-        return abilities.sort((a: AbilityShareEntry, b: AbilityShareEntry) => {
-            const aPinnedIndex = pinnedAbilities.indexOf(a.id);
-            const bPinnedIndex = pinnedAbilities.indexOf(b.id);
-            if (aPinnedIndex >= 0 && bPinnedIndex >= 0) {
-                return bPinnedIndex - aPinnedIndex;
-            } else if (aPinnedIndex >= 0 && bPinnedIndex === -1) {
-                return -1;
-            } else if (aPinnedIndex === -1 && bPinnedIndex >= 0) {
-                return 1;
-            } else {
-                const aTime = new Date(a.timestamp ?? "0").getTime();
-                const bTime = new Date(b.timestamp ?? "0").getTime();
-                return bTime - aTime;
-            }
-        });
-    }, [abilities, pinnedAbilities]);
+        return abilities
+            .filter((a) => {
+                return (
+                    a.name.toLowerCase().includes(debounceFilter.toLowerCase()) ||
+                    a.statblockName.toLowerCase().includes(debounceFilter.toLowerCase())
+                );
+            })
+            .sort((a: AbilityShareEntry, b: AbilityShareEntry) => {
+                const aPinnedIndex = pinnedAbilities.indexOf(a.id);
+                const bPinnedIndex = pinnedAbilities.indexOf(b.id);
+                if (aPinnedIndex >= 0 && bPinnedIndex >= 0) {
+                    return bPinnedIndex - aPinnedIndex;
+                } else if (aPinnedIndex >= 0 && bPinnedIndex === -1) {
+                    return -1;
+                } else if (aPinnedIndex === -1 && bPinnedIndex >= 0) {
+                    return 1;
+                } else {
+                    const aTime = new Date(a.timestamp ?? "0").getTime();
+                    const bTime = new Date(b.timestamp ?? "0").getTime();
+                    return bTime - aTime;
+                }
+            });
+    }, [abilities, pinnedAbilities, debounceFilter]);
     const renderAbility = (ability: AbilityShareEntry) => {
         if (ability.e5Action) {
             return (
@@ -172,6 +182,8 @@ export const SharedAbilities = () => {
                         statblock={ability.statblockName}
                         stats={ability.statblockStats ?? defaultStats}
                         hideShare={true}
+                        attack={ability.spellAttack}
+                        dc={ability.spellDc}
                     />
                 </E5AbilityWrapper>
             );
@@ -212,6 +224,16 @@ export const SharedAbilities = () => {
                 }
             }}
         >
+            <div className={styles.filterWrapper}>
+                <input
+                    type={"text"}
+                    placeholder={"filter abilities"}
+                    value={filter}
+                    onChange={(e) => {
+                        setFilter(e.target.value);
+                    }}
+                />
+            </div>
             {sortedAbilities.map((ability, index) => {
                 const pinned = pinnedAbilities.includes(ability.id);
                 const deltaTime = new Date().getTime() - new Date(ability.timestamp ?? "0").getTime();

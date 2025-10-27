@@ -268,6 +268,8 @@ export const Spell = ({
                                 name: spell.name,
                                 e5Spell: spell,
                                 statblockStats: stats,
+                                spellDc: dc,
+                                spellAttack: attack,
                             }}
                         />
                     )}
