@@ -40,6 +40,7 @@ import "./drop-group.scss";
 import { updateItems } from "../../helper/obrHelper.ts";
 import { useShallow } from "zustand/react/shallow";
 import { isUndefined } from "lodash";
+import { useUISettingsContext } from "../../context/UISettingsContext.ts";
 
 type DropGroupProps = {
     title: string;
@@ -58,6 +59,8 @@ export const DropGroup = (props: DropGroupProps) => {
     const [groups, addGroup, removeGroup] = useBattleContext(
         useShallow((state) => [state.groups, state.addGroup, state.removeGroup]),
     );
+    const battleFocus = useUISettingsContext.getState().battleFocus;
+
     const addRoll = useRollLogContext(useShallow((state) => state.addRoll));
     const playerContext = usePlayerContext();
     const initButtonRef = useRef<HTMLButtonElement>(null);
@@ -302,25 +305,27 @@ export const DropGroup = (props: DropGroupProps) => {
                             </button>
                         </div>
                     </div>
-                    <div className={"setting"}>
-                        <RestSvg color={"#888888"} />
-                        <button
-                            className={"button short"}
-                            onClick={() => {
-                                rest(props.list, "Short Rest");
-                            }}
-                        >
-                            short
-                        </button>
-                        <button
-                            className={"button long"}
-                            onClick={() => {
-                                rest(props.list, "Long Rest");
-                            }}
-                        >
-                            long
-                        </button>
-                    </div>
+                    {!battleFocus ? (
+                        <div className={"setting"}>
+                            <RestSvg color={"#888888"} />
+                            <button
+                                className={"button short"}
+                                onClick={() => {
+                                    rest(props.list, "Short Rest");
+                                }}
+                            >
+                                short
+                            </button>
+                            <button
+                                className={"button long"}
+                                onClick={() => {
+                                    rest(props.list, "Long Rest");
+                                }}
+                            >
+                                long
+                            </button>
+                        </div>
+                    ) : null}
                 </div>
 
                 <button

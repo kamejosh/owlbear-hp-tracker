@@ -21,8 +21,15 @@
 
     @include breakpoint.laptop {
         grid-template-rows: 1fr;
-        grid-template-columns: repeat(5, auto);
+        grid-template-columns: repeat(6, auto);
         grid-template-areas: "icon hp ac init sheet rest";
+    }
+
+    &.battle-focus {
+        grid-template-areas: "icon hp ac" ". init .";
+        @media (min-width: 380px) {
+            grid-template-areas: "icon hp ac init";
+        }
     }
 
     &.popover {
