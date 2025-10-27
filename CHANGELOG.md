@@ -1,3 +1,11 @@
+# 3.5.1
+
++ Add Battle Focus Mode: You can now choose to use a reduced UI that only shows HP, AC, and Initiative Elements. This allows for a smaller UI footprint and makes it easier to use on mobile devices.
++ Add Shared Abilities. You can now share every statblock ability between all players, only with the GM, or only with your self. This abilities show up in the statblock popover and can be pinned and filtered. This might be useful for quickly referencing abilities or asking GMs or other players for clarification.
++ Fix context roll buttons for skills in the right column
++ Add GMG API for Behaviors extension
++ Fix implied dice notations for ``+4`` to use a d20
+
 # 3.5.0
 
 + Added [Dice+](https://owlbear.rogue.pub/extension/https://dice-plus.missinglinkdev.com/manifest.json) to supported Dice Rollers

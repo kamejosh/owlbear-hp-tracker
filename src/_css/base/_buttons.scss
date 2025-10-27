@@ -35,62 +35,71 @@ button,
     box-shadow: 0 0 10px var(--bg-color);
     background-color: var(--bg-color);
 
-    @include breakpoint.mobile-and-tablet-only {
-        position: initial;
-        grid-template-columns: repeat(7, 25px);
-        grid-template-areas:
-            "settings changelog help statblock statblock ta ta"
-            ". patreon discord statblock statblock ta ta";
-        justify-content: flex-end;
-        box-shadow: none;
-        background-color: transparent;
-        width: 100%;
-
-        .tabletop-almanac-button {
-            grid-area: ta;
+    &.battle-focus {
+        grid-template-columns: repeat(2, 15px);
+        @media (min-width: 380px) {
+            grid-template-columns: repeat(2, 25px);
         }
+    }
 
-        .patreon-button {
-            grid-area: patreon;
-        }
+    &:not(.battle-focus) {
+        @include breakpoint.mobile-and-tablet-only {
+            position: initial;
+            grid-template-columns: repeat(7, 25px);
+            grid-template-areas:
+                "settings changelog help statblock statblock ta ta"
+                ". patreon discord statblock statblock ta ta";
+            justify-content: flex-end;
+            box-shadow: none;
+            background-color: transparent;
+            width: 100%;
 
-        .statblock-button {
-            grid-area: statblock;
-        }
-
-        .shared-abilities-notification {
-            grid-area: statblock;
-        }
-
-        .settings-button {
-            grid-area: settings;
-        }
-
-        .discord-button {
-            grid-area: discord;
-        }
-
-        .change-log-button {
-            grid-area: changelog;
-        }
-
-        .help-button {
-            grid-area: help;
-        }
-
-        .change-log-button {
-            &.ignored {
-                animation: changeColor 1s ease-in-out 0s 30 alternate;
+            .tabletop-almanac-button {
+                grid-area: ta;
             }
-        }
 
-        &.statblock {
-            display: flex;
+            .patreon-button {
+                grid-area: patreon;
+            }
 
-            .top-button {
-                width: 20px;
-                height: 21px;
-                font-size: 0.7rem;
+            .statblock-button {
+                grid-area: statblock;
+            }
+
+            .shared-abilities-notification {
+                grid-area: statblock;
+            }
+
+            .settings-button {
+                grid-area: settings;
+            }
+
+            .discord-button {
+                grid-area: discord;
+            }
+
+            .change-log-button {
+                grid-area: changelog;
+            }
+
+            .help-button {
+                grid-area: help;
+            }
+
+            .change-log-button {
+                &.ignored {
+                    animation: changeColor 1s ease-in-out 0s 30 alternate;
+                }
+            }
+
+            &.statblock {
+                display: flex;
+
+                .top-button {
+                    width: 20px;
+                    height: 21px;
+                    font-size: 0.7rem;
+                }
             }
         }
     }

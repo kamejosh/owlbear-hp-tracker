@@ -54,8 +54,7 @@ export const StatblockList = (props: StatblockListProps) => {
 
     useEffect(() => {
         if ((!id || (!items.map((i) => i.id).includes(id) && id !== "shared-abilities")) && items.length > 0) {
-            // setId(items[0].id);
-            setId("shared-abilities"); //TODO remove after development
+            setId("shared-abilities");
             if (swiper) {
                 swiper.slideTo(0, 100, false);
             }
