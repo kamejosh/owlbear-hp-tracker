@@ -12,11 +12,3 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(({ chil
         </button>
     );
 });
-
-// export const IconButton = (props: PropsWithChildren & { onClick: () => void }) => {
-//     return (
-//         <button className={styles.iconButton} onClick={props.onClick}>
-//             {props.children}
-//         </button>
-//     );
-// };
