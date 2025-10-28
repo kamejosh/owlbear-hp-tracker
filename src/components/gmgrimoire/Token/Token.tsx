@@ -17,6 +17,7 @@ import { useComponentContext } from "../../../context/ComponentContext.tsx";
 import { Rest } from "./Rest.tsx";
 import { useBattleContext } from "../../../context/BattleContext.tsx";
 import { useShallow } from "zustand/react/shallow";
+import { useUISettingsContext } from "../../../context/UISettingsContext.ts";
 
 type TokenProps = {
     id: string;
@@ -30,6 +31,7 @@ export const Token = (props: TokenProps) => {
     const component = useComponentContext(useShallow((state) => state.component));
     const playerContext = usePlayerContext();
     const room = useMetadataContext(useShallow((state) => state.room));
+    const [battleFocus] = useUISettingsContext(useShallow((state) => [state.battleFocus]));
     const containerRef = useRef<HTMLDivElement>(null);
     const token = useTokenListContext(useShallow((state) => state.tokens?.get(props.id)));
     const data = token?.data as GMGMetadata;
@@ -186,7 +188,7 @@ export const Token = (props: TokenProps) => {
             ref={containerRef}
             className={`token ${playerContext.role === "PLAYER" ? "player" : ""} ${
                 props.selected ? "selected" : ""
-            } ${component} ${data.isCurrent ? "current" : ""} ${showNext ? "next" : ""}`}
+            } ${component} ${data.isCurrent ? "current" : ""} ${showNext ? "next" : ""} ${battleFocus ? "battle-focus" : ""}`}
             style={{
                 background: `linear-gradient(to right, ${getBgColor(data)}, #1C1B22 50%, #1C1B22 )`,
             }}
@@ -216,7 +218,8 @@ export const Token = (props: TokenProps) => {
             <HP id={props.id} />
             <AC id={props.id} />
             <Initiative id={props.id} />
-            {props.popover ? null : playerContext.role === "GM" || item.createdUserId === playerContext.id ? (
+            {props.popover || battleFocus ? null : playerContext.role === "GM" ||
+              item.createdUserId === playerContext.id ? (
                 <>
                     {playerContext.role === "GM" || data.sheet ? <Sheet id={props.id} /> : null}
                     <Rest id={props.id} />

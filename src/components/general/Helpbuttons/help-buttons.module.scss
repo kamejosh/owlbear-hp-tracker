@@ -1,0 +1,24 @@
+@use "../../../_css/utilities/breakpoint";
+
+.shareAbilityNotification {
+    display: flex;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    justify-content: center;
+    align-items: center;
+    translate: -50% -50%;
+    z-index: 1000;
+    border: 1px solid white;
+    border-radius: 8px;
+    background-color: rgba(180, 0, 0);
+    padding: 2px 5px;
+    width: fit-content;
+    height: 15px;
+
+    @include breakpoint.laptop {
+        position: absolute;
+        left: 52%;
+        translate: -50% -25%;
+    }
+}

@@ -18,7 +18,7 @@ export type InventoryFilterContext = {
 };
 
 export const useInventoryFilterContext = create<InventoryFilterContext>()(
-    persist(
+    persist<InventoryFilterContext>(
         (set) => ({
             filter: {
                 filter: {

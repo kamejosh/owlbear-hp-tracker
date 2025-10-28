@@ -33,6 +33,7 @@ import { DraggableLocation, DropResult, DragDropContext } from "@hello-pangea/dn
 import Tippy from "@tippyjs/react";
 import { updateItems } from "../../helper/obrHelper.ts";
 import { useShallow } from "zustand/react/shallow";
+import { FocusSvg } from "../svgs/FocusSvg.tsx";
 
 export const GMGrimoire = () => {
     return (
@@ -56,9 +57,23 @@ const Content = () => {
     const enableAutoSort = !!scene?.enableAutoSort;
     const { isReady } = SceneReadyContext();
     const characterId = useCharSheet(useShallow((state) => state.characterId));
-    const [playerPreview, setPlayerPreview] = useUISettingsContext(
-        useShallow((state) => [state.playerPreview, state.setPlayerPreview]),
+    const [playerPreview, setPlayerPreview, battleFocus, setBattleFocus] = useUISettingsContext(
+        useShallow((state) => [state.playerPreview, state.setPlayerPreview, state.battleFocus, state.setBattleFocus]),
     );
+
+    useEffect(() => {
+        const resizeActionWindow = async () => {
+            if (playerContext.role === "GM") {
+                if (battleFocus) {
+                    await OBR.action.setWidth(410);
+                } else {
+                    await OBR.action.setWidth(570);
+                }
+            }
+        };
+
+        resizeActionWindow();
+    }, [battleFocus, playerContext.role]);
 
     useEffect(() => {
         const initGrimoire = async () => {
@@ -284,14 +299,15 @@ const Content = () => {
         ) : (
             <div className={`gm-grimoire ${playerContext.role === "PLAYER" ? "player" : ""}`}>
                 <Helpbuttons ignoredChanges={ignoredChanges} setIgnoredChange={setIgnoredChanges} />
+
                 {playerContext.role === "PLAYER" ? (
                     <h1 className={"title"}>
                         GM's Grimoire <span className={"small"}>{version}</span>
                     </h1>
                 ) : null}
                 {playerContext.role === "GM" ? (
-                    <div className={`headings`}>
-                        <>
+                    <div className={"ui-buttons"}>
+                        <div className={`headings`}>
                             <Tippy content={"Toggle Player Preview Mode"}>
                                 <button
                                     className={`toggle-preview ${playerPreview ? "active" : ""}`}
@@ -300,6 +316,16 @@ const Content = () => {
                                     }}
                                 >
                                     <PlayerSvg />
+                                </button>
+                            </Tippy>
+                            <Tippy content={"Toggle Battle Focus"}>
+                                <button
+                                    className={`toggle-battle-focus ${battleFocus ? "active" : ""}`}
+                                    onClick={() => {
+                                        setBattleFocus(!battleFocus);
+                                    }}
+                                >
+                                    <FocusSvg />
                                 </button>
                             </Tippy>
                             <span className={"initiative-order"}>
@@ -331,8 +357,8 @@ const Content = () => {
                                     </button>
                                 </Tippy>
                             </span>
-                            <BattleRounds />
-                        </>
+                        </div>
+                        <BattleRounds />
                     </div>
                 ) : null}
                 <div className={"grimoire-content"}>

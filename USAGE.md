@@ -31,6 +31,7 @@
         <li><a href="#multi-selection">Multi Selection</a></li>
       </ul>
       <li><a href="#statblock-popover">Statblock Popover</a></li>
+      <li><a href="#shared-abilits">Shared Abilites</a></li>
     </ul>
     <li><a href="#custom-statblocks">Custom Statblocks</a></li>
     <li><a href="#dice-roller">Dice Roller</a></li>
@@ -61,6 +62,7 @@
 Designed for DnD 5e and PF2e this extension allows tracking and changing Players and Creatures' settings and statblocks while dynamically hiding and showing this information to players.
 
 [Check out the Tutorial](https://youtu.be/uEWr6qooAK8)
+[Check out the Battle Demo](https://youtu.be/N-rgaGysszg)
 
 ![hp-tracker example](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/GameMastersGrimoire.png)
 
@@ -150,7 +152,8 @@ The Token List Buttons are always visible and stick to the upper left corner, ev
 + The Token List Settings
 + The Battle Buttons
 
-The Token List Settings consist of the "Player Preview Toggle"-Button and the "Sort by Initiative"-Section. When the "Player Preview" is active, the Token Images in the Token List display an approximation of what players will see (HP Bar, HP Text, AC). 
+The Token List Settings consist of the "Player Preview Toggle"-Button, "Toggle Battle Focus"-Button, and the "Sort by Initiative"-Section. When the "Player Preview" is active, the Token Images in the Token List display an approximation of what players will see (HP Bar, HP Text, AC). 
+When activating "Battle Focus" the UI get's smaller and only shows the elements necessary to manage a battle.
 
 When the Sort by Initiative Checkbox is active you can choose between ascending and descending to automatically sort all tokens in all groups by initiative. New Tokens added to a group will also automatically be sorted by initiative. You will still be able to sort Tokens manually if they have the same initiative value and the same initiative bonus.
 
@@ -251,6 +254,7 @@ A token in the GMG represents a single Owlbear Item where the GMG Extension has 
 + Dynamic Color Background (based on ratio between HP and max HP)
 + Player Preview
   + Shows an approximation what players will see
+  + Long Press the Icon to resync the Token with TA (if you changed any values there)
 + HP Section
   + Red Heart shows the current HP state
   + Blue Heart shows if temporary HP are active for a token
@@ -381,7 +385,7 @@ This can be used to do AoE damage or healing without entering the values for eac
 
 ![Popover Multiselect](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/multiselect_demo.gif)
 
-<h3 id="game-masters-grimoire-statblock-popover">Game Master's Grimoire statblock popover</h3>
+<h3 id="statblock-popover">Statblock Popover</h3>
 
 Every Token that has a statblock assigned automatically shows up in the Statblock Popover. For Players only the tokens which they own show up in the Statblock Popover.
 
@@ -397,6 +401,11 @@ The Popover displays all available statblocks indicating which statblock is curr
 By default when selecting a Token either in the [Game Master's Grimoire Action Window](#game-masters-grimoire-action-window) or in the Scene. The associated statblock of the selected Token is displayed except when the statblock is collapsed. This can be prevented by "pinning" a statblocks. While pinned no automatic switching is done even when another statblock is selected. To reactivate automatic switching unselect the pin on the currently active statblock.
 
 ![Statblock Demo](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/statblock_demo.gif)
+
+<h4 id="shared-abilits">Shared Abilities</h4>
+
+The Statblock Popover also shows a list of all abilities that have been shared with you. You can pin and search these abilities. They are still connected with the token they've been shared from, so in case you use a limited ability it will reduce the uses for the statblock.
+
 
 <h1 id="custom-statblocks">Custom Statblocks</h1>
 

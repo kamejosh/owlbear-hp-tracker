@@ -4,23 +4,32 @@ import { getDamage } from "../../../../helper/helpers.ts";
 import { PfSpell, usePfGetSpell } from "../../../../api/pf/usePfApi.ts";
 import { components } from "../../../../api/schema";
 import { SpellFilter } from "../SpellFilter.tsx";
-import { capitalize } from "lodash";
+import { capitalize, isNull } from "lodash";
 import { useMetadataContext } from "../../../../context/MetadataContext.ts";
 import { useShallow } from "zustand/react/shallow";
 import { FancyLineBreak, LineBreak } from "../../../general/LineBreak.tsx";
 import styles from "./statblock-spells.module.scss";
+import { ShareAbilityButton } from "../../../general/ShareAbilityButton.tsx";
+import { usePFStatblockContext } from "../../../../context/PFStatblockContext.tsx";
+import { usePlayerContext } from "../../../../context/PlayerContext.ts";
 
 export type PfSpellCategory = components["schemas"]["SpellCategoryOut"];
 export type PfSpellList = components["schemas"]["SpelllistOut"];
 export type PfSpellOut = components["schemas"]["SpellStatblockOut"];
 
-const Spell = (props: { spell: PfSpellOut; statblock: string; stats: Stats }) => {
+export const Spell = (props: { spell: PfSpellOut; statblock: string; stats: Stats; hideShare?: boolean }) => {
     const room = useMetadataContext(useShallow((state) => state.room));
+    const statblockContext = usePFStatblockContext();
+    const playerContext = usePlayerContext();
     const [open, setOpen] = useState<boolean>(false);
 
     const spellQuery = usePfGetSpell(props.spell.slug, room?.tabletopAlmanacAPIKey);
 
     const spell: PfSpell | null = spellQuery.isSuccess && spellQuery.data ? spellQuery.data : null;
+
+    if (isNull(spell)) {
+        return null;
+    }
 
     const damage = getDamage(spell?.description?.text || "");
 
@@ -30,6 +39,19 @@ const Spell = (props: { spell: PfSpellOut; statblock: string; stats: Stats }) =>
                 <div className={"spell-info"}>
                     <div className={"spell-header"}>
                         <h4 className={"spell-name"}>{spell?.name}</h4>
+                        {props.hideShare ? null : (
+                            <ShareAbilityButton
+                                entry={{
+                                    id: "", // id is set by the button function
+                                    itemId: statblockContext.item.id,
+                                    username: playerContext.name ?? "",
+                                    statblockName: statblockContext.statblock.name,
+                                    name: spell.name,
+                                    pfSpell: spell,
+                                    statblockStats: statblockContext.statblock.stats,
+                                }}
+                            />
+                        )}
                     </div>
                     {damage ? (
                         <span className={"spell-damage"}>
@@ -56,7 +78,9 @@ const Spell = (props: { spell: PfSpellOut; statblock: string; stats: Stats }) =>
                         </div>
                     ) : null}
                 </div>
-                <button className={`expand ${open ? "open" : null}`} onClick={() => setOpen(!open)}></button>
+                {props.hideShare ? null : (
+                    <button className={`expand ${open ? "open" : null}`} onClick={() => setOpen(!open)}></button>
+                )}
             </div>
             <div className={`spell-more-info ${open ? "open" : null}`}>
                 <div className={"more-info-content"}>
@@ -192,17 +216,12 @@ const PfSpellListComponent = (props: { list: PfSpellList; statblock: string; sta
             </h4>
             <ul className={"spells"}>
                 {!!props.list.spells
-                    ? props.list.spells.map((spell) => {
+                    ? props.list.spells.map((spell, index) => {
                           return (
-                              <>
-                                  <Spell
-                                      spell={spell}
-                                      key={spell.slug}
-                                      statblock={props.statblock}
-                                      stats={props.stats}
-                                  />
+                              <div key={index}>
+                                  <Spell spell={spell} statblock={props.statblock} stats={props.stats} />
                                   <LineBreak />
-                              </>
+                              </div>
                           );
                       })
                     : null}

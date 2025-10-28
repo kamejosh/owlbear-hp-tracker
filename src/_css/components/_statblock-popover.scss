@@ -5,8 +5,8 @@
     }
 
     .statblock-popover {
-        height: 100%;
         position: relative;
+        height: 100%;
 
         &.minimized {
             &::before {

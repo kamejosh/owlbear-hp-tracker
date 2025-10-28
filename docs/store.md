@@ -12,7 +12,6 @@ tags:
 manifest: https://gmg.tabletop-almanac.com/manifest.json
 learn-more: https://github.com/kamejosh/owlbear-hp-tracker
 ---
-
 <details>
   <summary style="font-size:1.5rem;font-weight:bold;">Table of Content</summary>
   <ul>
@@ -46,6 +45,7 @@ learn-more: https://github.com/kamejosh/owlbear-hp-tracker
         <li><a href="#multi-selection">Multi Selection</a></li>
       </ul>
       <li><a href="#statblock-popover">Statblock Popover</a></li>
+      <li><a href="#shared-abilits">Shared Abilites</a></li>
     </ul>
     <li><a href="#custom-statblocks">Custom Statblocks</a></li>
     <li><a href="#dice-roller">Dice Roller</a></li>
@@ -76,6 +76,7 @@ learn-more: https://github.com/kamejosh/owlbear-hp-tracker
 Designed for DnD 5e and PF2e this extension allows tracking and changing Players and Creatures' settings and statblocks while dynamically hiding and showing this information to players.
 
 [Check out the Tutorial](https://youtu.be/uEWr6qooAK8)
+[Check out the Battle Demo](https://youtu.be/N-rgaGysszg)
 
 ![hp-tracker example](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/GameMastersGrimoire.png)
 
@@ -95,9 +96,9 @@ Your players rest at a campsite, but they fell asleep during their watch and wer
 + Copy the Hobgoblin Token four times
 + Roll initiative for the whole group and sort by initiative
 + Optional:
-  + Activate the participating groups for battle
-  + Start the battle using the "Start Battle"-Button
-  + Use The "Next" or "Back" button to circle through the battle participants and highlight the current token.
+    + Activate the participating groups for battle
+    + Start the battle using the "Start Battle"-Button
+    + Use The "Next" or "Back" button to circle through the battle participants and highlight the current token.
 
 <h2 id="video-example">Video Example</h2>
 
@@ -165,7 +166,8 @@ The Token List Buttons are always visible and stick to the upper left corner, ev
 + The Token List Settings
 + The Battle Buttons
 
-The Token List Settings consist of the "Player Preview Toggle"-Button and the "Sort by Initiative"-Section. When the "Player Preview" is active, the Token Images in the Token List display an approximation of what players will see (HP Bar, HP Text, AC).
+The Token List Settings consist of the "Player Preview Toggle"-Button, "Toggle Battle Focus"-Button, and the "Sort by Initiative"-Section. When the "Player Preview" is active, the Token Images in the Token List display an approximation of what players will see (HP Bar, HP Text, AC).
+When activating "Battle Focus" the UI get's smaller and only shows the elements necessary to manage a battle.
 
 When the Sort by Initiative Checkbox is active you can choose between ascending and descending to automatically sort all tokens in all groups by initiative. New Tokens added to a group will also automatically be sorted by initiative. You will still be able to sort Tokens manually if they have the same initiative value and the same initiative bonus.
 
@@ -200,7 +202,7 @@ The following settings are available:
 + Disable HP Bar: In case you don't want to display any HP Bar you can check this setting here.
 + Text and Bar Offset: To have a more flexible positioning of the HP Bar and Text, a value can be entered (negative or positive number) and the position of the HP Bar and Text is then adjusted by this value.
 + Armorclass Icon and Text Offset: To have a more flexible positioning of the AC Background and Text an offset for the X- and Y-Axis can be added. This value is scaled considering the Token size.
-+ Use calculated rolls (no 3D dice): By default the dice roller is enabled if you don't want to use dddice for dice rolling you can activate this option and an integrated dice roller will be used. This makes dice rolling faster because the calculation is done locally but you will not see beautiful 3D rendered dice.
++ Dice Roller: You can select which Dice Roller you want to use. By default the dddice roller is selected but you can also use the Simple Dice Roller or the [Dice+](https://owlbear.rogue.pub/extension/https://dice-plus.missinglinkdev.com/manifest.json) extension.
 + Allow negative HP/AC: By default negative HP and AC are not allowed but when this settings is checked then HP and AC can be set to negative numbers. The HP Bar will always display negative HP the same as when it is 0.
 + Sort Tokens in Player View: When active, the [Player Action Window](#player-action-window) will display Tokens ordered by their initiative value. If not active, Tokens will have the same order as they were added to the scene (so kind of random).
 + Set Initiative Dice: This setting decides with which "dice" the roll initiative button in the groups and the token works. The default is 20, meaning a value from 1 to 20 (excl. modifiers) can be rolled. By setting it to 10 the value can only range from 1 to 10. When using 3D dice only values that are available in the selected theme should be used.
@@ -240,8 +242,8 @@ Double-clicking a token focuses the scene on the corresponding icon:
 GMG's groups offer a lot of functionality besides grouping tokens together. There are multiple reasons to consider groups:
 
 + For larger maps it makes sense to group creatures of areas together to keep a better overview
-  + collapsing groups of creatures currently not seen by the players
-  + keeping an overview over which creatures will be fighting in the next battle.
+    + collapsing groups of creatures currently not seen by the players
+    + keeping an overview over which creatures will be fighting in the next battle.
 + The group buttons allow you to change every token of the group at the same time
 + You want to keep a group as reserve not yet part of the initiative order and activate it once it's time
 
@@ -265,29 +267,30 @@ A token in the GMG represents a single Owlbear Item where the GMG Extension has 
 
 + Dynamic Color Background (based on ratio between HP and max HP)
 + Player Preview
-  + Shows an approximation what players will see
+    + Shows an approximation what players will see
+    + Long Press the Icon to resync the Token with TA (if you changed any values there)
 + HP Section
-  + Red Heart shows the current HP state
-  + Blue Heart shows if temporary HP are active for a token
-  + current HP / max HP on the top row
-  + temp HP / [Map Button](#map-button) on the bottom row
+    + Red Heart shows the current HP state
+    + Blue Heart shows if temporary HP are active for a token
+    + current HP / max HP on the top row
+    + temp HP / [Map Button](#map-button) on the bottom row
 + AC Section
-  + Input for the AC
-  + [Map Button](#map-button)
+    + Input for the AC
+    + [Map Button](#map-button)
 + Initiative Section
-  + Input for the current initiative
-  + Dice Button to roll Initiative (automatically sets the current initiative) with initiative bonus modifier
-  + Input for initiative Bonus
-    + Is automatically prefilled by the selected statblock (DEX modifier for DnD and perception value for PF2e)
-  + Player List Button: When selected the token shows up in the [Player Action Window](#player-action-window)
+    + Input for the current initiative
+    + Dice Button to roll Initiative (automatically sets the current initiative) with initiative bonus modifier
+    + Input for initiative Bonus
+        + Is automatically prefilled by the selected statblock (DEX modifier for DnD and perception value for PF2e)
+    + Player List Button: When selected the token shows up in the [Player Action Window](#player-action-window)
 + Statblock Section
-  + Open the assigned statblock or delete it
-  + If no statblock is assigned open the statblock search
-  + transfer token ownership to a player
-    + If this is set, a square in the players color indicates that this token is assigned to a player
-    + This player will have full access to the statblock
-    + This player will see this token in their Player Action Window (no matter the Player List Button setting)
-    + This works together with Smoke & Specter token ownership as it uses the base owlbear rodeo token ownership setting
+    + Open the assigned statblock or delete it
+    + If no statblock is assigned open the statblock search
+    + transfer token ownership to a player
+        + If this is set, a square in the players color indicates that this token is assigned to a player
+        + This player will have full access to the statblock
+        + This player will see this token in their Player Action Window (no matter the Player List Button setting)
+        + This works together with Smoke & Specter token ownership as it uses the base owlbear rodeo token ownership setting
 
 A token that is selected in the scene has a white border. A token whose turn it is in the current battle has a red border.
 
@@ -302,7 +305,7 @@ Values can be changed in a few different ways:
 + Arithmetic operations: for the HP field the value can be changed via arithmetic (+ and -) operations. If the current value is `"10"` and you edit the field like this `"10 + 3"` the field value will be changed to `"13"` once you select anything outside of the field or press enter.
 + Arrow Keys: when focus is on HP, maxHP, tempHP or AC you can increase or decrease the values by 1 by pressing up or down arrow key respectively
 + Entering a number: when focused on any field, you can delete its content and enter a new value.
-  + Note that changing the maxHP or tempHP field influences the HP field.
+    + Note that changing the maxHP or tempHP field influences the HP field.
 + Rolling Initiative: When clicking the Initiative Button a random number between 1 and the chosen [Initiative Dice](#settings) (default: 20) is rolled and the dexterity modifier (5e) or perception (pf2e) from the [Statblock](#statblock) (if selected) is added and entered as the final initiative value. You can also change the initiative bonus to any number, once a statblock is assigned. By default a 3D dice is rolled to determine the random value.
 
 **Note: The HP value can never exceed the maxHP value ([except when maxHP is 0](#initializing-token)). It can also not be a negative number if the [Setting](#settings) for "Allow negative numbers" is not selected. All symbols except numbers will be removed to maintain a compatible value.**
@@ -396,7 +399,7 @@ This can be used to do AoE damage or healing without entering the values for eac
 
 ![Popover Multiselect](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/multiselect_demo.gif)
 
-<h3 id="game-masters-grimoire-statblock-popover">Game Master's Grimoire statblock popover</h3>
+<h3 id="statblock-popover">Statblock Popover</h3>
 
 Every Token that has a statblock assigned automatically shows up in the Statblock Popover. For Players only the tokens which they own show up in the Statblock Popover.
 
@@ -412,6 +415,11 @@ The Popover displays all available statblocks indicating which statblock is curr
 By default when selecting a Token either in the [Game Master's Grimoire Action Window](#game-masters-grimoire-action-window) or in the Scene. The associated statblock of the selected Token is displayed except when the statblock is collapsed. This can be prevented by "pinning" a statblocks. While pinned no automatic switching is done even when another statblock is selected. To reactivate automatic switching unselect the pin on the currently active statblock.
 
 ![Statblock Demo](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/statblock_demo.gif)
+
+<h4 id="shared-abilits">Shared Abilities</h4>
+
+The Statblock Popover also shows a list of all abilities that have been shared with you. You can pin and search these abilities. They are still connected with the token they've been shared from, so in case you use a limited ability it will reduce the uses for the statblock.
+
 
 <h1 id="custom-statblocks">Custom Statblocks</h1>
 
@@ -477,16 +485,16 @@ While hovering over a dice button the little dice inside the button begins to sh
 These optional parameters are:
 
 + ADV
-  + changes the dice roll to 2d20kh1 (roll 2 d20 and keep the highest one) + modifier
+    + changes the dice roll to 2d20kh1 (roll 2 d20 and keep the highest one) + modifier
 + DIS
-  + changes the dice roll to 2d20dh1 (roll 2 d20 and drop the highest one) + modifier
+    + changes the dice roll to 2d20dh1 (roll 2 d20 and drop the highest one) + modifier
 + HIDE
-  + Dice roll will only be visible for you other people will not be notified and it will not show up in their dice log
+    + Dice roll will only be visible for you other people will not be notified and it will not show up in their dice log
 
 Dice that are marked as Damage Dice have optional roll button:
 
 + CRIT
-  + automatically rolls the damage as a crit based on the selected crit rules on [Tabletop Almanac](https://tabletop-almanac.com)
+    + automatically rolls the damage as a crit based on the selected crit rules on [Tabletop Almanac](https://tabletop-almanac.com)
 
 ![Dice Button Hover](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/dice_button_hover.png)
 
@@ -539,3 +547,8 @@ Using dddice you can roll dice in your DnD Beyond Character Sheets and see those
 When in the [Settings](#room-settings) the option "Use calculated rolls" is activated, dddice is disabled. GMG will then use a local script to calculate the result of the chosen dice-roll and use the OBR broadcast API to notify all connected players of the result.
 
 The simple dice-calculator uses the [rpg-dice-roller](https://dice-roller.github.io/documentation/) package under the hood. Available dice notations for custom dice buttons and the quickroll function can be found [here](https://dice-roller.github.io/documentation/guide/notation/).
+
+<h2 id="dice-plus">Dice Plus</h2>
+
+Since version 3.5.0 GMG supports [Dice+](https://owlbear.rogue.pub/extension/https://dice-plus.missinglinkdev.com/manifest.json) as a dice roller.  
+After installing the extension, you have to reload website (so that GMG ad Dice+ can exchange setup data with each other) and select the Dice+ extension as you dice roller in the settings.

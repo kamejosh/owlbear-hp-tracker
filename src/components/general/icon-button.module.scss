@@ -1,0 +1,27 @@
+.iconButton {
+    padding: 0;
+    width: 32px;
+    height: 24px;
+    overflow: hidden;
+
+    svg {
+        transition: all 0.25s ease-in-out;
+        width: 32px;
+        height: 22px;
+        fill: white;
+    }
+
+    &:hover,
+    &:focus-visible {
+        background-color: var(--bg-color-light);
+    }
+
+    &:active {
+        background-color: var(--bg-color);
+    }
+}
+
+.shareTargetButton {
+    display: flex;
+    flex-direction: column;
+}
