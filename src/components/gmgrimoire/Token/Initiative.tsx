@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
 import { GMGMetadata } from "../../../helper/types.ts";
@@ -15,15 +15,35 @@ import { setPrettySordidInitiative } from "../../../helper/prettySordidHelpers.t
 import { DiceButton } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { defaultStats } from "../../../helper/variables.ts";
 import { isNumber, toInteger } from "lodash";
+import { useDebounce } from "ahooks";
 
 export const Initiative = ({ id }: { id: string }) => {
     const playerContext = usePlayerContext();
-    const initRef = useRef<HTMLInputElement>(null);
-    const initBonusRef = useRef<HTMLInputElement>(null);
     const [room, taSettings] = useMetadataContext(useShallow((state) => [state.room, state.taSettings]));
     const token = useTokenListContext(useShallow((state) => state.tokens?.get(id)));
     const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
+    const [initiative, setInitiative] = useState<string>(data.initiative.toString());
+    const [initiativeBonus, setInitiativeBonus] = useState<string>(data.stats.initiativeBonus.toString());
+    const debouncedInitiative = useDebounce(initiative, { wait: 500 });
+    const debouncedInitiativeBonus = useDebounce(initiativeBonus, { wait: 500 });
+
+    useEffect(() => {
+        const update = async () => {
+            const newData = { ...data, initiative: Number(debouncedInitiative) };
+            await updateTokenMetadata(newData, [id]);
+            await setPrettySordidInitiative(id, taSettings, Number(debouncedInitiative));
+        };
+        void update();
+    }, [debouncedInitiative]);
+
+    useEffect(() => {
+        const update = async () => {
+            const newData = { ...data, stats: { initiativeBonus: Number(debouncedInitiativeBonus) } };
+            await updateTokenMetadata(newData, [id]);
+        };
+        void update();
+    }, [debouncedInitiativeBonus]);
 
     const customDiceTheme = useMemo(() => {
         if (item.createdUserId != playerContext.id) {
@@ -35,18 +55,6 @@ export const Initiative = ({ id }: { id: string }) => {
         }
     }, [item, playerContext, room]);
 
-    useEffect(() => {
-        if (initRef && initRef.current) {
-            initRef.current.value = String(data?.initiative);
-        }
-    }, [data?.initiative]);
-
-    useEffect(() => {
-        if (initBonusRef && initBonusRef.current) {
-            initBonusRef.current.value = String(data?.stats.initiativeBonus);
-        }
-    }, [data?.stats.initiativeBonus]);
-
     return (
         <div className={"initiative-wrapper"}>
             <InitiativeSvg />
@@ -54,13 +62,14 @@ export const Initiative = ({ id }: { id: string }) => {
                 <input
                     type={"number"}
                     size={1}
-                    value={String(data.initiative)}
+                    value={initiative}
                     step={0.1}
-                    ref={initRef}
-                    onChange={async (e) => {
-                        const newData = { ...data, initiative: Number(e.target.value) };
-                        await updateTokenMetadata(newData, [id]);
-                        await setPrettySordidInitiative(id, taSettings, Number(e.target.value));
+                    onChange={(e) => {
+                        let value = e.target.value;
+                        if (value.length > 1 && value.startsWith("0")) {
+                            value = value.substring(1);
+                        }
+                        setInitiative(value);
                     }}
                     className={"initiative"}
                 />
@@ -72,21 +81,19 @@ export const Initiative = ({ id }: { id: string }) => {
                 stats={defaultStats}
                 statblock={getTokenName(item) ?? data.sheet}
                 onRoll={async (rollResult) => {
-                    let initiative = 0;
+                    let localInitiative = 0;
                     try {
                         if (rollResult && "total" in rollResult) {
-                            initiative = rollResult.total;
+                            localInitiative = rollResult.total;
                         } else if (rollResult && "total_value" in rollResult && isNumber(rollResult.total_value)) {
-                            initiative = toInteger(rollResult.total_value);
+                            localInitiative = toInteger(rollResult.total_value);
                         } else if (rollResult && "values" in rollResult) {
-                            initiative = rollResult.values.map((v) => v.value).reduce((a, b) => a + b, 0);
+                            localInitiative = rollResult.values.map((v) => v.value).reduce((a, b) => a + b, 0);
                         } else if (rollResult && "result" in rollResult) {
-                            initiative = rollResult.result.totalValue;
+                            localInitiative = rollResult.result.totalValue;
                         }
                     } catch {}
-                    const newData = { ...data, initiative: initiative };
-                    await updateTokenMetadata(newData, [id]);
-                    await setPrettySordidInitiative(id, taSettings, initiative);
+                    setInitiative(localInitiative.toString());
                 }}
                 classes={"init-wrapper"}
                 customDiceThemeId={customDiceTheme}
@@ -96,20 +103,14 @@ export const Initiative = ({ id }: { id: string }) => {
                 <input
                     type={"number"}
                     size={1}
-                    defaultValue={data.stats.initiativeBonus}
+                    value={initiativeBonus}
                     step={1}
-                    ref={initBonusRef}
-                    onBlur={async (e) => {
-                        const value = Number(e.target.value);
-                        const newData = { ...data, stats: { initiativeBonus: value } };
-                        await updateTokenMetadata(newData, [id]);
-                    }}
-                    onKeyDown={async (e) => {
-                        if (e.key === "Enter") {
-                            const value = Number(e.currentTarget.value);
-                            const newData = { ...data, stats: { initiativeBonus: value } };
-                            await updateTokenMetadata(newData, [id]);
+                    onChange={(e) => {
+                        let value = e.target.value;
+                        if (value.length > 1 && value.startsWith("0")) {
+                            value = value.substring(1);
                         }
+                        setInitiativeBonus(value);
                     }}
                     className={"initiative-bonus"}
                 />

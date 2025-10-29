@@ -3,7 +3,7 @@ import { changeArmorClass, updateTokenMetadata } from "../../../helper/tokenHelp
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
 import { GMGMetadata } from "../../../helper/types.ts";
 import { Image } from "@owlbear-rodeo/sdk";
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { ACSvg } from "../../svgs/ACSvg.tsx";
 import { MapButton } from "./MapButton.tsx";
 import "./ac.scss";
@@ -11,20 +11,25 @@ import { updateAc } from "../../../helper/acHelper.ts";
 import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import Tippy from "@tippyjs/react";
 import { useShallow } from "zustand/react/shallow";
+import { useDebounce } from "ahooks";
 
 export const AC = ({ id, hideExtras }: { id: string; hideExtras?: boolean }) => {
     const playerContext = usePlayerContext();
     const room = useMetadataContext(useShallow((state) => state.room));
-    const acRef = useRef<HTMLInputElement>(null);
     const token = useTokenListContext(useShallow((state) => state.tokens?.get(id)));
     const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
+    const [ac, setAc] = useState<string>(data.armorClass.toString());
+    const debouncedAc = useDebounce(ac, { wait: 500 });
 
     useEffect(() => {
-        if (acRef && acRef.current) {
-            acRef.current.value = String(data?.armorClass);
+        let factor = 1;
+        if (room?.allowNegativeNumbers) {
+            factor = debouncedAc.startsWith("-") ? -1 : 1;
         }
-    }, [data?.armorClass]);
+        const value = Number(debouncedAc.replace(/[^0-9]/g, ""));
+        changeArmorClass(value * factor, data, item, room);
+    }, [debouncedAc]);
 
     return (
         <div className={`token-ac ${hideExtras ? "no-extras" : ""}`}>
@@ -34,20 +39,16 @@ export const AC = ({ id, hideExtras }: { id: string; hideExtras?: boolean }) => 
                     className={"ac-input"}
                     type={"text"}
                     size={1}
-                    value={data.armorClass}
+                    value={ac}
                     onChange={(e) => {
-                        let factor = 1;
-                        if (room?.allowNegativeNumbers) {
-                            factor = e.target.value.startsWith("-") ? -1 : 1;
-                        }
-                        const value = Number(e.target.value.replace(/[^0-9]/g, ""));
-                        changeArmorClass(value * factor, data, item, room);
+                        setAc(e.target.value);
                     }}
                     onKeyDown={(e) => {
+                        const currentValue = Number(e.currentTarget.value);
                         if (e.key === "ArrowUp") {
-                            changeArmorClass(data.armorClass + 1, data, item, room);
+                            setAc((currentValue + 1).toString());
                         } else if (e.key === "ArrowDown") {
-                            changeArmorClass(data.armorClass - 1, data, item, room);
+                            setAc((currentValue - 1).toString());
                         }
                     }}
                 />
