@@ -23,8 +23,8 @@ export const Initiative = ({ id }: { id: string }) => {
     const token = useTokenListContext(useShallow((state) => state.tokens?.get(id)));
     const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
-    const [initiative, setInitiative] = useState<number>(data.initiative);
-    const [initiativeBonus, setInitiativeBonus] = useState<number>(data.stats.initiativeBonus);
+    const [initiative, setInitiative] = useState<string>(data.initiative.toString());
+    const [initiativeBonus, setInitiativeBonus] = useState<string>(data.stats.initiativeBonus.toString());
     const debouncedInitiative = useDebounce(initiative, { wait: 500 });
     const debouncedInitiativeBonus = useDebounce(initiativeBonus, { wait: 500 });
 
@@ -39,7 +39,7 @@ export const Initiative = ({ id }: { id: string }) => {
 
     useEffect(() => {
         const update = async () => {
-            const newData = { ...data, stats: { initiativeBonus: debouncedInitiativeBonus } };
+            const newData = { ...data, stats: { initiativeBonus: Number(debouncedInitiativeBonus) } };
             await updateTokenMetadata(newData, [id]);
         };
         void update();
@@ -65,7 +65,11 @@ export const Initiative = ({ id }: { id: string }) => {
                     value={initiative}
                     step={0.1}
                     onChange={(e) => {
-                        setInitiative(Number(e.target.value));
+                        let value = e.target.value;
+                        if (value.length > 1 && value.startsWith("0")) {
+                            value = value.substring(1);
+                        }
+                        setInitiative(value);
                     }}
                     className={"initiative"}
                 />
@@ -89,7 +93,7 @@ export const Initiative = ({ id }: { id: string }) => {
                             localInitiative = rollResult.result.totalValue;
                         }
                     } catch {}
-                    setInitiative(localInitiative);
+                    setInitiative(localInitiative.toString());
                 }}
                 classes={"init-wrapper"}
                 customDiceThemeId={customDiceTheme}
@@ -102,7 +106,11 @@ export const Initiative = ({ id }: { id: string }) => {
                     value={initiativeBonus}
                     step={1}
                     onChange={(e) => {
-                        setInitiativeBonus(Number(e.target.value));
+                        let value = e.target.value;
+                        if (value.length > 1 && value.startsWith("0")) {
+                            value = value.substring(1);
+                        }
+                        setInitiativeBonus(value);
                     }}
                     className={"initiative-bonus"}
                 />

@@ -7,6 +7,7 @@ export type BattleContextType = {
     current: string | null;
     next: string | null;
     battle: boolean;
+    battleRound: number;
 };
 
 export type BattleContextActions = {
@@ -16,15 +17,17 @@ export type BattleContextActions = {
     setCurrent: (id: string | null) => void;
     setNext: (id: string | null) => void;
     setBattle: (battle: boolean) => void;
+    setBattleRound: (battleRound: number) => void;
 };
 
 export const useBattleContext = create<BattleContextType & BattleContextActions>()(
-    persist(
+    persist<BattleContextType & BattleContextActions>(
         (set) => ({
             groups: [] as Array<string>,
             current: null,
             next: null,
             battle: false,
+            battleRound: 1,
             setCurrent: (id) =>
                 set(() => {
                     return { current: id };
@@ -57,6 +60,10 @@ export const useBattleContext = create<BattleContextType & BattleContextActions>
             setBattle: (battle) =>
                 set(() => {
                     return { battle: battle };
+                }),
+            setBattleRound: (battleRound) =>
+                set(() => {
+                    return { battleRound: battleRound };
                 }),
         }),
         { name: `${ID}.battle-context`, storage: createJSONStorage(() => localStorage) },

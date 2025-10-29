@@ -18,17 +18,20 @@ export const BattleRounds = () => {
     const tokens = useTokenListContext(useShallow((state) => state.tokens));
     const [scene, taSettings] = useMetadataContext(useShallow((state) => [state.scene, state.taSettings]));
     const [hold, setHold] = useState<boolean>(false);
-    const [groups, setGroups, current, setCurrent, battle, setBattle, setNext] = useBattleContext(
-        useShallow((state) => [
-            state.groups,
-            state.setGroups,
-            state.current,
-            state.setCurrent,
-            state.battle,
-            state.setBattle,
-            state.setNext,
-        ]),
-    );
+    const [groups, setGroups, current, setCurrent, battle, setBattle, setNext, battleRound, setBattleRound] =
+        useBattleContext(
+            useShallow((state) => [
+                state.groups,
+                state.setGroups,
+                state.current,
+                state.setCurrent,
+                state.battle,
+                state.setBattle,
+                state.setNext,
+                state.battleRound,
+                state.setBattleRound,
+            ]),
+        );
     const tokensData: Array<{ data: GMGMetadata; item: Image }> = tokens
         ? [...tokens].map((t) => {
               return { data: t[1].data, item: t[1].item };
@@ -99,7 +102,6 @@ export const BattleRounds = () => {
             return tokens;
         }
     }, [tokensData, groups]);
-    const [battleRound, setBattleRound] = useState<number>(1);
 
     const stopBattle = () => {
         setBattle(false);
