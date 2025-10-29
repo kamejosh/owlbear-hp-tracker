@@ -9,6 +9,7 @@ import { updateItems, updateList } from "./obrHelper.ts";
 import { isObject } from "lodash";
 
 export const updateTokenMetadata = async (tokenData: GMGMetadata, ids: Array<string>) => {
+    console.trace("GM's Grimoire: Updating token metadata", tokenData);
     try {
         await updateList(ids, 16, async (subList) => {
             await updateItems(subList, (items: Array<Item>) => {

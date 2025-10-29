@@ -39,7 +39,7 @@ export const Initiative = ({ id }: { id: string }) => {
 
     useEffect(() => {
         const update = async () => {
-            const newData = { ...data, stats: { initiativeBonus: Number(debouncedInitiativeBonus) } };
+            const newData = { ...data, stats: { ...stats, initiativeBonus: Number(debouncedInitiativeBonus) } };
             await updateTokenMetadata(newData, [id]);
         };
         void update();
