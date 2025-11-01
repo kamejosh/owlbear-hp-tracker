@@ -132,7 +132,7 @@ export const setupDddice = async () => {
             }
         } catch {}
     });
-    if (metadata.diceRoller === DICE_ROLLER.DDDICE) {
+    if (metadataKey in metadata && (metadata[metadataKey] as RoomMetadata).diceRoller === DICE_ROLLER.DDDICE) {
         blastMessage({ type: "dddice.isLoaded" });
         console.info("GM's Grimoire - Finished setting up dddice");
     }
