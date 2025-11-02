@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useMetadataContext } from "../../../context/MetadataContext.ts";
+import { useMetadataContext, useTaSettingsStore } from "../../../context/MetadataContext.ts";
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
 import { GMGMetadata } from "../../../helper/types.ts";
 import { updateTokenMetadata } from "../../../helper/tokenHelper.ts";
@@ -19,7 +19,8 @@ import { useDebounce } from "ahooks";
 
 export const Initiative = ({ id }: { id: string }) => {
     const playerContext = usePlayerContext();
-    const [room, taSettings] = useMetadataContext(useShallow((state) => [state.room, state.taSettings]));
+    const [room] = useMetadataContext(useShallow((state) => [state.room]));
+    const taSettings = useTaSettingsStore.getState().taSettings;
     const token = useTokenListContext(useShallow((state) => state.tokens?.get(id)));
     const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
@@ -30,20 +31,33 @@ export const Initiative = ({ id }: { id: string }) => {
 
     useEffect(() => {
         const update = async () => {
-            const newData = { ...data, initiative: Number(debouncedInitiative) };
-            await updateTokenMetadata(newData, [id]);
-            await setPrettySordidInitiative(id, taSettings, Number(debouncedInitiative));
+            if (data.initiative !== Number(debouncedInitiative)) {
+                const newData = { ...data, initiative: Number(debouncedInitiative) };
+                await updateTokenMetadata(newData, [id]);
+                await setPrettySordidInitiative(id, taSettings, Number(debouncedInitiative));
+            }
         };
         void update();
     }, [debouncedInitiative]);
 
     useEffect(() => {
         const update = async () => {
-            const newData = { ...data, stats: { ...data.stats, initiativeBonus: Number(debouncedInitiativeBonus) } };
-            await updateTokenMetadata(newData, [id]);
+            if (data.stats.initiativeBonus !== Number(debouncedInitiativeBonus)) {
+                const newData = {
+                    ...data,
+                    stats: { ...data.stats, initiativeBonus: Number(debouncedInitiativeBonus) },
+                };
+                await updateTokenMetadata(newData, [id]);
+            }
         };
         void update();
     }, [debouncedInitiativeBonus]);
+
+    useEffect(() => {
+        if (data.initiative !== Number(initiative)) {
+            setInitiative(data.initiative.toString());
+        }
+    }, [data.initiative]);
 
     const customDiceTheme = useMemo(() => {
         if (item.createdUserId != playerContext.id) {

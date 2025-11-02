@@ -6,7 +6,7 @@ import { DiceSvg } from "../../svgs/DiceSvg.tsx";
 import { AddSvg } from "../../svgs/AddSvg.tsx";
 import { dicePlusRoll, diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
 import { RollLogSvg } from "../../svgs/RollLogSvg.tsx";
-import { useMetadataContext } from "../../../context/MetadataContext.ts";
+import { useMetadataContext, useTaSettingsStore } from "../../../context/MetadataContext.ts";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 import { getDiceImage, getSvgForDiceType, getThemePreview } from "../../../helper/previewHelpers.tsx";
@@ -33,7 +33,9 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
     );
     const addRoll = useRollLogContext(useShallow((state) => state.addRoll));
     const { buttons, setButtons } = useDiceButtonsContext();
-    const [room, taSettings] = useMetadataContext(useShallow((state) => [state.room, state.taSettings]));
+    const [room] = useMetadataContext(useShallow((state) => [state.room]));
+    const taSettings = useTaSettingsStore.getState().taSettings;
+
     const [hover, setHover] = useState<boolean>(false);
     const [addCustom, setAddCustom] = useState<boolean>(false);
     const [validCustom, setValidCustom] = useState<boolean>(false);
@@ -330,7 +332,9 @@ const CustomDiceButton = (props: CustomDiceButtonProps) => {
 const QuickButtons = ({ open }: { open: boolean }) => {
     const { theme, rollerApi } = useDiceRoller();
     const addRoll = useRollLogContext(useShallow((state) => state.addRoll));
-    const [room, taSettings] = useMetadataContext(useShallow((state) => [state.room, state.taSettings]));
+    const [room] = useMetadataContext(useShallow((state) => [state.room]));
+    const taSettings = useTaSettingsStore.getState().taSettings;
+
     const [validCustom, setValidCustom] = useState<boolean>(true);
     const playerContext = usePlayerContext();
 

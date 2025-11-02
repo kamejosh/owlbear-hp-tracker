@@ -1,5 +1,5 @@
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
-import { useMetadataContext } from "../../../context/MetadataContext.ts";
+import { useMetadataContext, useTaSettingsStore } from "../../../context/MetadataContext.ts";
 import { useCallback, useMemo, useState } from "react";
 import { dicePlusRoll, diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
@@ -44,7 +44,9 @@ type DiceButtonProps = {
 };
 export const DiceButton = (props: DiceButtonProps) => {
     const { component } = useComponentContext();
-    const [room, taSettings] = useMetadataContext(useShallow((state) => [state.room, state.taSettings]));
+    const [room] = useMetadataContext(useShallow((state) => [state.room]));
+    const taSettings = useTaSettingsStore.getState().taSettings;
+
     const addRoll = useRollLogContext(useShallow((state) => state.addRoll));
     const [rollerApi, initialized, theme, themes] = useDiceRoller(
         useShallow((state) => [state.rollerApi, state.initialized, state.theme, state.themes]),

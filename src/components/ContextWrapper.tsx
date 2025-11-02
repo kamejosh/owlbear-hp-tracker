@@ -4,7 +4,7 @@ import { PropsWithChildren, useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PluginGate } from "../context/PluginGateContext.tsx";
 import { metadataKey } from "../helper/variables.ts";
-import { useMetadataContext } from "../context/MetadataContext.ts";
+import { useMetadataContext, useTaSettingsStore } from "../context/MetadataContext.ts";
 import { RoomMetadata, SceneMetadata } from "../helper/types.ts";
 import { Loader } from "./general/Loader.tsx";
 import { objectsEqual, updateSceneMetadata } from "../helper/helpers.ts";
@@ -19,8 +19,9 @@ type ContextWrapperProps = PropsWithChildren & {
     component: string;
 };
 
-const Content = (props: PropsWithChildren) => {
-    const [setTaSettings, room] = useMetadataContext(useShallow((state) => [state.setTaSettings, state.room]));
+export const TabletopAlmanacSettingsContext = (props: PropsWithChildren) => {
+    const [room] = useMetadataContext(useShallow((state) => [state.room]));
+    const setTaSettings = useTaSettingsStore.getState().setTaSettings;
 
     const settingsQuery = useGetSettings(room?.tabletopAlmanacAPIKey);
 
@@ -32,20 +33,19 @@ const Content = (props: PropsWithChildren) => {
     return <>{props.children}</>;
 };
 
+const Content = (props: PropsWithChildren) => {
+    return <>{props.children}</>;
+};
+
 export const ContextWrapper = (props: ContextWrapperProps) => {
     const [role, setRole] = useState<string | null>(null);
     const [playerId, setPlayerId] = useState<string | null>(null);
     const [playerName, setPlayerName] = useState<string | null>(null);
     const [ready, setReady] = useState<boolean>(false);
-    const [room, scene, setSceneMetadata, setRoomMetadata, taSettings] = useMetadataContext(
-        useShallow((state) => [
-            state.room,
-            state.scene,
-            state.setSceneMetadata,
-            state.setRoomMetadata,
-            state.taSettings,
-        ]),
+    const [room, scene, setSceneMetadata, setRoomMetadata] = useMetadataContext(
+        useShallow((state) => [state.room, state.scene, state.setSceneMetadata, state.setRoomMetadata]),
     );
+    const taSettings = useTaSettingsStore.getState().taSettings;
     const { component, setComponent } = useComponentContext();
     const queryClient = new QueryClient();
     const { isReady } = SceneReadyContext();

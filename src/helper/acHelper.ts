@@ -97,17 +97,20 @@ export const updateAcOffset = async (offset: { x: number; y: number }) => {
 };
 
 export const updateAc = async (token: Item, data: GMGMetadata) => {
-    const acAttachment = (await getAttachedItems(token.id, ["CURVE"])).filter((a) => attachmentFilter(a, "AC"));
+    // when switching a scene this functions loses connection to the previous scene and breaks the update script
+    try {
+        const acAttachment = (await getAttachedItems(token.id, ["CURVE"])).filter((a) => attachmentFilter(a, "AC"));
 
-    const show = data.acOnMap && data.hpTrackerActive;
-    const visible = !!data.playerMap?.ac && token.visible;
-    if (!show) {
-        await deleteAttachments(acAttachment);
-    } else {
-        const changes = new Map<string, ACItemChanges>();
-        await saveOrChangeAC(token, data, acAttachment, changes, visible);
-        await updateAcChanges(changes);
-    }
+        const show = data.acOnMap && data.hpTrackerActive;
+        const visible = !!data.playerMap?.ac && token.visible;
+        if (!show) {
+            await deleteAttachments(acAttachment);
+        } else {
+            const changes = new Map<string, ACItemChanges>();
+            await saveOrChangeAC(token, data, acAttachment, changes, visible);
+            await updateAcChanges(changes);
+        }
+    } catch {}
 };
 
 export const updateAcChanges = async (changes: Map<string, ACItemChanges>) => {

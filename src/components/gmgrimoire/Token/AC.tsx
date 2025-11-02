@@ -28,7 +28,9 @@ export const AC = ({ id, hideExtras }: { id: string; hideExtras?: boolean }) => 
             factor = debouncedAc.startsWith("-") ? -1 : 1;
         }
         const value = Number(debouncedAc.replace(/[^0-9]/g, ""));
-        changeArmorClass(value * factor, data, item, room);
+        if (data.armorClass !== value) {
+            changeArmorClass(value * factor, data, item, room);
+        }
     }, [debouncedAc]);
 
     return (

@@ -32,7 +32,6 @@ export const useGetSettings = (apiKey?: string) => {
                   return await getSettings(url, apiKey);
               }
             : skipToken,
-        refetchInterval: Infinity,
         refetchOnReconnect: false,
         refetchOnWindowFocus: false,
         refetchOnMount: false,

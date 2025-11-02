@@ -16,7 +16,7 @@ import {
     toggleHpOnMap,
     toggleTokenInPlayerList,
 } from "../../helper/multiTokenHelper.ts";
-import { useMetadataContext } from "../../context/MetadataContext.ts";
+import { useMetadataContext, useTaSettingsStore } from "../../context/MetadataContext.ts";
 import { useDiceRoller } from "../../context/DDDiceContext.tsx";
 import { IDiceRoll, Operator } from "dddice-js";
 import { dicePlusRoll, diceToRoll, getUserUuid, localRoll } from "../../helper/diceHelper.ts";
@@ -50,9 +50,9 @@ type DropGroupProps = {
 };
 
 export const DropGroup = (props: DropGroupProps) => {
-    const [room, scene, taSettings] = useMetadataContext(
-        useShallow((state) => [state.room, state.scene, state.taSettings]),
-    );
+    const [room, scene] = useMetadataContext(useShallow((state) => [state.room, state.scene]));
+    const taSettings = useTaSettingsStore.getState().taSettings;
+
     const [rollerApi, initialized, theme, themes] = useDiceRoller(
         useShallow((state) => [state.rollerApi, state.initialized, state.theme, state.themes]),
     );

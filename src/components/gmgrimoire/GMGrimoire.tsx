@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ContextWrapper } from "../ContextWrapper.tsx";
+import { ContextWrapper, TabletopAlmanacSettingsContext } from "../ContextWrapper.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
 import { changelogModal, itemMetadataKey, version } from "../../helper/variables.ts";
@@ -38,10 +38,12 @@ import { FocusSvg } from "../svgs/FocusSvg.tsx";
 export const GMGrimoire = () => {
     return (
         <ContextWrapper component={"action_window"}>
-            <TokenContextWrapper>
-                <Content />
-                <DiceTray classes={"hp-tracker-dice-tray"} />
-            </TokenContextWrapper>
+            <TabletopAlmanacSettingsContext>
+                <TokenContextWrapper>
+                    <Content />
+                    <DiceTray classes={"hp-tracker-dice-tray"} />
+                </TokenContextWrapper>
+            </TabletopAlmanacSettingsContext>
         </ContextWrapper>
     );
 };

@@ -7,7 +7,7 @@ import OBR, { Image } from "@owlbear-rodeo/sdk";
 import { isEqual, isUndefined } from "lodash";
 import { destroyIndicator, notifyNextPlayer, setIndicator } from "../../../helper/currentHelper.ts";
 import { rest } from "../../../helper/multiTokenHelper.ts";
-import { useMetadataContext } from "../../../context/MetadataContext.ts";
+import { useMetadataContext, useTaSettingsStore } from "../../../context/MetadataContext.ts";
 import { useShallow } from "zustand/react/shallow";
 import { setPrettySordidActive } from "../../../helper/prettySordidHelpers.ts";
 import { updateTokenMetadata } from "../../../helper/tokenHelper.ts";
@@ -16,7 +16,9 @@ import { useLongPress } from "../../../helper/hooks.ts";
 
 export const BattleRounds = () => {
     const tokens = useTokenListContext(useShallow((state) => state.tokens));
-    const [scene, taSettings] = useMetadataContext(useShallow((state) => [state.scene, state.taSettings]));
+    const [scene] = useMetadataContext(useShallow((state) => [state.scene]));
+    const taSettings = useTaSettingsStore.getState().taSettings;
+
     const [hold, setHold] = useState<boolean>(false);
     const [groups, setGroups, current, setCurrent, battle, setBattle, setNext, battleRound, setBattleRound] =
         useBattleContext(
