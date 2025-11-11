@@ -19,7 +19,7 @@ import {
 import { useMetadataContext, useTaSettingsStore } from "../../context/MetadataContext.ts";
 import { useDiceRoller } from "../../context/DDDiceContext.tsx";
 import { IDiceRoll, Operator } from "dddice-js";
-import { dicePlusRoll, diceToRoll, getUserUuid, localRoll } from "../../helper/diceHelper.ts";
+import { dicePlusGroupRoll, diceToRoll, getUserUuid, localRoll } from "../../helper/diceHelper.ts";
 import { getRoomDiceUser, getTokenName } from "../../helper/helpers.ts";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import { useRollLogContext } from "../../context/RollLogContext.tsx";
@@ -123,15 +123,27 @@ export const DropGroup = (props: DropGroupProps) => {
     };
 
     const diceLessRoll = async (dice: string, statblock: string, hidden: boolean, id: string) => {
-        let result;
-        if (room?.diceRoller === DICE_ROLLER.SIMPLE) {
-            result = await localRoll(dice, "Initiative: Roll", addRoll, hidden, statblock);
-        } else if (room?.diceRoller === DICE_ROLLER.DICE_PLUS) {
-            result = await dicePlusRoll(dice, "Initiative: Roll", addRoll, hidden, statblock);
-        }
+        const result = await localRoll(dice, "Initiative: Roll", addRoll, hidden, statblock);
+
         if (result) {
             return { value: result.total, id: id };
         }
+    };
+
+    const setDicePlusInitiative = async (hidden: boolean) => {
+        initButtonRef.current?.classList.add("rolling");
+        initButtonRef.current?.classList.remove("rolling");
+        let notation = "";
+        props.list.forEach((_, index) => {
+            notation += `1d${room?.initiativeDice ?? 20} #T${index}`;
+            if (index < props.list.length - 1) {
+                notation += " + ";
+            }
+        });
+
+        await dicePlusGroupRoll(notation, "Initiative: Roll", addRoll, hidden, props.list, room?.initiativeDice ?? 20);
+        initButtonRef.current?.classList.remove("rolling");
+        initButtonRef.current?.blur();
     };
 
     const setInitiative = async (hidden: boolean) => {
@@ -284,7 +296,11 @@ export const DropGroup = (props: DropGroupProps) => {
                                     const now = Date.now();
                                     if (now - start.current < 1000) {
                                         clearTimeout(timeout);
-                                        await setInitiative(defaultHidden);
+                                        if (room?.diceRoller === DICE_ROLLER.DICE_PLUS) {
+                                            await setDicePlusInitiative(defaultHidden);
+                                        } else {
+                                            await setInitiative(defaultHidden);
+                                        }
                                     }
                                 }}
                             >
@@ -298,7 +314,11 @@ export const DropGroup = (props: DropGroupProps) => {
                                     room?.diceRoller === DICE_ROLLER.DDDICE
                                 }
                                 onClick={async () => {
-                                    await setInitiative(!defaultHidden);
+                                    if (room?.diceRoller === DICE_ROLLER.DICE_PLUS) {
+                                        await setDicePlusInitiative(!defaultHidden);
+                                    } else {
+                                        await setInitiative(!defaultHidden);
+                                    }
                                 }}
                             >
                                 {defaultHidden ? "SHOW" : "HIDE"}

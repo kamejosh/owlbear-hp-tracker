@@ -24,6 +24,8 @@ export type DicePlusRollDiceResult = {
 };
 
 export type DicePlusRollGroup = {
+    description?: string;
+    diceModel?: string;
     diceType: string;
     dice: Array<DicePlusRollDiceResult>;
     total: number;

@@ -1,6 +1,6 @@
-import { RoomMetadata } from "./types.ts";
-import { dddiceRollToRollLog, updateRoomMetadata } from "./helpers.ts";
-import OBR, { Metadata } from "@owlbear-rodeo/sdk";
+import { GMGMetadata, RoomMetadata } from "./types.ts";
+import { dddiceRollToRollLog, getTokenName, updateRoomMetadata } from "./helpers.ts";
+import OBR, { Image, Metadata } from "@owlbear-rodeo/sdk";
 import {
     IAvailableDie,
     IDiceRoll,
@@ -17,7 +17,14 @@ import {
     ThreeDDiceRollEvent,
 } from "dddice-js";
 import { RollLogEntryType, rollLogStore } from "../context/RollLogContext.tsx";
-import { GMG_ID, rollLogPopover, rollLogPopoverId, rollMessageChannel } from "./variables.ts";
+import {
+    GMG_ID,
+    itemMetadataKey,
+    prettySordidID,
+    rollLogPopover,
+    rollLogPopoverId,
+    rollMessageChannel,
+} from "./variables.ts";
 import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 import { v4 } from "uuid";
 import { diceRollerStore } from "../context/DDDiceContext.tsx";
@@ -30,6 +37,8 @@ import {
     DicePlusRollRequestData,
     DicePlusRollResultData,
 } from "../background/diceplus.ts";
+import { updateItems } from "./obrHelper.ts";
+import { useTaSettingsStore } from "../context/MetadataContext.ts";
 
 let rollLogTimeOut: number;
 
@@ -462,6 +471,94 @@ export const dicePlusRoll = async (
             if (onRoll) {
                 onRoll(data);
             }
+
+            unsubscribeMessage();
+            unsubscribeError();
+        }
+    });
+
+    const unsubscribeError = OBR.broadcast.onMessage(dicePlusErrorChannel, async (message) => {
+        const data = message.data as DicePlusRollErrorData;
+        // because we don't want to handle rolls multiple times we check if the rollId is the same
+        if (data.rollId === rollRequest.rollId) {
+            console.warn(`${data.error} for: ${data.notation}`);
+            unsubscribeMessage();
+            unsubscribeError();
+        }
+    });
+
+    await OBR.broadcast.sendMessage(dicePlusRequestChannel, rollRequest, { destination: "ALL" });
+};
+
+export const dicePlusGroupRoll = async (
+    diceEquation: string,
+    label: string,
+    addRoll: (entry: RollLogEntryType) => void,
+    hidden: boolean = false,
+    items: Array<Image>,
+    initiativeDice: number,
+) => {
+    const rollRequest: DicePlusRollRequestData = {
+        source: GMG_ID,
+        showResults: false,
+        rollId: crypto.randomUUID(),
+        playerName: label,
+        rollTarget: hidden ? "self" : "everyone",
+        diceNotation: diceEquation,
+        timestamp: Date.now(),
+        playerId: OBR.player.id,
+    };
+
+    const unsubscribeMessage = OBR.broadcast.onMessage(dicePlusResponseChannel, async (message) => {
+        const data = message.data as DicePlusRollResultData;
+        // because we don't want to handle rolls multiple times we check if the rollId is the same
+        if (data.rollId === rollRequest.rollId) {
+            const name = await OBR.player.getName();
+            let index = 0;
+            const newInitiativeValues: Map<string, number> = new Map();
+            for (const group of data.result.groups) {
+                const item = items[index];
+                if (item) {
+                    const data = item.metadata[itemMetadataKey] as GMGMetadata;
+                    newInitiativeValues.set(item.id, group.total + data.stats.initiativeBonus);
+
+                    const logEntry = {
+                        uuid: crypto.randomUUID(),
+                        created_at: new Date().toISOString(),
+                        equation: `1d${initiativeDice}+${data.stats.initiativeBonus}`,
+                        label: label,
+                        is_hidden: false,
+                        total_value: String(group.total + data.stats.initiativeBonus),
+                        username: getTokenName(item),
+                        values: group.dice.map((die) => String(die.value)),
+                        owlbear_user_id: OBR.player.id,
+                        participantUsername: name,
+                    };
+
+                    if (!hidden) {
+                        await OBR.broadcast.sendMessage(rollMessageChannel, logEntry, { destination: "REMOTE" });
+                    }
+
+                    await handleNewRoll(addRoll, logEntry);
+                    rollLogStore.persist.rehydrate();
+                }
+                index++;
+            }
+
+            await updateItems(
+                items.map((i) => i.id),
+                (items) => {
+                    items.forEach((item) => {
+                        const bonus = (item.metadata[itemMetadataKey] as GMGMetadata).stats.initiativeBonus;
+                        const initiative =
+                            newInitiativeValues.get(item.id) ?? Math.floor(Math.random() * initiativeDice) + 1 + bonus;
+                        (item.metadata[itemMetadataKey] as GMGMetadata).initiative = initiative;
+                        if (useTaSettingsStore.getState().taSettings.sync_pretty_sordid) {
+                            item.metadata[`${prettySordidID}/metadata`] = { count: String(initiative), active: false };
+                        }
+                    });
+                },
+            );
 
             unsubscribeMessage();
             unsubscribeError();
