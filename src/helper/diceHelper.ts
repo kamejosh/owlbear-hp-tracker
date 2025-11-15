@@ -24,6 +24,7 @@ import {
     rollLogPopover,
     rollLogPopoverId,
     rollMessageChannel,
+    rollMessageWhisperChannel,
 } from "./variables.ts";
 import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 import { v4 } from "uuid";
@@ -388,6 +389,43 @@ export const validateTheme = (t: ITheme) => {
         diceIds.includes(IDieType.D12) &&
         diceIds.includes(IDieType.D20)
     );
+};
+
+export const syncLocalRoll = (
+    diceEquation: string,
+    label: string,
+    addRoll: (entry: RollLogEntryType) => void,
+    hidden: boolean = false,
+    username: string,
+    statblock?: string,
+    ownerId?: string,
+) => {
+    try {
+        const roll = new DiceRoll(diceEquation.replaceAll(" ", ""));
+        const logEntry = {
+            uuid: v4(),
+            created_at: new Date().toISOString(),
+            equation: diceEquation,
+            label: label,
+            is_hidden: false,
+            total_value: String(roll.total),
+            username: statblock ?? username,
+            values: [roll.output.substring(roll.output.indexOf(":") + 1, roll.output.indexOf("=") - 1)],
+            owlbear_user_id: ownerId ?? OBR.player.id,
+            participantUsername: username,
+        };
+
+        if (!hidden) {
+            void OBR.broadcast.sendMessage(rollMessageChannel, logEntry, { destination: "REMOTE" });
+        } else if (ownerId) {
+            void OBR.broadcast.sendMessage(rollMessageWhisperChannel, logEntry, { destination: "REMOTE" });
+        }
+
+        void handleNewRoll(addRoll, logEntry);
+        rollLogStore.persist.rehydrate();
+
+        return roll;
+    } catch {}
 };
 
 export const localRoll = async (

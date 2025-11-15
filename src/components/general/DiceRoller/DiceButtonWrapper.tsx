@@ -12,13 +12,15 @@ import { useShallow } from "zustand/react/shallow";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import "./dice-button-wrapper.scss";
-import { isNull, isUndefined, toNumber } from "lodash";
+import { toNumber } from "lodash";
 import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 import { autoPlacement, safePolygon, useFloating, useHover, useInteractions } from "@floating-ui/react";
 import remarkBreaks from "remark-breaks";
 import { useComponentContext } from "../../../context/ComponentContext.tsx";
 import { DICE_ROLLER } from "../../../helper/types.ts";
 import { DicePlusRollResultData } from "../../../background/diceplus.ts";
+import { replaceStatWithMod } from "../../../helper/limitHelpers.ts";
+import { Skills } from "../../../helper/equipmentHelpers.ts";
 
 export type Stats = {
     strength: number;
@@ -34,6 +36,7 @@ type DiceButtonProps = {
     text: string;
     context: string;
     stats: Stats;
+    skills?: Skills | null;
     statblock?: string;
     onRoll?: (rollResult?: IRoll | DiceRoll | DicePlusRollResultData | null) => void;
     limitReached?: boolean | null;
@@ -81,78 +84,8 @@ export const DiceButton = (props: DiceButtonProps) => {
 
     const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
 
-    const replaceStatWithMod = (text: string) => {
-        if (room?.ruleset === "e5" && text.includes("PB")) {
-            if (!isUndefined(props.proficiencyBonus) && !isNull(props.proficiencyBonus)) {
-                text = text.replace("PB", props.proficiencyBonus.toString());
-            } else {
-                text = text.replace("PB", "0");
-            }
-        }
-        if (room?.ruleset === "e5" && text.includes("SCM")) {
-            text = text.replace(
-                "SCM",
-                Math.floor(
-                    (Math.max(props.stats.intelligence, props.stats.wisdom, props.stats.charisma) - 10) / 2,
-                ).toString(),
-            );
-        }
-        if (text.includes("STR")) {
-            text = text.replace(
-                "STR",
-                (room?.ruleset === "pf"
-                    ? props.stats.strength
-                    : Math.floor((props.stats.strength - 10) / 2)
-                ).toString(),
-            );
-        }
-        if (text.includes("DEX")) {
-            text = text.replace(
-                "DEX",
-                (room?.ruleset === "pf"
-                    ? props.stats.dexterity
-                    : Math.floor((props.stats.dexterity - 10) / 2)
-                ).toString(),
-            );
-        }
-        if (text.includes("CON")) {
-            text = text.replace(
-                "CON",
-                (room?.ruleset === "pf"
-                    ? props.stats.constitution
-                    : Math.floor((props.stats.constitution - 10) / 2)
-                ).toString(),
-            );
-        }
-        if (text.includes("INT")) {
-            text = text.replace(
-                "INT",
-                (room?.ruleset === "pf"
-                    ? props.stats.intelligence
-                    : Math.floor((props.stats.intelligence - 10) / 2)
-                ).toString(),
-            );
-        }
-        if (text.includes("WIS")) {
-            text = text.replace(
-                "WIS",
-                (room?.ruleset === "pf" ? props.stats.wisdom : Math.floor((props.stats.wisdom - 10) / 2)).toString(),
-            );
-        }
-        if (text.includes("CHA")) {
-            text = text.replace(
-                "CHA",
-                (room?.ruleset === "pf"
-                    ? props.stats.charisma
-                    : Math.floor((props.stats.charisma - 10) / 2)
-                ).toString(),
-            );
-        }
-        return text;
-    };
-
-    const dice = replaceStatWithMod(props.dice);
-    const text = replaceStatWithMod(props.text);
+    const dice = replaceStatWithMod(props.dice, props.stats, props.skills, props.proficiencyBonus);
+    const text = replaceStatWithMod(props.text, props.stats, props.skills, props.proficiencyBonus);
 
     const addModifier = (originalDie: string, baseDie: string) => {
         if (originalDie.includes("+")) {
@@ -262,7 +195,7 @@ export const DiceButton = (props: DiceButtonProps) => {
             } else if (room?.diceRoller === DICE_ROLLER.DICE_PLUS) {
                 await dicePlusRoll(modifiedDice, label, addRoll, modifier === "SELF", props.statblock, props.onRoll);
             }
-            if (props.onRoll) {
+            if (props.onRoll && room?.diceRoller !== DICE_ROLLER.DICE_PLUS) {
                 props.onRoll(rollResult);
             }
             button.classList.remove("rolling");
@@ -436,6 +369,7 @@ export const DiceButtonWrapper = ({
     context: string;
     statblock?: string;
     stats: Stats;
+    skills?: Skills | null;
     onRoll?: () => void;
     limitReached?: boolean | null;
     damageDie?: boolean;

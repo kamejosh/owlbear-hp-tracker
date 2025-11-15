@@ -66,6 +66,7 @@ const Upcast = ({
                     stats={stats}
                     context={`${capitalize(spell.name)}: Upcast Level ${upcastSpell.level}`}
                     statblock={statblock}
+                    skills={statblockContext.statblock.skills}
                     proficiencyBonus={statblockContext.statblock.proficiency_bonus}
                 />
             </div>
@@ -79,6 +80,7 @@ const Upcast = ({
                             context={`${capitalize(spell.name)}: (Level ${upcastSpell.level}) Damage`}
                             stats={stats}
                             statblock={statblock}
+                            skills={statblockContext.statblock.skills}
                             limitReached={limitReached}
                             damageDie={true}
                             onRoll={async () => {
@@ -192,6 +194,7 @@ export const Spell = ({
                                                 text={`+${attack}&nbspattack`}
                                                 context={`${capitalize(spell.name)}: Attack`}
                                                 statblock={statblock}
+                                                skills={statblockContext.statblock.skills}
                                                 stats={stats}
                                                 onRoll={async () => {
                                                     if (itemId && limitValues) {
@@ -227,6 +230,7 @@ export const Spell = ({
                                 text={`DC ${dc}`}
                                 context={`${capitalize(spell.name)}: Attack`}
                                 stats={stats}
+                                skills={statblockContext.statblock.skills}
                                 proficiencyBonus={statblockContext.statblock.proficiency_bonus}
                             />
                         </span>
@@ -240,6 +244,7 @@ export const Spell = ({
                                 context={`${capitalize(spell.name)}: Damage`}
                                 stats={stats}
                                 statblock={statblock}
+                                skills={statblockContext.statblock.skills}
                                 limitReached={limitReached}
                                 damageDie={true}
                                 proficiencyBonus={statblockContext.statblock.proficiency_bonus}
@@ -328,6 +333,7 @@ export const Spell = ({
                                 }
                             }}
                             limitReached={limitReached}
+                            skills={statblockContext.statblock.skills}
                             proficiencyBonus={statblockContext.statblock.proficiency_bonus}
                         />
                     </div>
@@ -339,6 +345,7 @@ export const Spell = ({
                                 stats={stats}
                                 context={`${capitalize(spell.name)}: Higher Level`}
                                 statblock={statblock}
+                                skills={statblockContext.statblock.skills}
                                 proficiencyBonus={statblockContext.statblock.proficiency_bonus}
                             />
                         </div>
@@ -463,6 +470,7 @@ export const E5Spells = () => {
                                 text={`+${statblock.spell_attack}`}
                                 context={"Spell Attack"}
                                 stats={stats}
+                                skills={statblock.skills}
                                 proficiencyBonus={statblock.proficiency_bonus}
                             />
                         </span>

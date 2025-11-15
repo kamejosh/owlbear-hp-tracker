@@ -1,10 +1,15 @@
 import { itemMetadataKey } from "./variables.ts";
-import { GMGMetadata, RoomMetadata } from "./types.ts";
-import { Item } from "@owlbear-rodeo/sdk";
+import { GMGMetadata, Limit, RoomMetadata } from "./types.ts";
+import { Image, Item } from "@owlbear-rodeo/sdk";
 import { updateHp } from "./hpHelpers.ts";
 import { updateAc } from "./acHelper.ts";
 import { chunk } from "lodash";
 import { updateItems, updateList } from "./obrHelper.ts";
+import { useMetadataContext, useTaSettingsStore } from "../context/MetadataContext.ts";
+import { syncLocalRoll } from "./diceHelper.ts";
+import { getTokenName } from "./helpers.ts";
+import { DiceRoll } from "@dice-roller/rpg-dice-roller";
+import { rollLogStore } from "../context/RollLogContext.tsx";
 
 export const getHpOnMap = (list: Array<Item>) => {
     const hpMap = list.map((token) => {
@@ -142,27 +147,109 @@ export const toggleTokenInPlayerList = async (list: Array<Item>) => {
     );
 };
 
+const onLimitRollComparison = (
+    rollResult: DiceRoll,
+    operator: string,
+    comparator: number,
+    itemId: string,
+    limitValues: Limit,
+) => {
+    try {
+        const result = rollResult?.total;
+        if (operator && comparator && itemId && limitValues) {
+            if (operator === ">" && result > Number(comparator)) {
+                return 0;
+            } else if (operator === "<" && result < Number(comparator)) {
+                return 0;
+            }
+        }
+    } catch {}
+    return limitValues.used;
+};
+
+const onLimitRoll = (rollResult: DiceRoll, itemId: string, limitValues: Limit) => {
+    try {
+        const result = rollResult.total;
+        if (itemId && limitValues) {
+            return Math.max(limitValues.used - result, 0);
+        }
+    } catch {}
+    return limitValues.used;
+};
+
+const handleLimitFormula = (limit: Limit, item: Item) => {
+    const room = useMetadataContext.getState().room;
+    const taSettings = useTaSettingsStore.getState().taSettings;
+    const addRoll = rollLogStore.getState().addRoll;
+
+    if (limit.formula && room) {
+        const comparisonRegex = /(.*)\s*([><])\s*(.*)/;
+        const comparisonMatch = limit.formula.match(comparisonRegex);
+
+        const label = `Limit: ${limit.id}`;
+        const character = getTokenName(item as Image);
+        if (comparisonMatch) {
+            const [_, dice, operator, comparator] = comparisonMatch;
+            const rollResult = syncLocalRoll(
+                dice,
+                label,
+                addRoll,
+                taSettings.gm_rolls_hidden,
+                "",
+                character,
+                item.createdUserId,
+            );
+            if (rollResult) {
+                return onLimitRollComparison(rollResult, operator, Number(comparator), item.id, limit);
+            }
+        } else {
+            const rollResult = syncLocalRoll(
+                limit.formula,
+                label,
+                addRoll,
+                taSettings.gm_rolls_hidden,
+                "",
+                character,
+                item.createdUserId,
+            );
+            if (rollResult) {
+                return onLimitRoll(rollResult, item.id, limit);
+            }
+        }
+    }
+    return limit.used;
+};
+
 export const rest = async (list: Array<Item>, restType: string) => {
     const hpUpdated: Array<string> = [];
 
     await updateItems(
         list.map((i) => i.id),
         (items) => {
-            items.forEach((item) => {
+            for (const item of items) {
                 const data = item.metadata[itemMetadataKey] as GMGMetadata;
                 const newLimits = data.stats.limits?.map((limit) => {
+                    // console.log({ ...limit, resets: [...limit.resets] }, restType);
                     if (limit.resets.includes(restType)) {
+                        if (limit.formula) {
+                            const limitData = { ...limit };
+                            const itemData = { ...item };
+                            console.log(limitData.id);
+                            const used = handleLimitFormula(limitData, itemData);
+                            return { ...limitData, used: used };
+                        }
                         return { ...limit, used: 0 };
                     } else {
                         return limit;
                     }
                 });
+
                 (item.metadata[itemMetadataKey] as GMGMetadata).stats.limits = newLimits;
                 if (restType === "Long Rest" && data.hp !== data.maxHp + (data.stats?.tempHp ?? 0)) {
                     (item.metadata[itemMetadataKey] as GMGMetadata).hp = data.maxHp + (data.stats?.tempHp ?? 0);
                     hpUpdated.push(item.id);
                 }
-            });
+            }
         },
     );
 

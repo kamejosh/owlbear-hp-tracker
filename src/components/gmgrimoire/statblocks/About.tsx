@@ -17,7 +17,7 @@ export const About = ({
 }: {
     about?: string | null;
     slug: string;
-    statblock?: E5Statblock | PfStatblock;
+    statblock?: E5Statblock;
     stats?: Stats;
     context?: string;
     defaultOpen?: boolean;
@@ -36,6 +36,7 @@ export const About = ({
                         text={about}
                         context={context || statblock?.name || "Custom Roll"}
                         statblock={tokenName ?? statblock?.name}
+                        skills={statblock?.skills}
                         stats={
                             stats || {
                                 strength: statblock?.stats.strength || 0,
@@ -65,7 +66,7 @@ export const PFAbout = ({
 }: {
     about?: string | null;
     slug: string;
-    statblock?: E5Statblock | PfStatblock;
+    statblock?: PfStatblock;
     stats?: Stats;
     context?: string;
     defaultOpen?: boolean;

@@ -82,6 +82,7 @@ export const E5Skills = () => {
                                       stats={stats}
                                       context={`${capitalize(skill)}: Check`}
                                       statblock={tokenName}
+                                      skills={statblock.skills}
                                       proficiencyBonus={statblock.proficiency_bonus}
                                   />
                               </li>

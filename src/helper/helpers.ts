@@ -27,6 +27,8 @@ import { updateHp } from "./hpHelpers.ts";
 import { updateAc } from "./acHelper.ts";
 import { AbilityShareEntry } from "../context/AbilityShareStore.tsx";
 import { abilityShareRoute } from "../background/api.ts";
+import { replaceStatWithMod } from "./limitHelpers.ts";
+import { Stats } from "../components/general/DiceRoller/DiceButtonWrapper.tsx";
 
 export const getYOffset = async (height: number) => {
     const metadata = (await OBR.room.getMetadata()) as Metadata;
@@ -326,6 +328,7 @@ const getLimitsE5 = (statblock: E5Statblock) => {
                     max: action.limit.uses,
                     used: 0,
                     resets: action.limit.resets ?? [],
+                    formula: action.limit.formula,
                 });
             }
         });
@@ -354,6 +357,7 @@ const getLimitsE5 = (statblock: E5Statblock) => {
             max: limit.uses,
             used: 0,
             resets: limit.resets ?? [],
+            formula: limit.formula,
         });
     });
 
@@ -364,6 +368,7 @@ const getLimitsE5 = (statblock: E5Statblock) => {
                 max: equipment.item.charges.uses,
                 used: 0,
                 resets: equipment.item.charges.resets ?? [],
+                formula: equipment.item.charges.formula,
             });
         }
         getActionTypeLimits(equipment.item.bonus?.actions || []);
@@ -372,6 +377,7 @@ const getLimitsE5 = (statblock: E5Statblock) => {
         getActionTypeLimits(equipment.item.bonus?.special_abilities || []);
     });
 
+    // TODO: add support for multiclass hitdice
     if (statblock.hp.hit_dice) {
         try {
             const hitDice = statblock.hp.hit_dice.split("d");
@@ -384,19 +390,51 @@ const getLimitsE5 = (statblock: E5Statblock) => {
             });
         } catch {}
     }
+
+    const stats: Stats = {
+        strength: statblock.stats.strength ?? 0,
+        dexterity: statblock.stats.dexterity ?? 0,
+        constitution: statblock.stats.constitution ?? 0,
+        wisdom: statblock.stats.wisdom ?? 0,
+        intelligence: statblock.stats.intelligence ?? 0,
+        charisma: statblock.stats.charisma ?? 0,
+    };
     const uniqueLimits: Array<Limit> = [];
     limits.forEach((limit) => {
         const foundLimit = uniqueLimits.find((l) => l.id === limit.id);
         if (foundLimit) {
             if (limit.max > foundLimit.max) {
-                uniqueLimits.splice(
-                    uniqueLimits.findIndex((l) => l.id === limit.id),
-                    1,
-                    limit,
-                );
+                if (limit.formula) {
+                    uniqueLimits.splice(
+                        uniqueLimits.findIndex((l) => l.id === limit.id),
+                        1,
+                        {
+                            ...limit,
+                            formula: replaceStatWithMod(
+                                limit.formula,
+                                stats,
+                                statblock.skills,
+                                statblock.proficiency_bonus,
+                            ),
+                        },
+                    );
+                } else {
+                    uniqueLimits.splice(
+                        uniqueLimits.findIndex((l) => l.id === limit.id),
+                        1,
+                        limit,
+                    );
+                }
             }
         } else {
-            uniqueLimits.push(limit);
+            if (limit.formula) {
+                uniqueLimits.push({
+                    ...limit,
+                    formula: replaceStatWithMod(limit.formula, stats, statblock.skills, statblock.proficiency_bonus),
+                });
+            } else {
+                uniqueLimits.push(limit);
+            }
         }
     });
     return uniqueLimits;

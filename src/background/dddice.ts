@@ -1,5 +1,11 @@
 import OBR, { Metadata } from "@owlbear-rodeo/sdk";
-import { diceTrayModal, diceTrayModalId, metadataKey, rollMessageChannel } from "../helper/variables.ts";
+import {
+    diceTrayModal,
+    diceTrayModalId,
+    metadataKey,
+    rollMessageChannel,
+    rollMessageWhisperChannel,
+} from "../helper/variables.ts";
 import { DICE_ROLLER, DiceUser, RoomMetadata } from "../helper/types.ts";
 import { getRoomDiceUser } from "../helper/helpers.ts";
 import { AsyncLock } from "../helper/AsyncLock.ts";
@@ -112,11 +118,18 @@ const roomCallback = async (metadata: Metadata, forceLogin: boolean) => {
 export const setupDddice = async () => {
     const metadata = await OBR.room.getMetadata();
     await roomCallback(metadata, true);
+    const playerRole = await OBR.player.getRole();
 
     OBR.room.onMetadataChange((metadata) => roomCallback(metadata, false));
     // get dice rolls from integrated dice roller
     OBR.broadcast.onMessage(rollMessageChannel, (event) => {
         handleNewRoll(rollLogStore.getState().addRoll, event.data as RollLogEntryType);
+    });
+    OBR.broadcast.onMessage(rollMessageWhisperChannel, (event) => {
+        const data = event.data as RollLogEntryType;
+        if (data.owlbear_user_id === OBR.player.id || playerRole === "GM") {
+            handleNewRoll(rollLogStore.getState().addRoll, event.data as RollLogEntryType);
+        }
     });
     // handle dice rolls from dddice
     window.addEventListener("message", async (event) => {

@@ -133,6 +133,7 @@ export const E5Ability = ({
                                     context={`${capitalize(ability.name)}: To Hit`}
                                     statblock={tokenName}
                                     stats={stats}
+                                    skills={statblock.skills}
                                     onRoll={async () => {
                                         await updateLimit(item.id, limitValues);
                                     }}
@@ -154,6 +155,7 @@ export const E5Ability = ({
                                 text={ability.damage_dice}
                                 context={`${capitalize(ability.name)}: Damage`}
                                 statblock={tokenName}
+                                skills={statblock.skills}
                                 stats={stats}
                                 onRoll={
                                     !ability.attack_bonus

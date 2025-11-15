@@ -72,6 +72,7 @@ export const E5General = () => {
                             text={`1d${hitDiceText}+CON`}
                             context={"Hit Dice"}
                             stats={stats}
+                            skills={statblock.skills}
                             statblock={tokenName}
                             onRoll={async (rollResult) => {
                                 let heal = 0;
@@ -133,6 +134,7 @@ export const E5General = () => {
                                         Math.floor((statValue - 10) / 2),
                                     )}
                                     stats={stats}
+                                    skills={statblock.skills}
                                     context={`${capitalize(name)}: Check`}
                                     statblock={tokenName}
                                     proficiencyBonus={statblock.proficiency_bonus}
@@ -145,6 +147,7 @@ export const E5General = () => {
                                         Math.floor(saveValue),
                                     )}
                                     stats={stats}
+                                    skills={statblock.skills}
                                     context={`${capitalize(name.substring(0, 3))}: Save`}
                                     statblock={tokenName}
                                     proficiencyBonus={statblock.proficiency_bonus}

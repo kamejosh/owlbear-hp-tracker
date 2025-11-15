@@ -14,6 +14,7 @@ export type Limit = {
     max: number;
     used: number;
     resets: Array<string>;
+    formula?: string | null;
 };
 
 export type GMGMetadata = {

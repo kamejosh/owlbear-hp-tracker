@@ -14,6 +14,7 @@ export const statblockPopoverId = `${ID}/statblock-popover`;
 export const rollLogPopoverId = `${ID}/dice-log`;
 export const shortRestPopoverId = `${ID}/short-rest`;
 export const rollMessageChannel = `${ID}.roll-event`;
+export const rollMessageWhisperChannel = `${ID}.roll-event-whisper`;
 export const nextTurnChannel = `${ID}.next-turn`;
 
 export const prettySordidID = "com.pretty-initiative";
