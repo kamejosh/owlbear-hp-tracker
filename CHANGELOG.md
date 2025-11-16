@@ -1,3 +1,13 @@
+# 3.6.0
+
++ Add limit formulas
+  + statblock limits can now use the formulas defined in TA to caluclate if or by how mucha a limits is reset
+  + 1d6 > 4 will reset the limit to 0 uses when rolling a 5 or 6
+  + 1d4 will reset decreases the uses by the rolled value
+  + formulas are triggered automatically when other reset conditions are met (e.g. round or short rest). **This can be deactivated in the settings**
++ Add hit dice support for multiclass statblocks
++ Add support for Skill variables in dice notations
+
 # 3.5.1
 
 + Add Battle Focus Mode: You can now choose to use a reduced UI that only shows HP, AC, and Initiative Elements. This allows for a smaller UI footprint and makes it easier to use on mobile devices.

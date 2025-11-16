@@ -241,6 +241,16 @@ export const Settings = () => {
                             }}
                         />
                     </div>
+                    <div className={"auto-limit setting"}>
+                        Disable automatic limit reset (based on formula):
+                        <input
+                            type={"checkbox"}
+                            checked={room?.disableLimitRolls || false}
+                            onChange={() => {
+                                updateRoomMetadata(room, { disableLimitRolls: !room?.disableLimitRolls });
+                            }}
+                        />
+                    </div>
                     <div className={"player-sort setting"}>
                         Sort Tokens by Initiative for Players:
                         <input

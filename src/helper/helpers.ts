@@ -377,16 +377,18 @@ const getLimitsE5 = (statblock: E5Statblock) => {
         getActionTypeLimits(equipment.item.bonus?.special_abilities || []);
     });
 
-    // TODO: add support for multiclass hitdice
     if (statblock.hp.hit_dice) {
         try {
-            const hitDice = statblock.hp.hit_dice.split("d");
-            const dice = parseInt(hitDice[0]);
-            limits.push({
-                id: "Hit Dice",
-                max: dice,
-                used: 0,
-                resets: ["Long Rest"],
+            const hitDice = statblock.hp.hit_dice.match(/\d+d\d+/gi);
+            hitDice?.forEach((hitDie) => {
+                const hDice = hitDie.split("d");
+                const dice = parseInt(hDice[0]);
+                limits.push({
+                    id: `Hit Dice ${hDice[1]}`,
+                    max: dice,
+                    used: 0,
+                    resets: ["Long Rest"],
+                });
             });
         } catch {}
     }

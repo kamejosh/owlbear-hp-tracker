@@ -14,19 +14,15 @@ const statList = ["strength", "dexterity", "constitution", "intelligence", "wisd
 
 export const E5General = () => {
     const { statblock, stats, tokenName, item, equipmentBonuses, data } = useE5StatblockContext();
-    const hitDice = data.stats.limits?.find((l) => l.id === "Hit Dice");
-    let hitDiceLimit: LimitType | null = null;
-    let hitDiceText: string | null = null;
-    if (statblock.hp.hit_dice) {
-        try {
-            hitDiceLimit = {
-                name: "Hit Dice",
-                uses: Number(statblock.hp.hit_dice.split("d")[0]),
-                resets: ["Long Rest"],
-            };
-            hitDiceText = statblock.hp.hit_dice.split("d")[1].split("+")[0];
-        } catch {}
-    }
+    const hitDices = data.stats.limits?.filter((l) => l.id.startsWith("Hit Dice"));
+    let hitDiceLimits: Array<LimitType> | undefined = hitDices?.map((l) => {
+        return {
+            name: l.id,
+            uses: l.max,
+            resets: ["Long Rest"],
+            description: l.id.split(" ").pop(),
+        };
+    });
 
     return (
         <div className={styles.general}>
@@ -56,46 +52,71 @@ export const E5General = () => {
                 </div>
             ) : null}
             <LineBreak />
-            {hitDiceLimit && hitDice && hitDiceText ? (
+            {hitDiceLimits && hitDices ? (
                 <div className={styles.hitDiceWrapper}>
                     <h3 className={styles.hitDice}>Hit Dice</h3>
-                    <LimitComponent
-                        limit={hitDiceLimit}
-                        title={"uses"}
-                        limitValues={hitDice}
-                        itemId={item.id}
-                        hideReset={true}
-                    />
-                    <div className={"dice-button-wrapper"}>
-                        <DiceButton
-                            dice={`1d${hitDiceText}+CON`}
-                            text={`1d${hitDiceText}+CON`}
-                            context={"Hit Dice"}
-                            stats={stats}
-                            skills={statblock.skills}
-                            statblock={tokenName}
-                            onRoll={async (rollResult) => {
-                                let heal = 0;
-                                try {
-                                    if (rollResult && "total" in rollResult) {
-                                        heal = rollResult.total;
-                                    } else if (rollResult && "values" in rollResult) {
-                                        heal = rollResult.values.map((v) => v.value).reduce((a, b) => a + b, 0);
-                                    } else if (rollResult && "result" in rollResult) {
-                                        heal = rollResult.result.totalValue;
-                                    }
-                                } catch {}
-                                if (heal) {
-                                    const newData = { ...data, hp: Math.min(data.hp + heal, data.maxHp) };
-                                    await updateHp(item, newData);
-                                    await updateTokenMetadata(newData, [item.id]);
-                                }
-                                await updateLimit(item.id, hitDice);
-                            }}
-                            limitReached={hitDiceLimit.uses === hitDice.used}
-                            proficiencyBonus={statblock.proficiency_bonus}
-                        />
+                    <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                        {hitDiceLimits.map((limit, i) => {
+                            return (
+                                <div
+                                    key={i}
+                                    style={{
+                                        border: "1px solid #ccc",
+                                        padding: "4px",
+                                        borderRadius: "5px",
+                                        display: "flex",
+                                        gap: "4px",
+                                        flexDirection: "column",
+                                    }}
+                                >
+                                    <LimitComponent
+                                        limit={limit}
+                                        title={"uses"}
+                                        limitValues={hitDices[i]}
+                                        itemId={item.id}
+                                        hideReset={true}
+                                        hideDescription={true}
+                                    />
+                                    <div className={"dice-button-wrapper"}>
+                                        <DiceButton
+                                            dice={`1d${limit.description}+CON`}
+                                            text={`1d${limit.description}+CON`}
+                                            context={"Hit Dice"}
+                                            stats={stats}
+                                            skills={statblock.skills}
+                                            statblock={tokenName}
+                                            onRoll={async (rollResult) => {
+                                                let heal = 0;
+                                                try {
+                                                    if (rollResult && "total" in rollResult) {
+                                                        heal = rollResult.total;
+                                                    } else if (rollResult && "values" in rollResult) {
+                                                        heal = rollResult.values
+                                                            .map((v) => v.value)
+                                                            .reduce((a, b) => a + b, 0);
+                                                    } else if (rollResult && "result" in rollResult) {
+                                                        heal = rollResult.result.totalValue;
+                                                    }
+                                                } catch {}
+                                                if (heal) {
+                                                    const newData = {
+                                                        ...data,
+                                                        hp: Math.min(data.hp + heal, data.maxHp),
+                                                    };
+                                                    await updateHp(item, newData);
+                                                    await updateTokenMetadata(newData, [item.id]);
+                                                }
+                                                await updateLimit(item.id, hitDices[i]);
+                                            }}
+                                            limitReached={limit.uses === hitDices[i].used}
+                                            proficiencyBonus={statblock.proficiency_bonus}
+                                        />
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
+
                     <LineBreak />
                 </div>
             ) : null}

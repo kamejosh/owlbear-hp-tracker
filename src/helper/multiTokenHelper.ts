@@ -5,7 +5,7 @@ import { updateHp } from "./hpHelpers.ts";
 import { updateAc } from "./acHelper.ts";
 import { chunk } from "lodash";
 import { updateItems, updateList } from "./obrHelper.ts";
-import { useMetadataContext, useTaSettingsStore } from "../context/MetadataContext.ts";
+import { useMetadataContext } from "../context/MetadataContext.ts";
 import { syncLocalRoll } from "./diceHelper.ts";
 import { getTokenName } from "./helpers.ts";
 import { DiceRoll } from "@dice-roller/rpg-dice-roller";
@@ -179,7 +179,6 @@ const onLimitRoll = (rollResult: DiceRoll, itemId: string, limitValues: Limit) =
 
 const handleLimitFormula = (limit: Limit, item: Item) => {
     const room = useMetadataContext.getState().room;
-    const taSettings = useTaSettingsStore.getState().taSettings;
     const addRoll = rollLogStore.getState().addRoll;
 
     if (limit.formula && room) {
@@ -190,28 +189,12 @@ const handleLimitFormula = (limit: Limit, item: Item) => {
         const character = getTokenName(item as Image);
         if (comparisonMatch) {
             const [_, dice, operator, comparator] = comparisonMatch;
-            const rollResult = syncLocalRoll(
-                dice,
-                label,
-                addRoll,
-                taSettings.gm_rolls_hidden,
-                "",
-                character,
-                item.createdUserId,
-            );
+            const rollResult = syncLocalRoll(dice, label, addRoll, true, "", character, item.createdUserId);
             if (rollResult) {
                 return onLimitRollComparison(rollResult, operator, Number(comparator), item.id, limit);
             }
         } else {
-            const rollResult = syncLocalRoll(
-                limit.formula,
-                label,
-                addRoll,
-                taSettings.gm_rolls_hidden,
-                "",
-                character,
-                item.createdUserId,
-            );
+            const rollResult = syncLocalRoll(limit.formula, label, addRoll, true, "", character, item.createdUserId);
             if (rollResult) {
                 return onLimitRoll(rollResult, item.id, limit);
             }
@@ -222,6 +205,7 @@ const handleLimitFormula = (limit: Limit, item: Item) => {
 
 export const rest = async (list: Array<Item>, restType: string) => {
     const hpUpdated: Array<string> = [];
+    const room = useMetadataContext.getState().room;
 
     await updateItems(
         list.map((i) => i.id),
@@ -229,14 +213,15 @@ export const rest = async (list: Array<Item>, restType: string) => {
             for (const item of items) {
                 const data = item.metadata[itemMetadataKey] as GMGMetadata;
                 const newLimits = data.stats.limits?.map((limit) => {
-                    // console.log({ ...limit, resets: [...limit.resets] }, restType);
                     if (limit.resets.includes(restType)) {
                         if (limit.formula) {
-                            const limitData = { ...limit };
-                            const itemData = { ...item };
-                            console.log(limitData.id);
-                            const used = handleLimitFormula(limitData, itemData);
-                            return { ...limitData, used: used };
+                            if (!room?.disableLimitRolls) {
+                                const limitData = { ...limit };
+                                const itemData = { ...item };
+                                const used = handleLimitFormula(limitData, itemData);
+                                return { ...limitData, used: used };
+                            }
+                            return limit;
                         }
                         return { ...limit, used: 0 };
                     } else {
