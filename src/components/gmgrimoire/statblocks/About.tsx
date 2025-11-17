@@ -72,7 +72,6 @@ export const PFAbout = ({
     defaultOpen?: boolean;
     hideTitle?: boolean;
 }) => {
-    const room = useMetadataContext.getState().room;
     const [open, setOpen] = useLocalStorage<boolean>(`${ID}.about.${slug}`, !!defaultOpen);
     return about ? (
         <div className={`about ${hideTitle ? "no-title" : ""}`}>
@@ -94,7 +93,7 @@ export const PFAbout = ({
                                 charisma: statblock?.stats.charisma || 0,
                             }
                         }
-                        proficiencyBonus={room?.ruleset === "e5" ? (statblock as E5Statblock).proficiency_bonus : null}
+                        proficiencyBonus={null}
                     />
                 </div>
             </div>
