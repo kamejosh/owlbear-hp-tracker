@@ -7,6 +7,10 @@
   + formulas are triggered automatically when other reset conditions are met (e.g. round or short rest). **This can be deactivated in the settings**
 + Add hit dice support for multiclass statblocks
 + Add support for Skill variables in dice notations
++ Debounce Init and AC inputs
++ Fix GMG not closing the dddice overlay if the dddice extension is installed
++ Fix failure to load extension when limits don't have a valid max value
+
 
 # 3.5.1
 
