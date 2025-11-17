@@ -1,16 +1,21 @@
 # 3.6.0
 
-+ Add limit formulas
-  + statblock limits can now use the formulas defined in TA to caluclate if or by how mucha a limits is reset
-  + 1d6 > 4 will reset the limit to 0 uses when rolling a 5 or 6
-  + 1d4 will reset decreases the uses by the rolled value
-  + formulas are triggered automatically when other reset conditions are met (e.g. round or short rest). **This can be deactivated in the settings**
-+ Add hit dice support for multiclass statblocks
-+ Add support for Skill variables in dice notations
-+ Debounce Init and AC inputs
-+ Fix GMG not closing the dddice overlay if the dddice extension is installed
-+ Fix failure to load extension when limits don't have a valid max value
+### New Features
 
++ Limit Reset Formulas:
+    + Statblock limits can now utilize formulas defined in the TA to dynamically calculate if, and by how much, a limit is reset.
+  + Examples:
+      + The formula `1d6 > 4` will reset the limit to 0 uses when a result of 5 or 6 is rolled.
+      + The formula `1d4` will decrease the current uses by the value rolled.
+  + Formulas are triggered automatically when other reset conditions (e.g., round or short rest) are met. This automatic triggering can be deactivated in the settings.
++ Multiclass Hit Dice Support: Added support for managing and tracking Hit Dice for multiclass statblocks.
++ Skill Variables in Dice Notation: Introduced support for using Skill variables within dice notations (e.g., in formulas or damage rolls).
+
+### Improvements and Fixes
+
++ Input Performance: Debounced the inputs for Initiative (Init) and Armor Class (AC) to improve responsiveness and performance.
++ GMG/dddice Overlay Fix: Corrected an issue where the GMG failed to close the dddice overlay when the dddice extension was active.
++  Extension Loading Fix: Resolved a failure to load extensions that occurred when a limit did not possess a valid maximum value.
 
 # 3.5.1
 
