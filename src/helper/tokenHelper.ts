@@ -3,10 +3,15 @@ import { Image, Item } from "@owlbear-rodeo/sdk";
 import { itemMetadataKey } from "./variables.ts";
 import { evalString } from "./helpers.ts";
 import { updateHp } from "./hpHelpers.ts";
-import { RefObject } from "react";
 import { updateAc } from "./acHelper.ts";
 import { updateItems, updateList } from "./obrHelper.ts";
-import { isObject } from "lodash";
+import { isEqual, isObject } from "lodash";
+
+export type HpFields = {
+    hp: string;
+    maxHp: string;
+    tempHp: string;
+};
 
 export const updateTokenMetadata = async (tokenData: GMGMetadata, ids: Array<string>) => {
     try {
@@ -24,101 +29,90 @@ export const updateTokenMetadata = async (tokenData: GMGMetadata, ids: Array<str
     }
 };
 
-export const changeHp = async (
-    newHp: number,
+export const updateHpFields = async (hpFields: HpFields, data: GMGMetadata, item: Image) => {
+    const newData = {
+        ...data,
+        hp: Number(hpFields.hp),
+        maxHp: Number(hpFields.maxHp),
+        stats: { ...data.stats, tempHp: Number(hpFields.tempHp) },
+    };
+    if (!isEqual(newData, data)) {
+        await updateHp(item, newData);
+        await updateTokenMetadata(newData, [item.id]);
+    }
+};
+
+export const getNewHpFieldValues = (
+    field: "hp" | "maxHp" | "tempHp",
     data: GMGMetadata,
-    item: Image,
-    hpRef?: RefObject<HTMLInputElement>,
-    tempHpRef?: RefObject<HTMLInputElement>,
+    newValue?: number,
+    input?: string,
     room?: RoomMetadata | null,
-) => {
+): HpFields => {
+    const retValue: HpFields = {
+        hp: data.hp.toString(),
+        maxHp: data.maxHp.toString(),
+        tempHp: (data.stats.tempHp ?? 0).toString(),
+    };
+    let value: number;
+    if (input) {
+        if (input.indexOf("+") > 0 || input.indexOf("-") > 0) {
+            value = Number(evalString(input));
+        } else {
+            value = Number(input.replace(/[^0-9]/g, ""));
+        }
+    } else if (newValue) {
+        value = newValue;
+    } else {
+        return retValue;
+    }
+
+    if (field === "hp") {
+        let factor = 1;
+        let hp;
+        if (room?.allowNegativeNumbers && input) {
+            factor = input.startsWith("-") ? -1 : 1;
+            hp = value * factor;
+        } else {
+            hp = Math.max(value, 0);
+        }
+        if (hp < data.hp && data.stats.tempHp && data.stats.tempHp > 0) {
+            retValue.tempHp = Math.max(data.stats.tempHp - (data.hp - hp), 0).toString();
+        }
+        if (data.maxHp == 0) {
+            retValue.maxHp = Math.max(value, 0).toString();
+        }
+        let maxHpValue = Number(retValue.maxHp) + (data.stats.tempHp ?? 0);
+        retValue.hp = Math.min(hp, maxHpValue).toString();
+        return retValue;
+    } else if (field === "maxHp") {
+        retValue.hp = Math.min(Number(retValue.hp), Number(retValue.tempHp) + value).toString();
+        return { ...retValue, maxHp: Math.max(value, 0).toString() };
+    } else if (field === "tempHp") {
+        if (value > 0) {
+            if (!data.stats.tempHp) {
+                retValue.hp = (Number(retValue.hp) + value).toString();
+            } else {
+                retValue.hp = (Number(retValue.hp) + value - data.stats.tempHp).toString();
+            }
+        }
+        retValue.hp = Math.min(Number(retValue.hp), Number(retValue.maxHp) + Math.max(value, 0)).toString();
+        return { ...retValue, tempHp: Math.max(value, 0).toString() };
+    }
+    return retValue;
+};
+
+export const changeHp = async (newHp: number, data: GMGMetadata, item: Image, room?: RoomMetadata | null) => {
     const newData = { ...data };
     if (newHp < data.hp && data.stats.tempHp && data.stats.tempHp > 0) {
         newData.stats.tempHp = Math.max(data.stats.tempHp - (data.hp - newHp), 0);
-        if (tempHpRef && tempHpRef.current) {
-            tempHpRef.current.value = String(newData.stats.tempHp);
-        }
     }
     newData.hp = room?.allowNegativeNumbers ? newHp : Math.max(newHp, 0);
     await updateHp(item, newData);
     await updateTokenMetadata(newData, [item.id]);
-    if (hpRef && hpRef.current) {
-        hpRef.current.value = String(newData.hp);
-    }
 };
 
-export const getNewHpValue = async (
-    input: string,
-    data: GMGMetadata,
-    item: Image,
-    maxHpRef?: RefObject<HTMLInputElement>,
-    room?: RoomMetadata | null,
-) => {
-    let value: number;
-    let factor = 1;
-    if (room?.allowNegativeNumbers) {
-        factor = input.startsWith("-") ? -1 : 1;
-    }
-    if (input.indexOf("+") > 0 || input.indexOf("-") > 0) {
-        value = Number(evalString(input));
-    } else {
-        value = Number(input.replace(/[^0-9]/g, ""));
-    }
-    let hp: number;
-    if (data.maxHp > 0) {
-        hp = Math.min(Number(value * factor), data.stats.tempHp ? data.maxHp + data.stats.tempHp : data.maxHp);
-    } else {
-        hp = Number(value * factor);
-        const newData = { ...data, hp: hp, maxHp: Math.max(value, 0) };
-        await updateHp(item, newData);
-        await updateTokenMetadata(newData, [item.id]);
-        if (maxHpRef && maxHpRef.current) {
-            maxHpRef.current.value = String(newData.maxHp);
-        }
-        return null;
-    }
-    return room?.allowNegativeNumbers ? hp : Math.max(hp, 0);
-};
-
-export const changeMaxHp = async (
-    newMax: number,
-    data: GMGMetadata,
-    item: Image,
-    maxHpRef?: RefObject<HTMLInputElement>,
-) => {
-    const newData = { ...data };
-    newData.maxHp = Math.max(newMax, 0);
-    let maxHp = newData.maxHp;
-    if (newData.stats.tempHp) {
-        maxHp += newData.stats.tempHp;
-    }
-    if (maxHp < newData.hp) {
-        newData.hp = maxHp;
-    }
-    await updateHp(item, newData);
-    await updateTokenMetadata(newData, [item.id]);
-    if (maxHpRef && maxHpRef.current) {
-        maxHpRef.current.value = String(newMax);
-    }
-};
-
-export const getNewTempHp = (input: string) => {
-    let value: number;
-    if (input.indexOf("+") > 0 || input.indexOf("-") > 0) {
-        value = Number(evalString(input));
-    } else {
-        value = Number(input.replace(/[^0-9]/g, ""));
-    }
-    return value;
-};
-
-export const changeTempHp = async (
-    newTempHp: number,
-    data: GMGMetadata,
-    item: Image,
-    hpRef?: RefObject<HTMLInputElement>,
-    tempHpRef?: RefObject<HTMLInputElement>,
-) => {
+export const changeTempHp = async (newTempHp: number, data: GMGMetadata, item: Image) => {
     // temporary hitpoints can't be negative
     const newData = { ...data, stats: { ...data.stats, tempHp: newTempHp } };
     if (newTempHp > 0) {
@@ -130,13 +124,9 @@ export const changeTempHp = async (
     }
     newData.hp = Math.min(newData.hp, newData.maxHp + newData.stats.tempHp);
     newData.stats.tempHp = Math.max(newTempHp, 0);
-    await updateHp(item, newData);
-    await updateTokenMetadata(newData, [item.id]);
-    if (hpRef && hpRef.current) {
-        hpRef.current.value = String(newData.hp);
-    }
-    if (tempHpRef && tempHpRef.current) {
-        tempHpRef.current.value = String(newData.stats.tempHp);
+    if (!isEqual(newData, data)) {
+        await updateHp(item, newData);
+        await updateTokenMetadata(newData, [item.id]);
     }
 };
 

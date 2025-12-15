@@ -1,17 +1,10 @@
-import {
-    changeHp,
-    changeMaxHp,
-    changeTempHp,
-    getNewHpValue,
-    getNewTempHp,
-    updateTokenMetadata,
-} from "../../../helper/tokenHelper.ts";
-import { useEffect, useRef } from "react";
+import { getNewHpFieldValues, HpFields, updateHpFields, updateTokenMetadata } from "../../../helper/tokenHelper.ts";
+import { useEffect, useState } from "react";
 import { GMGMetadata } from "../../../helper/types.ts";
 import { Image } from "@owlbear-rodeo/sdk";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
-import _ from "lodash";
+import _, { isEqual, isNaN } from "lodash";
 import { HPSvg } from "../../svgs/HPSvg.tsx";
 import "./hp.scss";
 import { MapButton } from "./MapButton.tsx";
@@ -19,34 +12,50 @@ import { usePlayerContext } from "../../../context/PlayerContext.ts";
 import { updateHp } from "../../../helper/hpHelpers.ts";
 import Tippy from "@tippyjs/react";
 import { useShallow } from "zustand/react/shallow";
+import { useDebounce } from "ahooks";
 
 export const HP = ({ id }: { id: string }) => {
     const playerContext = usePlayerContext();
-    const hpRef = useRef<HTMLInputElement>(null);
-    const maxHpRef = useRef<HTMLInputElement>(null);
-    const tempHpRef = useRef<HTMLInputElement>(null);
     const room = useMetadataContext(useShallow((state) => state.room));
     const token = useTokenListContext(useShallow((state) => state.tokens?.get(id)));
     const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
+    const [hpFields, setHpFields] = useState<HpFields & { persist: boolean }>({
+        hp: data.hp.toString(),
+        maxHp: data.maxHp.toString(),
+        tempHp: (data.stats.tempHp ?? 0).toString(),
+        persist: true,
+    });
+    const debouncedHpFields = useDebounce(hpFields, { wait: 500 });
 
     useEffect(() => {
-        if (hpRef && hpRef.current) {
-            hpRef.current.value = String(data?.hp);
+        if (
+            data.hp !== Number(hpFields.hp) ||
+            data.maxHp !== Number(hpFields.maxHp) ||
+            data.stats.tempHp !== Number(hpFields.tempHp)
+        ) {
+            setHpFields({
+                hp: data.hp.toString(),
+                maxHp: data.maxHp.toString(),
+                tempHp: (data.stats.tempHp ?? 0).toString(),
+                persist: false,
+            });
         }
-    }, [data?.hp]);
+    }, [data.hp, data.maxHp, data.stats.tempHp]);
 
     useEffect(() => {
-        if (maxHpRef && maxHpRef.current) {
-            maxHpRef.current.value = String(data?.maxHp);
+        const hp = Number(debouncedHpFields.hp);
+        const maxHp = Number(debouncedHpFields.maxHp);
+        const tempHp = Number(debouncedHpFields.tempHp);
+        if (debouncedHpFields.persist) {
+            if (isNaN(hp) || isNaN(maxHp) || isNaN(tempHp)) {
+                return;
+            }
+            if (hp !== data.hp || maxHp !== data.maxHp || tempHp !== (data.stats.tempHp ?? 0)) {
+                updateHpFields(debouncedHpFields, data, item);
+            }
         }
-    }, [data?.maxHp]);
-
-    useEffect(() => {
-        if (tempHpRef && tempHpRef.current && _.isNumber(data?.stats?.tempHp)) {
-            tempHpRef.current.value = String(data?.stats?.tempHp);
-        }
-    }, [data?.stats?.tempHp]);
+    }, [debouncedHpFields]);
 
     return (
         <div className={"token-hp"}>
@@ -60,37 +69,50 @@ export const HP = ({ id }: { id: string }) => {
             <div className={"current-hp"}>
                 <Tippy content={"Set current HP"}>
                     <input
-                        ref={hpRef}
                         type={"text"}
-                        defaultValue={data.hp}
-                        onBlur={async (e) => {
-                            const input = e.target.value;
-                            const hp = await getNewHpValue(input, data, item, maxHpRef, room);
-                            if (hp !== null) {
-                                e.target.value = String(hp);
-                                await changeHp(hp, data, item, hpRef, tempHpRef, room);
+                        value={hpFields.hp}
+                        onChange={(e) => {
+                            setHpFields({ ...hpFields, hp: e.currentTarget.value, persist: false });
+                        }}
+                        onBlur={(e) => {
+                            const newHpFields = getNewHpFieldValues("hp", data, undefined, e.currentTarget.value, room);
+                            if (!isEqual(newHpFields, hpFields)) {
+                                setHpFields({ ...newHpFields, persist: true });
                             }
                         }}
                         onKeyDown={async (e) => {
                             if (e.key === "ArrowUp") {
-                                const hp = Math.min(
-                                    data.hp + 1,
-                                    data.stats.tempHp ? data.maxHp + data.stats.tempHp : data.maxHp,
+                                const newHpFields = getNewHpFieldValues(
+                                    "hp",
+                                    data,
+                                    Number(hpFields.hp) + 1,
+                                    undefined,
+                                    room,
                                 );
-                                await changeHp(hp, data, item, hpRef, tempHpRef, room);
-                                e.currentTarget.value = String(hp);
+                                if (!isEqual(newHpFields, hpFields)) {
+                                    setHpFields({ ...newHpFields, persist: true });
+                                }
                             } else if (e.key === "ArrowDown") {
-                                const hp = Math.min(
-                                    data.hp - 1,
-                                    data.stats.tempHp ? data.maxHp + data.stats.tempHp : data.maxHp,
+                                const newHpFields = getNewHpFieldValues(
+                                    "hp",
+                                    data,
+                                    Number(hpFields.hp) - 1,
+                                    undefined,
+                                    room,
                                 );
-                                await changeHp(hp, data, item, hpRef, tempHpRef, room);
-                                e.currentTarget.value = String(hp);
+                                if (!isEqual(newHpFields, hpFields)) {
+                                    setHpFields({ ...newHpFields, persist: true });
+                                }
                             } else if (e.key === "Enter") {
-                                const input = e.currentTarget.value;
-                                const hp = await getNewHpValue(input, data, item, maxHpRef, room);
-                                if (hp !== null) {
-                                    await changeHp(hp, data, item, hpRef, tempHpRef, room);
+                                const newHpFields = getNewHpFieldValues(
+                                    "hp",
+                                    data,
+                                    undefined,
+                                    e.currentTarget.value,
+                                    room,
+                                );
+                                if (!isEqual(newHpFields, hpFields)) {
+                                    setHpFields({ ...newHpFields, persist: true });
                                 }
                             }
                         }}
@@ -100,21 +122,57 @@ export const HP = ({ id }: { id: string }) => {
                 <Tippy content={"Set max HP"}>
                     <input
                         type={"text"}
-                        ref={maxHpRef}
-                        defaultValue={data.maxHp}
-                        onKeyDown={async (e) => {
+                        value={hpFields.maxHp}
+                        onKeyDown={(e) => {
                             if (e.key === "ArrowUp") {
-                                await changeMaxHp(data.maxHp + 1, data, item, maxHpRef);
+                                const newHpFields = getNewHpFieldValues(
+                                    "maxHp",
+                                    data,
+                                    Number(hpFields.maxHp) + 1,
+                                    undefined,
+                                    room,
+                                );
+                                if (!isEqual(newHpFields, hpFields)) {
+                                    setHpFields({ ...newHpFields, persist: true });
+                                }
                             } else if (e.key === "ArrowDown") {
-                                await changeMaxHp(data.maxHp - 1, data, item, maxHpRef);
+                                const newHpFields = getNewHpFieldValues(
+                                    "maxHp",
+                                    data,
+                                    Number(hpFields.maxHp) - 1,
+                                    undefined,
+                                    room,
+                                );
+                                if (!isEqual(newHpFields, hpFields)) {
+                                    setHpFields({ ...newHpFields, persist: true });
+                                }
                             } else if (e.key === "Enter") {
-                                const value = Number(e.currentTarget.value.replace(/[^0-9]/g, ""));
-                                await changeMaxHp(value, data, item, maxHpRef);
+                                const newHpFields = getNewHpFieldValues(
+                                    "maxHp",
+                                    data,
+                                    undefined,
+                                    e.currentTarget.value,
+                                    room,
+                                );
+                                if (!isEqual(newHpFields, hpFields)) {
+                                    setHpFields({ ...newHpFields, persist: true });
+                                }
                             }
                         }}
-                        onBlur={async (e) => {
-                            const value = Number(e.target.value.replace(/[^0-9]/g, ""));
-                            await changeMaxHp(value, data, item, maxHpRef);
+                        onBlur={(e) => {
+                            const newHpFields = getNewHpFieldValues(
+                                "maxHp",
+                                data,
+                                undefined,
+                                e.currentTarget.value,
+                                room,
+                            );
+                            if (!isEqual(newHpFields, hpFields)) {
+                                setHpFields({ ...newHpFields, persist: true });
+                            }
+                        }}
+                        onChange={(e) => {
+                            setHpFields({ ...hpFields, maxHp: e.currentTarget.value, persist: false });
                         }}
                     />
                 </Tippy>
@@ -123,21 +181,57 @@ export const HP = ({ id }: { id: string }) => {
                 <Tippy content={"set temp HP"}>
                     <input
                         type={"text"}
-                        defaultValue={data.stats.tempHp}
-                        ref={tempHpRef}
-                        onKeyDown={async (e) => {
+                        value={hpFields.tempHp}
+                        onKeyDown={(e) => {
                             if (e.key === "ArrowUp") {
-                                await changeTempHp((data.stats.tempHp || 0) + 1, data, item, hpRef, tempHpRef);
+                                const newHpFields = getNewHpFieldValues(
+                                    "tempHp",
+                                    data,
+                                    Number(hpFields.tempHp) + 1,
+                                    undefined,
+                                    room,
+                                );
+                                if (!isEqual(newHpFields, hpFields)) {
+                                    setHpFields({ ...newHpFields, persist: true });
+                                }
                             } else if (e.key === "ArrowDown") {
-                                await changeTempHp((data.stats.tempHp || 0) - 1, data, item, hpRef, tempHpRef);
+                                const newHpFields = getNewHpFieldValues(
+                                    "tempHp",
+                                    data,
+                                    Number(hpFields.tempHp) - 1,
+                                    undefined,
+                                    room,
+                                );
+                                if (!isEqual(newHpFields, hpFields)) {
+                                    setHpFields({ ...newHpFields, persist: true });
+                                }
                             } else if (e.key === "Enter") {
-                                const value = getNewTempHp(e.currentTarget.value);
-                                await changeTempHp(value, data, item, hpRef, tempHpRef);
+                                const newHpFields = getNewHpFieldValues(
+                                    "tempHp",
+                                    data,
+                                    undefined,
+                                    e.currentTarget.value,
+                                    room,
+                                );
+                                if (!isEqual(newHpFields, hpFields)) {
+                                    setHpFields({ ...newHpFields, persist: true });
+                                }
                             }
                         }}
-                        onBlur={async (e) => {
-                            const value = getNewTempHp(e.currentTarget.value);
-                            await changeTempHp(value, data, item, hpRef, tempHpRef);
+                        onChange={async (e) => {
+                            setHpFields({ ...hpFields, tempHp: e.currentTarget.value, persist: false });
+                        }}
+                        onBlur={(e) => {
+                            const newHpFields = getNewHpFieldValues(
+                                "tempHp",
+                                data,
+                                undefined,
+                                e.currentTarget.value,
+                                room,
+                            );
+                            if (!isEqual(newHpFields, hpFields)) {
+                                setHpFields({ ...newHpFields, persist: true });
+                            }
                         }}
                     />
                 </Tippy>

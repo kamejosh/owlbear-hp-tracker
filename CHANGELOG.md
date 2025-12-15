@@ -1,3 +1,8 @@
+# Current
+
++ Fix an issue where the hp input values would not refresh in the statblock popover
++ Allow equations for maxHp
+
 # 3.6.0
 
 ### New Features

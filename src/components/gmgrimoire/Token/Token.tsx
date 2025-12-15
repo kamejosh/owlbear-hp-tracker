@@ -44,7 +44,7 @@ export const Token = (props: TokenProps) => {
         // could be undefined so we check for boolean
         if (room && room.allowNegativeNumbers === false) {
             if (data.hp < 0) {
-                changeHp(0, data, item, undefined, undefined, room);
+                changeHp(0, data, item, room);
             }
             if (data.armorClass < 0) {
                 changeArmorClass(0, data, item, room);
