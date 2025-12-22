@@ -19,7 +19,6 @@ import { E5Statblock } from "../api/e5/useE5Api.ts";
 import { PfStatblock } from "../api/pf/usePfApi.ts";
 import axiosRetry from "axios-retry";
 import { Ability } from "../components/gmgrimoire/statblocks/e5/E5Ability.tsx";
-import { chunk } from "lodash";
 import { deleteItems, updateItems } from "./obrHelper.ts";
 import { getEquipmentBonuses } from "./equipmentHelpers.ts";
 import { UserSettings } from "../api/tabletop-almanac/useUser.ts";
@@ -886,32 +885,18 @@ export const prepareTokenForGrimoire = async (contextItems: Array<Image>) => {
 };
 
 export const reorderMetadataIndex = async (list: Array<Image>, group?: string) => {
-    const chunks = chunk(list, 12);
     let index = 0;
-    for (const subList of chunks) {
-        try {
-            await updateItems(
-                subList.map((i) => i.id),
-                (items) => {
-                    items.forEach((item) => {
-                        const data = item.metadata[itemMetadataKey] as GMGMetadata;
-                        data.index = index;
-                        if (group) {
-                            data.group = group;
-                        }
-                        index++;
-                        item.metadata[itemMetadataKey] = { ...data };
-                    });
-                },
-            );
-        } catch (e) {
-            const errorName =
-                isObject(e) && "error" in e && isObject(e.error) && "name" in e.error
-                    ? e.error.name
-                    : "Undefined Error";
-            console.warn(`GM's Grimoire: Error while updating reordering ${subList.length} tokens: ${errorName}`);
-        }
-    }
+    await updateItems(list, (items) => {
+        items.forEach((item) => {
+            const data = item.metadata[itemMetadataKey] as GMGMetadata;
+            data.index = index;
+            if (group) {
+                data.group = group;
+            }
+            index++;
+            item.metadata[itemMetadataKey] = { ...data };
+        });
+    });
 };
 
 export const orderByInitiative = async (tokenMap: Map<string, Array<Image>>, reverse: boolean = false) => {

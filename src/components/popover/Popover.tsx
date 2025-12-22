@@ -29,7 +29,7 @@ import { PlayerButton } from "../gmgrimoire/Token/PlayerButton.tsx";
 import { HPSvg } from "../svgs/HPSvg.tsx";
 import { ACSvg } from "../svgs/ACSvg.tsx";
 import { InitiativeSvg } from "../svgs/InitiativeSvg.tsx";
-import { updateItems } from "../../helper/obrHelper.ts";
+import { updateItems, updateList } from "../../helper/obrHelper.ts";
 import { useShallow } from "zustand/react/shallow";
 
 export const Popover = () => {
@@ -84,20 +84,25 @@ const MultiContent = ({ ids }: { ids: Array<string> }) => {
                             room?.allowNegativeNumbers ? newHp : Math.max(newHp, 0),
                             itemData.maxHp + (itemData.stats.tempHp || 0),
                         );
-                        const uItem = items.find((i) => i.id === item.id);
-                        if (uItem && itemMetadataKey in uItem.metadata) {
-                            const uItemData = uItem.metadata[itemMetadataKey] as GMGMetadata;
-                            updateHp(uItem, {
-                                ...uItemData,
-                                hp: itemData.hp,
-                                stats: { ...uItemData.stats, tempHp: itemData.stats.tempHp },
-                            });
-                        }
                         item.metadata[itemMetadataKey] = { ...itemData };
                     }
                 });
             },
         );
+
+        const newItems = await OBR.scene.items.getItems(items.map((i) => i.id));
+        await updateList(newItems, 2, async (subList) => {
+            for (const item of subList) {
+                if (item && itemMetadataKey in item.metadata) {
+                    const uItemData = item.metadata[itemMetadataKey] as GMGMetadata;
+                    await updateHp(item, {
+                        ...uItemData,
+                        hp: uItemData.hp,
+                        stats: { ...uItemData.stats, tempHp: uItemData.stats.tempHp },
+                    });
+                }
+            }
+        });
     };
 
     return (

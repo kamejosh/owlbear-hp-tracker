@@ -2,6 +2,9 @@
 
 + Fix an issue where the hp input values would not refresh in the statblock popover
 + Allow equations for maxHp
++ Adjust big updates to make use of OBRs new ratelimit implementation
++ Improve popover multitoken hp changes
++ Fix issue when dragging multiple tokens inside a group
 
 # 3.6.0
 

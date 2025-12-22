@@ -200,6 +200,7 @@ const Content = () => {
             const alsoSelected = result.filter(
                 (item) => selectedTokens.includes(item.id) && item.id != dragItem.draggableId,
             );
+            const multiEndIndex = endIndex > startIndex ? endIndex - alsoSelected.length : endIndex;
 
             let localRemove: Array<Image> = [];
 
@@ -214,7 +215,7 @@ const Content = () => {
 
             localRemove = localRemove.concat(multiRemove);
             localRemove.forEach((item) => {
-                result.splice(endIndex, 0, item);
+                result.splice(multiEndIndex, 0, item);
             });
         } else {
             result.splice(endIndex, 0, removed);
