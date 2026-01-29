@@ -1,7 +1,7 @@
 import { components } from "../../../../api/schema";
 import { useMemo, useState } from "react";
 import { DiceButton, DiceButtonWrapper, Stats } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
-import { getDamage, updateLimit } from "../../../../helper/helpers.ts";
+import { evalString, getDamage, updateLimit } from "../../../../helper/helpers.ts";
 import { SpellFilter } from "../SpellFilter.tsx";
 import { capitalize, isNull, isUndefined } from "lodash";
 import { E5SpellSlot } from "../../../../api/e5/useE5Api.ts";
@@ -20,6 +20,7 @@ import { addSpellToRollLog } from "../../../../helper/diceHelper.ts";
 import { useRollLogContext } from "../../../../context/RollLogContext.tsx";
 import { ShareAbilityButton } from "../../../general/ShareAbilityButton.tsx";
 import { usePlayerContext } from "../../../../context/PlayerContext.ts";
+import { replaceStatWithMod } from "../../../../helper/limitHelpers.ts";
 
 type Spell = components["schemas"]["src__model_types__e5__spell__Spell"];
 type Upcast = components["schemas"]["SpellUpcast"];
@@ -191,7 +192,7 @@ export const Spell = ({
                                         <>
                                             <DiceButton
                                                 dice={`1d20+${attack}`}
-                                                text={`+${attack}&nbspattack`}
+                                                text={`+${attack}attack`}
                                                 context={`${capitalize(spell.name)}: Attack`}
                                                 statblock={statblock}
                                                 skills={statblockContext.statblock.skills}
@@ -452,6 +453,18 @@ export const E5Spells = () => {
             }
         });
 
+    const dc = String(Number(statblock.spell_dc ?? 0) + equipmentBonuses.statblockBonuses.dc);
+    const spell_attack =
+        statblock.spell_attack ||
+        evalString(
+            replaceStatWithMod(
+                `SCM + PB + ${equipmentBonuses.statblockBonuses.scm}`,
+                stats,
+                statblock.skills,
+                statblock.proficiency_bonus,
+            ),
+        );
+
     return (
         <div className={"spells"}>
             <div className={styles.top}>
@@ -461,20 +474,20 @@ export const E5Spells = () => {
             <div className={styles.sticky}>
                 <SpellFilter filters={filters} spellFilter={spellFilter} setSpellFilter={setSpellFilter} />
                 <div className={styles.info}>
-                    {statblock.spell_dc ? <span>DC {statblock.spell_dc}</span> : null}
-                    {statblock.spell_attack ? (
-                        <span className={styles.spellAttack}>
-                            Attack{" "}
-                            <DiceButton
-                                dice={`d20+${statblock.spell_attack}`}
-                                text={`+${statblock.spell_attack}`}
-                                context={"Spell Attack"}
-                                stats={stats}
-                                skills={statblock.skills}
-                                proficiencyBonus={statblock.proficiency_bonus}
-                            />
-                        </span>
-                    ) : null}
+                    <span>DC: {dc}</span>
+
+                    <span className={styles.spellAttack}>
+                        Attack{" "}
+                        <DiceButton
+                            dice={`d20+${spell_attack}`}
+                            text={`+${spell_attack}`}
+                            context={"Spell Attack"}
+                            stats={stats}
+                            skills={statblock.skills}
+                            proficiencyBonus={statblock.proficiency_bonus}
+                            reduce={true}
+                        />
+                    </span>
                 </div>
                 <SpellSlots />
             </div>
@@ -494,8 +507,8 @@ export const E5Spells = () => {
                                     statblock={tokenName}
                                     stats={stats}
                                     spellSlots={statblock.spell_slots}
-                                    dc={statblock.spell_dc}
-                                    attack={statblock.spell_attack}
+                                    dc={dc}
+                                    attack={spell_attack}
                                 />
                                 <LineBreak />
                             </li>
@@ -523,8 +536,8 @@ export const E5Spells = () => {
                                                     spellSlots={statblock.spell_slots}
                                                     charges={e.item.charges}
                                                     chargesUsed={spell.charges}
-                                                    dc={statblock.spell_dc}
-                                                    attack={statblock.spell_attack}
+                                                    dc={dc}
+                                                    attack={spell_attack}
                                                     embedded={true}
                                                 />
                                                 <LineBreak />
@@ -561,8 +574,8 @@ export const E5Spells = () => {
                                                             stats={stats}
                                                             charges={e.item.charges}
                                                             chargesUsed={spell.charges}
-                                                            dc={statblock.spell_dc}
-                                                            attack={statblock.spell_attack}
+                                                            dc={dc}
+                                                            attack={spell_attack}
                                                         />
                                                         <LineBreak />
                                                     </div>

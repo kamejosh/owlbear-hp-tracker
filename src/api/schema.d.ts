@@ -13,8 +13,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Login For Access Token */
-        post: operations["login_for_access_token_token_post"];
+        /** Login */
+        post: operations["login"];
         delete?: never;
         options?: never;
         head?: never;
@@ -29,7 +29,7 @@ export interface paths {
             cookie?: never;
         };
         /** Refresh Access Token */
-        get: operations["refresh_access_token_refresh_get"];
+        get: operations["refresh_access_token"];
         put?: never;
         post?: never;
         delete?: never;
@@ -48,7 +48,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Reset Password */
-        post: operations["reset_password_password_reset_post"];
+        post: operations["reset_password"];
         delete?: never;
         options?: never;
         head?: never;
@@ -65,7 +65,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Get Activation Mail */
-        post: operations["get_activation_mail_activation_link_post"];
+        post: operations["get_activation_mail"];
         delete?: never;
         options?: never;
         head?: never;
@@ -80,7 +80,7 @@ export interface paths {
             cookie?: never;
         };
         /** List Statblocks */
-        get: operations["list_statblocks_api_v2_e5_statblock__get"];
+        get: operations["list_statblocks"];
         put?: never;
         post?: never;
         delete?: never;
@@ -97,7 +97,7 @@ export interface paths {
             cookie?: never;
         };
         /** List Spells */
-        get: operations["list_spells_api_v2_e5_spell__get"];
+        get: operations["list_spells"];
         put?: never;
         post?: never;
         delete?: never;
@@ -114,7 +114,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get Stats */
-        get: operations["get_stats_stats__get"];
+        get: operations["get_stats"];
         put?: never;
         post?: never;
         delete?: never;
@@ -133,7 +133,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Create User */
-        post: operations["create_user_api_v1_users__post"];
+        post: operations["create_user"];
         delete?: never;
         options?: never;
         head?: never;
@@ -154,7 +154,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Update User Roles */
-        patch: operations["update_user_roles_api_v1_users__user_id__roles_patch"];
+        patch: operations["update_user_roles"];
         trace?: never;
     };
     "/api/v1/users/me/": {
@@ -165,14 +165,14 @@ export interface paths {
             cookie?: never;
         };
         /** Get Users Me */
-        get: operations["get_users_me_api_v1_users_me__get"];
+        get: operations["get_users_me"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
         /** Update User */
-        patch: operations["update_user_api_v1_users_me__patch"];
+        patch: operations["update_user"];
         trace?: never;
     };
     "/api/v1/users/me/api_keys": {
@@ -183,12 +183,12 @@ export interface paths {
             cookie?: never;
         };
         /** List Api Keys */
-        get: operations["list_api_keys_api_v1_users_me_api_keys_get"];
+        get: operations["list_api_keys"];
         /** Update Api Keys */
-        put: operations["update_api_keys_api_v1_users_me_api_keys_put"];
+        put: operations["update_api_keys"];
         post?: never;
-        /** Update Api Keys */
-        delete: operations["update_api_keys_api_v1_users_me_api_keys_delete"];
+        /** Delete Api Keys */
+        delete: operations["delete_api_keys"];
         options?: never;
         head?: never;
         patch?: never;
@@ -201,8 +201,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List Statblocks */
-        get: operations["list_statblocks_api_v1_users_me_statblocks_get"];
+        /** List User Statblocks */
+        get: operations["list_user_statblocks"];
         put?: never;
         post?: never;
         delete?: never;
@@ -218,8 +218,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List Spells */
-        get: operations["list_spells_api_v1_users_me_spells_get"];
+        /** List User Spells */
+        get: operations["list_user_spells"];
         put?: never;
         post?: never;
         delete?: never;
@@ -235,8 +235,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List Items */
-        get: operations["list_items_api_v1_users_me_items_get"];
+        /** List User Items */
+        get: operations["list_user_items"];
         put?: never;
         post?: never;
         delete?: never;
@@ -255,7 +255,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Change Password */
-        post: operations["change_password_api_v1_users_change_password_post"];
+        post: operations["change_password"];
         delete?: never;
         options?: never;
         head?: never;
@@ -272,7 +272,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Activate User */
-        post: operations["activate_user_api_v1_users_activate_post"];
+        post: operations["activate_user"];
         delete?: never;
         options?: never;
         head?: never;
@@ -287,9 +287,9 @@ export interface paths {
             cookie?: never;
         };
         /** Get User Settings */
-        get: operations["get_user_settings_api_v1_users_me_settings_get"];
+        get: operations["get_user_settings"];
         /** Put User Settings */
-        put: operations["put_user_settings_api_v1_users_me_settings_put"];
+        put: operations["put_user_settings"];
         post?: never;
         delete?: never;
         options?: never;
@@ -306,9 +306,9 @@ export interface paths {
         };
         get?: never;
         /** Set User Patreon */
-        put: operations["set_user_patreon_api_v1_users_me_patreon_put"];
+        put: operations["set_user_patreon"];
         /** Refresh Patreon */
-        post: operations["refresh_patreon_api_v1_users_me_patreon_post"];
+        post: operations["refresh_patreon"];
         delete?: never;
         options?: never;
         head?: never;
@@ -323,10 +323,10 @@ export interface paths {
             cookie?: never;
         };
         /** List Pf Statblocks */
-        get: operations["list_pf_statblocks_api_v1_pf_statblock__get"];
+        get: operations["list_pf_statblocks"];
         put?: never;
         /** Create Pf Statblock */
-        post: operations["create_pf_statblock_api_v1_pf_statblock__post"];
+        post: operations["create_pf_statblock"];
         delete?: never;
         options?: never;
         head?: never;
@@ -341,7 +341,7 @@ export interface paths {
             cookie?: never;
         };
         /** Search Pf Statblock */
-        get: operations["search_pf_statblock_api_v1_pf_statblock_search__get"];
+        get: operations["search_pf_statblock"];
         put?: never;
         post?: never;
         delete?: never;
@@ -358,12 +358,12 @@ export interface paths {
             cookie?: never;
         };
         /** Get Pf Statblock Slug */
-        get: operations["get_pf_statblock_slug_api_v1_pf_statblock__slug__get"];
+        get: operations["get_pf_statblock_slug"];
         /** Edit Pf Statblock */
-        put: operations["edit_pf_statblock_api_v1_pf_statblock__slug__put"];
+        put: operations["edit_pf_statblock"];
         post?: never;
         /** Delete Pf Statblock */
-        delete: operations["delete_pf_statblock_api_v1_pf_statblock__slug__delete"];
+        delete: operations["delete_pf_statblock"];
         options?: never;
         head?: never;
         patch?: never;
@@ -378,7 +378,7 @@ export interface paths {
         };
         get?: never;
         /** Set Active Pf Statblock */
-        put: operations["set_active_pf_statblock_api_v1_pf_statblock__slug__active_put"];
+        put: operations["set_active_pf_statblock"];
         post?: never;
         delete?: never;
         options?: never;
@@ -394,10 +394,10 @@ export interface paths {
             cookie?: never;
         };
         /** List Pf Spells */
-        get: operations["list_pf_spells_api_v1_pf_spell__get"];
+        get: operations["list_pf_spells"];
         put?: never;
-        /** Create Spell */
-        post: operations["create_spell_api_v1_pf_spell__post"];
+        /** Create Pf Spell */
+        post: operations["create_pf_spell"];
         delete?: never;
         options?: never;
         head?: never;
@@ -412,7 +412,7 @@ export interface paths {
             cookie?: never;
         };
         /** Search Pf Spell */
-        get: operations["search_pf_spell_api_v1_pf_spell_search_get"];
+        get: operations["search_pf_spell"];
         put?: never;
         post?: never;
         delete?: never;
@@ -429,12 +429,12 @@ export interface paths {
             cookie?: never;
         };
         /** Get Pf Spells Slug */
-        get: operations["get_pf_spells_slug_api_v1_pf_spell__slug__get"];
+        get: operations["get_pf_spells_slug"];
         /** Update Pf Spell */
-        put: operations["update_pf_spell_api_v1_pf_spell__slug__put"];
+        put: operations["update_pf_spell"];
         post?: never;
         /** Delete Pf Spell */
-        delete: operations["delete_pf_spell_api_v1_pf_spell__slug__delete"];
+        delete: operations["delete_pf_spell"];
         options?: never;
         head?: never;
         patch?: never;
@@ -448,10 +448,10 @@ export interface paths {
             cookie?: never;
         };
         /** List E5 Statblocks */
-        get: operations["list_e5_statblocks_api_v1_e5_statblock__get"];
+        get: operations["list_e5_statblocks"];
         put?: never;
         /** Create E5 Statblock */
-        post: operations["create_e5_statblock_api_v1_e5_statblock__post"];
+        post: operations["create_e5_statblock"];
         delete?: never;
         options?: never;
         head?: never;
@@ -466,7 +466,7 @@ export interface paths {
             cookie?: never;
         };
         /** Search E5 Creature */
-        get: operations["search_e5_creature_api_v1_e5_statblock_search__get"];
+        get: operations["search_e5_creature"];
         put?: never;
         post?: never;
         delete?: never;
@@ -483,12 +483,12 @@ export interface paths {
             cookie?: never;
         };
         /** Get E5 Statblock Slug */
-        get: operations["get_e5_statblock_slug_api_v1_e5_statblock__slug__get"];
+        get: operations["get_e5_statblock_slug"];
         /** Edit E5 Statblock */
-        put: operations["edit_e5_statblock_api_v1_e5_statblock__slug__put"];
+        put: operations["edit_e5_statblock"];
         post?: never;
         /** Delete E5 Statblock */
-        delete: operations["delete_e5_statblock_api_v1_e5_statblock__slug__delete"];
+        delete: operations["delete_e5_statblock"];
         options?: never;
         head?: never;
         patch?: never;
@@ -503,7 +503,7 @@ export interface paths {
         };
         get?: never;
         /** Set Active E5 Statblock */
-        put: operations["set_active_e5_statblock_api_v1_e5_statblock__slug__active_put"];
+        put: operations["set_active_e5_statblock"];
         post?: never;
         delete?: never;
         options?: never;
@@ -521,7 +521,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Create Statblock From External Source */
-        post: operations["create_statblock_from_external_source_api_v1_e5_statblock_external_post"];
+        post: operations["create_statblock_from_external_source"];
         delete?: never;
         options?: never;
         head?: never;
@@ -536,10 +536,10 @@ export interface paths {
             cookie?: never;
         };
         /** List E5 Spells */
-        get: operations["list_e5_spells_api_v1_e5_spell__get"];
+        get: operations["list_e5_spells"];
         put?: never;
         /** Create Spell */
-        post: operations["create_spell_api_v1_e5_spell__post"];
+        post: operations["create_spell"];
         delete?: never;
         options?: never;
         head?: never;
@@ -554,7 +554,7 @@ export interface paths {
             cookie?: never;
         };
         /** Search E5 Spell */
-        get: operations["search_e5_spell_api_v1_e5_spell_search_get"];
+        get: operations["search_e5_spell"];
         put?: never;
         post?: never;
         delete?: never;
@@ -571,12 +571,12 @@ export interface paths {
             cookie?: never;
         };
         /** Get E5 Spells Slug */
-        get: operations["get_e5_spells_slug_api_v1_e5_spell__slug__get"];
+        get: operations["get_e5_spells_slug"];
         /** Update E5 Spell */
-        put: operations["update_e5_spell_api_v1_e5_spell__slug__put"];
+        put: operations["update_e5_spell"];
         post?: never;
         /** Delete E5 Spell */
-        delete: operations["delete_e5_spell_api_v1_e5_spell__slug__delete"];
+        delete: operations["delete_e5_spell"];
         options?: never;
         head?: never;
         patch?: never;
@@ -590,7 +590,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get E5 Encounters */
-        get: operations["get_e5_encounters_api_v1_e5_encounter__get"];
+        get: operations["get_e5_encounters"];
         put?: never;
         post?: never;
         delete?: never;
@@ -607,10 +607,10 @@ export interface paths {
             cookie?: never;
         };
         /** List E5 Items */
-        get: operations["list_e5_items_api_v1_e5_item__get"];
+        get: operations["list_e5_items"];
         put?: never;
         /** Create Item */
-        post: operations["create_item_api_v1_e5_item__post"];
+        post: operations["create_item"];
         delete?: never;
         options?: never;
         head?: never;
@@ -625,7 +625,7 @@ export interface paths {
             cookie?: never;
         };
         /** Search Items */
-        get: operations["search_items_api_v1_e5_item_search_get"];
+        get: operations["search_items"];
         put?: never;
         post?: never;
         delete?: never;
@@ -642,15 +642,231 @@ export interface paths {
             cookie?: never;
         };
         /** Get E5 Item Slug */
-        get: operations["get_e5_item_slug_api_v1_e5_item__slug__get"];
+        get: operations["get_e5_item_slug"];
         put?: never;
         post?: never;
         /** Delete Item */
-        delete: operations["delete_item_api_v1_e5_item__slug__delete"];
+        delete: operations["delete_item"];
         options?: never;
         head?: never;
         /** Edit Item */
-        patch: operations["edit_item_api_v1_e5_item__slug__patch"];
+        patch: operations["edit_item"];
+        trace?: never;
+    };
+    "/api/v1/party/player/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Player Parties */
+        get: operations["list_player_parties"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/party/player/statblock/{statblock_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Player Statblock */
+        get: operations["get_player_statblock"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Player Statblock */
+        patch: operations["update_player_statblock"];
+        trace?: never;
+    };
+    "/api/v1/party/player/statblock/{statblock_id}/external": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resync Player Statblock */
+        post: operations["resync_player_statblock"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/party/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Parties */
+        get: operations["list_parties"];
+        put?: never;
+        /** Create Party */
+        post: operations["create_party"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/party/{party_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Party */
+        get: operations["get_party"];
+        put?: never;
+        post?: never;
+        /** Delete Party */
+        delete: operations["delete_party"];
+        options?: never;
+        head?: never;
+        /** Update Party */
+        patch: operations["update_party"];
+        trace?: never;
+    };
+    "/api/v1/party/{party_id}/money/{money_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update Party Money */
+        put: operations["update_party_money"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/party/{party_id}/inventory/{inventory_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Party Inventory */
+        get: operations["get_party_inventory"];
+        /** Update Party Inventory */
+        put: operations["update_party_inventory"];
+        post?: never;
+        /** Empty Party Inventory */
+        delete: operations["empty_party_inventory"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/party/{party_id}/statblock/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Party Statblocks */
+        get: operations["list_party_statblocks"];
+        put?: never;
+        /** Add Party Statblock */
+        post: operations["add_party_statblock"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/party/{party_id}/statblock/{statblock_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Party Statblock */
+        get: operations["get_party_statblock"];
+        put?: never;
+        post?: never;
+        /** Delete Party Statblock */
+        delete: operations["delete_party_statblock"];
+        options?: never;
+        head?: never;
+        /** Update Party Statblock */
+        patch: operations["update_party_statblock"];
+        trace?: never;
+    };
+    "/api/v1/party/{party_id}/statblock/{party_statblock_id}/equipment/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Party Statblock Equipment */
+        get: operations["list_party_statblock_equipment"];
+        put?: never;
+        /** Add Party Statblock Equipment */
+        post: operations["add_party_statblock_equipment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/party/{party_id}/statblock/{party_statblock_id}/equipment/{equipment_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Party Statblock Equipment */
+        get: operations["get_party_statblock_equipment"];
+        /** Update Party Statblock Equipment */
+        put: operations["update_party_statblock_equipment"];
+        post?: never;
+        /** Remove Party Statblock Equipment */
+        delete: operations["remove_party_statblock_equipment"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/party/{party_id}/spells/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Party Spells */
+        get: operations["list_party_spells"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/legal/": {
@@ -661,7 +877,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get Legal */
-        get: operations["get_legal_legal__get"];
+        get: operations["get_legal"];
         put?: never;
         post?: never;
         delete?: never;
@@ -678,7 +894,7 @@ export interface paths {
             cookie?: never;
         };
         /** List Users */
-        get: operations["list_users_admin_users_get"];
+        get: operations["list_users"];
         put?: never;
         post?: never;
         delete?: never;
@@ -695,7 +911,7 @@ export interface paths {
             cookie?: never;
         };
         /** Search Users */
-        get: operations["search_users_admin_users_search_get"];
+        get: operations["search_users"];
         put?: never;
         post?: never;
         delete?: never;
@@ -712,8 +928,25 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Update User */
-        put: operations["update_user_admin_users__user_id__put"];
+        /** Admin Update User */
+        put: operations["admin_update_user"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/{user_id}/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Admin Activate User */
+        put: operations["admin_activate_user"];
         post?: never;
         delete?: never;
         options?: never;
@@ -725,24 +958,6 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** Action */
-        "Action-Output": {
-            /** Name */
-            name: string;
-            /** Desc */
-            desc: string;
-            /** Attack Bonus */
-            attack_bonus?: number | null;
-            /** Stat Bonus */
-            stat_bonus?: ("STR" | "DEX" | "CON" | "INT" | "WIS" | "CHA")[] | null;
-            /** Use Proficiency */
-            use_proficiency?: boolean | null;
-            /** Needs Proficiency */
-            needs_proficiency?: boolean | null;
-            /** Damage Dice */
-            damage_dice?: string | null;
-            limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
-        };
         /** ActionOut */
         ActionOut: {
             /** Name */
@@ -782,25 +997,21 @@ export interface components {
          * @enum {string}
          */
         ActionTypeEnumOut: "FREE" | "ONE" | "TWO" | "THREE";
-        /** ArmorClass */
-        ArmorClass: {
-            /** Value */
-            value: number;
-            /** Special */
-            special?: string | null;
-        };
         /** Bloodline */
         Bloodline: {
             /** Name */
             name: string;
         };
-        /** Body_login_for_access_token_token_post */
-        Body_login_for_access_token_token_post: {
+        /** Body_login_token_post */
+        Body_login_token_post: {
             /** Grant Type */
             grant_type?: string | null;
             /** Username */
             username: string;
-            /** Password */
+            /**
+             * Password
+             * Format: password
+             */
             password: string;
             /**
              * Scope
@@ -809,7 +1020,10 @@ export interface components {
             scope: string;
             /** Client Id */
             client_id?: string | null;
-            /** Client Secret */
+            /**
+             * Client Secret
+             * Format: password
+             */
             client_secret?: string | null;
         };
         /** Cast */
@@ -946,7 +1160,7 @@ export interface components {
             group?: string | null;
             /** Alignment */
             alignment?: string | null;
-            armor_class: components["schemas"]["ArmorClass"];
+            armor_class: components["schemas"]["src__model_types__pf__statblock__ArmorClass"];
             hp: components["schemas"]["src__model_types__e5__base__Hitpoints"];
             speed: components["schemas"]["Speed"];
             stats: components["schemas"]["src__model_types__e5__base__Stats"];
@@ -1001,7 +1215,7 @@ export interface components {
             /** Spell Attack */
             spell_attack?: string | null;
             /** Limits */
-            limits?: components["schemas"]["LimitedUse-Input"][] | null;
+            limits?: components["schemas"]["src__model_types__base__LimitedUse"][] | null;
             /** Source */
             source?: string | null;
             money?: components["schemas"]["MoneyIn"] | null;
@@ -1024,7 +1238,7 @@ export interface components {
             group?: string | null;
             /** Alignment */
             alignment?: string | null;
-            armor_class: components["schemas"]["ArmorClass"];
+            armor_class: components["schemas"]["src__model_types__pf__statblock__ArmorClass"];
             hp: components["schemas"]["src__model_types__e5__base__Hitpoints"];
             speed: components["schemas"]["Speed"];
             stats: components["schemas"]["src__model_types__e5__base__Stats"];
@@ -1055,21 +1269,21 @@ export interface components {
             /** Cr */
             cr?: number | null;
             /** Actions */
-            actions?: components["schemas"]["Action-Output"][] | null;
+            actions?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
             /** Bonus Actions */
-            bonus_actions?: components["schemas"]["Action-Output"][] | null;
+            bonus_actions?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
             /** Lair Actions */
-            lair_actions?: components["schemas"]["Action-Output"][] | null;
+            lair_actions?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
             /** Mythic Actions */
-            mythic_actions?: components["schemas"]["Action-Output"][] | null;
+            mythic_actions?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
             /** Reactions */
-            reactions?: components["schemas"]["Action-Output"][] | null;
+            reactions?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
             /** Legendary Desc */
             legendary_desc?: string | null;
             /** Legendary Actions */
-            legendary_actions?: components["schemas"]["Action-Output"][] | null;
+            legendary_actions?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
             /** Special Abilities */
-            special_abilities?: components["schemas"]["Action-Output"][] | null;
+            special_abilities?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
             /** Spell Slots */
             spell_slots?: components["schemas"]["SpellSlots-Output"][] | null;
             /** Spells */
@@ -1102,9 +1316,53 @@ export interface components {
             /** Id */
             id: string;
         };
+        /** Filter[PartyFields] */
+        Filter_PartyFields_: {
+            filter_field: components["schemas"]["PartyFields"];
+            /**
+             * Filter Function
+             * @enum {string}
+             */
+            filter_function: "equals" | "lt" | "lte" | "gt" | "gte" | "contains" | "not";
+            /** Filter Value */
+            filter_value: string | number | boolean;
+        };
+        /** Filter[PartySpellFields] */
+        Filter_PartySpellFields_: {
+            filter_field: components["schemas"]["PartySpellFields"];
+            /**
+             * Filter Function
+             * @enum {string}
+             */
+            filter_function: "equals" | "lt" | "lte" | "gt" | "gte" | "contains" | "not";
+            /** Filter Value */
+            filter_value: string | number | boolean;
+        };
+        /** Filter[PartyStatblockFields] */
+        Filter_PartyStatblockFields_: {
+            filter_field: components["schemas"]["PartyStatblockFields"];
+            /**
+             * Filter Function
+             * @enum {string}
+             */
+            filter_function: "equals" | "lt" | "lte" | "gt" | "gte" | "contains" | "not";
+            /** Filter Value */
+            filter_value: string | number | boolean;
+        };
         /** Filter[SpellFields] */
         Filter_SpellFields_: {
             filter_field: components["schemas"]["SpellFields"];
+            /**
+             * Filter Function
+             * @enum {string}
+             */
+            filter_function: "equals" | "lt" | "lte" | "gt" | "gte" | "contains" | "not";
+            /** Filter Value */
+            filter_value: string | number | boolean;
+        };
+        /** Filter[StatblockEquipmentFields] */
+        Filter_StatblockEquipmentFields_: {
+            filter_field: components["schemas"]["StatblockEquipmentFields"];
             /**
              * Filter Function
              * @enum {string}
@@ -1159,6 +1417,10 @@ export interface components {
             hp?: number | null;
             /** Armor Class */
             armor_class?: number | null;
+            /** Dc */
+            dc?: number | null;
+            /** Scm */
+            scm?: number | null;
             /** Damage Vulnerabilities */
             damage_vulnerabilities?: string | null;
             /** Damage Resistances */
@@ -1190,6 +1452,10 @@ export interface components {
             hp?: number | null;
             /** Armor Class */
             armor_class?: number | null;
+            /** Dc */
+            dc?: number | null;
+            /** Scm */
+            scm?: number | null;
             /** Damage Vulnerabilities */
             damage_vulnerabilities?: string | null;
             /** Damage Resistances */
@@ -1203,13 +1469,13 @@ export interface components {
             /** Proficiency */
             proficiency?: string[] | null;
             /** Actions */
-            actions?: components["schemas"]["Action-Output"][] | null;
+            actions?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
             /** Bonus Actions */
-            bonus_actions?: components["schemas"]["Action-Output"][] | null;
+            bonus_actions?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
             /** Reactions */
-            reactions?: components["schemas"]["Action-Output"][] | null;
+            reactions?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
             /** Special Abilities */
-            special_abilities?: components["schemas"]["Action-Output"][] | null;
+            special_abilities?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
             stats?: components["schemas"]["src__model_types__e5__base__Stats"] | null;
             speed?: components["schemas"]["Speed"] | null;
             saving_throws?: components["schemas"]["src__model_types__e5__base__SavingThrows"] | null;
@@ -1228,7 +1494,7 @@ export interface components {
             /** Description */
             description?: string | null;
             /** Rarity */
-            rarity?: ("Common" | "Uncommon" | "Rare" | "Very Rare" | "Legendary" | "Artifact") | null;
+            rarity?: ("Common" | "Uncommon" | "Rare" | "Very Rare" | "Unique" | "Legendary" | "Artifact") | null;
             /** Sentient */
             sentient?: boolean | null;
             /** Consumable */
@@ -1244,7 +1510,7 @@ export interface components {
             range?: string | null;
             /** Spells */
             spells?: components["schemas"]["ItemSpellIn"][] | null;
-            charges?: components["schemas"]["LimitedUse-Input"] | null;
+            charges?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
             stats?: components["schemas"]["ItemStatsIn"] | null;
             bonus?: components["schemas"]["ItemBonusIn"] | null;
             modifiers?: components["schemas"]["ItemModifiersIn"] | null;
@@ -1273,7 +1539,7 @@ export interface components {
             /** Description */
             description?: string | null;
             /** Rarity */
-            rarity?: ("Common" | "Uncommon" | "Rare" | "Very Rare" | "Legendary" | "Artifact") | null;
+            rarity?: ("Common" | "Uncommon" | "Rare" | "Very Rare" | "Unique" | "Legendary" | "Artifact") | null;
             /** Sentient */
             sentient?: boolean | null;
             /** Consumable */
@@ -1330,7 +1596,7 @@ export interface components {
         };
         /** ItemStatsIn */
         ItemStatsIn: {
-            armor_class?: components["schemas"]["ArmorClass"] | null;
+            armor_class?: components["schemas"]["src__model_types__pf__statblock__ArmorClass"] | null;
             hp?: components["schemas"]["src__model_types__e5__base__Hitpoints"] | null;
             /** Senses */
             senses?: string[] | null;
@@ -1355,20 +1621,20 @@ export interface components {
         };
         /** ItemStatsOut */
         ItemStatsOut: {
-            armor_class?: components["schemas"]["ArmorClass"] | null;
+            armor_class?: components["schemas"]["src__model_types__pf__statblock__ArmorClass"] | null;
             hp?: components["schemas"]["src__model_types__e5__base__Hitpoints"] | null;
             /** Senses */
             senses?: string[] | null;
             /** Languages */
             languages?: string[] | null;
             /** Actions */
-            actions?: components["schemas"]["Action-Output"][] | null;
+            actions?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
             /** Bonus Actions */
-            bonus_actions?: components["schemas"]["Action-Output"][] | null;
+            bonus_actions?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
             /** Reactions */
-            reactions?: components["schemas"]["Action-Output"][] | null;
+            reactions?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
             /** Special Abilities */
-            special_abilities?: components["schemas"]["Action-Output"][] | null;
+            special_abilities?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
             /** Spell Dc */
             spell_dc?: string | null;
             /** Spell Attack */
@@ -1379,19 +1645,6 @@ export interface components {
             skills?: components["schemas"]["Skills"] | null;
             /** Id */
             id: number;
-        };
-        /** LimitedUse */
-        "LimitedUse-Input": {
-            /** Name */
-            name: string;
-            /** Description */
-            description?: string | null;
-            /** Uses */
-            uses: number;
-            /** Resets */
-            resets?: string[];
-            /** Formula */
-            formula?: string | null;
         };
         /** ModifierStats */
         ModifierStats: {
@@ -1485,7 +1738,7 @@ export interface components {
             stats: components["schemas"]["src__model_types__pf__statblock__Stats"];
             /** Items */
             items?: string[] | null;
-            armor_class: components["schemas"]["ArmorClass"];
+            armor_class: components["schemas"]["src__model_types__pf__statblock__ArmorClass"];
             saving_throws: components["schemas"]["src__model_types__pf__statblock__SavingThrows"];
             hp: components["schemas"]["src__model_types__pf__statblock__Hitpoints"];
             /** Immunities */
@@ -1505,7 +1758,7 @@ export interface components {
             /** About */
             about?: string | null;
             /** Limits */
-            limits?: components["schemas"]["LimitedUse-Input"][] | null;
+            limits?: components["schemas"]["src__model_types__base__LimitedUse"][] | null;
             /** Special Abilities */
             special_abilities?: components["schemas"]["SpecialAbility-Input"][] | null;
         };
@@ -1530,7 +1783,7 @@ export interface components {
             stats: components["schemas"]["src__model_types__pf__statblock__Stats"];
             /** Items */
             items?: string[] | null;
-            armor_class: components["schemas"]["ArmorClass"];
+            armor_class: components["schemas"]["src__model_types__pf__statblock__ArmorClass"];
             saving_throws: components["schemas"]["src__model_types__pf__statblock__SavingThrows"];
             hp: components["schemas"]["src__model_types__pf__statblock__Hitpoints"];
             /** Immunities */
@@ -1567,10 +1820,31 @@ export interface components {
             /** Total */
             total: number;
         };
+        /** Pagination[PartyOut] */
+        Pagination_PartyOut_: {
+            /** Page */
+            page: components["schemas"]["PartyOut"][];
+            /** Total */
+            total: number;
+        };
+        /** Pagination[PartyStatblockOut] */
+        Pagination_PartyStatblockOut_: {
+            /** Page */
+            page: components["schemas"]["PartyStatblockOut"][];
+            /** Total */
+            total: number;
+        };
         /** Pagination[Spell] */
         Pagination_Spell_: {
             /** Page */
             page: components["schemas"]["src__model_types__e5__spell__Spell"][];
+            /** Total */
+            total: number;
+        };
+        /** Pagination[StatblockItemOut] */
+        Pagination_StatblockItemOut_: {
+            /** Page */
+            page: components["schemas"]["StatblockItemOut"][];
             /** Total */
             total: number;
         };
@@ -1581,15 +1855,33 @@ export interface components {
         Party: {
             /** Id */
             id: number;
-            /** Pfstatblocks */
-            pfstatblocks?: components["schemas"]["pf_StatBlock"][] | null;
-            /** E5Statblocks */
-            e5statblocks?: components["schemas"]["e5_StatBlock"][] | null;
+            /** Name */
+            name: string;
+            /** Statblocks */
+            statblocks?: components["schemas"]["PartyStatblock"][] | null;
+            /** Group Name */
+            group_name?: string | null;
+            /** Links */
+            links: string[];
             user?: components["schemas"]["User"] | null;
-            /** Userid */
-            userId: string;
-            Money?: components["schemas"]["Money"] | null;
-            PartyInventory?: components["schemas"]["PartyInventory"] | null;
+            /** User Id */
+            user_id: string;
+            money?: components["schemas"]["Money"] | null;
+            inventory?: components["schemas"]["PartyInventory"] | null;
+        };
+        /**
+         * PartyFields
+         * @enum {string}
+         */
+        PartyFields: "id" | "name" | "group_name";
+        /** PartyIn */
+        PartyIn: {
+            /** Name */
+            name: string;
+            /** Group Name */
+            group_name?: string | null;
+            /** Links */
+            links?: string[] | null;
         };
         /**
          * PartyInventory
@@ -1599,26 +1891,179 @@ export interface components {
             /** Id */
             id: number;
             party?: components["schemas"]["Party"] | null;
-            /** Party Items */
-            Party_Items?: components["schemas"]["Party_Item"][] | null;
-            /** Partyid */
-            partyId: number;
+            /** Items */
+            items?: components["schemas"]["PartyItem"][] | null;
+            /** Party Id */
+            party_id: number;
+            /** Log */
+            log?: components["schemas"]["PartyInventoryLog"][] | null;
+        };
+        /** PartyInventoryBaseOut */
+        PartyInventoryBaseOut: {
+            /** Id */
+            id: number;
+            /** Party Id */
+            party_id: number;
         };
         /**
-         * Party_Item
-         * @description Represents a Party_Item record
+         * PartyInventoryLog
+         * @description Represents a PartyInventoryLog record
          */
-        Party_Item: {
+        PartyInventoryLog: {
+            /** Id */
+            id: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Message */
+            message: string;
+            inventory?: components["schemas"]["PartyInventory"] | null;
+            /** Inventory Id */
+            inventory_id: number;
+        };
+        /** PartyInventoryOut */
+        PartyInventoryOut: {
+            /** Id */
+            id: number;
+            /** Party Id */
+            party_id: number;
+            /** Items */
+            items?: components["schemas"]["PartyItemOut"][] | null;
+        };
+        /** PartyInventoryUpdate */
+        PartyInventoryUpdate: {
+            /** Item Updates */
+            item_updates?: {
+                [key: string]: components["schemas"]["PartyItemUpdate"];
+            } | null;
+            /** New Items */
+            new_items?: components["schemas"]["PartyItemIn"][] | null;
+        };
+        /**
+         * PartyItem
+         * @description Represents a PartyItem record
+         */
+        PartyItem: {
             /** Id */
             id: number;
             /** Count */
             count: number;
             item?: components["schemas"]["e5_Item"] | null;
-            partyInventory?: components["schemas"]["PartyInventory"] | null;
-            /** E5 Itemid */
-            e5_ItemId: number;
-            /** Partyinventoryid */
-            partyInventoryId: number;
+            inventory?: components["schemas"]["PartyInventory"] | null;
+            /** Item Id */
+            item_id: number;
+            /** Inventory Id */
+            inventory_id: number;
+        };
+        /** PartyItemIn */
+        PartyItemIn: {
+            /** Count */
+            count: number;
+            /** Item Id */
+            item_id: number;
+        };
+        /** PartyItemOut */
+        PartyItemOut: {
+            /** Id */
+            id: number;
+            /** Count */
+            count: number;
+            item: components["schemas"]["ItemOut"];
+        };
+        /** PartyItemUpdate */
+        PartyItemUpdate: {
+            /** Add */
+            add?: number | null;
+            /** Remove */
+            remove?: number | null;
+            /** Count */
+            count?: number | null;
+            /** Item Id */
+            item_id?: number | null;
+        };
+        /** PartyOut */
+        PartyOut: {
+            /** Name */
+            name: string;
+            /** Group Name */
+            group_name?: string | null;
+            /** Links */
+            links?: string[] | null;
+            /** Id */
+            id: number;
+            /** Statblocks */
+            statblocks?: components["schemas"]["PartyStatblockOut"][] | null;
+            money?: components["schemas"]["MoneyOut"] | null;
+            inventory?: components["schemas"]["PartyInventoryBaseOut"] | null;
+        };
+        /**
+         * PartySpellFields
+         * @enum {string}
+         */
+        PartySpellFields: "id" | "name";
+        /**
+         * PartyStatblock
+         * @description Represents a PartyStatblock record
+         */
+        PartyStatblock: {
+            /** Id */
+            id: number;
+            /** Is Character */
+            is_character: boolean;
+            statblock?: components["schemas"]["e5_StatBlock"] | null;
+            user?: components["schemas"]["User"] | null;
+            party?: components["schemas"]["Party"] | null;
+            /** Party Id */
+            party_id: number;
+            /** Statblock Id */
+            statblock_id?: string | null;
+            /** User Id */
+            user_id?: string | null;
+        };
+        /**
+         * PartyStatblockFields
+         * @enum {string}
+         */
+        PartyStatblockFields: "id" | "is_character" | "user_id";
+        /** PartyStatblockIn */
+        PartyStatblockIn: {
+            /** Is Character */
+            is_character?: boolean | null;
+            /** Statblock Id */
+            statblock_id: string;
+            /** User Id */
+            user_id?: string | null;
+        };
+        /** PartyStatblockOut */
+        PartyStatblockOut: {
+            /** Id */
+            id: number;
+            /** Is Character */
+            is_character: boolean;
+            statblock?: components["schemas"]["SimpleE5StatblockOut"] | null;
+            user?: components["schemas"]["UserOut"] | null;
+            /** Party Id */
+            party_id: number;
+        };
+        /** PartyStatblockUpdate */
+        PartyStatblockUpdate: {
+            /** Is Character */
+            is_character?: boolean | null;
+            /** Statblock Id */
+            statblock_id?: string | null;
+            /** User Id */
+            user_id?: string | null;
+        };
+        /** PartyUpdate */
+        PartyUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Group Name */
+            group_name?: string | null;
+            /** Links */
+            links?: string[] | null;
         };
         /** PasswordResetIn */
         PasswordResetIn: {
@@ -1662,7 +2107,7 @@ export interface components {
             failure?: string | null;
             /** Critical Failure */
             critical_failure?: string | null;
-            limit?: components["schemas"]["LimitedUse-Input"] | null;
+            limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
         };
         /** Reaction */
         "Reaction-Output": {
@@ -1725,6 +2170,17 @@ export interface components {
              */
             notify_next_turn: boolean;
         };
+        /** SimpleE5StatblockOut */
+        SimpleE5StatblockOut: {
+            /** Name */
+            name: string;
+            /** Id */
+            id: string;
+            /** Slug */
+            slug: string;
+            /** External Id */
+            external_id?: string | null;
+        };
         /** Skill */
         Skill: {
             /** Name */
@@ -1771,9 +2227,33 @@ export interface components {
             /** Survival */
             survival?: number | null;
         };
+        /** Sort[PartyFields] */
+        Sort_PartyFields_: {
+            sort_field?: components["schemas"]["PartyFields"] | null;
+            /** Sort Order */
+            sort_order?: ("asc" | "desc") | null;
+        };
+        /** Sort[PartySpellFields] */
+        Sort_PartySpellFields_: {
+            sort_field?: components["schemas"]["PartySpellFields"] | null;
+            /** Sort Order */
+            sort_order?: ("asc" | "desc") | null;
+        };
+        /** Sort[PartyStatblockFields] */
+        Sort_PartyStatblockFields_: {
+            sort_field?: components["schemas"]["PartyStatblockFields"] | null;
+            /** Sort Order */
+            sort_order?: ("asc" | "desc") | null;
+        };
         /** Sort[SpellFields] */
         Sort_SpellFields_: {
             sort_field?: components["schemas"]["SpellFields"] | null;
+            /** Sort Order */
+            sort_order?: ("asc" | "desc") | null;
+        };
+        /** Sort[StatblockEquipmentFields] */
+        Sort_StatblockEquipmentFields_: {
+            sort_field?: components["schemas"]["StatblockEquipmentFields"] | null;
             /** Sort Order */
             sort_order?: ("asc" | "desc") | null;
         };
@@ -1789,7 +2269,7 @@ export interface components {
             name: string;
             /** Description */
             description: string;
-            limit?: components["schemas"]["LimitedUse-Input"] | null;
+            limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
         };
         /** SpecialAbility */
         "SpecialAbility-Output": {
@@ -1916,7 +2396,7 @@ export interface components {
         "SpellSlots-Input": {
             /** Level */
             level: number;
-            limit: components["schemas"]["LimitedUse-Input"];
+            limit: components["schemas"]["src__model_types__base__LimitedUse"];
         };
         /** SpellSlots */
         "SpellSlots-Output": {
@@ -1988,7 +2468,7 @@ export interface components {
             level: string;
             /** Spells */
             spells: components["schemas"]["SpellInfo"][];
-            limit?: components["schemas"]["LimitedUse-Input"] | null;
+            limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
         };
         /** SpelllistOut */
         SpelllistOut: {
@@ -1999,6 +2479,29 @@ export interface components {
             /** Spells */
             spells: components["schemas"]["SpellStatblockOut"][];
             limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
+        };
+        /** StandardSuccessResponse */
+        StandardSuccessResponse: {
+            /** Detail */
+            detail: string;
+        };
+        /**
+         * StatblockEquipmentFields
+         * @enum {string}
+         */
+        StatblockEquipmentFields: "id" | "equipped" | "attuned" | "loot" | "proficient" | "embedded" | "count";
+        /** StatblockEquipmentUpdate */
+        StatblockEquipmentUpdate: {
+            /** Add */
+            add?: number | null;
+            /** Remove */
+            remove?: number | null;
+            /** Count */
+            count?: number | null;
+            /** Equipped */
+            equipped?: boolean | null;
+            /** Attuned */
+            attuned?: boolean | null;
         };
         /**
          * StatblockFields
@@ -2039,6 +2542,13 @@ export interface components {
             item: components["schemas"]["ItemOut"];
             /** Count */
             count?: number | null;
+        };
+        /** Token */
+        Token: {
+            /** Access Token */
+            access_token: string;
+            /** Token Type */
+            token_type: string;
         };
         /** TokenSettings */
         TokenSettings: {
@@ -2119,9 +2629,13 @@ export interface components {
             custom_tier_end?: string | null;
             /** Party */
             Party?: components["schemas"]["Party"][] | null;
+            /** Party Statblock */
+            party_statblock?: components["schemas"]["PartyStatblock"][] | null;
         };
         /** UserAdminInfo */
         UserAdminInfo: {
+            /** Id */
+            id: string;
             /** Username */
             username: string;
             /** Email */
@@ -2133,8 +2647,6 @@ export interface components {
             /** Custom Tier End */
             custom_tier_end?: string | null;
             patreon?: components["schemas"]["src__model_types__types__Patreon"] | null;
-            /** Id */
-            id: string;
             /** Active */
             active: boolean;
             /** Statblocks */
@@ -2168,6 +2680,8 @@ export interface components {
         };
         /** UserOut */
         UserOut: {
+            /** Id */
+            id: string;
             /** Username */
             username: string;
             /** Email */
@@ -2194,6 +2708,8 @@ export interface components {
         };
         /** UserWithApiKey */
         UserWithApiKey: {
+            /** Id */
+            id: string;
             /** Username */
             username: string;
             /** Email */
@@ -2203,6 +2719,8 @@ export interface components {
         };
         /** UserWithScopes */
         UserWithScopes: {
+            /** Id */
+            id: string;
             /** Username */
             username: string;
             /** Email */
@@ -2385,7 +2903,7 @@ export interface components {
             /** E5 Statblock Item */
             e5_StatBlock_Item?: components["schemas"]["e5_StatBlock_Item"][] | null;
             /** Party Items */
-            Party_Items?: components["schemas"]["Party_Item"][] | null;
+            party_items?: components["schemas"]["PartyItem"][] | null;
             ac?: components["schemas"]["e5_ItemAC"] | null;
         };
         /**
@@ -2414,6 +2932,10 @@ export interface components {
             hp: number;
             /** Armor Class */
             armor_class: number;
+            /** Dc */
+            dc?: number | null;
+            /** Scm */
+            scm?: number | null;
             /** Damage Vulnerabilities */
             damage_vulnerabilities?: string | null;
             /** Damage Resistances */
@@ -3031,9 +3553,9 @@ export interface components {
             e5_ArmorClassId: string;
             /** E5 Statsid */
             e5_StatsId: string;
-            /** Party */
-            party?: components["schemas"]["Party"][] | null;
             money?: components["schemas"]["Money"] | null;
+            /** Party Statblock */
+            party_statblock?: components["schemas"]["PartyStatblock"][] | null;
         };
         /**
          * e5_StatBlock_Item
@@ -3561,8 +4083,6 @@ export interface components {
             pf_ArmorClassId: string;
             /** Pf Statsid */
             pf_StatsId: string;
-            /** Party */
-            Party?: components["schemas"]["Party"][] | null;
         };
         /**
          * pf_Stats
@@ -3705,6 +4225,24 @@ export interface components {
             formula?: string | null;
         };
         /** Action */
+        src__model_types__e5__base__Action: {
+            /** Name */
+            name: string;
+            /** Desc */
+            desc: string;
+            /** Attack Bonus */
+            attack_bonus?: number | null;
+            /** Stat Bonus */
+            stat_bonus?: ("STR" | "DEX" | "CON" | "INT" | "WIS" | "CHA")[] | null;
+            /** Use Proficiency */
+            use_proficiency?: boolean | null;
+            /** Needs Proficiency */
+            needs_proficiency?: boolean | null;
+            /** Damage Dice */
+            damage_dice?: string | null;
+            limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
+        };
+        /** Action */
         "src__model_types__e5__base__Action-Input": {
             /** Name */
             name: string;
@@ -3720,7 +4258,7 @@ export interface components {
             needs_proficiency?: boolean | null;
             /** Damage Dice */
             damage_dice?: string | null;
-            limit?: components["schemas"]["LimitedUse-Input"] | null;
+            limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
         };
         /** Hitpoints */
         src__model_types__e5__base__Hitpoints: {
@@ -3973,7 +4511,14 @@ export interface components {
             critical_failure?: string | null;
             /** Constant */
             constant?: string | null;
-            limit?: components["schemas"]["LimitedUse-Input"] | null;
+            limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
+        };
+        /** ArmorClass */
+        src__model_types__pf__statblock__ArmorClass: {
+            /** Value */
+            value: number;
+            /** Special */
+            special?: string | null;
         };
         /** Hitpoints */
         src__model_types__pf__statblock__Hitpoints: {
@@ -4041,7 +4586,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    login_for_access_token_token_post: {
+    login: {
         parameters: {
             query?: never;
             header?: never;
@@ -4050,7 +4595,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/x-www-form-urlencoded": components["schemas"]["Body_login_for_access_token_token_post"];
+                "application/x-www-form-urlencoded": components["schemas"]["Body_login_token_post"];
             };
         };
         responses: {
@@ -4060,7 +4605,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["Token"];
                 };
             };
             /** @description Validation Error */
@@ -4074,7 +4619,7 @@ export interface operations {
             };
         };
     };
-    refresh_access_token_refresh_get: {
+    refresh_access_token: {
         parameters: {
             query?: never;
             header?: never;
@@ -4089,12 +4634,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["Token"];
                 };
             };
         };
     };
-    reset_password_password_reset_post: {
+    reset_password: {
         parameters: {
             query: {
                 email: string;
@@ -4125,7 +4670,7 @@ export interface operations {
             };
         };
     };
-    get_activation_mail_activation_link_post: {
+    get_activation_mail: {
         parameters: {
             query: {
                 username: string;
@@ -4156,7 +4701,7 @@ export interface operations {
             };
         };
     };
-    list_statblocks_api_v2_e5_statblock__get: {
+    list_statblocks: {
         parameters: {
             query?: {
                 limit?: number;
@@ -4190,7 +4735,7 @@ export interface operations {
             };
         };
     };
-    list_spells_api_v2_e5_spell__get: {
+    list_spells: {
         parameters: {
             query?: {
                 limit?: number;
@@ -4224,7 +4769,7 @@ export interface operations {
             };
         };
     };
-    get_stats_stats__get: {
+    get_stats: {
         parameters: {
             query?: never;
             header?: never;
@@ -4244,7 +4789,7 @@ export interface operations {
             };
         };
     };
-    create_user_api_v1_users__post: {
+    create_user: {
         parameters: {
             query?: never;
             header?: never;
@@ -4277,7 +4822,7 @@ export interface operations {
             };
         };
     };
-    update_user_roles_api_v1_users__user_id__roles_patch: {
+    update_user_roles: {
         parameters: {
             query?: never;
             header?: never;
@@ -4312,7 +4857,7 @@ export interface operations {
             };
         };
     };
-    get_users_me_api_v1_users_me__get: {
+    get_users_me: {
         parameters: {
             query?: never;
             header?: never;
@@ -4332,7 +4877,7 @@ export interface operations {
             };
         };
     };
-    update_user_api_v1_users_me__patch: {
+    update_user: {
         parameters: {
             query?: never;
             header?: never;
@@ -4365,7 +4910,7 @@ export interface operations {
             };
         };
     };
-    list_api_keys_api_v1_users_me_api_keys_get: {
+    list_api_keys: {
         parameters: {
             query?: never;
             header?: never;
@@ -4385,7 +4930,7 @@ export interface operations {
             };
         };
     };
-    update_api_keys_api_v1_users_me_api_keys_put: {
+    update_api_keys: {
         parameters: {
             query?: never;
             header?: never;
@@ -4405,7 +4950,7 @@ export interface operations {
             };
         };
     };
-    update_api_keys_api_v1_users_me_api_keys_delete: {
+    delete_api_keys: {
         parameters: {
             query: {
                 api_key: string;
@@ -4436,7 +4981,7 @@ export interface operations {
             };
         };
     };
-    list_statblocks_api_v1_users_me_statblocks_get: {
+    list_user_statblocks: {
         parameters: {
             query?: never;
             header?: never;
@@ -4456,7 +5001,7 @@ export interface operations {
             };
         };
     };
-    list_spells_api_v1_users_me_spells_get: {
+    list_user_spells: {
         parameters: {
             query?: never;
             header?: never;
@@ -4476,7 +5021,7 @@ export interface operations {
             };
         };
     };
-    list_items_api_v1_users_me_items_get: {
+    list_user_items: {
         parameters: {
             query?: never;
             header?: never;
@@ -4496,7 +5041,7 @@ export interface operations {
             };
         };
     };
-    change_password_api_v1_users_change_password_post: {
+    change_password: {
         parameters: {
             query?: never;
             header?: never;
@@ -4529,7 +5074,7 @@ export interface operations {
             };
         };
     };
-    activate_user_api_v1_users_activate_post: {
+    activate_user: {
         parameters: {
             query?: never;
             header?: never;
@@ -4549,7 +5094,7 @@ export interface operations {
             };
         };
     };
-    get_user_settings_api_v1_users_me_settings_get: {
+    get_user_settings: {
         parameters: {
             query?: never;
             header?: never;
@@ -4569,7 +5114,7 @@ export interface operations {
             };
         };
     };
-    put_user_settings_api_v1_users_me_settings_put: {
+    put_user_settings: {
         parameters: {
             query?: never;
             header?: never;
@@ -4602,7 +5147,7 @@ export interface operations {
             };
         };
     };
-    set_user_patreon_api_v1_users_me_patreon_put: {
+    set_user_patreon: {
         parameters: {
             query: {
                 patreon_email: string | null;
@@ -4633,7 +5178,7 @@ export interface operations {
             };
         };
     };
-    refresh_patreon_api_v1_users_me_patreon_post: {
+    refresh_patreon: {
         parameters: {
             query?: never;
             header?: never;
@@ -4653,7 +5198,7 @@ export interface operations {
             };
         };
     };
-    list_pf_statblocks_api_v1_pf_statblock__get: {
+    list_pf_statblocks: {
         parameters: {
             query?: {
                 take?: number | null;
@@ -4685,7 +5230,7 @@ export interface operations {
             };
         };
     };
-    create_pf_statblock_api_v1_pf_statblock__post: {
+    create_pf_statblock: {
         parameters: {
             query?: never;
             header?: never;
@@ -4718,7 +5263,7 @@ export interface operations {
             };
         };
     };
-    search_pf_statblock_api_v1_pf_statblock_search__get: {
+    search_pf_statblock: {
         parameters: {
             query?: {
                 name?: string;
@@ -4752,7 +5297,7 @@ export interface operations {
             };
         };
     };
-    get_pf_statblock_slug_api_v1_pf_statblock__slug__get: {
+    get_pf_statblock_slug: {
         parameters: {
             query?: never;
             header?: never;
@@ -4783,7 +5328,7 @@ export interface operations {
             };
         };
     };
-    edit_pf_statblock_api_v1_pf_statblock__slug__put: {
+    edit_pf_statblock: {
         parameters: {
             query?: never;
             header?: never;
@@ -4818,7 +5363,7 @@ export interface operations {
             };
         };
     };
-    delete_pf_statblock_api_v1_pf_statblock__slug__delete: {
+    delete_pf_statblock: {
         parameters: {
             query?: never;
             header?: never;
@@ -4849,7 +5394,7 @@ export interface operations {
             };
         };
     };
-    set_active_pf_statblock_api_v1_pf_statblock__slug__active_put: {
+    set_active_pf_statblock: {
         parameters: {
             query: {
                 active: boolean;
@@ -4882,7 +5427,7 @@ export interface operations {
             };
         };
     };
-    list_pf_spells_api_v1_pf_spell__get: {
+    list_pf_spells: {
         parameters: {
             query?: {
                 take?: number;
@@ -4914,7 +5459,7 @@ export interface operations {
             };
         };
     };
-    create_spell_api_v1_pf_spell__post: {
+    create_pf_spell: {
         parameters: {
             query?: never;
             header?: never;
@@ -4947,7 +5492,7 @@ export interface operations {
             };
         };
     };
-    search_pf_spell_api_v1_pf_spell_search_get: {
+    search_pf_spell: {
         parameters: {
             query?: {
                 name?: string;
@@ -4980,7 +5525,7 @@ export interface operations {
             };
         };
     };
-    get_pf_spells_slug_api_v1_pf_spell__slug__get: {
+    get_pf_spells_slug: {
         parameters: {
             query?: never;
             header?: never;
@@ -5011,7 +5556,7 @@ export interface operations {
             };
         };
     };
-    update_pf_spell_api_v1_pf_spell__slug__put: {
+    update_pf_spell: {
         parameters: {
             query?: never;
             header?: never;
@@ -5046,7 +5591,7 @@ export interface operations {
             };
         };
     };
-    delete_pf_spell_api_v1_pf_spell__slug__delete: {
+    delete_pf_spell: {
         parameters: {
             query?: never;
             header?: never;
@@ -5077,7 +5622,7 @@ export interface operations {
             };
         };
     };
-    list_e5_statblocks_api_v1_e5_statblock__get: {
+    list_e5_statblocks: {
         parameters: {
             query?: {
                 take?: number | null;
@@ -5109,7 +5654,7 @@ export interface operations {
             };
         };
     };
-    create_e5_statblock_api_v1_e5_statblock__post: {
+    create_e5_statblock: {
         parameters: {
             query?: never;
             header?: never;
@@ -5142,7 +5687,7 @@ export interface operations {
             };
         };
     };
-    search_e5_creature_api_v1_e5_statblock_search__get: {
+    search_e5_creature: {
         parameters: {
             query?: {
                 search_string?: string;
@@ -5175,7 +5720,7 @@ export interface operations {
             };
         };
     };
-    get_e5_statblock_slug_api_v1_e5_statblock__slug__get: {
+    get_e5_statblock_slug: {
         parameters: {
             query?: never;
             header?: never;
@@ -5206,7 +5751,7 @@ export interface operations {
             };
         };
     };
-    edit_e5_statblock_api_v1_e5_statblock__slug__put: {
+    edit_e5_statblock: {
         parameters: {
             query?: never;
             header?: never;
@@ -5241,7 +5786,7 @@ export interface operations {
             };
         };
     };
-    delete_e5_statblock_api_v1_e5_statblock__slug__delete: {
+    delete_e5_statblock: {
         parameters: {
             query?: never;
             header?: never;
@@ -5272,7 +5817,7 @@ export interface operations {
             };
         };
     };
-    set_active_e5_statblock_api_v1_e5_statblock__slug__active_put: {
+    set_active_e5_statblock: {
         parameters: {
             query: {
                 active: boolean;
@@ -5305,7 +5850,7 @@ export interface operations {
             };
         };
     };
-    create_statblock_from_external_source_api_v1_e5_statblock_external_post: {
+    create_statblock_from_external_source: {
         parameters: {
             query?: never;
             header?: never;
@@ -5338,7 +5883,7 @@ export interface operations {
             };
         };
     };
-    list_e5_spells_api_v1_e5_spell__get: {
+    list_e5_spells: {
         parameters: {
             query?: {
                 take?: number;
@@ -5370,7 +5915,7 @@ export interface operations {
             };
         };
     };
-    create_spell_api_v1_e5_spell__post: {
+    create_spell: {
         parameters: {
             query?: never;
             header?: never;
@@ -5403,7 +5948,7 @@ export interface operations {
             };
         };
     };
-    search_e5_spell_api_v1_e5_spell_search_get: {
+    search_e5_spell: {
         parameters: {
             query?: {
                 search_string?: string;
@@ -5436,7 +5981,7 @@ export interface operations {
             };
         };
     };
-    get_e5_spells_slug_api_v1_e5_spell__slug__get: {
+    get_e5_spells_slug: {
         parameters: {
             query?: never;
             header?: never;
@@ -5467,7 +6012,7 @@ export interface operations {
             };
         };
     };
-    update_e5_spell_api_v1_e5_spell__slug__put: {
+    update_e5_spell: {
         parameters: {
             query?: never;
             header?: never;
@@ -5502,7 +6047,7 @@ export interface operations {
             };
         };
     };
-    delete_e5_spell_api_v1_e5_spell__slug__delete: {
+    delete_e5_spell: {
         parameters: {
             query?: never;
             header?: never;
@@ -5533,7 +6078,7 @@ export interface operations {
             };
         };
     };
-    get_e5_encounters_api_v1_e5_encounter__get: {
+    get_e5_encounters: {
         parameters: {
             query: {
                 rooms: number;
@@ -5567,7 +6112,7 @@ export interface operations {
             };
         };
     };
-    list_e5_items_api_v1_e5_item__get: {
+    list_e5_items: {
         parameters: {
             query?: {
                 take?: number;
@@ -5599,7 +6144,7 @@ export interface operations {
             };
         };
     };
-    create_item_api_v1_e5_item__post: {
+    create_item: {
         parameters: {
             query?: never;
             header?: never;
@@ -5632,7 +6177,7 @@ export interface operations {
             };
         };
     };
-    search_items_api_v1_e5_item_search_get: {
+    search_items: {
         parameters: {
             query?: {
                 search_string?: string;
@@ -5665,7 +6210,7 @@ export interface operations {
             };
         };
     };
-    get_e5_item_slug_api_v1_e5_item__slug__get: {
+    get_e5_item_slug: {
         parameters: {
             query?: never;
             header?: never;
@@ -5696,7 +6241,7 @@ export interface operations {
             };
         };
     };
-    delete_item_api_v1_e5_item__slug__delete: {
+    delete_item: {
         parameters: {
             query?: never;
             header?: never;
@@ -5727,7 +6272,7 @@ export interface operations {
             };
         };
     };
-    edit_item_api_v1_e5_item__slug__patch: {
+    edit_item: {
         parameters: {
             query?: never;
             header?: never;
@@ -5762,7 +6307,821 @@ export interface operations {
             };
         };
     };
-    get_legal_legal__get: {
+    list_player_parties: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                sort?: components["schemas"]["Sort_PartyFields_"][] | null;
+                filter?: components["schemas"]["Filter_PartyFields_"][] | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Pagination_PartyOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_player_statblock: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                statblock_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["E5StatblockOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_player_statblock: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                statblock_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["E5StatblockIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["E5StatblockOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resync_player_statblock: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                statblock_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["E5StatblockOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_parties: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                sort?: components["schemas"]["Sort_PartyFields_"][] | null;
+                filter?: components["schemas"]["Filter_PartyFields_"][] | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Pagination_PartyOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_party: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PartyIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartyOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_party: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                party_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartyOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_party: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                party_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartyOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_party: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                party_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PartyUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartyOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_party_money: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                party_id: number;
+                money_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MoneyIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MoneyOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_party_inventory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                party_id: number;
+                inventory_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartyInventoryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_party_inventory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                party_id: number;
+                inventory_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PartyInventoryUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartyInventoryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    empty_party_inventory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                party_id: number;
+                inventory_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartyInventoryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_party_statblocks: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                sort?: components["schemas"]["Sort_PartyStatblockFields_"][] | null;
+                filter?: components["schemas"]["Filter_PartyStatblockFields_"][] | null;
+            };
+            header?: never;
+            path: {
+                party_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Pagination_PartyStatblockOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_party_statblock: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                party_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PartyStatblockIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartyStatblockOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_party_statblock: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                party_id: number;
+                statblock_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartyStatblockOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_party_statblock: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                party_id: number;
+                statblock_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StandardSuccessResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_party_statblock: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                party_id: number;
+                statblock_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PartyStatblockUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartyStatblockOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_party_statblock_equipment: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                sort?: components["schemas"]["Sort_StatblockEquipmentFields_"][] | null;
+                filter?: components["schemas"]["Filter_StatblockEquipmentFields_"][] | null;
+            };
+            header?: never;
+            path: {
+                party_id: number;
+                party_statblock_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Pagination_StatblockItemOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_party_statblock_equipment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                party_id: number;
+                party_statblock_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StatblockItemIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatblockItemOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_party_statblock_equipment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                party_id: number;
+                party_statblock_id: number;
+                equipment_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatblockItemOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_party_statblock_equipment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                party_id: number;
+                party_statblock_id: number;
+                equipment_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StatblockEquipmentUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatblockItemOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_party_statblock_equipment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                party_id: number;
+                party_statblock_id: number;
+                equipment_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartyInventoryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_party_spells: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                sort?: components["schemas"]["Sort_PartySpellFields_"][] | null;
+                filter?: components["schemas"]["Filter_PartySpellFields_"][] | null;
+            };
+            header?: never;
+            path: {
+                party_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Pagination_Spell_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_legal: {
         parameters: {
             query?: never;
             header?: never;
@@ -5782,7 +7141,7 @@ export interface operations {
             };
         };
     };
-    list_users_admin_users_get: {
+    list_users: {
         parameters: {
             query?: {
                 take?: number;
@@ -5814,7 +7173,7 @@ export interface operations {
             };
         };
     };
-    search_users_admin_users_search_get: {
+    search_users: {
         parameters: {
             query?: {
                 email?: string | null;
@@ -5848,7 +7207,7 @@ export interface operations {
             };
         };
     };
-    update_user_admin_users__user_id__put: {
+    admin_update_user: {
         parameters: {
             query?: never;
             header?: never;
@@ -5862,6 +7221,37 @@ export interface operations {
                 "application/json": components["schemas"]["UserAdminUpdate"];
             };
         };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserWithScopes"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_activate_user: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {

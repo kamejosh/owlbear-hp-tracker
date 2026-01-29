@@ -10,7 +10,7 @@ import { About } from "../About.tsx";
 import { ShareAbilityButton } from "../../../general/ShareAbilityButton.tsx";
 import { usePlayerContext } from "../../../../context/PlayerContext.ts";
 
-export type Ability = components["schemas"]["Action-Output"];
+export type Ability = components["schemas"]["src__model_types__e5__base__Action"];
 
 export const E5Ability = ({
     ability,

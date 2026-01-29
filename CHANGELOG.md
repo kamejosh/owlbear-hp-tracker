@@ -5,6 +5,7 @@
 + Adjust big updates to make use of OBRs new ratelimit implementation
 + Improve popover multitoken hp changes
 + Fix issue when dragging multiple tokens inside a group
++ Add DC and SCM Bonus from Items
 
 # 3.6.0
 

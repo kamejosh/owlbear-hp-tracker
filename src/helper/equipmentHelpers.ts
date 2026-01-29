@@ -24,6 +24,8 @@ export type StatblockBonuses = {
     spells: Array<{ itemId: number; spells: Array<ItemSpell> }>;
     hpBonus: number;
     ac: number;
+    dc: number;
+    scm: number;
     damageVulnerabilities: string;
     damageResistances: string;
     damageImmunities: string;
@@ -134,6 +136,8 @@ export const getEquipmentBonuses = (
         spells: [],
         hpBonus: 0,
         ac: 0,
+        dc: 0,
+        scm: 0,
         damageImmunities: "",
         damageResistances: "",
         damageVulnerabilities: "",
@@ -215,6 +219,12 @@ export const getEquipmentBonuses = (
                 }
                 if (itemBonus.armor_class) {
                     bonuses.ac += itemBonus.armor_class;
+                }
+                if (itemBonus.dc) {
+                    bonuses.dc += itemBonus.dc;
+                }
+                if (itemBonus.scm) {
+                    bonuses.scm += itemBonus.scm;
                 }
                 if (itemBonus.damage_vulnerabilities) {
                     bonuses.damageVulnerabilities += ` ${itemBonus.damage_vulnerabilities}`;

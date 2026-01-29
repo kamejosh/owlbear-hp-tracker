@@ -44,6 +44,7 @@ type DiceButtonProps = {
     proficiencyBonus?: number | null;
     classes?: string;
     customDiceThemeId?: string;
+    reduce?: boolean;
 };
 export const DiceButton = (props: DiceButtonProps) => {
     const { component } = useComponentContext();
