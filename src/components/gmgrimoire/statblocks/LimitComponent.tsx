@@ -15,7 +15,7 @@ import { DiceButton } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
 export type LimitType = components["schemas"]["src__model_types__base__LimitedUse"];
 
 const BoxLimits = ({ limitValues, itemId }: { limitValues: Limit; itemId: string }) => {
-    if (limitValues.max === 0 || isNaN(limitValues.max) || limitValues.max === undefined || limitValues.max === null) {
+    if (limitValues.max <= 0 || isNaN(limitValues.max) || limitValues.max === undefined || limitValues.max === null) {
         return <></>;
     }
     return (
