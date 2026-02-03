@@ -20,7 +20,7 @@ import { PfStatblock } from "../api/pf/usePfApi.ts";
 import axiosRetry from "axios-retry";
 import { Ability } from "../components/gmgrimoire/statblocks/e5/E5Ability.tsx";
 import { deleteItems, updateItems } from "./obrHelper.ts";
-import { getEquipmentBonuses } from "./equipmentHelpers.ts";
+import { getEquipmentBonuses, isItemInUse } from "./equipmentHelpers.ts";
 import { UserSettings } from "../api/tabletop-almanac/useUser.ts";
 import { updateHp } from "./hpHelpers.ts";
 import { updateAc } from "./acHelper.ts";
@@ -316,7 +316,7 @@ export const getRoomDiceUser = (room: RoomMetadata | null, id: string | null) =>
     return room?.diceUser?.find((user) => user.playerId === id);
 };
 
-const getLimitsE5 = (statblock: E5Statblock) => {
+export const getLimitsE5 = (statblock: E5Statblock, data?: GMGMetadata) => {
     const limits: Array<Limit> = [];
 
     const getActionTypeLimits = (actionType?: Array<Ability>) => {
@@ -361,19 +361,25 @@ const getLimitsE5 = (statblock: E5Statblock) => {
     });
 
     statblock.equipment?.forEach((equipment) => {
-        if (equipment.item.charges) {
-            limits.push({
-                id: equipment.item.charges.name,
-                max: equipment.item.charges.uses,
-                used: 0,
-                resets: equipment.item.charges.resets ?? [],
-                formula: equipment.item.charges.formula,
-            });
+        if (
+            (data && isItemInUse(data, equipment)) ||
+            (!data && equipment.item.requires_attuning && equipment.attuned) ||
+            (!data && equipment.item.can_equip && equipment.equipped)
+        ) {
+            if (equipment.item.charges) {
+                limits.push({
+                    id: equipment.item.charges.name,
+                    max: equipment.item.charges.uses,
+                    used: 0,
+                    resets: equipment.item.charges.resets ?? [],
+                    formula: equipment.item.charges.formula,
+                });
+            }
+            getActionTypeLimits(equipment.item.bonus?.actions || []);
+            getActionTypeLimits(equipment.item.bonus?.bonus_actions || []);
+            getActionTypeLimits(equipment.item.bonus?.reactions || []);
+            getActionTypeLimits(equipment.item.bonus?.special_abilities || []);
         }
-        getActionTypeLimits(equipment.item.bonus?.actions || []);
-        getActionTypeLimits(equipment.item.bonus?.bonus_actions || []);
-        getActionTypeLimits(equipment.item.bonus?.reactions || []);
-        getActionTypeLimits(equipment.item.bonus?.special_abilities || []);
     });
 
     if (statblock.hp.hit_dice) {

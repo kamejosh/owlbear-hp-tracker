@@ -9,6 +9,7 @@ import { updateAc } from "./acHelper.ts";
 import { E5Statblock } from "../api/e5/useE5Api.ts";
 import { Item } from "@owlbear-rodeo/sdk";
 import { isNull, isUndefined } from "lodash";
+import { getLimitsE5 } from "./helpers.ts";
 
 export type ItemOut = components["schemas"]["ItemOut"];
 export type StatblockItems = components["schemas"]["StatblockItemOut"];
@@ -452,6 +453,14 @@ export const handleEquipmentChange = async (
     };
     if (statblock.equipment) {
         const equipmentBonus = getEquipmentBonuses(newData, statblock.stats, statblock.equipment);
+        const statblockLimits = getLimitsE5(statblock, newData);
+        statblockLimits.forEach((limit) => {
+            const currentLimit = data.stats.limits?.find((l) => l.id === limit.id);
+            if (currentLimit) {
+                limit.used = Math.min(currentLimit.used, limit.max);
+            }
+        });
+        newData.stats.limits = statblockLimits;
         newData.maxHp = Number(statblock.hp.value) + Number(equipmentBonus.statblockBonuses.hpBonus);
         newData.hp = Math.min(newData.hp, newData.maxHp);
         const combinedAC = equipmentBonus.ac || statblock.armor_class.value;

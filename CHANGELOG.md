@@ -6,6 +6,7 @@
 + Improve popover multitoken hp changes
 + Fix issue when dragging multiple tokens inside a group
 + Add DC and SCM Bonus from Items
++ Fix limits are update when un/equipping items
 
 # 3.6.0
 
