@@ -28,7 +28,7 @@ button,
     position: fixed;
     top: 1rem;
     right: 1rem;
-    grid-template-columns: repeat(7, 25px);
+    grid-template-columns: repeat(9, 25px);
     grid-auto-flow: row;
     gap: 0.5ch;
     z-index: 200;
@@ -45,10 +45,10 @@ button,
     &:not(.battle-focus) {
         @include breakpoint.mobile-and-tablet-only {
             position: initial;
-            grid-template-columns: repeat(7, 25px);
+            grid-template-columns: repeat(9, 25px);
             grid-template-areas:
-                "settings changelog help statblock statblock ta ta"
-                ". patreon discord statblock statblock ta ta";
+                "settings changelog help statblock statblock ta ta party party"
+                ". patreon discord statblock statblock ta ta party party";
             justify-content: flex-end;
             box-shadow: none;
             background-color: transparent;
@@ -56,6 +56,10 @@ button,
 
             .tabletop-almanac-button {
                 grid-area: ta;
+            }
+
+            .party-button {
+                grid-area: party;
             }
 
             .patreon-button {
@@ -168,7 +172,8 @@ button,
     }
 
     &.tabletop-almanac-button,
-    &.statblock-button {
+    &.statblock-button,
+    &.party-button {
         grid-row: span 2;
         grid-column: span 2;
         width: 100%;

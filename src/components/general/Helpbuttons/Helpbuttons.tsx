@@ -18,6 +18,7 @@ import { useShallow } from "zustand/react/shallow";
 import { useAbilityShareStore } from "../../../context/AbilityShareStore.tsx";
 import styles from "./help-buttons.module.scss";
 import { useUISettingsContext } from "../../../context/UISettingsContext.ts";
+import { Groups, SupervisedUserCircle } from "@mui/icons-material";
 
 type HelpButtonsProps = {
     ignoredChanges?: boolean;
@@ -101,28 +102,35 @@ export const Helpbuttons = (props: HelpButtonsProps) => {
                             </div>
                         </Tippy>
                     ) : null}
-                    {playerContext.role == "GM" ? (
-                        <Tippy content={"Open Settings"}>
-                            <button
-                                className={"settings-button top-button"}
-                                onClick={async () => {
-                                    let width = 600;
-                                    let height = 900;
-                                    try {
-                                        width = await OBR.viewport.getWidth();
-                                        height = await OBR.viewport.getHeight();
-                                    } catch {}
-                                    await OBR.modal.open({
-                                        ...settingsModal,
-                                        width: Math.min(500, width * 0.9),
-                                        height: Math.min(800, height * 0.9),
-                                    });
-                                }}
-                                title={"Settings"}
-                            >
-                                <SettingsSvg />
-                            </button>
-                        </Tippy>
+                    {playerContext.role === "GM" ? (
+                        <>
+                            <Tippy content={"Open Party Settings"}>
+                                <button className={"top-button party-button"}>
+                                    <SupervisedUserCircle />
+                                </button>
+                            </Tippy>
+                            <Tippy content={"Open Settings"}>
+                                <button
+                                    className={"settings-button top-button"}
+                                    onClick={async () => {
+                                        let width = 600;
+                                        let height = 900;
+                                        try {
+                                            width = await OBR.viewport.getWidth();
+                                            height = await OBR.viewport.getHeight();
+                                        } catch {}
+                                        await OBR.modal.open({
+                                            ...settingsModal,
+                                            width: Math.min(500, width * 0.9),
+                                            height: Math.min(800, height * 0.9),
+                                        });
+                                    }}
+                                    title={"Settings"}
+                                >
+                                    <SettingsSvg />
+                                </button>
+                            </Tippy>
+                        </>
                     ) : null}
                     <a
                         href={"https://www.patreon.com/TTRPGAPI"}

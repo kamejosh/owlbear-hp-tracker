@@ -886,74 +886,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/users": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List Users */
-        get: operations["list_users"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/admin/users/search": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Search Users */
-        get: operations["search_users"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/admin/users/{user_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** Admin Update User */
-        put: operations["admin_update_user"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/admin/users/{user_id}/activate": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** Admin Activate User */
-        put: operations["admin_activate_user"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1935,9 +1867,7 @@ export interface components {
         /** PartyInventoryUpdate */
         PartyInventoryUpdate: {
             /** Item Updates */
-            item_updates?: {
-                [key: string]: components["schemas"]["PartyItemUpdate"];
-            } | null;
+            item_updates?: components["schemas"]["PartyItemUpdate"][] | null;
             /** New Items */
             new_items?: components["schemas"]["PartyItemIn"][] | null;
         };
@@ -2631,43 +2561,6 @@ export interface components {
             Party?: components["schemas"]["Party"][] | null;
             /** Party Statblock */
             party_statblock?: components["schemas"]["PartyStatblock"][] | null;
-        };
-        /** UserAdminInfo */
-        UserAdminInfo: {
-            /** Id */
-            id: string;
-            /** Username */
-            username: string;
-            /** Email */
-            email: string;
-            /** Scopes */
-            scopes: string[];
-            /** Custom Tier */
-            custom_tier?: string | null;
-            /** Custom Tier End */
-            custom_tier_end?: string | null;
-            patreon?: components["schemas"]["src__model_types__types__Patreon"] | null;
-            /** Active */
-            active: boolean;
-            /** Statblocks */
-            statblocks: number;
-            /** Spells */
-            spells: number;
-            /** Items */
-            items: number;
-        };
-        /** UserAdminUpdate */
-        UserAdminUpdate: {
-            /** Username */
-            username?: string | null;
-            /** Email */
-            email?: string | null;
-            /** Patreon Email */
-            patreon_email?: string | null;
-            /** Custom Tier */
-            custom_tier?: ("Goblin" | "Quartermaster" | "Free" | "Beholder" | "Moderator" | "Admin") | null;
-            /** Custom Tier End */
-            custom_tier_end?: string | null;
         };
         /** UserIn */
         UserIn: {
@@ -7137,138 +7030,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
-                };
-            };
-        };
-    };
-    list_users: {
-        parameters: {
-            query?: {
-                take?: number;
-                skip?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserAdminInfo"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    search_users: {
-        parameters: {
-            query?: {
-                email?: string | null;
-                username?: string | null;
-                scopes?: string | null;
-                patreon?: boolean | null;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserAdminInfo"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    admin_update_user: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                user_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UserAdminUpdate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserWithScopes"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    admin_activate_user: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                user_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserWithScopes"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
