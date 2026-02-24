@@ -33,6 +33,12 @@ export const AC = ({ id, hideExtras }: { id: string; hideExtras?: boolean }) => 
         }
     }, [debouncedAc]);
 
+    useEffect(() => {
+        if (data.armorClass !== Number(ac)) {
+            setAc(data.armorClass.toString());
+        }
+    }, [data.armorClass]);
+
     return (
         <div className={`token-ac ${hideExtras ? "no-extras" : ""}`}>
             {!hideExtras ? <ACSvg /> : null}

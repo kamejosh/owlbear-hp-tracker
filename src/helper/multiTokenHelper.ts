@@ -188,33 +188,36 @@ export const rest = async (list: Array<Item>, restType: string) => {
     const hpUpdated: Array<string> = [];
     const room = useMetadataContext.getState().room;
 
-    await updateItems(list, (items) => {
-        for (const item of items) {
-            const data = item.metadata[itemMetadataKey] as GMGMetadata;
-            const newLimits = data.stats.limits?.map((limit) => {
-                if (limit.resets.includes(restType)) {
-                    if (limit.formula) {
-                        if (!room?.disableLimitRolls) {
-                            const limitData = { ...limit };
-                            const itemData = { ...item };
-                            const used = handleLimitFormula(limitData, itemData);
-                            return { ...limitData, used: used };
+    await updateItems(
+        list.map((i) => i.id),
+        (items) => {
+            for (const item of items) {
+                const data = item.metadata[itemMetadataKey] as GMGMetadata;
+                const newLimits = data.stats.limits?.map((limit) => {
+                    if (limit.resets.includes(restType)) {
+                        if (limit.formula) {
+                            if (!room?.disableLimitRolls) {
+                                const limitData = { ...limit };
+                                const itemData = { ...item };
+                                const used = handleLimitFormula(limitData, itemData);
+                                return { ...limitData, used: used };
+                            }
+                            return limit;
                         }
+                        return { ...limit, used: 0 };
+                    } else {
                         return limit;
                     }
-                    return { ...limit, used: 0 };
-                } else {
-                    return limit;
-                }
-            });
+                });
 
-            (item.metadata[itemMetadataKey] as GMGMetadata).stats.limits = newLimits;
-            if (restType === "Long Rest" && data.hp !== data.maxHp + (data.stats?.tempHp ?? 0)) {
-                (item.metadata[itemMetadataKey] as GMGMetadata).hp = data.maxHp + (data.stats?.tempHp ?? 0);
-                hpUpdated.push(item.id);
+                (item.metadata[itemMetadataKey] as GMGMetadata).stats.limits = newLimits;
+                if (restType === "Long Rest" && data.hp !== data.maxHp + (data.stats?.tempHp ?? 0)) {
+                    (item.metadata[itemMetadataKey] as GMGMetadata).hp = data.maxHp + (data.stats?.tempHp ?? 0);
+                    hpUpdated.push(item.id);
+                }
             }
-        }
-    });
+        },
+    );
 
     const updated = list.filter((i) => hpUpdated.includes(i.id));
 

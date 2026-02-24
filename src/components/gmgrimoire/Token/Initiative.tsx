@@ -11,7 +11,7 @@ import Tippy from "@tippyjs/react";
 import { Image } from "@owlbear-rodeo/sdk";
 import { getTokenName } from "../../../helper/helpers.ts";
 import { useShallow } from "zustand/react/shallow";
-import { setPrettySordidInitiative } from "../../../helper/prettySordidHelpers.ts";
+import { removeFromPrettySordid, setPrettySordidInitiative } from "../../../helper/prettySordidHelpers.ts";
 import { DiceButton } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { defaultStats } from "../../../helper/variables.ts";
 import { isNumber, toInteger } from "lodash";
@@ -34,7 +34,9 @@ export const Initiative = ({ id }: { id: string }) => {
             if (data.initiative !== Number(debouncedInitiative)) {
                 const newData = { ...data, initiative: Number(debouncedInitiative) };
                 await updateTokenMetadata(newData, [id]);
-                await setPrettySordidInitiative(id, taSettings, Number(debouncedInitiative));
+                if (data.playerList) {
+                    await setPrettySordidInitiative(id, taSettings, Number(debouncedInitiative));
+                }
             }
         };
         void update();
@@ -135,6 +137,11 @@ export const Initiative = ({ id }: { id: string }) => {
                     onClick={async () => {
                         const newData = { ...data, playerList: !data.playerList };
                         await updateTokenMetadata(newData, [id]);
+                        if (newData.playerList) {
+                            await setPrettySordidInitiative(id, taSettings, Number(initiative));
+                        } else {
+                            await removeFromPrettySordid(id, taSettings);
+                        }
                     }}
                 />
             ) : null}

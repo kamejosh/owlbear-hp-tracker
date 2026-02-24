@@ -20,6 +20,18 @@ export const setPrettySordidInitiative = async (item: string, taSettings: UserSe
     }
 };
 
+export const removeFromPrettySordid = async (item: string, taSettings: UserSettings) => {
+    try {
+        if (taSettings.sync_pretty_sordid) {
+            await updateItems([item], (items) => {
+                items.forEach((item) => {
+                    item.metadata[`${prettySordidID}/metadata`] = undefined;
+                });
+            });
+        }
+    } catch (e: any) {}
+};
+
 export const setPrettySordidActive = async (current: string | null, newCurrent: string, taSettings: UserSettings) => {
     try {
         if (taSettings.sync_pretty_sordid) {

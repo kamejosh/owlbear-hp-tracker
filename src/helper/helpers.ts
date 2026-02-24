@@ -927,3 +927,11 @@ export const delay = (ms: number) => {
 export const shareAbility = async (entry: AbilityShareEntry) => {
     await OBR.broadcast.sendMessage(abilityShareRoute, entry, { destination: "ALL" });
 };
+
+export const getItemMetadata = (item: Image) => {
+    if (itemMetadataKey in item.metadata) {
+        return item.metadata[itemMetadataKey] as GMGMetadata;
+    } else {
+        return undefined;
+    }
+};

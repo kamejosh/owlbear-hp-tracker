@@ -461,7 +461,10 @@ export const handleEquipmentChange = async (
             }
         });
         newData.stats.limits = statblockLimits;
-        newData.maxHp = Number(statblock.hp.value) + Number(equipmentBonus.statblockBonuses.hpBonus);
+        newData.maxHp = Math.max(
+            Number(statblock.hp.value) + Number(equipmentBonus.statblockBonuses.hpBonus),
+            data.maxHp,
+        );
         newData.hp = Math.min(newData.hp, newData.maxHp);
         const combinedAC = equipmentBonus.ac || statblock.armor_class.value;
 
