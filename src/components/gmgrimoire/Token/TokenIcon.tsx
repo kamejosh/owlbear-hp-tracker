@@ -115,12 +115,15 @@ export const TokenIcon = ({
                         clearTimeout(timeout);
                         setContextEvent(e.nativeEvent);
                     }}
+                    style={{ opacity: item.visible ? 1 : 0.5 }}
                 >
                     <img
                         src={item.image.url}
                         alt={""}
                         className={`${item.scale.x < 0 && playerPreview ? "flipped" : ""}`}
-                        style={{ rotate: `${playerPreview ? item.rotation + "deg" : 0 + "deg"}` }}
+                        style={{
+                            rotate: `${playerPreview ? item.rotation + "deg" : 0 + "deg"}`,
+                        }}
                     />
                     {playerContext.role === "GM" && playerPreview ? (
                         <>

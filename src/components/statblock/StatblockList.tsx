@@ -8,7 +8,13 @@ import { useCallback, useEffect, useState } from "react";
 import { itemMetadataKey } from "../../helper/variables.ts";
 import { GMGMetadata } from "../../helper/types.ts";
 import SwiperClass from "swiper/types/swiper-class";
-import { delay, getBgColor, getTokenName, sortItems, updateSceneMetadata } from "../../helper/helpers.ts";
+import {
+    delay,
+    getBgColor,
+    getTokenName,
+    sortItemsByGroupAndIndex,
+    updateSceneMetadata,
+} from "../../helper/helpers.ts";
 import { useTokenListContext } from "../../context/TokenContext.tsx";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
@@ -42,7 +48,7 @@ export const StatblockList = (props: StatblockListProps) => {
             const itemList = [...tokens]
                 .filter((t) => t[1].data.sheet !== "")
                 .map((t) => t[1].item)
-                .sort(sortItems);
+                .sort((a, b) => sortItemsByGroupAndIndex(a, b, scene));
             if (playerContext.role === "GM") {
                 return itemList;
             } else if (playerContext.role === "PLAYER") {

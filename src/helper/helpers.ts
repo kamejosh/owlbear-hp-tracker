@@ -111,6 +111,19 @@ export const evalString = (s: string) => {
     return tokens.reduce((sum: string, value: string) => parseFloat(sum) + parseFloat(value));
 };
 
+export const sortItemsByGroupAndIndex = (a: Item, b: Item, scene: SceneMetadata | null) => {
+    const groups = scene?.groups ?? ["Default"];
+    const aData = a.metadata[itemMetadataKey] as GMGMetadata;
+    const bData = b.metadata[itemMetadataKey] as GMGMetadata;
+    const aGroupIndex = groups.indexOf(aData.group ?? "Default");
+    const bGroupIndex = groups.indexOf(bData.group ?? "Default");
+    if (aGroupIndex === bGroupIndex) {
+        return (aData.index ?? 0) - (bData.index ?? 0);
+    } else {
+        return aGroupIndex - bGroupIndex;
+    }
+};
+
 export const sortItems = (a: Item, b: Item) => {
     const aData = a.metadata[itemMetadataKey] as GMGMetadata;
     const bData = b.metadata[itemMetadataKey] as GMGMetadata;

@@ -12,6 +12,8 @@
   + AC value in token list is updated when equipping an item
 + Improve Pretty Sordid integration that follows the Player List Property to show or hide statblocks in PS
 + Set darkvision default to 3 feet
++ Fix statblock popover sorting when tokens are in different groups
++ Make Token Icon transparent when Item is hidden in the scene
 
 # 3.6.0
 
