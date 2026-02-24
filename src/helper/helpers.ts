@@ -882,6 +882,9 @@ export const prepareTokenForGrimoire = async (contextItems: Array<Image>) => {
                         item.metadata["com.battle-system.smoke/visionRange"] = String(
                             itemStatblocks[item.id].darkvision,
                         );
+                    } else if (settings?.assign_ss_darkvision) {
+                        item.metadata["com.battle-system.smoke/visionDark"] = "3";
+                        item.metadata["com.battle-system.smoke/visionRange"] = "3";
                     }
                 }
             });

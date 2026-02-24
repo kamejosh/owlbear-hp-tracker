@@ -11,6 +11,7 @@
   + max HP is no longer reset when equipping an item
   + AC value in token list is updated when equipping an item
 + Improve Pretty Sordid integration that follows the Player List Property to show or hide statblocks in PS
++ Set darkvision default to 3 feet
 
 # 3.6.0
 
