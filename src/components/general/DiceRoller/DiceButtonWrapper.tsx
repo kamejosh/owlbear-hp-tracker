@@ -98,7 +98,7 @@ export const DiceButton = (props: DiceButtonProps) => {
         return baseDie;
     };
 
-    const roll = async (modifier?: "ADV" | "DIS" | "SELF" | "CRIT") => {
+    const roll = async (hidden: boolean, modifier?: "ADV" | "DIS" | "CRIT") => {
         const button = refs.domReference.current;
         if (button) {
             button.classList.add("rolling");
@@ -185,16 +185,16 @@ export const DiceButton = (props: DiceButtonProps) => {
                             label: label,
                             operator: parsed.operator,
                             external_id: props.statblock,
-                            whisper: modifier === "SELF" ? await getUserUuid(room, rollerApi) : undefined,
+                            whisper: hidden ? await getUserUuid(room, rollerApi) : undefined,
                         });
                     } catch {
                         console.warn("error in dice roll", parsed.dice, parsed.operator);
                     }
                 }
             } else if (room?.diceRoller === DICE_ROLLER.SIMPLE) {
-                rollResult = await localRoll(modifiedDice, label, addRoll, modifier === "SELF", props.statblock);
+                rollResult = await localRoll(modifiedDice, label, addRoll, hidden, props.statblock);
             } else if (room?.diceRoller === DICE_ROLLER.DICE_PLUS) {
-                await dicePlusRoll(modifiedDice, label, addRoll, modifier === "SELF", props.statblock, props.onRoll);
+                await dicePlusRoll(modifiedDice, label, addRoll, hidden, props.statblock, props.onRoll);
             }
             if (props.onRoll && room?.diceRoller !== DICE_ROLLER.DICE_PLUS) {
                 props.onRoll(rollResult);
@@ -262,7 +262,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                     disabled={!isEnabled()}
                     className={`dice-button button ${props.limitReached ? "limit" : ""}`}
                     onClick={async () => {
-                        await roll(defaultHidden ? "SELF" : undefined);
+                        await roll(defaultHidden);
                     }}
                 >
                     <div className={"dice-preview"}>{getDicePreview()}</div>
@@ -291,7 +291,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                                     className={"advantage"}
                                     disabled={!isEnabled()}
                                     onClick={async () => {
-                                        await roll("ADV");
+                                        await roll(defaultHidden, "ADV");
                                     }}
                                 >
                                     ADV
@@ -300,7 +300,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                                     className={"disadvantage"}
                                     disabled={!isEnabled()}
                                     onClick={async () => {
-                                        await roll("DIS");
+                                        await roll(defaultHidden, "DIS");
                                     }}
                                 >
                                     DIS
@@ -312,7 +312,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                                 className={"crit"}
                                 disabled={!isEnabled()}
                                 onClick={async () => {
-                                    await roll("CRIT");
+                                    await roll(defaultHidden, "CRIT");
                                 }}
                             >
                                 CRIT
@@ -322,7 +322,7 @@ export const DiceButton = (props: DiceButtonProps) => {
                             className={"self"}
                             disabled={!isEnabled()}
                             onClick={async () => {
-                                await roll(defaultHidden ? undefined : "SELF");
+                                await roll(!defaultHidden);
                             }}
                         >
                             {defaultHidden ? "SHOW" : "HIDE"}

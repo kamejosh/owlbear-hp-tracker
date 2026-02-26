@@ -14,6 +14,7 @@
 + Set darkvision default to 3 feet
 + Fix statblock popover sorting when tokens are in different groups
 + Make Token Icon transparent when Item is hidden in the scene
++ Fix hidden by default is not used when rolling advantage or crits
 
 # 3.6.0
 
