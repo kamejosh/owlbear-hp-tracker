@@ -43,6 +43,11 @@ export const diceModal: Modal = {
     url: "/modal.html?content=dddice",
 };
 
+export const partyModal: Modal = {
+    id: modalId,
+    url: "/party.html",
+};
+
 export const diceTrayModal: Modal = {
     id: diceTrayModalId,
     url: "/modal.html?content=dicetray",

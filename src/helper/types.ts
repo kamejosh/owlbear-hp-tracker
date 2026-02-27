@@ -109,6 +109,7 @@ export type RoomMetadata = {
     disableHpBar?: boolean;
     disableColorGradient?: boolean;
     disableLimitRolls?: boolean;
+    partyId?: number;
 };
 
 export type AttachmentMetadata = {

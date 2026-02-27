@@ -315,6 +315,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/me/logged-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get User Logged In */
+        get: operations["get_user_logged_in"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/pf/statblock/": {
         parameters: {
             query?: never;
@@ -886,6 +903,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Users */
+        get: operations["list_users"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search Users */
+        get: operations["search_users"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Admin Update User */
+        put: operations["admin_update_user"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/{user_id}/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Admin Activate User */
+        put: operations["admin_activate_user"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1092,7 +1177,7 @@ export interface components {
             group?: string | null;
             /** Alignment */
             alignment?: string | null;
-            armor_class: components["schemas"]["src__model_types__pf__statblock__ArmorClass"];
+            armor_class: components["schemas"]["src__model_types__e5__base__ArmorClass"];
             hp: components["schemas"]["src__model_types__e5__base__Hitpoints"];
             speed: components["schemas"]["Speed"];
             stats: components["schemas"]["src__model_types__e5__base__Stats"];
@@ -1170,7 +1255,7 @@ export interface components {
             group?: string | null;
             /** Alignment */
             alignment?: string | null;
-            armor_class: components["schemas"]["src__model_types__pf__statblock__ArmorClass"];
+            armor_class: components["schemas"]["src__model_types__e5__base__ArmorClass"];
             hp: components["schemas"]["src__model_types__e5__base__Hitpoints"];
             speed: components["schemas"]["Speed"];
             stats: components["schemas"]["src__model_types__e5__base__Stats"];
@@ -1528,7 +1613,7 @@ export interface components {
         };
         /** ItemStatsIn */
         ItemStatsIn: {
-            armor_class?: components["schemas"]["src__model_types__pf__statblock__ArmorClass"] | null;
+            armor_class?: components["schemas"]["src__model_types__e5__base__ArmorClass"] | null;
             hp?: components["schemas"]["src__model_types__e5__base__Hitpoints"] | null;
             /** Senses */
             senses?: string[] | null;
@@ -1553,7 +1638,7 @@ export interface components {
         };
         /** ItemStatsOut */
         ItemStatsOut: {
-            armor_class?: components["schemas"]["src__model_types__pf__statblock__ArmorClass"] | null;
+            armor_class?: components["schemas"]["src__model_types__e5__base__ArmorClass"] | null;
             hp?: components["schemas"]["src__model_types__e5__base__Hitpoints"] | null;
             /** Senses */
             senses?: string[] | null;
@@ -1577,6 +1662,11 @@ export interface components {
             skills?: components["schemas"]["Skills"] | null;
             /** Id */
             id: number;
+        };
+        /** LoggedIn */
+        LoggedIn: {
+            /** Logged In */
+            logged_in: boolean;
         };
         /** ModifierStats */
         ModifierStats: {
@@ -1670,7 +1760,7 @@ export interface components {
             stats: components["schemas"]["src__model_types__pf__statblock__Stats"];
             /** Items */
             items?: string[] | null;
-            armor_class: components["schemas"]["src__model_types__pf__statblock__ArmorClass"];
+            armor_class: components["schemas"]["src__model_types__e5__base__ArmorClass"];
             saving_throws: components["schemas"]["src__model_types__pf__statblock__SavingThrows"];
             hp: components["schemas"]["src__model_types__pf__statblock__Hitpoints"];
             /** Immunities */
@@ -1715,7 +1805,7 @@ export interface components {
             stats: components["schemas"]["src__model_types__pf__statblock__Stats"];
             /** Items */
             items?: string[] | null;
-            armor_class: components["schemas"]["src__model_types__pf__statblock__ArmorClass"];
+            armor_class: components["schemas"]["src__model_types__e5__base__ArmorClass"];
             saving_throws: components["schemas"]["src__model_types__pf__statblock__SavingThrows"];
             hp: components["schemas"]["src__model_types__pf__statblock__Hitpoints"];
             /** Immunities */
@@ -2561,6 +2651,43 @@ export interface components {
             Party?: components["schemas"]["Party"][] | null;
             /** Party Statblock */
             party_statblock?: components["schemas"]["PartyStatblock"][] | null;
+        };
+        /** UserAdminInfo */
+        UserAdminInfo: {
+            /** Id */
+            id: string;
+            /** Username */
+            username: string;
+            /** Email */
+            email: string;
+            /** Scopes */
+            scopes: string[];
+            /** Custom Tier */
+            custom_tier?: string | null;
+            /** Custom Tier End */
+            custom_tier_end?: string | null;
+            patreon?: components["schemas"]["src__model_types__types__Patreon"] | null;
+            /** Active */
+            active: boolean;
+            /** Statblocks */
+            statblocks: number;
+            /** Spells */
+            spells: number;
+            /** Items */
+            items: number;
+        };
+        /** UserAdminUpdate */
+        UserAdminUpdate: {
+            /** Username */
+            username?: string | null;
+            /** Email */
+            email?: string | null;
+            /** Patreon Email */
+            patreon_email?: string | null;
+            /** Custom Tier */
+            custom_tier?: ("Goblin" | "Quartermaster" | "Free" | "Beholder" | "Moderator" | "Admin") | null;
+            /** Custom Tier End */
+            custom_tier_end?: string | null;
         };
         /** UserIn */
         UserIn: {
@@ -4153,6 +4280,13 @@ export interface components {
             damage_dice?: string | null;
             limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
         };
+        /** ArmorClass */
+        src__model_types__e5__base__ArmorClass: {
+            /** Value */
+            value: number;
+            /** Special */
+            special?: string | null;
+        };
         /** Hitpoints */
         src__model_types__e5__base__Hitpoints: {
             /** Value */
@@ -4405,13 +4539,6 @@ export interface components {
             /** Constant */
             constant?: string | null;
             limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
-        };
-        /** ArmorClass */
-        src__model_types__pf__statblock__ArmorClass: {
-            /** Value */
-            value: number;
-            /** Special */
-            special?: string | null;
         };
         /** Hitpoints */
         src__model_types__pf__statblock__Hitpoints: {
@@ -5087,6 +5214,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+        };
+    };
+    get_user_logged_in: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoggedIn"];
                 };
             };
         };
@@ -7030,6 +7177,138 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+        };
+    };
+    list_users: {
+        parameters: {
+            query?: {
+                take?: number;
+                skip?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserAdminInfo"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search_users: {
+        parameters: {
+            query?: {
+                email?: string | null;
+                username?: string | null;
+                scopes?: string | null;
+                patreon?: boolean | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserAdminInfo"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_update_user: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserAdminUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserWithScopes"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_activate_user: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserWithScopes"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

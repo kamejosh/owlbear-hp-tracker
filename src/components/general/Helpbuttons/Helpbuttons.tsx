@@ -2,6 +2,7 @@ import OBR from "@owlbear-rodeo/sdk";
 import {
     changelogModal,
     helpModal,
+    partyModal,
     settingsModal,
     statblockPopover,
     statblockPopoverId,
@@ -18,7 +19,7 @@ import { useShallow } from "zustand/react/shallow";
 import { useAbilityShareStore } from "../../../context/AbilityShareStore.tsx";
 import styles from "./help-buttons.module.scss";
 import { useUISettingsContext } from "../../../context/UISettingsContext.ts";
-import { Groups, SupervisedUserCircle } from "@mui/icons-material";
+import { SupervisedUserCircle } from "@mui/icons-material";
 
 type HelpButtonsProps = {
     ignoredChanges?: boolean;
@@ -105,7 +106,22 @@ export const Helpbuttons = (props: HelpButtonsProps) => {
                     {playerContext.role === "GM" ? (
                         <>
                             <Tippy content={"Open Party Settings"}>
-                                <button className={"top-button party-button"}>
+                                <button
+                                    className={"top-button party-button"}
+                                    onClick={async () => {
+                                        let width = 600;
+                                        let height = 900;
+                                        try {
+                                            width = await OBR.viewport.getWidth();
+                                            height = await OBR.viewport.getHeight();
+                                        } catch {}
+                                        await OBR.modal.open({
+                                            ...partyModal,
+                                            width: Math.min(500, width * 0.9),
+                                            height: Math.min(800, height * 0.9),
+                                        });
+                                    }}
+                                >
                                     <SupervisedUserCircle />
                                 </button>
                             </Tippy>
