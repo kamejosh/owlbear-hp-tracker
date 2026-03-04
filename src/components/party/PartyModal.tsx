@@ -9,6 +9,10 @@ import { useDebounce } from "ahooks";
 import { useEffect, useState } from "react";
 import styles from "./party.module.css";
 import { PartySelect } from "./PartySelect.tsx";
+import { PartyStatblocks } from "./PartyStatblocks.tsx";
+import { usePartyStore } from "../../context/PartyStore.tsx";
+import { usePlayerContext } from "../../context/PlayerContext.ts";
+import { PartyInventory } from "./PartyInventory.tsx";
 
 export const PartyModal = () => {
     return (
@@ -21,7 +25,17 @@ export const PartyModal = () => {
 };
 
 const Content = () => {
-    const room = useMetadataContext.getState().room;
+    const player = usePlayerContext();
+
+    if (player.role === "GM") {
+        return <GMContent />;
+    }
+    return <PlayerContent />;
+};
+
+const GMContent = () => {
+    const room = useMetadataContext((state) => state.room);
+    const currentParty = usePartyStore((state) => state.currentParty);
     const loginQuery = useGetLoggedIn(room?.tabletopAlmanacAPIKey);
     const [apiKey, setApiKey] = useState<string>(room?.tabletopAlmanacAPIKey || "");
     const debouncedApiKey = useDebounce(apiKey, { wait: 1000 });
@@ -59,14 +73,29 @@ const Content = () => {
 
     return (
         <div className={"party-modal"}>
-            <div className={"party-modal-header"}>
-                <h2>Party Settings</h2>
-            </div>
             <PartySelect />
-            <div className={"party-modal-content"}>
-                <div className={"party-modal-content-header"}>
-                    <h3>Party Members</h3>
+
+            {currentParty ? (
+                <div className={"party-modal-content"}>
+                    <h2 style={{ marginBottom: "0.5rem" }}>{currentParty?.name}</h2>
+                    <PartyStatblocks />
+                    <PartyInventory />
                 </div>
+            ) : (
+                <div className={"party-modal-content"}>No party selected</div>
+            )}
+        </div>
+    );
+};
+
+const PlayerContent = () => {
+    const currentParty = usePartyStore((state) => state.currentParty);
+    const player = usePlayerContext();
+
+    return (
+        <div className={"party-modal"}>
+            <div className={"party-modal-content"}>
+                <h2 style={{ marginBottom: "0.5rem" }}>{currentParty?.name}</h2>
             </div>
         </div>
     );

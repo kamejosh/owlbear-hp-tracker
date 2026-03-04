@@ -5,16 +5,26 @@ import { Link } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useDebounce } from "ahooks";
 import { updateRoomMetadata } from "../../helper/helpers.ts";
+import { partyStore } from "../../context/PartyStore.tsx";
 
 export const PartySelect = () => {
-    const room = useMetadataContext.getState().room;
+    const room = useMetadataContext((state) => state.room);
     const [partyId, setPartyId] = useState<number | undefined>(room?.partyId);
+    const addParty = partyStore.getState().addParty;
     const debouncedPartyId = useDebounce(partyId, { wait: 500 });
     const partyQuery = useListParties({ limit: 100, offset: 0 });
 
     useEffect(() => {
         void updateRoomMetadata(room, { partyId: debouncedPartyId });
     }, [debouncedPartyId]);
+
+    useEffect(() => {
+        if (partyQuery.isSuccess) {
+            partyQuery.data.page.forEach((party) => {
+                addParty(party);
+            });
+        }
+    }, [partyQuery.isSuccess]);
 
     const parties = partyQuery.isSuccess ? partyQuery.data?.page : [];
 
@@ -40,12 +50,12 @@ export const PartySelect = () => {
     }
 
     return (
-        <div>
-            Select a party for this Owlbear Rodeo Room:
+        <div style={{ display: "flex", gap: "1ch", alignItems: "center", justifyContent: "flex-end" }}>
+            Select party:
             <select
                 value={partyId}
-                onSelect={(e) => {
-                    setPartyId(Number(e));
+                onChange={(e) => {
+                    setPartyId(Number(e.target.value));
                 }}
             >
                 {parties?.map((party) => {

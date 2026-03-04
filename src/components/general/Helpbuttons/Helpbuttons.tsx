@@ -103,28 +103,28 @@ export const Helpbuttons = (props: HelpButtonsProps) => {
                             </div>
                         </Tippy>
                     ) : null}
+                    <Tippy content={"Open Party Settings"}>
+                        <button
+                            className={"top-button party-button"}
+                            onClick={async () => {
+                                let width = 600;
+                                let height = 900;
+                                try {
+                                    width = await OBR.viewport.getWidth();
+                                    height = await OBR.viewport.getHeight();
+                                } catch {}
+                                await OBR.modal.open({
+                                    ...partyModal,
+                                    width: Math.min(500, width * 0.9),
+                                    height: Math.min(800, height * 0.9),
+                                });
+                            }}
+                        >
+                            <SupervisedUserCircle />
+                        </button>
+                    </Tippy>
                     {playerContext.role === "GM" ? (
                         <>
-                            <Tippy content={"Open Party Settings"}>
-                                <button
-                                    className={"top-button party-button"}
-                                    onClick={async () => {
-                                        let width = 600;
-                                        let height = 900;
-                                        try {
-                                            width = await OBR.viewport.getWidth();
-                                            height = await OBR.viewport.getHeight();
-                                        } catch {}
-                                        await OBR.modal.open({
-                                            ...partyModal,
-                                            width: Math.min(500, width * 0.9),
-                                            height: Math.min(800, height * 0.9),
-                                        });
-                                    }}
-                                >
-                                    <SupervisedUserCircle />
-                                </button>
-                            </Tippy>
                             <Tippy content={"Open Settings"}>
                                 <button
                                     className={"settings-button top-button"}

@@ -48,6 +48,32 @@ export const useListParties = (params: ListPartiesParams) => {
     });
 };
 
+const getParty = async ({ partyId, token }: { partyId: number; token: string }) => {
+    const headers = {
+        "X-API-Key": token,
+    };
+    return axios.request({
+        url: `${TTRPG_URL}/party/${partyId}`,
+        headers: headers,
+        method: "GET",
+    });
+};
+
+export const useGetParty = (partyId: number | undefined) => {
+    const token = useMetadataContext.getState().room?.tabletopAlmanacAPIKey;
+
+    return useQuery({
+        queryKey: ["parties", partyId],
+        queryFn: async () => {
+            if (partyId === undefined) {
+                throw new Error("Party ID is undefined");
+            }
+            return (await getParty({ partyId: partyId, token: token || "" })).data as PartyOut;
+        },
+        enabled: !!partyId,
+    });
+};
+
 const getPartyInventory = async ({
     partyId,
     inventoryId,
@@ -58,7 +84,7 @@ const getPartyInventory = async ({
     token: string;
 }) => {
     const headers = {
-        Authorization: `Bearer ${token}`,
+        "X-API-Key": token,
     };
     return axios.request({
         url: `${TTRPG_URL}/party/${partyId}/inventory/${inventoryId}`,
@@ -67,20 +93,24 @@ const getPartyInventory = async ({
     });
 };
 
-export const useGetPartyInventory = (partyId: number, inventoryId: number) => {
+export const useGetPartyInventory = (partyId: number | undefined, inventoryId: number | undefined) => {
     const token = useMetadataContext.getState().room?.tabletopAlmanacAPIKey;
 
     return useQuery({
         queryKey: ["partyInventory", partyId, inventoryId],
         queryFn: async () => {
+            if (partyId === undefined || inventoryId === undefined) {
+                throw new Error("Party ID or Inventory ID is undefined");
+            }
             return (await getPartyInventory({ partyId, inventoryId, token: token || "" })).data;
         },
+        enabled: !!partyId && !!inventoryId,
     });
 };
 
 const deleteParty = async ({ partyId, token }: { partyId: number; token: string }) => {
     const headers = {
-        Authorization: `Bearer ${token}`,
+        "X-API-Key": token,
     };
     return axios.request({
         url: `${TTRPG_URL}/party/${partyId}`,
@@ -106,7 +136,7 @@ export const useDeleteParty = (partyId: number) => {
 
 const createParty = async ({ party, token }: { party: PartyIn; token: string }) => {
     const headers = {
-        Authorization: `Bearer ${token}`,
+        "X-API-Key": token,
     };
     return axios.request({
         url: `${TTRPG_URL}/party/`,
@@ -133,7 +163,7 @@ export const useCreateParty = () => {
 
 const updateParty = async ({ partyId, party, token }: { partyId: number; party: PartyUpdate; token: string }) => {
     const headers = {
-        Authorization: `Bearer ${token}`,
+        "X-API-Key": token,
     };
     return axios.request({
         url: `${TTRPG_URL}/party/${partyId}`,
@@ -170,7 +200,7 @@ const updatePartyMoney = async ({
     token: string;
 }) => {
     const headers = {
-        Authorization: `Bearer ${token}`,
+        "X-API-Key": token,
     };
     return axios.request({
         url: `${TTRPG_URL}/party/${partyId}/money/${moneyId}`,
@@ -202,7 +232,7 @@ export const useUpdatePartyMoney = (partyId: number, moneyId: number | undefined
 
 export const addPartyStatblock = (partyId: number, partyStatblock: PartyStatblockIn, token: string) => {
     const headers = {
-        Authorization: `Bearer ${token}`,
+        "X-API-Key": token,
     };
     return axios.request({
         url: `${TTRPG_URL}/party/${partyId}/statblock/`,
@@ -229,7 +259,7 @@ export const useAddPartyStatblock = (partyId: number) => {
 
 const deletePartyStatblock = (partyId: number, statblockId: number, token: string) => {
     const headers = {
-        Authorization: `Bearer ${token}`,
+        "X-API-Key": token,
     };
     return axios.request({
         url: `${TTRPG_URL}/party/${partyId}/statblock/${statblockId}`,
@@ -260,7 +290,7 @@ export const updatePartyStatblock = (
     token: string,
 ) => {
     const headers = {
-        Authorization: `Bearer ${token}`,
+        "X-API-Key": token,
     };
     return axios.request({
         url: `${TTRPG_URL}/party/${partyId}/statblock/${statblockId}`,
@@ -287,7 +317,7 @@ export const useUpdatePartyStatblock = (partyId: number, statblockId: number) =>
 
 const listPlayerParties = async ({ params, token }: { params: ListPartiesParams; token: string }) => {
     const headers = {
-        Authorization: `Bearer ${token}`,
+        "X-API-Key": token,
     };
     return axios.request({
         url: `${TTRPG_URL}/party/player/`,
@@ -310,7 +340,7 @@ export const useListPlayerParties = (params: ListPartiesParams) => {
 
 const getPlayerStatblock = async ({ id, token }: { id: string; token: string }) => {
     const headers = {
-        Authorization: `Bearer ${token}`,
+        "X-API-Key": token,
     };
 
     return axios.request({
@@ -333,7 +363,7 @@ export const useGetPlayerStatblock = (id: string) => {
 
 export const updatePlayerStatblock = (id: string, statblockUpdate: E5StatblockIn, token: string) => {
     const headers = {
-        Authorization: `Bearer ${token}`,
+        "X-API-Key": token,
     };
     return axios.request({
         url: `${TTRPG_URL}/party/player/statblock/${id}`,
@@ -360,7 +390,7 @@ export const useUpdatePlayerStatblock = (id: string) => {
 
 export const resyncPlayerStatblock = (id: string, token: string) => {
     const headers = {
-        Authorization: `Bearer ${token}`,
+        "X-API-Key": token,
     };
     return axios.request({
         url: `${TTRPG_URL}/party/player/statblock/${id}/external`,
@@ -396,7 +426,7 @@ const getPartySpells = ({
     token: string;
 }) => {
     const headers = {
-        Authorization: `Bearer ${token}`,
+        "X-API-Key": token,
     };
     const nameFilter = { filter_value: name, filter_field: "name", filter_function: "contains" };
     const idFilter = { filter_value: id, filter_field: "id", filter_function: "equals" };
@@ -435,7 +465,7 @@ const updatePartyInventory = ({
     token: string | null | undefined;
 }) => {
     const headers = {
-        Authorization: `Bearer ${token}`,
+        "X-API-Key": token,
     };
     return axios.request({
         url: `${TTRPG_URL}/party/${partyId}/inventory/${inventoryId}`,
@@ -472,7 +502,7 @@ const listPartyStatblockEquipment = async ({
     token: string;
 }) => {
     const headers = {
-        Authorization: `Bearer ${token}`,
+        "X-API-Key": token,
     };
     return axios.request({
         url: `${TTRPG_URL}/party/${partyId}/statblock/${party_statblock_id}/equipment/`,
@@ -511,7 +541,7 @@ const addPartyStatblockEquipment = ({
     token: string | null | undefined;
 }) => {
     const headers = {
-        Authorization: `Bearer ${token}`,
+        "X-API-Key": token,
     };
     return axios.request({
         url: `${TTRPG_URL}/party/${partyId}/statblock/${partyStatblockId}/equipment/`,
@@ -557,7 +587,7 @@ const updatePartyStatblockEquipment = ({
     token: string | null | undefined;
 }) => {
     const headers = {
-        Authorization: `Bearer ${token}`,
+        "X-API-Key": token,
     };
     return axios.request({
         url: `${TTRPG_URL}/party/${partyId}/statblock/${partyStatblockId}/equipment/${equipmentId}`,
