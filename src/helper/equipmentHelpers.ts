@@ -447,7 +447,7 @@ export const handleEquipmentChange = async (
     statblock: E5Statblock,
     item: Item,
 ) => {
-    const newData = {
+    let newData = {
         ...data,
         equipment: { equipped: equipped, attuned: attuned },
     };
@@ -460,7 +460,7 @@ export const handleEquipmentChange = async (
                 limit.used = Math.min(currentLimit.used, limit.max);
             }
         });
-        newData.stats.limits = statblockLimits;
+        newData.stats = { ...newData.stats, limits: statblockLimits };
         newData.maxHp = Math.max(
             Number(statblock.hp.value) + Number(equipmentBonus.statblockBonuses.hpBonus),
             data.maxHp,

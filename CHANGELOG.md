@@ -15,6 +15,8 @@
 + Fix statblock popover sorting when tokens are in different groups
 + Make Token Icon transparent when Item is hidden in the scene
 + Fix hidden by default is not used when rolling advantage or crits
++ Fix issue with inventory filters
++ Fix issues on FF + Linux that bricks equipping and unequipping items
 
 # 3.6.0
 

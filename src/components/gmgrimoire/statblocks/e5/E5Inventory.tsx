@@ -124,7 +124,7 @@ export const E5Item = ({ equipment }: { equipment: StatblockItems }) => {
 };
 
 export const E5Inventory = () => {
-    const { statblock } = useE5StatblockContext();
+    const { statblock, data } = useE5StatblockContext();
     const filter = useInventoryFilterContext((state) => state.filter);
 
     const sort = (a: StatblockItems, b: StatblockItems) => {
@@ -188,8 +188,8 @@ export const E5Inventory = () => {
         return (
             !item.embedded &&
             (!filter.filter.consumable || item.item.consumable) &&
-            (!filter.filter.isEquipped || item.equipped) &&
-            (!filter.filter.isAttuned || item.attuned) &&
+            (!filter.filter.isEquipped || item.equipped || data.equipment?.equipped?.includes(item.item.slug)) &&
+            (!filter.filter.isAttuned || item.attuned || data.equipment?.attuned?.includes(item.item.slug)) &&
             (filter.filter.search === "" || item.item.name.toLowerCase().includes(filter.filter.search.toLowerCase()))
         );
     };
