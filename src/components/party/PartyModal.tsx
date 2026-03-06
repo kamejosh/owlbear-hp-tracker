@@ -46,10 +46,6 @@ const GMContent = () => {
 
     const validKey = loginQuery.isSuccess ? loginQuery.data.logged_in : false;
 
-    if (loginQuery.isLoading) {
-        return <Loader />;
-    }
-
     if (!room?.tabletopAlmanacAPIKey || !validKey) {
         return (
             <div>
@@ -65,7 +61,11 @@ const GMContent = () => {
                             setApiKey(e.target.value);
                         }}
                     />
-                    {!validKey ? <div className={styles.error}>The entered key is invalid</div> : null}
+                    {loginQuery.isLoading ? (
+                        <Loader />
+                    ) : !validKey ? (
+                        <div className={styles.error}>The entered key is invalid</div>
+                    ) : null}
                 </p>
             </div>
         );
