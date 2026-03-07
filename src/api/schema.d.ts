@@ -315,6 +315,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/me/logged-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get User Logged In */
+        get: operations["get_user_logged_in"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/pf/statblock/": {
         parameters: {
             query?: never;
@@ -1160,7 +1177,7 @@ export interface components {
             group?: string | null;
             /** Alignment */
             alignment?: string | null;
-            armor_class: components["schemas"]["src__model_types__pf__statblock__ArmorClass"];
+            armor_class: components["schemas"]["src__model_types__e5__base__ArmorClass"];
             hp: components["schemas"]["src__model_types__e5__base__Hitpoints"];
             speed: components["schemas"]["Speed"];
             stats: components["schemas"]["src__model_types__e5__base__Stats"];
@@ -1238,7 +1255,7 @@ export interface components {
             group?: string | null;
             /** Alignment */
             alignment?: string | null;
-            armor_class: components["schemas"]["src__model_types__pf__statblock__ArmorClass"];
+            armor_class: components["schemas"]["src__model_types__e5__base__ArmorClass"];
             hp: components["schemas"]["src__model_types__e5__base__Hitpoints"];
             speed: components["schemas"]["Speed"];
             stats: components["schemas"]["src__model_types__e5__base__Stats"];
@@ -1596,7 +1613,7 @@ export interface components {
         };
         /** ItemStatsIn */
         ItemStatsIn: {
-            armor_class?: components["schemas"]["src__model_types__pf__statblock__ArmorClass"] | null;
+            armor_class?: components["schemas"]["src__model_types__e5__base__ArmorClass"] | null;
             hp?: components["schemas"]["src__model_types__e5__base__Hitpoints"] | null;
             /** Senses */
             senses?: string[] | null;
@@ -1621,7 +1638,7 @@ export interface components {
         };
         /** ItemStatsOut */
         ItemStatsOut: {
-            armor_class?: components["schemas"]["src__model_types__pf__statblock__ArmorClass"] | null;
+            armor_class?: components["schemas"]["src__model_types__e5__base__ArmorClass"] | null;
             hp?: components["schemas"]["src__model_types__e5__base__Hitpoints"] | null;
             /** Senses */
             senses?: string[] | null;
@@ -1645,6 +1662,11 @@ export interface components {
             skills?: components["schemas"]["Skills"] | null;
             /** Id */
             id: number;
+        };
+        /** LoggedIn */
+        LoggedIn: {
+            /** Logged In */
+            logged_in: boolean;
         };
         /** ModifierStats */
         ModifierStats: {
@@ -1738,7 +1760,7 @@ export interface components {
             stats: components["schemas"]["src__model_types__pf__statblock__Stats"];
             /** Items */
             items?: string[] | null;
-            armor_class: components["schemas"]["src__model_types__pf__statblock__ArmorClass"];
+            armor_class: components["schemas"]["src__model_types__e5__base__ArmorClass"];
             saving_throws: components["schemas"]["src__model_types__pf__statblock__SavingThrows"];
             hp: components["schemas"]["src__model_types__pf__statblock__Hitpoints"];
             /** Immunities */
@@ -1783,7 +1805,7 @@ export interface components {
             stats: components["schemas"]["src__model_types__pf__statblock__Stats"];
             /** Items */
             items?: string[] | null;
-            armor_class: components["schemas"]["src__model_types__pf__statblock__ArmorClass"];
+            armor_class: components["schemas"]["src__model_types__e5__base__ArmorClass"];
             saving_throws: components["schemas"]["src__model_types__pf__statblock__SavingThrows"];
             hp: components["schemas"]["src__model_types__pf__statblock__Hitpoints"];
             /** Immunities */
@@ -1935,9 +1957,7 @@ export interface components {
         /** PartyInventoryUpdate */
         PartyInventoryUpdate: {
             /** Item Updates */
-            item_updates?: {
-                [key: string]: components["schemas"]["PartyItemUpdate"];
-            } | null;
+            item_updates?: components["schemas"]["PartyItemUpdate"][] | null;
             /** New Items */
             new_items?: components["schemas"]["PartyItemIn"][] | null;
         };
@@ -4260,6 +4280,13 @@ export interface components {
             damage_dice?: string | null;
             limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
         };
+        /** ArmorClass */
+        src__model_types__e5__base__ArmorClass: {
+            /** Value */
+            value: number;
+            /** Special */
+            special?: string | null;
+        };
         /** Hitpoints */
         src__model_types__e5__base__Hitpoints: {
             /** Value */
@@ -4512,13 +4539,6 @@ export interface components {
             /** Constant */
             constant?: string | null;
             limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
-        };
-        /** ArmorClass */
-        src__model_types__pf__statblock__ArmorClass: {
-            /** Value */
-            value: number;
-            /** Special */
-            special?: string | null;
         };
         /** Hitpoints */
         src__model_types__pf__statblock__Hitpoints: {
@@ -5194,6 +5214,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+        };
+    };
+    get_user_logged_in: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoggedIn"];
                 };
             };
         };

@@ -1,0 +1,16 @@
+.select-and-remove-group {
+    display: flex;
+    gap: 1ch;
+    width: unset !important;
+
+    .remove {
+        width: 40px;
+    }
+
+    select {
+        border-color: black;
+        background-color: var(--primary-color);
+        padding-inline: 8px;
+        min-width: 40px;
+    }
+}
