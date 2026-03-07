@@ -37,7 +37,15 @@ export const PartyStatblocks = () => {
 
     return (
         <div>
-            <div style={{ display: "flex", gap: "1ch", alignItems: "center", justifyContent: "space-between" }}>
+            <div
+                style={{
+                    display: "flex",
+                    gap: "1ch",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    height: "32px",
+                }}
+            >
                 <h3>Members</h3>
                 <button
                     onClick={() => setCollapsed(!collapsed)}

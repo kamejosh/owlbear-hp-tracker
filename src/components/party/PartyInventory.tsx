@@ -168,7 +168,12 @@ const AddInventoryItem = ({
                 <SubmitButton form={form} pending={updatePartyInventory.isPending} />
             </div>
             {isOpen && item && (
-                <div ref={refs.setFloating} className={styles.floatingInfo} {...getFloatingProps()}>
+                <div
+                    ref={refs.setFloating}
+                    className={styles.floatingInfo}
+                    {...getFloatingProps()}
+                    style={{ ...floatingStyles }}
+                >
                     {/*TODO <ItemComponent item={item} />*/}
                     Hier kommt das item rein
                 </div>
@@ -427,7 +432,15 @@ export const PartyInventory = () => {
 
     return (
         <div>
-            <div style={{ display: "flex", gap: "1ch", alignItems: "center", justifyContent: "space-between" }}>
+            <div
+                style={{
+                    display: "flex",
+                    gap: "1ch",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    height: "32px",
+                }}
+            >
                 <h3>Inventory</h3>
                 <button
                     onClick={() => setCollapsed(!collapsed)}

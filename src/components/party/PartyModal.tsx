@@ -76,7 +76,10 @@ const GMContent = () => {
             <PartySelect />
 
             {currentParty ? (
-                <div className={"party-modal-content"}>
+                <div
+                    className={"party-modal-content"}
+                    style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}
+                >
                     <h2 style={{ marginBottom: "0.5rem" }}>{currentParty?.name}</h2>
                     <PartyStatblocks />
                     <PartyInventory />
