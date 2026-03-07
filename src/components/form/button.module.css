@@ -1,0 +1,71 @@
+.deleteButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    outline: 2px solid var(--dark-color);
+    outline-offset: -2px;
+    border-radius: 8px;
+    background-color: var(--warning-color);
+    padding: 4px 8px;
+    height: 40px;
+    color: white;
+
+    svg {
+        fill: white;
+    }
+}
+
+.editButton {
+    display: flex;
+    outline-color: transparent;
+    background-color: transparent;
+    padding: 4px 2px;
+    height: 30px;
+
+    svg {
+        fill: white;
+    }
+}
+
+.editGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5ch;
+}
+
+.formLeft {
+    :nth-child(2) {
+        &:not(button) {
+            align-self: flex-start;
+        }
+    }
+}
+
+.formRight {
+    :nth-child(2) {
+        &:not(button) {
+            align-self: flex-end;
+        }
+    }
+
+    .top {
+        justify-content: flex-end;
+    }
+}
+
+.editButtonTop {
+    align-self: flex-start;
+}
+
+.submitButton {
+    justify-self: flex-end;
+    margin-top: 10px;
+}
+
+.top {
+    display: flex;
+    align-items: center;
+    gap: 1ch;
+}

@@ -50,7 +50,7 @@ const GMContent = () => {
         return (
             <div>
                 <h2>Party Settings</h2>
-                <p>
+                <div>
                     To use the party feature enter your{" "}
                     <Link href={"https://tabletop-almanac.com"}>Tabletop Almanac</Link> API Key:
                     <input
@@ -66,7 +66,7 @@ const GMContent = () => {
                     ) : !validKey ? (
                         <div className={styles.error}>The entered key is invalid</div>
                     ) : null}
-                </p>
+                </div>
             </div>
         );
     }

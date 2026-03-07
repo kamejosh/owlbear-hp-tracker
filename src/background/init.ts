@@ -402,6 +402,8 @@ const initMessageBus = async () => {
 };
 
 const initParty = async () => {
+    // TODO: add the party group to the groups list and assign the members to the group
+
     // subscribe to party changes
     OBR.room.onMetadataChange((metadata) => {
         const room = useMetadataContext.getState().room;
