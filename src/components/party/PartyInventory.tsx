@@ -10,7 +10,7 @@ import {
     useGetPartyInventory,
     useUpdatePartyInventory,
 } from "../../api/tabletop-almanac/useParty.ts";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ItemOut, StatblockItems } from "../../helper/equipmentHelpers.ts";
 import { useForm } from "react-hook-form";
 import {
@@ -31,6 +31,7 @@ import { NumberInput } from "../form/RHFInputs.tsx";
 import { SubmitButton } from "../form/SubmitButton.tsx";
 import { DeleteButton } from "../form/DeleteButton.tsx";
 import { EditButton } from "../form/EditButton.tsx";
+import styles from "./party-inventory.module.scss";
 
 export const AutoCompleteItemInput = (props: { error: string; onSelect: (value: number, item: ItemOut) => void }) => {
     const [items, setItems] = useState<Array<ItemOut>>([]);
@@ -73,12 +74,12 @@ export const AutoCompleteItemInput = (props: { error: string; onSelect: (value: 
                 const { key, ...optionProps } = props as any;
                 return (
                     <li key={item.slug} {...optionProps}>
-                        <div style={{ display: "flex", width: "100%", justifyContent: "space-between" }}>
-                            <div style={{ display: "flex", gap: "10px" }}>
+                        <div className={styles.autoCompleteOption}>
+                            <div className={styles.optionMain}>
                                 <Tippy content={item.name}>
-                                    <span>{item.name}</span>
+                                    <span className={styles.itemName}>{item.name}</span>
                                 </Tippy>
-                                <span>
+                                <span className={styles.optionIndicators}>
                                     {item.stats ? (
                                         <Tippy content={"Item is sentient"}>
                                             <span>S</span>
@@ -96,7 +97,7 @@ export const AutoCompleteItemInput = (props: { error: string; onSelect: (value: 
                                     ) : null}
                                 </span>
                             </div>
-                            <div style={{ display: "flex", gap: "10px", fontSize: "0.8em", opacity: 0.7 }}>
+                            <div className={styles.optionMeta}>
                                 <span>{item.rarity}</span>
                                 <span className={"source"}>{item.source}</span>
                             </div>
@@ -148,12 +149,8 @@ const AddInventoryItem = ({
     };
 
     return (
-        <form onSubmit={form.handleSubmit(handleSubmit)}>
-            <div
-                style={{ display: "flex", gap: "10px", alignItems: "flex-end", justifyContent: "stretch" }}
-                ref={refs.setReference}
-                {...getReferenceProps()}
-            >
+        <form onSubmit={form.handleSubmit(handleSubmit)} className={styles.addForm}>
+            <div className={styles.addFormRow} ref={refs.setReference} {...getReferenceProps()}>
                 <AutoCompleteItemInput
                     error={""}
                     onSelect={(itemId, item) => {
@@ -164,34 +161,14 @@ const AddInventoryItem = ({
                 />
                 <NumberInput form={form} fieldName={"new_items.0.count"} label={"Count"} required={true} />
             </div>
-            <div
-                style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "10px" }}
-                className={"button-group"}
-            >
-                <button
-                    className={"button delete"}
-                    type={"button"}
-                    onClick={() => setAddItem(false)}
-                    style={{ marginTop: "10px" }}
-                >
+            <div className={styles.buttonGroup}>
+                <button className={"button delete"} type={"button"} onClick={() => setAddItem(false)}>
                     Cancel
                 </button>
                 <SubmitButton form={form} pending={updatePartyInventory.isPending} />
             </div>
             {isOpen && item && (
-                <div
-                    ref={refs.setFloating}
-                    style={{
-                        ...floatingStyles,
-                        backgroundColor: "#2b2a33dd",
-                        border: "1px solid #ddd",
-                        padding: "8px",
-                        borderRadius: "8px",
-                        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                        zIndex: 100,
-                    }}
-                    {...getFloatingProps()}
-                >
+                <div ref={refs.setFloating} className={styles.floatingInfo} {...getFloatingProps()}>
                     {/*TODO <ItemComponent item={item} />*/}
                     Hier kommt das item rein
                 </div>
@@ -263,54 +240,62 @@ export const PartyInventoryItem = ({
     const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
 
     return (
-        <div>
-            <span>
+        <div className={styles.inventoryItem}>
+            <div className={styles.itemMain}>
                 {editItem ? (
                     <EditItemCount item={item} partyId={partyId} inventoryId={inventoryId} setEditItem={setEditItem} />
                 ) : (
-                    `${item.count} x `
+                    <>
+                        <span>{item.count} x </span>
+                        <div className={styles.itemInfo}>
+                            <b ref={refs.setReference} {...getReferenceProps()} className={styles.itemName}>
+                                {item.item.name}
+                            </b>
+                            <span className={styles.itemMeta}>
+                                {item.item.rarity} - {item.item.source}
+                            </span>
+                        </div>
+                        {item.item.cost ? (
+                            <div className={styles.itemCost}>
+                                {item.item.cost.pp ? (
+                                    <span className={`${styles.costItem} ${styles.pp}`}>{item.item.cost.pp}PP</span>
+                                ) : null}
+                                {item.item.cost.gp ? (
+                                    <span className={`${styles.costItem} ${styles.gp}`}>{item.item.cost.gp}GP</span>
+                                ) : null}
+                                {item.item.cost.ep ? (
+                                    <span className={`${styles.costItem} ${styles.ep}`}>{item.item.cost.ep}EP</span>
+                                ) : null}
+                                {item.item.cost.sp ? (
+                                    <span className={`${styles.costItem} ${styles.sp}`}>{item.item.cost.sp}SP</span>
+                                ) : null}
+                                {item.item.cost.cp ? (
+                                    <span className={`${styles.costItem} ${styles.cp}`}>{item.item.cost.cp}CP</span>
+                                ) : null}
+                            </div>
+                        ) : null}
+                    </>
                 )}
-                <b ref={refs.setReference} {...getReferenceProps()}>
-                    {item.item.name}
-                </b>
-                ,{" "}
-                <span style={{ fontStyle: "italic", fontSize: "0.8rem" }}>
-                    {item.item.rarity} - {item.item.source}
-                </span>
-                {item.item.cost ? (
-                    <span style={{ marginLeft: "10px", fontSize: "0.7rem" }}>
-                        {item.item.cost.pp ? `${item.item.cost?.pp}PP` : null}{" "}
-                        {item.item.cost.gp ? `${item.item.cost?.gp}GP` : null}{" "}
-                        {item.item.cost.ep ? `${item.item.cost?.ep}EP` : null}{" "}
-                        {item.item.cost.sp ? `${item.item.cost?.sp}SP` : null}{" "}
-                        {item.item.cost.cp ? `${item.item.cost?.cp}CP` : null}
-                    </span>
-                ) : null}
-            </span>
+            </div>
 
-            <EditButton onClick={() => setEditItem(!editItem)} alignCenter={true} />
-            <DeleteButton
-                message={`Do you want to delete ${item.item.name}`}
-                onClick={async () => {
-                    await updatePartyInventory.mutateAsync({
-                        item_updates: [{ item_id: item.item.id, count: 0 }],
-                    });
-                }}
-            />
+            <div className={styles.actions}>
+                <EditButton onClick={() => setEditItem(!editItem)} alignCenter={true} />
+                <DeleteButton
+                    message={`Do you want to delete ${item.item.name}`}
+                    onClick={async () => {
+                        await updatePartyInventory.mutateAsync({
+                            item_updates: [{ item_id: item.item.id, count: 0 }],
+                        });
+                    }}
+                />
+            </div>
             {isOpen && (
                 <FloatingPortal>
                     <div
                         ref={refs.setFloating}
-                        style={{
-                            ...floatingStyles,
-                            backgroundColor: "#2b2a33dd",
-                            border: "1px solid #ddd",
-                            padding: "8px",
-                            borderRadius: "8px",
-                            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                            zIndex: 100,
-                        }}
+                        className={styles.floatingInfo}
                         {...getFloatingProps()}
+                        style={{ ...floatingStyles }}
                     >
                         {/*TODO <ItemComponent item={item.item} />*/}
                     </div>
@@ -352,13 +337,78 @@ export const sortInventory = (
     return 0;
 };
 
+export const PartyInventoryItems = ({ inventory }: { inventory: PartyInventoryOut }) => {
+    const currentParty = usePartyStore((state) => state.currentParty);
+    const [addItem, setAddItem] = useState<boolean>(false);
+    const [sort, setSort] = useState<"name" | "rarity">("name");
+
+    const weight = useMemo(() => {
+        if (inventory && inventory.items) {
+            return inventory.items.reduce((acc, item) => acc + (item.item.weight ?? 0), 0);
+        } else {
+            return null;
+        }
+    }, [inventory]);
+
+    if (currentParty && inventory?.items?.length === 0) {
+        return (
+            <div className={styles.emptyState}>
+                <h4>No items in inventory</h4>
+                {addItem ? (
+                    <AddInventoryItem partyId={inventory.party_id} inventoryId={inventory.id} setAddItem={setAddItem} />
+                ) : (
+                    <button className={styles.addButton} onClick={() => setAddItem(true)}>
+                        Add Item
+                    </button>
+                )}
+            </div>
+        );
+    }
+
+    if (currentParty && inventory)
+        return (
+            <div className={styles.inventoryContainer}>
+                <div className={styles.controls}>
+                    <select
+                        className={styles.select}
+                        onChange={(e) => setSort(e.target.value as "name" | "rarity")}
+                        value={sort}
+                    >
+                        <option value={"name"}>Sort by name</option>
+                        <option value={"rarity"}>Sort by rarity</option>
+                    </select>
+                    {weight ? <p>Weight: {weight}</p> : null}
+                </div>
+                <div className={styles.inventoryList}>
+                    {inventory?.items
+                        ?.sort((a, b) => sortInventory(a, b, sort))
+                        .map((item) => {
+                            return (
+                                <PartyInventoryItem
+                                    key={item.id}
+                                    item={item}
+                                    partyId={inventory.party_id}
+                                    inventoryId={inventory.id}
+                                />
+                            );
+                        })}
+                </div>
+                {addItem ? (
+                    <AddInventoryItem partyId={inventory.party_id} inventoryId={inventory.id} setAddItem={setAddItem} />
+                ) : (
+                    <button className={styles.addButton} onClick={() => setAddItem(true)}>
+                        + Add Item
+                    </button>
+                )}
+            </div>
+        );
+};
+
 export const PartyInventory = () => {
     const currentParty = usePartyStore((state) => state.currentParty);
 
     const [partyId, _] = useState<number | undefined>(currentParty?.id);
     const [inventoryId, setInventoryId] = useState<number | undefined>(undefined);
-    const [addItem, setAddItem] = useState<boolean>(false);
-    const [sort, setSort] = useState<"name" | "rarity">("name");
 
     const partyQuery = useGetParty(partyId);
     const partyInventoryQuery = useGetPartyInventory(partyId, inventoryId);
@@ -375,49 +425,18 @@ export const PartyInventory = () => {
         defaultValue: false,
     });
 
-    if (currentParty && inventory?.items?.length === 0) {
-        return (
-            <div>
-                <h4>No items in inventory</h4>
-                {addItem && partyId && inventoryId ? (
-                    <AddInventoryItem partyId={partyId} inventoryId={inventoryId} setAddItem={setAddItem} />
-                ) : (
-                    <button className={"add-button"} onClick={() => setAddItem(true)}>
-                        Add Item
-                    </button>
-                )}
-            </div>
-        );
-    }
-
-    if (currentParty && inventory && partyId && inventoryId)
-        // const weight = inventory.items?.reduce((acc, item) => acc + (item.item.weight ?? 0), 0);
-
-        return (
-            <div>
-                {/*{weight ? <p>Weight: {weight}</p> : null}*/}
-                <select
-                    style={{ width: "200px" }}
-                    onChange={(e) => setSort(e.target.value as "name" | "rarity")}
-                    value={sort}
+    return (
+        <div>
+            <div style={{ display: "flex", gap: "1ch", alignItems: "center", justifyContent: "space-between" }}>
+                <h3>Inventory</h3>
+                <button
+                    onClick={() => setCollapsed(!collapsed)}
+                    style={{ display: "flex", gap: "1ch", alignItems: "center" }}
                 >
-                    <option value={"name"}>Sort by name</option>
-                    <option value={"rarity"}>Sort by rarity</option>
-                </select>
-                {inventory?.items
-                    ?.sort((a, b) => sortInventory(a, b, sort))
-                    .map((item) => {
-                        return (
-                            <PartyInventoryItem key={item.id} item={item} partyId={partyId} inventoryId={inventoryId} />
-                        );
-                    })}
-                {addItem ? (
-                    <AddInventoryItem partyId={partyId} inventoryId={inventoryId} setAddItem={setAddItem} />
-                ) : (
-                    <button className={"add-button"} onClick={() => setAddItem(true)}>
-                        +
-                    </button>
-                )}
+                    <ChevronRight sx={{ rotate: collapsed ? "0deg" : "90deg", transition: "all 0.25s ease" }} />
+                </button>
             </div>
-        );
+            {collapsed ? null : <PartyInventoryItems inventory={inventory} />}
+        </div>
+    );
 };
