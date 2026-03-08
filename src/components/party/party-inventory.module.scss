@@ -158,19 +158,29 @@
     }
 }
 
+.addItemCount {
+    input {
+        height: 35px;
+    }
+}
+
 .autoCompleteOption {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    gap: 3px;
     width: 100%;
 
     .optionMain {
         display: flex;
+        align-items: center;
         gap: 10px;
     }
 
     .optionIndicators {
         display: flex;
-        gap: 4px;
+        align-items: center;
+        gap: 2px;
         color: #aaa;
         font-weight: bold;
         font-size: 0.8em;
@@ -178,9 +188,15 @@
 
     .optionMeta {
         display: flex;
+        flex-shrink: 0;
+        align-items: center;
         gap: 10px;
         opacity: 0.7;
         font-size: 0.8em;
+
+        * > {
+            flex-shrink: 0;
+        }
     }
 }
 

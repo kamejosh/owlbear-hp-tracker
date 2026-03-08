@@ -48,7 +48,7 @@ export const AutoCompleteItemInput = (props: { error: string; onSelect: (value: 
 
     return (
         <Autocomplete
-            style={{ flexGrow: 1, minWidth: "200px" }}
+            style={{ flexGrow: 1, minWidth: "200px", backgroundColor: "#2b2a33", color: "white" }}
             options={items}
             getOptionLabel={(option) => option.name}
             filterOptions={(x) => x}
@@ -62,13 +62,28 @@ export const AutoCompleteItemInput = (props: { error: string; onSelect: (value: 
             onInputChange={(_, newInputValue) => {
                 searchItems.run(newInputValue);
             }}
+            slotProps={{
+                paper: {
+                    sx: {
+                        backgroundColor: "#2b2a33",
+                        color: "white",
+                        "& .MuiAutocomplete-option:hover": {
+                            backgroundColor: "#121212",
+                        },
+                    },
+                },
+            }}
             renderInput={(params) => (
                 <TextField
                     {...params}
                     error={!!props.error}
                     placeholder="Type to search..."
-                    variant="outlined"
                     size="small"
+                    sx={{
+                        "& .MuiInputBase-root": {
+                            color: "white",
+                        },
+                    }}
                 />
             )}
             renderOption={(props, item) => {
@@ -160,13 +175,19 @@ const AddInventoryItem = ({
                         console.log(itemId);
                     }}
                 />
-                <NumberInput form={form} fieldName={"new_items.0.count"} label={"Count"} required={true} />
+                <Tippy content={"Count of items to add"}>
+                    <NumberInput
+                        form={form}
+                        fieldName={"new_items.0.count"}
+                        label={"Count"}
+                        required={true}
+                        className={styles.addItemCount}
+                    />
+                </Tippy>
             </div>
             <div className={styles.buttonGroup}>
-                <button className={"button delete"} type={"button"} onClick={() => setAddItem(false)}>
-                    Cancel
-                </button>
                 <SubmitButton form={form} pending={updatePartyInventory.isPending} />
+                <CancelButton onClick={() => setAddItem(false)} />
             </div>
             {isOpen && item && (
                 <div
