@@ -43,7 +43,6 @@ export const PartyStatblocks = () => {
                     gap: "1ch",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    height: "32px",
                 }}
             >
                 <h3>Members</h3>

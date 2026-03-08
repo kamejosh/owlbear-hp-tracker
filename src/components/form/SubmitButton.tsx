@@ -1,5 +1,6 @@
 import styles from "./button.module.css";
 import { FieldValues, UseFormReturn } from "react-hook-form";
+import { Check } from "@mui/icons-material";
 
 export type SubmitButtonProps<T extends FieldValues> = {
     form: UseFormReturn<T>;
@@ -13,7 +14,7 @@ export const SubmitButton = <T extends FieldValues>({ form, pending }: SubmitBut
             type={"submit"}
             disabled={!form.formState.isValid || Object.values(form.formState.errors).length > 0}
         >
-            Submit
+            <Check />
         </button>
     );
 };

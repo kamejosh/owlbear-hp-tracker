@@ -18,7 +18,9 @@ export const PartyModal = () => {
     return (
         <ContextWrapper component={"party"}>
             <TokenContextWrapper>
-                <Content />
+                <div className={"party-modal"}>
+                    <Content />
+                </div>
             </TokenContextWrapper>
         </ContextWrapper>
     );
@@ -72,20 +74,17 @@ const GMContent = () => {
     }
 
     return (
-        <div className={"party-modal"}>
+        <div className={styles.partyModal}>
             <PartySelect />
 
             {currentParty ? (
-                <div
-                    className={"party-modal-content"}
-                    style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}
-                >
+                <div className={styles.partyModalContent}>
                     <h2 style={{ marginBottom: "0.5rem" }}>{currentParty?.name}</h2>
                     <PartyStatblocks />
                     <PartyInventory />
                 </div>
             ) : (
-                <div className={"party-modal-content"}>No party selected</div>
+                <div className={styles.partyModalContent}>No party selected</div>
             )}
         </div>
     );
@@ -96,8 +95,8 @@ const PlayerContent = () => {
     const player = usePlayerContext();
 
     return (
-        <div className={"party-modal"}>
-            <div className={"party-modal-content"}>
+        <div className={styles.partyModal}>
+            <div className={styles.partyModalContent}>
                 <h2 style={{ marginBottom: "0.5rem" }}>{currentParty?.name}</h2>
             </div>
         </div>

@@ -1,31 +1,49 @@
+:root {
+    --dark-color: #161616;
+    --warning-color: #8a3838;
+}
+
 .deleteButton {
     display: flex;
     justify-content: center;
     align-items: center;
     transition: all 0.25s ease;
     cursor: pointer;
-    outline: 2px solid var(--dark-color);
-    outline-offset: -2px;
-    border-radius: 8px;
+    border: 2px solid var(--dark-color);
+    border-radius: 4px;
     background-color: var(--warning-color);
     padding: 4px 8px;
-    height: 40px;
+    height: 32px;
     color: white;
 
     svg {
         fill: white;
+        width: 20px;
+        height: 20px;
     }
 }
 
 .editButton {
     display: flex;
-    outline-color: transparent;
-    background-color: transparent;
-    padding: 4px 2px;
-    height: 30px;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    border: 2px solid var(--dark-color);
+    border-radius: 4px;
+    background-color: #555;
+    padding: 4px 8px;
+    height: 32px;
+    color: white;
 
     svg {
         fill: white;
+        width: 20px;
+        height: 20px;
+    }
+
+    &:hover {
+        background-color: #666;
     }
 }
 
@@ -60,8 +78,15 @@
 }
 
 .submitButton {
-    justify-self: flex-end;
-    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    background-color: #555;
+}
+
+.cancelButton {
+    display: flex;
+    align-items: center;
+    background-color: var(--warning-color);
 }
 
 .top {

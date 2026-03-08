@@ -32,6 +32,7 @@ import { SubmitButton } from "../form/SubmitButton.tsx";
 import { DeleteButton } from "../form/DeleteButton.tsx";
 import { EditButton } from "../form/EditButton.tsx";
 import styles from "./party-inventory.module.scss";
+import { CancelButton } from "../form/CancelButton.tsx";
 
 export const AutoCompleteItemInput = (props: { error: string; onSelect: (value: number, item: ItemOut) => void }) => {
     const [items, setItems] = useState<Array<ItemOut>>([]);
@@ -208,9 +209,10 @@ export const EditItemCount = ({
     };
 
     return (
-        <form onSubmit={form.handleSubmit(handleSubmit)}>
+        <form className={styles.editItemForm} onSubmit={form.handleSubmit(handleSubmit)}>
             <NumberInput form={form} fieldName={"item_updates.0.count"} label={"Count"} required={true} />
             <SubmitButton form={form} pending={updatePartyInventory.isPending} />
+            <CancelButton onClick={() => setEditItem(false)} />
         </form>
     );
 };
@@ -250,37 +252,37 @@ export const PartyInventoryItem = ({
                 {editItem ? (
                     <EditItemCount item={item} partyId={partyId} inventoryId={inventoryId} setEditItem={setEditItem} />
                 ) : (
-                    <>
-                        <span>{item.count} x </span>
-                        <div className={styles.itemInfo}>
-                            <b ref={refs.setReference} {...getReferenceProps()} className={styles.itemName}>
-                                {item.item.name}
-                            </b>
-                            <span className={styles.itemMeta}>
-                                {item.item.rarity} - {item.item.source}
-                            </span>
-                        </div>
-                        {item.item.cost ? (
-                            <div className={styles.itemCost}>
-                                {item.item.cost.pp ? (
-                                    <span className={`${styles.costItem} ${styles.pp}`}>{item.item.cost.pp}PP</span>
-                                ) : null}
-                                {item.item.cost.gp ? (
-                                    <span className={`${styles.costItem} ${styles.gp}`}>{item.item.cost.gp}GP</span>
-                                ) : null}
-                                {item.item.cost.ep ? (
-                                    <span className={`${styles.costItem} ${styles.ep}`}>{item.item.cost.ep}EP</span>
-                                ) : null}
-                                {item.item.cost.sp ? (
-                                    <span className={`${styles.costItem} ${styles.sp}`}>{item.item.cost.sp}SP</span>
-                                ) : null}
-                                {item.item.cost.cp ? (
-                                    <span className={`${styles.costItem} ${styles.cp}`}>{item.item.cost.cp}CP</span>
-                                ) : null}
-                            </div>
-                        ) : null}
-                    </>
+                    <span>{item.count} x </span>
                 )}
+                <>
+                    <div className={styles.itemInfo}>
+                        <b ref={refs.setReference} {...getReferenceProps()} className={styles.itemName}>
+                            {item.item.name}
+                        </b>
+                        <span className={styles.itemMeta}>
+                            {item.item.rarity} - {item.item.source}
+                        </span>
+                    </div>
+                    {item.item.cost ? (
+                        <div className={styles.itemCost}>
+                            {item.item.cost.pp ? (
+                                <span className={`${styles.costItem} ${styles.pp}`}>{item.item.cost.pp}PP</span>
+                            ) : null}
+                            {item.item.cost.gp ? (
+                                <span className={`${styles.costItem} ${styles.gp}`}>{item.item.cost.gp}GP</span>
+                            ) : null}
+                            {item.item.cost.ep ? (
+                                <span className={`${styles.costItem} ${styles.ep}`}>{item.item.cost.ep}EP</span>
+                            ) : null}
+                            {item.item.cost.sp ? (
+                                <span className={`${styles.costItem} ${styles.sp}`}>{item.item.cost.sp}SP</span>
+                            ) : null}
+                            {item.item.cost.cp ? (
+                                <span className={`${styles.costItem} ${styles.cp}`}>{item.item.cost.cp}CP</span>
+                            ) : null}
+                        </div>
+                    ) : null}
+                </>
             </div>
 
             <div className={styles.actions}>
@@ -438,7 +440,6 @@ export const PartyInventory = () => {
                     gap: "1ch",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    height: "32px",
                 }}
             >
                 <h3>Inventory</h3>

@@ -111,7 +111,7 @@ export const Helpbuttons = (props: HelpButtonsProps) => {
                                 let height = 900;
                                 try {
                                     width = await OBR.viewport.getWidth();
-                                    height = await OBR.viewport.getHeight();
+                                    height = (await OBR.viewport.getHeight()) - 60;
                                 } catch {}
                                 await OBR.modal.open({
                                     ...partyModal,
