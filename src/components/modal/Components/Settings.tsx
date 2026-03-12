@@ -65,7 +65,8 @@ export const Settings = () => {
                     <div className={"tabletop-almanac setting"}>
                         Tabletop Almanac API Key:
                         <input
-                            type={"password"}
+                            className={"masked-input"}
+                            type={"text"}
                             value={room?.tabletopAlmanacAPIKey || ""}
                             onChange={(e) => {
                                 updateRoomMetadata(room, { tabletopAlmanacAPIKey: e.currentTarget.value });

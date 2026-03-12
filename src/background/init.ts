@@ -1,4 +1,4 @@
-import OBR, { Image, Metadata } from "@owlbear-rodeo/sdk";
+import OBR, { Image, Item, Metadata } from "@owlbear-rodeo/sdk";
 import { ID, itemMetadataKey, metadataKey, nextTurnChannel, version } from "../helper/variables.ts";
 import { compare } from "compare-versions";
 import {
@@ -20,7 +20,7 @@ import {
 } from "../helper/hpHelpers.ts";
 import { v4 as uuidv4 } from "uuid";
 import { saveOrChangeAC, updateAc, updateAcChanges, updateAcVisibility } from "../helper/acHelper.ts";
-import { attachmentFilter, getAttachedItems, prepareTokenForGrimoire } from "../helper/helpers.ts";
+import { attachmentFilter, getAttachedItems, prepareTokenForGrimoire, updateSceneMetadata } from "../helper/helpers.ts";
 import { setupDddice } from "./dddice.ts";
 import { migrate102To103 } from "../migrations/v103.ts";
 import { migrate105To106 } from "../migrations/v106.ts";
@@ -36,7 +36,9 @@ import { updateTokenMetadata } from "../helper/tokenHelper.ts";
 import { migrateTo350 } from "../migrations/v350.ts";
 import { setupDicePlus } from "./diceplus.ts";
 import { registerMessageHandlers } from "./api.ts";
-import { isNull, isUndefined } from "lodash";
+import _, { isNull, isUndefined } from "lodash";
+import { useMetadataContext } from "../context/MetadataContext.ts";
+import { partyStore, PartyStoreStatblock } from "../context/PartyStore.tsx";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -399,6 +401,88 @@ const initMessageBus = async () => {
     });
 };
 
+const initParty = async () => {
+    OBR.scene.onMetadataChange((metadata) => {
+        const party = partyStore.getState().currentParty;
+        const scene = metadata[metadataKey] as SceneMetadata;
+        if (party && scene?.groups && party.group && !scene.groups.includes(party.group)) {
+            updateSceneMetadata(scene, { groups: [...scene.groups, party.group] });
+        }
+    });
+
+    // subscribe to party changes
+    OBR.room.onMetadataChange((metadata) => {
+        const room = useMetadataContext.getState().room;
+        const gmgMetadata = metadata[metadataKey] as RoomMetadata;
+        if (!_.isEqual(room, gmgMetadata) && gmgMetadata.partyId) {
+            partyStore.getState().setCurrentParty(gmgMetadata.partyId);
+        }
+    });
+
+    // subscribe to token changes
+    OBR.scene.items.onChange((items) => {
+        const currentParty = partyStore.getState().currentParty;
+        const partyStatblocks = currentParty?.members.map((member) => member.statblock?.slug) || [];
+        const newTokens: Array<Item> = [];
+        items.forEach((item) => {
+            if (item.type === "IMAGE") {
+                const image = item as Image;
+                if (itemMetadataKey in item.metadata) {
+                    const data = item.metadata[itemMetadataKey] as GMGMetadata;
+
+                    if (data.sheet && partyStatblocks.includes(data.sheet)) {
+                        const member = currentParty?.members.find((member) => member.statblock?.slug === data.sheet);
+
+                        if (member) {
+                            const newMember: PartyStoreStatblock = { ...member };
+
+                            if (item.createdUserId !== OBR.player.id && item.createdUserId !== member.playerId) {
+                                newMember.playerId = item.createdUserId;
+                            }
+
+                            if (!member.imageUrl) {
+                                newMember.imageUrl = image.image.url;
+                            }
+
+                            if (!_.isEqual(member.metadata, item.metadata)) {
+                                newMember.metadata = item.metadata;
+                            }
+
+                            if (!_.isEqual(member, newMember)) {
+                                partyStore.getState().updateMember(newMember);
+                            }
+                        }
+                    }
+                } else {
+                    const member = currentParty?.members.find((member) => member.imageUrl === image.image.url);
+                    if (member && member.metadata) {
+                        void OBR.scene.items.updateItems([item], (items) => {
+                            for (const i of items) {
+                                // we checked before but this makes typescript happy
+                                if (member.metadata) {
+                                    if (itemMetadataKey in member.metadata) {
+                                        const data = member.metadata[itemMetadataKey] as GMGMetadata;
+                                        member.metadata[itemMetadataKey] = { ...data, group: currentParty?.group };
+                                    }
+                                    i.metadata = member.metadata;
+                                    newTokens.push(item);
+                                }
+                                if (member.playerId) {
+                                    i.createdUserId = member.playerId;
+                                }
+                            }
+                        });
+                    }
+
+                    if (newTokens.length > 0) {
+                        initItems();
+                    }
+                }
+            }
+        });
+    });
+};
+
 OBR.onReady(async () => {
     console.info(`GM's Grimoire - version ${version} initializing`);
     try {
@@ -432,6 +516,12 @@ OBR.onReady(async () => {
 
         try {
             await initTokens();
+        } catch (e) {
+            console.warn("GM's Grimoire - error while initializing Token event handler", e);
+        }
+
+        try {
+            await initParty();
         } catch (e) {
             console.warn("GM's Grimoire - error while initializing Token event handler", e);
         }
