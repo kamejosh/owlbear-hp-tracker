@@ -20,7 +20,7 @@ import {
 } from "../helper/hpHelpers.ts";
 import { v4 as uuidv4 } from "uuid";
 import { saveOrChangeAC, updateAc, updateAcChanges, updateAcVisibility } from "../helper/acHelper.ts";
-import { attachmentFilter, getAttachedItems, prepareTokenForGrimoire } from "../helper/helpers.ts";
+import { attachmentFilter, getAttachedItems, prepareTokenForGrimoire, updateSceneMetadata } from "../helper/helpers.ts";
 import { setupDddice } from "./dddice.ts";
 import { migrate102To103 } from "../migrations/v103.ts";
 import { migrate105To106 } from "../migrations/v106.ts";
@@ -402,7 +402,13 @@ const initMessageBus = async () => {
 };
 
 const initParty = async () => {
-    // TODO: add the party group to the groups list and assign the members to the group
+    OBR.scene.onMetadataChange((metadata) => {
+        const party = partyStore.getState().currentParty;
+        const scene = metadata[metadataKey] as SceneMetadata;
+        if (party && scene?.groups && party.group && !scene.groups.includes(party.group)) {
+            updateSceneMetadata(scene, { groups: [...scene.groups, party.group] });
+        }
+    });
 
     // subscribe to party changes
     OBR.room.onMetadataChange((metadata) => {
@@ -423,6 +429,7 @@ const initParty = async () => {
                 const image = item as Image;
                 if (itemMetadataKey in item.metadata) {
                     const data = item.metadata[itemMetadataKey] as GMGMetadata;
+
                     if (data.sheet && partyStatblocks.includes(data.sheet)) {
                         const member = currentParty?.members.find((member) => member.statblock?.slug === data.sheet);
 
@@ -450,16 +457,20 @@ const initParty = async () => {
                     const member = currentParty?.members.find((member) => member.imageUrl === image.image.url);
                     if (member && member.metadata) {
                         void OBR.scene.items.updateItems([item], (items) => {
-                            items.forEach((i) => {
+                            for (const i of items) {
                                 // we checked before but this makes typescript happy
                                 if (member.metadata) {
+                                    if (itemMetadataKey in member.metadata) {
+                                        const data = member.metadata[itemMetadataKey] as GMGMetadata;
+                                        member.metadata[itemMetadataKey] = { ...data, group: currentParty?.group };
+                                    }
                                     i.metadata = member.metadata;
                                     newTokens.push(item);
                                 }
                                 if (member.playerId) {
                                     i.createdUserId = member.playerId;
                                 }
-                            });
+                            }
                         });
                     }
 

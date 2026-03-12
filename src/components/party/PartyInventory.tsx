@@ -33,6 +33,7 @@ import { DeleteButton } from "../form/DeleteButton.tsx";
 import { EditButton } from "../form/EditButton.tsx";
 import styles from "./party-inventory.module.scss";
 import { CancelButton } from "../form/CancelButton.tsx";
+import { ItemHover } from "../gmgrimoire/items/ItemHover.tsx";
 
 export const AutoCompleteItemInput = (props: { error: string; onSelect: (value: number, item: ItemOut) => void }) => {
     const [items, setItems] = useState<Array<ItemOut>>([]);
@@ -325,7 +326,7 @@ export const PartyInventoryItem = ({
                         {...getFloatingProps()}
                         style={{ ...floatingStyles }}
                     >
-                        {/*TODO <ItemComponent item={item.item} />*/}
+                        <ItemHover item={item.item} />
                     </div>
                 </FloatingPortal>
             )}
@@ -435,7 +436,7 @@ export const PartyInventoryItems = ({ inventory }: { inventory: PartyInventoryOu
 export const PartyInventory = () => {
     const currentParty = usePartyStore((state) => state.currentParty);
 
-    const [partyId, _] = useState<number | undefined>(currentParty?.id);
+    const [partyId, setPartyId] = useState<number | undefined>(currentParty?.id);
     const [inventoryId, setInventoryId] = useState<number | undefined>(undefined);
 
     const partyQuery = useGetParty(partyId);
@@ -445,7 +446,13 @@ export const PartyInventory = () => {
         if (partyQuery.isSuccess) {
             setInventoryId(partyQuery.data.inventory?.id);
         }
-    }, [partyQuery.isSuccess]);
+    }, [partyQuery.isRefetching, partyQuery.isSuccess]);
+
+    useEffect(() => {
+        if (currentParty) {
+            setPartyId(currentParty.id);
+        }
+    }, [currentParty]);
 
     const inventory: PartyInventoryOut = partyInventoryQuery.isSuccess ? partyInventoryQuery.data : null;
 

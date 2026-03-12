@@ -21,6 +21,7 @@ export type PartyStoreStatblock = {
 export type PartySettings = {
     id: number;
     name: string;
+    group: string;
     members: Array<PartyStoreStatblock>;
 };
 
@@ -42,6 +43,7 @@ export const partyStore = createStore<PartyStore>()(
                     const newParty: PartySettings = {
                         id: party.id,
                         name: party.name,
+                        group: party.group_name ?? "Default",
                         members:
                             party.statblocks?.map((s) => {
                                 return {
