@@ -118,7 +118,7 @@ export const TokenIcon = ({
                     style={{ opacity: item.visible ? 1 : 0.5 }}
                 >
                     <img
-                        src={item.image.url}
+                        src={item.image?.url}
                         alt={""}
                         className={`${item.scale.x < 0 && playerPreview ? "flipped" : ""}`}
                         style={{

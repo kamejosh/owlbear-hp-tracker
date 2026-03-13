@@ -1,5 +1,5 @@
 import OBR, { Image, Metadata } from "@owlbear-rodeo/sdk";
-import { ID, itemMetadataKey, metadataKey, nextTurnChannel, version } from "../helper/variables.ts";
+import { changelogModal, ID, itemMetadataKey, metadataKey, nextTurnChannel, version } from "../helper/variables.ts";
 import { compare } from "compare-versions";
 import {
     ACItemChanges,
@@ -20,7 +20,7 @@ import {
 } from "../helper/hpHelpers.ts";
 import { v4 as uuidv4 } from "uuid";
 import { saveOrChangeAC, updateAc, updateAcChanges, updateAcVisibility } from "../helper/acHelper.ts";
-import { attachmentFilter, getAttachedItems, prepareTokenForGrimoire } from "../helper/helpers.ts";
+import { attachmentFilter, getAttachedItems, prepareTokenForGrimoire, updateSceneMetadata } from "../helper/helpers.ts";
 import { setupDddice } from "./dddice.ts";
 import { migrate102To103 } from "../migrations/v103.ts";
 import { migrate105To106 } from "../migrations/v106.ts";
@@ -322,6 +322,40 @@ const setupContextMenu = async () => {
     });
 };
 
+const initGrimoire = async () => {
+    const sceneMetadata = await OBR.scene.getMetadata();
+    const roomMetadata = await OBR.room.getMetadata();
+    const playerRole = await OBR.player.getRole();
+
+    if (metadataKey in sceneMetadata) {
+        const scene = sceneMetadata[metadataKey] as SceneMetadata;
+        let ignoreUpdateNotification = false;
+
+        if (metadataKey in roomMetadata) {
+            ignoreUpdateNotification = (roomMetadata[metadataKey] as RoomMetadata).ignoreUpdateNotification ?? false;
+        }
+        if (
+            playerRole === "GM" &&
+            !ignoreUpdateNotification &&
+            scene?.version &&
+            compare(scene.version, version, "<")
+        ) {
+            const width = await OBR.viewport.getWidth();
+            await OBR.modal.open({
+                ...changelogModal,
+                fullScreen: false,
+                height: 600,
+                width: Math.min(width * 0.9, 600),
+            });
+        } else if (playerRole === "GM" && scene?.version && compare(scene.version, version, "<")) {
+            await OBR.notification.show(`GM's Grimoire has been updated to version ${version}`, "SUCCESS");
+        }
+        if (scene && scene?.version && compare(scene.version, version, "<")) {
+            await updateSceneMetadata(scene, { version: version });
+        }
+    }
+};
+
 const migrations = async () => {
     const metadata = await OBR.scene.getMetadata();
     if (metadataKey in metadata) {
@@ -362,6 +396,11 @@ const migrations = async () => {
 };
 
 const sceneReady = async () => {
+    try {
+        await initGrimoire();
+    } catch (e) {
+        console.warn("GM's Grimoire - Error while initializing Grimoire", e);
+    }
     try {
         await migrations();
     } catch (e) {
