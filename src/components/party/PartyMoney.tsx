@@ -20,7 +20,11 @@ const RATES = {
 };
 
 const normalizeToCP = (money: MoneyIn): MoneyIn => {
-    let { pp, gp, ep, sp, cp } = { ...money };
+    let pp = Number(money.pp) || 0;
+    let gp = Number(money.gp) || 0;
+    let ep = Number(money.ep) || 0;
+    let sp = Number(money.sp) || 0;
+    let cp = Number(money.cp) || 0;
 
     // Step 1: Resolve negatives from left to right (borrow from higher)
     // 10CP = 1SP
@@ -94,6 +98,37 @@ const toCP = (money: MoneyIn): number => {
     );
 };
 
+const formatCP = (totalCP: number): string => {
+    let remaining = Math.abs(totalCP);
+    const parts: string[] = [];
+
+    if (remaining >= RATES.pp) {
+        const amount = Math.floor(remaining / RATES.pp);
+        parts.push(`${amount}pp`);
+        remaining %= RATES.pp;
+    }
+    if (remaining >= RATES.gp) {
+        const amount = Math.floor(remaining / RATES.gp);
+        parts.push(`${amount}gp`);
+        remaining %= RATES.gp;
+    }
+    if (remaining >= RATES.ep) {
+        const amount = Math.floor(remaining / RATES.ep);
+        parts.push(`${amount}ep`);
+        remaining %= RATES.ep;
+    }
+    if (remaining >= RATES.sp) {
+        const amount = Math.floor(remaining / RATES.sp);
+        parts.push(`${amount}sp`);
+        remaining %= RATES.sp;
+    }
+    if (remaining > 0) {
+        parts.push(`${remaining}cp`);
+    }
+
+    return parts.join(" ");
+};
+
 const resolveCalculation = (input: string, currentValue: number): number => {
     let value: number;
     if (input.startsWith("+") || input.startsWith("-")) {
@@ -151,7 +186,8 @@ const PartyMoneyContent = ({ party }: { party: PartyOut | undefined }) => {
         const totalCP = toCP(resolvedValues);
 
         if (totalCP < 0) {
-            setError("Not enough money present");
+            const deficit = formatCP(totalCP);
+            setError(`Not enough money present (Missing ${deficit})`);
             setTimeout(() => setError(null), 3000);
             return;
         }
@@ -196,7 +232,8 @@ const PartyMoneyContent = ({ party }: { party: PartyOut | undefined }) => {
         const totalCP = toCP(draftMoneyNumeric);
 
         if (totalCP < 0) {
-            setError("Not enough money present");
+            const deficit = formatCP(totalCP);
+            setError(`Not enough money present (Missing ${deficit})`);
             setTimeout(() => setError(null), 3000);
             form.setValue(key, currentValue as any);
         } else {
