@@ -13,6 +13,7 @@ import { PartyStatblocks } from "./PartyStatblocks.tsx";
 import { usePartyStore } from "../../context/PartyStore.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import { PartyInventory } from "./PartyInventory.tsx";
+import { PartyMoney } from "./PartyMoney.tsx";
 
 export const PartyModal = () => {
     return (
@@ -82,6 +83,7 @@ const GMContent = () => {
                     <h2 style={{ marginBottom: "0.5rem" }}>{currentParty?.name}</h2>
                     <PartyStatblocks />
                     <PartyInventory />
+                    <PartyMoney />
                 </div>
             ) : (
                 <div className={styles.partyModalContent}>No party selected</div>

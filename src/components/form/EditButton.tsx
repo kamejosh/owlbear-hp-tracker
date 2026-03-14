@@ -13,7 +13,11 @@ export type EditGroupProps = PropsWithChildren & {
 };
 export const EditButton = ({ onClick, alignCenter }: EditButtonProps) => {
     return (
-        <button onClick={onClick} className={`${styles.editButton} ${alignCenter ? "" : styles.editButtonTop}`}>
+        <button
+            type="button"
+            onClick={onClick}
+            className={`${styles.editButton} ${alignCenter ? "" : styles.editButtonTop}`}
+        >
             <Edit />
         </button>
     );

@@ -107,8 +107,7 @@ export const deleteAttachments = async (attachments: Item[]) => {
 export const evalString = (s: string) => {
     const tokens = s.replace(/\s/g, "").match(/[+\-]?([0-9]+)/g) || [];
 
-    // @ts-ignore this works but ts doesn't like it
-    return tokens.reduce((sum: string, value: string) => parseFloat(sum) + parseFloat(value));
+    return tokens.reduce((sum: number, value: string) => sum + parseFloat(value), 0);
 };
 
 export const sortItemsByGroupAndIndex = (a: Item, b: Item, scene: SceneMetadata | null) => {
