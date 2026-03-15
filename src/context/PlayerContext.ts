@@ -4,6 +4,7 @@ export type PlayerContextType = {
     role: string | null;
     id: string | null;
     name: string | null;
+    color: string | null;
 };
 
 export const PlayerContext = createContext<PlayerContextType | null>(null);

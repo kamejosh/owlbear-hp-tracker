@@ -401,6 +401,56 @@ const initMessageBus = async () => {
     });
 };
 
+const initPlayerParty = async () => {
+    OBR.room.onMetadataChange((metadata) => {
+        const currentParty = partyStore.getState().currentParty;
+        const room = useMetadataContext.getState().room;
+        const gmgMetadata = metadata[metadataKey] as RoomMetadata;
+        if (!_.isEqual(room, gmgMetadata) && gmgMetadata.partyId && gmgMetadata.partyId !== currentParty?.id) {
+            partyStore.getState().setCurrentParty(gmgMetadata.partyId);
+        }
+    });
+
+    OBR.scene.items.onChange((items) => {
+        const currentParty = partyStore.getState().currentParty;
+        const partyStatblocks = currentParty?.members.map((member) => member.statblock?.slug) || [];
+        items.forEach((item) => {
+            if (item.type === "IMAGE") {
+                const image = item as Image;
+                if (itemMetadataKey in item.metadata) {
+                    const data = item.metadata[itemMetadataKey] as GMGMetadata;
+
+                    if (data.sheet && partyStatblocks.includes(data.sheet)) {
+                        const member = currentParty?.members.find((member) => member.statblock?.slug === data.sheet);
+
+                        if (member) {
+                            const newMember: PartyStoreStatblock = { ...member };
+
+                            console.log(
+                                OBR.player.id,
+                                item.createdUserId,
+                                member.playerId,
+                                member.playerId === OBR.player.id,
+                            );
+                            if (item.createdUserId !== member.playerId) {
+                                newMember.playerId = item.createdUserId;
+                            }
+
+                            if (!member.imageUrl) {
+                                newMember.imageUrl = image.image.url;
+                            }
+
+                            if (!_.isEqual(member, newMember)) {
+                                partyStore.getState().updateMember(newMember);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+};
+
 const initParty = async () => {
     OBR.scene.onMetadataChange((metadata) => {
         const party = partyStore.getState().currentParty;
@@ -524,6 +574,12 @@ OBR.onReady(async () => {
             await initParty();
         } catch (e) {
             console.warn("GM's Grimoire - error while initializing Token event handler", e);
+        }
+    } else {
+        try {
+            await initPlayerParty();
+        } catch (e) {
+            console.warn("GM's Grimoire - error while initializing Player Party", e);
         }
     }
     try {

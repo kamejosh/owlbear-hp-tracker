@@ -1,15 +1,14 @@
 import { usePartyStore } from "../../context/PartyStore.tsx";
 import { useEffect, useState } from "react";
 import { MoneyIn, PartyOut, useGetParty, useUpdatePartyMoney } from "../../api/tabletop-almanac/useParty.ts";
-import { useLocalStorageState } from "ahooks";
 import { ID } from "../../helper/variables.ts";
-import { ChevronRight } from "@mui/icons-material";
 import { EditGroup } from "../form/EditButton.tsx";
 import { SubmitButton } from "../form/SubmitButton.tsx";
 import { Loader } from "../general/Loader.tsx";
 import { useForm } from "react-hook-form";
 import styles from "./party-inventory.module.scss";
 import { evalString } from "../../helper/helpers.ts";
+import { PartyCollapse } from "./PartyCollapse.tsx";
 
 const RATES = {
     pp: 1000,
@@ -334,10 +333,6 @@ export const PartyMoney = () => {
 
     const party = partyQuery.isSuccess ? partyQuery.data : undefined;
 
-    const [collapsed, setCollapsed] = useLocalStorageState<boolean>(`${ID}.party.money.collapsed`, {
-        defaultValue: false,
-    });
-
     useEffect(() => {
         if (currentParty) {
             setPartyId(currentParty.id);
@@ -345,24 +340,8 @@ export const PartyMoney = () => {
     }, [currentParty]);
 
     return (
-        <div>
-            <div
-                style={{
-                    display: "flex",
-                    gap: "1ch",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                }}
-            >
-                <h3>Money</h3>
-                <button
-                    onClick={() => setCollapsed(!collapsed)}
-                    style={{ display: "flex", gap: "1ch", alignItems: "center" }}
-                >
-                    <ChevronRight sx={{ rotate: collapsed ? "0deg" : "90deg", transition: "all 0.25s ease" }} />
-                </button>
-            </div>
-            {collapsed ? null : <PartyMoneyContent party={party} />}
-        </div>
+        <PartyCollapse storageKey={`${ID}.party.money.collapsed`} heading="Money">
+            <PartyMoneyContent party={party} />
+        </PartyCollapse>
     );
 };

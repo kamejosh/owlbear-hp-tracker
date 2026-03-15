@@ -1,22 +1,23 @@
 import { partyStore, PartyStoreStatblock, usePartyStore } from "../../context/PartyStore.tsx";
-import OBR, { Player } from "@owlbear-rodeo/sdk";
-import { useEffect, useState } from "react";
-import { isNull } from "lodash";
-import { Link } from "@mui/material";
-import Tippy from "@tippyjs/react";
-import { PaidRounded, ScaleRounded } from "@mui/icons-material";
-import { ID } from "../../helper/variables.ts";
-import { useE5GetStatblock } from "../../api/e5/useE5Api.ts";
-import { Loader } from "../general/Loader.tsx";
-import { useMetadataContext } from "../../context/MetadataContext.ts";
-
-import styles from "./party-inventory.module.scss";
 import { PartyCollapse } from "./PartyCollapse.tsx";
+import { ID } from "../../helper/variables.ts";
+import { usePlayerContext } from "../../context/PlayerContext.ts";
+import { useEffect, useState } from "react";
+import OBR, { Player } from "@owlbear-rodeo/sdk";
+import { useE5GetStatblock } from "../../api/e5/useE5Api.ts";
+import { useMetadataContext } from "../../context/MetadataContext.ts";
+import Tippy from "@tippyjs/react";
+import { Loader } from "../general/Loader.tsx";
+import { PaidRounded, ScaleRounded } from "@mui/icons-material";
+import styles from "./party-inventory.module.scss";
 
-const PartyStatblock = ({ member }: { member: PartyStoreStatblock }) => {
+export const PlayerPartyStatblock = ({ member }: { member: PartyStoreStatblock }) => {
+    const player = usePlayerContext();
     const [obrParty, setObrParty] = useState<Player[]>([]);
     const apiKey = useMetadataContext((state) => state.room?.tabletopAlmanacAPIKey);
-    const statblockQuery = useE5GetStatblock(member.statblock?.slug ?? "", apiKey);
+    const isOwner = player.id === member.playerId;
+
+    const statblockQuery = useE5GetStatblock(isOwner ? (member.statblock?.slug ?? "") : "", apiKey);
 
     useEffect(() => {
         const init = async () => {
@@ -25,7 +26,7 @@ const PartyStatblock = ({ member }: { member: PartyStoreStatblock }) => {
         void init();
     }, []);
 
-    const player = obrParty.find((p) => p.id === member.playerId);
+    const statblockPlayer = obrParty.find((p) => p.id === member.playerId);
     const statblock = statblockQuery.isSuccess ? statblockQuery.data : undefined;
 
     const totalWeight =
@@ -76,6 +77,34 @@ const PartyStatblock = ({ member }: { member: PartyStoreStatblock }) => {
 
         return <div style={{ display: "flex", gap: "0.5ch" }}>{parts}</div>;
     };
+
+    if (!isOwner) {
+        return (
+            <li
+                style={{
+                    background: statblockPlayer?.color
+                        ? `linear-gradient(to right, ${statblockPlayer.color}, transparent 20px)`
+                        : "transparent",
+                    borderRadius: "8px",
+                    padding: "5px 24px",
+                    textAlign: "left",
+                    border: "1px solid white",
+                    display: "flex",
+                    gap: "1ch",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    flexWrap: "wrap",
+                }}
+            >
+                <div style={{ display: "flex", gap: "0.5ch", alignItems: "center" }}>
+                    {member.imageUrl ? (
+                        <img src={member.imageUrl} alt={member.statblock?.name} style={{ height: "43px" }} />
+                    ) : null}
+                    <h4 style={{ margin: "1ch", whiteSpace: "nowrap" }}>{member.statblock?.name}</h4>
+                </div>
+            </li>
+        );
+    }
 
     return (
         <li
@@ -146,29 +175,20 @@ const PartyStatblock = ({ member }: { member: PartyStoreStatblock }) => {
     );
 };
 
-export const PartyStatblocks = () => {
+export const PlayerPartyStatblocks = () => {
     const currentParty = usePartyStore((state) => state.currentParty);
 
-    if (isNull(currentParty)) {
-        return <div>No party selected</div>;
-    }
-
-    if (currentParty.members.length === 0) {
-        return (
-            <div>
-                Party currently has no members. Go to{" "}
-                <Link href={"https://tabletop-almanac.com/party"}>Tabletop Almanac</Link> and update your party
-            </div>
-        );
-    }
-
     return (
-        <PartyCollapse storageKey={`${ID}.party.members.collapsed`} heading="Members">
+        <PartyCollapse storageKey={`${ID}.party.player.members.collapsed`} heading={"Statblocks"}>
             <ul style={{ listStyle: "none", padding: 0, display: "flex", gap: "1ch", flexDirection: "column" }}>
-                {currentParty.members.map((member) => {
-                    return <PartyStatblock member={member} key={member.partyStatblockId} />;
+                {currentParty?.members?.map((member) => {
+                    return <PlayerPartyStatblock member={member} key={member.partyStatblockId} />;
                 })}
             </ul>
         </PartyCollapse>
     );
+};
+
+export const PlayerParty = () => {
+    return <PlayerPartyStatblocks />;
 };

@@ -1,6 +1,5 @@
-import { useDebounceFn, useLocalStorageState } from "ahooks";
+import { useDebounceFn } from "ahooks";
 import { ID } from "../../helper/variables.ts";
-import { ChevronRight } from "@mui/icons-material";
 import { usePartyStore } from "../../context/PartyStore.tsx";
 import {
     PartyInventoryOut,
@@ -34,6 +33,7 @@ import { EditButton } from "../form/EditButton.tsx";
 import styles from "./party-inventory.module.scss";
 import { CancelButton } from "../form/CancelButton.tsx";
 import { ItemHover } from "../gmgrimoire/items/ItemHover.tsx";
+import { PartyCollapse } from "./PartyCollapse.tsx";
 
 export const AutoCompleteItemInput = (props: { error: string; onSelect: (value: number, item: ItemOut) => void }) => {
     const [items, setItems] = useState<Array<ItemOut>>([]);
@@ -456,29 +456,9 @@ export const PartyInventory = () => {
 
     const inventory: PartyInventoryOut = partyInventoryQuery.isSuccess ? partyInventoryQuery.data : null;
 
-    const [collapsed, setCollapsed] = useLocalStorageState<boolean>(`${ID}.party.inventory.collapsed`, {
-        defaultValue: false,
-    });
-
     return (
-        <div>
-            <div
-                style={{
-                    display: "flex",
-                    gap: "1ch",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                }}
-            >
-                <h3>Inventory</h3>
-                <button
-                    onClick={() => setCollapsed(!collapsed)}
-                    style={{ display: "flex", gap: "1ch", alignItems: "center" }}
-                >
-                    <ChevronRight sx={{ rotate: collapsed ? "0deg" : "90deg", transition: "all 0.25s ease" }} />
-                </button>
-            </div>
-            {collapsed ? null : <PartyInventoryItems inventory={inventory} />}
-        </div>
+        <PartyCollapse storageKey={`${ID}.party.inventory.collapsed`} heading={"Inventory"}>
+            <PartyInventoryItems inventory={inventory} />
+        </PartyCollapse>
     );
 };
