@@ -25,33 +25,7 @@ const normalizeToCP = (money: MoneyIn): MoneyIn => {
     let sp = Number(money.sp) || 0;
     let cp = Number(money.cp) || 0;
 
-    // Step 1: Resolve negatives from left to right (borrow from higher)
-    // 10CP = 1SP
-    if (cp < 0) {
-        const needed = Math.ceil(Math.abs(cp) / 10);
-        sp -= needed;
-        cp += needed * 10;
-    }
-    // 5SP = 1EP
-    if (sp < 0) {
-        const needed = Math.ceil(Math.abs(sp) / 5);
-        ep -= needed;
-        sp += needed * 5;
-    }
-    // 2EP = 1GP
-    if (ep < 0) {
-        const needed = Math.ceil(Math.abs(ep) / 2);
-        gp -= needed;
-        ep += needed * 2;
-    }
-    // 10GP = 1PP
-    if (gp < 0) {
-        const needed = Math.ceil(Math.abs(gp) / 10);
-        pp -= needed;
-        gp += needed * 10;
-    }
-
-    // Step 2: Resolve negatives from right to left (borrow from lower)
+    // Step 1: Resolve negatives from right to left (borrow from lower)
     // If PP is negative, we MUST borrow from GP. 1PP = 10GP
     if (pp < 0) {
         const needed = Math.abs(pp) * 10;
@@ -75,6 +49,32 @@ const normalizeToCP = (money: MoneyIn): MoneyIn => {
         const needed = Math.abs(sp) * 10;
         cp -= needed;
         sp = 0;
+    }
+
+    // Step 2: Resolve negatives from left to right (borrow from higher)
+    // 10CP = 1SP
+    if (cp < 0) {
+        const needed = Math.ceil(Math.abs(cp) / 10);
+        sp -= needed;
+        cp += needed * 10;
+    }
+    // 5SP = 1EP
+    if (sp < 0) {
+        const needed = Math.ceil(Math.abs(sp) / 5);
+        ep -= needed;
+        sp += needed * 5;
+    }
+    // 2EP = 1GP
+    if (ep < 0) {
+        const needed = Math.ceil(Math.abs(ep) / 2);
+        gp -= needed;
+        ep += needed * 2;
+    }
+    // 10GP = 1PP
+    if (gp < 0) {
+        const needed = Math.ceil(Math.abs(gp) / 10);
+        pp -= needed;
+        gp += needed * 10;
     }
 
     // Since we check totalCP >= 0 before calling this, we should be at 0 or higher for all now.
@@ -132,9 +132,9 @@ const resolveCalculation = (input: string, currentValue: number): number => {
     let value: number;
     if (input.startsWith("+") || input.startsWith("-")) {
         const result = evalString(input);
-        value = Number(currentValue) + result;
+        value = Number(currentValue) + Number(result);
     } else if (input.includes("+") || input.includes("-")) {
-        value = evalString(input);
+        value = Number(evalString(input));
     } else {
         const parsed = parseFloat(input);
         value = isNaN(parsed) ? currentValue : parsed;
