@@ -39,6 +39,7 @@ import { registerMessageHandlers } from "./api.ts";
 import _, { isNull, isUndefined } from "lodash";
 import { useMetadataContext } from "../context/MetadataContext.ts";
 import { partyStore, PartyStoreStatblock } from "../context/PartyStore.tsx";
+import { listParties, PartyPagination } from "../api/tabletop-almanac/useParty.ts";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -401,7 +402,64 @@ const initMessageBus = async () => {
     });
 };
 
+const initPlayerPartyMembers = async (items: Array<Item>) => {
+    const currentParty = partyStore.getState().currentParty;
+    const partyStatblocks = currentParty?.members.map((member) => member.statblock?.slug) || [];
+    items.forEach((item) => {
+        if (item.type === "IMAGE") {
+            const image = item as Image;
+            if (itemMetadataKey in item.metadata) {
+                const data = item.metadata[itemMetadataKey] as GMGMetadata;
+
+                if (data.sheet && partyStatblocks.includes(data.sheet)) {
+                    const member = currentParty?.members.find((member) => member.statblock?.slug === data.sheet);
+
+                    if (member) {
+                        const newMember: PartyStoreStatblock = { ...member };
+
+                        if (item.createdUserId !== member.playerId) {
+                            newMember.playerId = item.createdUserId;
+                        }
+
+                        if (!member.imageUrl) {
+                            newMember.imageUrl = image.image.url;
+                        }
+
+                        if (!_.isEqual(member, newMember)) {
+                            partyStore.getState().updateMember(newMember);
+                        }
+                    }
+                }
+            }
+        }
+    });
+};
+
 const initPlayerParty = async () => {
+    const room = await OBR.room.getMetadata();
+    const addParty = partyStore.getState().addParty;
+    if (metadataKey in room) {
+        const roomMetadata = room[metadataKey] as RoomMetadata;
+        const apiKey = roomMetadata.tabletopAlmanacAPIKey;
+        if (apiKey) {
+            try {
+                const partQuery = await listParties({ params: { limit: 100, offset: 0 }, token: apiKey });
+                const parties = partQuery.data as PartyPagination;
+                parties.page.forEach((party) => {
+                    addParty(party);
+                });
+                if (roomMetadata.partyId) {
+                    partyStore.getState().setCurrentParty(roomMetadata.partyId);
+                }
+            } catch (e) {
+                console.error("GM's Grimoire - Error while fetching parties", e);
+            }
+        }
+    }
+
+    const items = await OBR.scene.items.getItems();
+    await initPlayerPartyMembers(items);
+
     OBR.room.onMetadataChange((metadata) => {
         const currentParty = partyStore.getState().currentParty;
         const room = useMetadataContext.getState().room;
@@ -412,42 +470,7 @@ const initPlayerParty = async () => {
     });
 
     OBR.scene.items.onChange((items) => {
-        const currentParty = partyStore.getState().currentParty;
-        const partyStatblocks = currentParty?.members.map((member) => member.statblock?.slug) || [];
-        items.forEach((item) => {
-            if (item.type === "IMAGE") {
-                const image = item as Image;
-                if (itemMetadataKey in item.metadata) {
-                    const data = item.metadata[itemMetadataKey] as GMGMetadata;
-
-                    if (data.sheet && partyStatblocks.includes(data.sheet)) {
-                        const member = currentParty?.members.find((member) => member.statblock?.slug === data.sheet);
-
-                        if (member) {
-                            const newMember: PartyStoreStatblock = { ...member };
-
-                            console.log(
-                                OBR.player.id,
-                                item.createdUserId,
-                                member.playerId,
-                                member.playerId === OBR.player.id,
-                            );
-                            if (item.createdUserId !== member.playerId) {
-                                newMember.playerId = item.createdUserId;
-                            }
-
-                            if (!member.imageUrl) {
-                                newMember.imageUrl = image.image.url;
-                            }
-
-                            if (!_.isEqual(member, newMember)) {
-                                partyStore.getState().updateMember(newMember);
-                            }
-                        }
-                    }
-                }
-            }
-        });
+        initPlayerPartyMembers(items);
     });
 };
 

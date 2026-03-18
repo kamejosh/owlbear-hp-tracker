@@ -25,7 +25,7 @@ export type E5StatblockIn = components["schemas"]["E5StatblockIn"];
 
 export type ListPartiesParams = NonNullable<operations["list_parties"]["parameters"]["query"]>;
 
-const listParties = async ({ params, token }: { params: ListPartiesParams; token: string }) => {
+export const listParties = async ({ params, token }: { params: ListPartiesParams; token: string }) => {
     const headers = {
         "X-API-Key": token,
     };
@@ -71,6 +71,7 @@ export const useGetParty = (partyId: number | undefined) => {
             return (await getParty({ partyId: partyId, token: token || "" })).data as PartyOut;
         },
         enabled: !!partyId,
+        refetchOnWindowFocus: true,
     });
 };
 
@@ -105,6 +106,8 @@ export const useGetPartyInventory = (partyId: number | undefined, inventoryId: n
             return (await getPartyInventory({ partyId, inventoryId, token: token || "" })).data;
         },
         enabled: !!partyId && !!inventoryId,
+        refetchInterval: 10000,
+        refetchOnWindowFocus: true,
     });
 };
 
@@ -567,8 +570,9 @@ export const useAddPartyStatblockEquipment = (partyId: number) => {
                 })
             ).data;
         },
-        onSuccess: () => {
+        onSuccess: (_data, variables) => {
             queryClient.invalidateQueries({ queryKey: ["partyInventory", partyId] });
+            queryClient.invalidateQueries({ queryKey: ["equipment", partyId, variables.partyStatblockId] });
         },
     });
 };
@@ -597,7 +601,12 @@ const updatePartyStatblockEquipment = ({
     });
 };
 
-export const useUpdatePartyStatblockEquipment = (partyId: number, partyStatblockId: number, equipmentId: number) => {
+export const useUpdatePartyStatblockEquipment = (
+    partyId: number,
+    partyStatblockId: number,
+    equipmentId: number,
+    slug: string,
+) => {
     const queryClient = useQueryClient();
     const token = useMetadataContext.getState().room?.tabletopAlmanacAPIKey;
 
@@ -617,6 +626,9 @@ export const useUpdatePartyStatblockEquipment = (partyId: number, partyStatblock
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ["equipment", partyId, partyStatblockId],
+            });
+            queryClient.invalidateQueries({
+                queryKey: ["slug", slug],
             });
         },
     });

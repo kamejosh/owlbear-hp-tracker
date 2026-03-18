@@ -16,7 +16,6 @@ import { PartyInventory } from "./PartyInventory.tsx";
 import { PartyMoney } from "./PartyMoney.tsx";
 import { PartyLinks } from "./PartyLinks.tsx";
 import { PlayerParty } from "./PlayerParty.tsx";
-import { useListParties } from "../../api/tabletop-almanac/useParty.ts";
 
 export const PartyModal = () => {
     return (
@@ -98,17 +97,6 @@ const GMContent = () => {
 
 const PlayerContent = () => {
     const currentParty = usePartyStore((state) => state.currentParty);
-    const addParty = usePartyStore((state) => state.addParty);
-
-    const partyQuery = useListParties({ limit: 100, offset: 0 });
-
-    useEffect(() => {
-        if (partyQuery.isSuccess) {
-            partyQuery.data.page.forEach((party) => {
-                addParty(party);
-            });
-        }
-    }, [partyQuery.isSuccess]);
 
     if (!currentParty) {
         return <div>No party selected</div>;
