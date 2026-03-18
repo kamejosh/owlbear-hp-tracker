@@ -17,7 +17,7 @@ import {
     AutoAwesome as AttunedIcon,
 } from "@mui/icons-material";
 import RemoveModeratorIcon from "@mui/icons-material/RemoveModerator";
-import { StatblockItems } from "../../helper/equipmentHelpers.ts";
+import { handleEquipmentChange, StatblockItems } from "../../helper/equipmentHelpers.ts";
 import {
     useGetParty,
     useUpdatePartyInventory,
@@ -35,22 +35,27 @@ import {
     useInteractions,
 } from "@floating-ui/react";
 import { ItemHover } from "../gmgrimoire/items/ItemHover.tsx";
+import { useTokenListContext } from "../../context/TokenContext.tsx";
+import { E5Statblock } from "../../api/e5/useE5Api.ts";
 
 export const PlayerPartyStatblockItem = ({
     item,
     partyId,
     inventoryId,
-    partyStatblockId,
     slug,
+    statblock,
+    member,
 }: {
     item: StatblockItems;
     partyId: number;
     inventoryId: number;
-    partyStatblockId: number;
     slug: string;
+    member: PartyStoreStatblock;
+    statblock: E5Statblock;
 }) => {
-    const updateStatblockEquipment = useUpdatePartyStatblockEquipment(partyId, partyStatblockId, item.id, slug);
+    const updateStatblockEquipment = useUpdatePartyStatblockEquipment(partyId, member.partyStatblockId, item.id, slug);
     const updatePartyInventory = useUpdatePartyInventory(partyId, inventoryId);
+    const tokens = useTokenListContext((state) => state.tokens);
 
     const [isOpen, setIsOpen] = useState(false);
 
@@ -68,6 +73,35 @@ export const PlayerPartyStatblockItem = ({
     });
 
     const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
+
+    const onEquipmentChange = async (equipped: boolean, attuned: boolean) => {
+        const token = [...(tokens?.values() ?? [])].find(
+            (t) =>
+                t.item.createdUserId === member.playerId &&
+                t.item.image.url === member.imageUrl &&
+                t.data.sheet === member.statblock?.slug,
+        );
+        if (token && statblock) {
+            const equippedSlugs = [...(token.data.equipment?.equipped || [])];
+            const attunedSlugs = [...(token.data.equipment?.attuned || [])];
+
+            const itemIndexEquipped = equippedSlugs.findIndex((s) => s === item.item.slug);
+            if (equipped && itemIndexEquipped === -1) {
+                equippedSlugs.push(item.item.slug);
+            } else if (!equipped && itemIndexEquipped !== -1) {
+                equippedSlugs.splice(itemIndexEquipped, 1);
+            }
+
+            const itemIndexAttuned = attunedSlugs.findIndex((s) => s === item.item.slug);
+            if (attuned && itemIndexAttuned === -1) {
+                attunedSlugs.push(item.item.slug);
+            } else if (!attuned && itemIndexAttuned !== -1) {
+                attunedSlugs.splice(itemIndexAttuned, 1);
+            }
+
+            await handleEquipmentChange(token.data, equippedSlugs, attunedSlugs, statblock, token.item);
+        }
+    };
 
     return (
         <div
@@ -118,8 +152,9 @@ export const PlayerPartyStatblockItem = ({
                     <Tippy content={`Toggle Equipped - Current: ${item.equipped ? "equipped" : "not equipped"}`}>
                         <button
                             className={"button"}
-                            onClick={() => {
-                                updateStatblockEquipment.mutateAsync({ equipped: !item.equipped });
+                            onClick={async () => {
+                                await updateStatblockEquipment.mutateAsync({ equipped: !item.equipped });
+                                await onEquipmentChange(!item.equipped, item.attuned);
                             }}
                             disabled={updateStatblockEquipment.isPending || updatePartyInventory.isPending}
                         >
@@ -131,8 +166,9 @@ export const PlayerPartyStatblockItem = ({
                     <Tippy content={`Toggle Attunement - Current: ${item.attuned ? "attuned" : "not attuned"}`}>
                         <button
                             className={"button"}
-                            onClick={() => {
-                                updateStatblockEquipment.mutateAsync({ attuned: !item.attuned });
+                            onClick={async () => {
+                                await updateStatblockEquipment.mutateAsync({ attuned: !item.attuned });
+                                await onEquipmentChange(item.equipped, !item.attuned);
                             }}
                             disabled={updateStatblockEquipment.isPending || updatePartyInventory.isPending}
                         >
@@ -144,11 +180,12 @@ export const PlayerPartyStatblockItem = ({
                     <button
                         className={"delete button"}
                         disabled={updateStatblockEquipment.isPending || updatePartyInventory.isPending}
-                        onClick={() => {
-                            updatePartyInventory.mutateAsync({
+                        onClick={async () => {
+                            await updatePartyInventory.mutateAsync({
                                 new_items: [{ item_id: item.item.id, count: item.count ?? 0 }],
                             });
-                            updateStatblockEquipment.mutateAsync({ remove: item.count });
+                            await updateStatblockEquipment.mutateAsync({ remove: item.count });
+                            await onEquipmentChange(false, false);
                         }}
                     >
                         <GroupRounded />
@@ -204,8 +241,9 @@ export const PlayerPartyStatblockEquipment = ({ member }: { member: PartyStoreSt
                         item={item}
                         partyId={currentParty.id}
                         inventoryId={party.inventory?.id || 0}
-                        partyStatblockId={member.partyStatblockId}
                         slug={statblock.slug ?? ""}
+                        statblock={statblock}
+                        member={member}
                         key={index}
                     />
                 ))}
