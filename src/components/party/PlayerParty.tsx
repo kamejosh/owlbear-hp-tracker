@@ -33,7 +33,6 @@ import {
     useGetPartyInventory,
     PartyInventoryOut,
     PartyItemOut,
-    PartyStatblockOut,
     useAddPartyStatblockEquipment,
     StatblockItemIn,
 } from "../../api/tabletop-almanac/useParty.ts";
@@ -51,8 +50,8 @@ import {
 import { ItemHover } from "../gmgrimoire/items/ItemHover.tsx";
 import { useTokenListContext } from "../../context/TokenContext.tsx";
 import { E5Statblock } from "../../api/e5/useE5Api.ts";
-import { useForm } from "react-hook-form";
-import { PartyInventoryItems, sortInventory } from "./PartyInventory.tsx";
+import { useForm, useWatch } from "react-hook-form";
+import { sortInventory } from "./PartyInventory.tsx";
 import { EditButton } from "../form/EditButton.tsx";
 import { NumberInput, SelectInput } from "../form/RHFInputs.tsx";
 import { SubmitButton } from "../form/SubmitButton.tsx";
@@ -394,31 +393,26 @@ export const PlayerPartyStatblockItem = ({
     };
 
     return (
-        <div
-            style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "1ch",
-                padding: "0.5ch 1ch",
-                borderRadius: "8px",
-                width: "100%",
-                backgroundColor: "#2b2a33",
-            }}
-        >
-            <div style={{ flexGrow: 1 }}>
-                <span ref={refs.setReference} {...getReferenceProps()}>
-                    {item.count} x {item.item.name}{" "}
-                    <span style={{ fontStyle: "italic", fontSize: "0.8rem" }}>{item.item.rarity}</span>
-                </span>
-                <span style={{ display: "flex", alignItems: "center" }}>
+        <div className={styles.inventoryItem}>
+            <div className={styles.itemMain}>
+                <span>{item.count} x </span>
+                <div className={styles.itemInfo}>
+                    <b ref={refs.setReference} {...getReferenceProps()} className={styles.itemName}>
+                        {item.item.name}
+                    </b>
+                    <span className={styles.itemMeta}>
+                        {item.item.rarity} - {item.item.source}
+                    </span>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "1ch" }}>
                     {item.equipped ? (
                         <Tippy content={"is equipped"}>
-                            <b>E</b>
+                            <b style={{ color: "var(--color-primary)" }}>E</b>
                         </Tippy>
                     ) : null}
                     {item.attuned ? (
                         <Tippy content={"is attuned"}>
-                            <b>A</b>
+                            <b style={{ color: "var(--color-secondary)" }}>A</b>
                         </Tippy>
                     ) : null}
                     {item.proficient ? (
@@ -427,21 +421,31 @@ export const PlayerPartyStatblockItem = ({
                         </Tippy>
                     ) : null}
                     {item.item.cost ? (
-                        <span style={{ marginLeft: "10px", fontSize: "0.8rem" }}>
-                            {item.item.cost.pp ? `${item.item.cost?.pp}PP` : null}{" "}
-                            {item.item.cost.gp ? `${item.item.cost?.gp}GP` : null}{" "}
-                            {item.item.cost.ep ? `${item.item.cost?.ep}EP` : null}{" "}
-                            {item.item.cost.sp ? `${item.item.cost?.sp}SP` : null}{" "}
-                            {item.item.cost.cp ? `${item.item.cost?.cp}CP` : null}
-                        </span>
+                        <div className={styles.itemCost}>
+                            {item.item.cost.pp ? (
+                                <span className={`${styles.costItem} ${styles.pp}`}>{item.item.cost.pp}PP</span>
+                            ) : null}
+                            {item.item.cost.gp ? (
+                                <span className={`${styles.costItem} ${styles.gp}`}>{item.item.cost.gp}GP</span>
+                            ) : null}
+                            {item.item.cost.ep ? (
+                                <span className={`${styles.costItem} ${styles.ep}`}>{item.item.cost.ep}EP</span>
+                            ) : null}
+                            {item.item.cost.sp ? (
+                                <span className={`${styles.costItem} ${styles.sp}`}>{item.item.cost.sp}SP</span>
+                            ) : null}
+                            {item.item.cost.cp ? (
+                                <span className={`${styles.costItem} ${styles.cp}`}>{item.item.cost.cp}CP</span>
+                            ) : null}
+                        </div>
                     ) : null}
-                </span>
+                </div>
             </div>
-            <div className={"buttons"} style={{ justifySelf: "flex-end", display: "flex", gap: "1ch" }}>
+            <div className={styles.actions}>
                 {item.item.can_equip ? (
                     <Tippy content={`Toggle Equipped - Current: ${item.equipped ? "equipped" : "not equipped"}`}>
                         <button
-                            className={"button"}
+                            className={styles.editButton}
                             onClick={async () => {
                                 await updateStatblockEquipment.mutateAsync({ equipped: !item.equipped });
                                 await onEquipmentChange(!item.equipped, item.attuned);
@@ -455,7 +459,7 @@ export const PlayerPartyStatblockItem = ({
                 {item.item.requires_attuning ? (
                     <Tippy content={`Toggle Attunement - Current: ${item.attuned ? "attuned" : "not attuned"}`}>
                         <button
-                            className={"button"}
+                            className={styles.editButton}
                             onClick={async () => {
                                 await updateStatblockEquipment.mutateAsync({ attuned: !item.attuned });
                                 await onEquipmentChange(item.equipped, !item.attuned);
@@ -468,7 +472,7 @@ export const PlayerPartyStatblockItem = ({
                 ) : null}
                 <Tippy content={"Move To Party Inventory"}>
                     <button
-                        className={"delete button"}
+                        className={styles.editButton}
                         disabled={updateStatblockEquipment.isPending || updatePartyInventory.isPending}
                         onClick={async () => {
                             await updatePartyInventory.mutateAsync({
@@ -737,7 +741,8 @@ const EditPlayerPartyInventoryItem = ({
     setEditItem: (state: boolean) => void;
     inventoryId: number;
 }) => {
-    const addPartyStatblockEquipment = useAddPartyStatblockEquipment(partyId);
+    const [slug, setSlug] = useState<string>("");
+    const addPartyStatblockEquipment = useAddPartyStatblockEquipment(partyId, slug);
     const updatePartyInventory = useUpdatePartyInventory(partyId, inventoryId);
     const player = usePlayerContext();
     const members = usePartyStore((state) => state.currentParty?.members);
@@ -763,6 +768,18 @@ const EditPlayerPartyInventoryItem = ({
         },
     });
 
+    const partyStatblockId = useWatch({
+        control: form.control,
+        name: "partyStatblockId",
+    });
+
+    useEffect(() => {
+        const selectedMember = availableStatblocks.find((m) => m.partyStatblockId === Number(partyStatblockId));
+        if (selectedMember) {
+            setSlug(selectedMember.statblock?.slug ?? "");
+        }
+    }, [partyStatblockId, availableStatblocks]);
+
     const handleSubmit = async (data: { data: StatblockItemIn; partyStatblockId: number }) => {
         try {
             await updatePartyInventory.mutateAsync({
@@ -777,45 +794,47 @@ const EditPlayerPartyInventoryItem = ({
     };
 
     return availableStatblocks.length > 0 && item.count > 0 ? (
-        <form onSubmit={form.handleSubmit(handleSubmit)} className={partyStyles.editItemCount}>
-            <NumberInput
-                form={form}
-                fieldName={"data.count"}
-                label={"Count"}
-                required={true}
-                min={0}
-                max={item.count}
-            />
-            <SelectInput
-                form={form}
-                fieldName={"partyStatblockId"}
-                label={"Statblock"}
-                required={true}
-                className={partyStyles.wideSelect}
-                options={availableStatblocks.map((s) => {
-                    // @ts-ignore we test above that statblock is not null
-                    return { key: s.id.toString(), value: s.statblock.name };
-                })}
-            />
-            <button
-                className={"button delete"}
-                type={"button"}
-                onClick={() => setEditItem(false)}
-                style={{ marginTop: "10px" }}
-            >
-                Cancel
-            </button>
-            <SubmitButton
-                form={form}
-                pending={addPartyStatblockEquipment.isPending || updatePartyInventory.isPending}
-            />
+        <form onSubmit={form.handleSubmit(handleSubmit)} className={styles.editItemForm}>
+            <div style={{ display: "flex", flexGrow: 1, gap: "0.5ch" }}>
+                <NumberInput
+                    form={form}
+                    fieldName={"data.count"}
+                    label={"Count"}
+                    required={true}
+                    min={0}
+                    max={item.count}
+                />
+                <SelectInput
+                    form={form}
+                    fieldName={"partyStatblockId"}
+                    label={"Statblock"}
+                    required={true}
+                    options={availableStatblocks.map((s) => {
+                        // @ts-ignore we test above that statblock is not null
+                        return { key: s.partyStatblockId.toString(), value: s.statblock.name };
+                    })}
+                />
+            </div>
+            <div className={styles.actions}>
+                <SubmitButton
+                    form={form}
+                    pending={addPartyStatblockEquipment.isPending || updatePartyInventory.isPending}
+                />
+                <button
+                    type="button"
+                    className={`${styles.actionButton} ${styles.cancel}`}
+                    onClick={() => setEditItem(false)}
+                    disabled={addPartyStatblockEquipment.isPending || updatePartyInventory.isPending}
+                >
+                    <CloseRounded />
+                </button>
+            </div>
         </form>
     ) : (
         <button
-            className={"button delete"}
+            className={`${styles.actionButton} ${styles.cancel}`}
             type={"button"}
             onClick={() => setEditItem(false)}
-            style={{ marginTop: "10px" }}
         >
             {availableStatblocks.length === 0 ? "No Available Statblocks: Cancel" : "No Items available: Cancel"}
         </button>
@@ -826,12 +845,10 @@ export const PlayerPartyInventoryItem = ({
     item,
     partyId,
     inventoryId,
-    statblocks,
 }: {
     item: PartyItemOut;
     partyId: number;
     inventoryId: number;
-    statblocks: PartyStatblockOut[];
 }) => {
     const [editItem, setEditItem] = useState<boolean>(false);
 
@@ -853,34 +870,54 @@ export const PlayerPartyInventoryItem = ({
     const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
 
     return (
-        <div className={partyStyles.partyInventoryItem}>
-            <span>
-                {`${item.count} x `}
-                <b ref={refs.setReference} {...getReferenceProps()}>
-                    {item.item.name}
-                </b>
-                , <span style={{ fontStyle: "italic", fontSize: "0.8rem" }}>{item.item.rarity}</span>
-                {item.item.cost ? (
-                    <span style={{ marginLeft: "10px", fontSize: "0.8rem" }}>
-                        {item.item.cost.pp ? `${item.item.cost?.pp}PP` : null}{" "}
-                        {item.item.cost.gp ? `${item.item.cost?.gp}GP` : null}{" "}
-                        {item.item.cost.ep ? `${item.item.cost?.ep}EP` : null}{" "}
-                        {item.item.cost.sp ? `${item.item.cost?.sp}SP` : null}{" "}
-                        {item.item.cost.cp ? `${item.item.cost?.cp}CP` : null}
-                    </span>
-                ) : null}
+        <div className={styles.inventoryItem}>
+            <div className={styles.itemMain}>
                 {editItem ? (
                     <EditPlayerPartyInventoryItem
                         item={item}
                         partyId={partyId}
-                        statblocks={statblocks}
                         inventoryId={inventoryId}
                         setEditItem={setEditItem}
                     />
-                ) : null}
-            </span>
-            <span></span>
-            <EditButton onClick={() => setEditItem(!editItem)} alignCenter={true} />
+                ) : (
+                    <>
+                        <span>{item.count} x </span>
+                        <div className={styles.itemInfo}>
+                            <b ref={refs.setReference} {...getReferenceProps()} className={styles.itemName}>
+                                {item.item.name}
+                            </b>
+                            <span className={styles.itemMeta}>
+                                {item.item.rarity} - {item.item.source}
+                            </span>
+                        </div>
+                        {item.item.cost ? (
+                            <div className={styles.itemCost}>
+                                {item.item.cost.pp ? (
+                                    <span className={`${styles.costItem} ${styles.pp}`}>{item.item.cost.pp}PP</span>
+                                ) : null}
+                                {item.item.cost.gp ? (
+                                    <span className={`${styles.costItem} ${styles.gp}`}>{item.item.cost.gp}GP</span>
+                                ) : null}
+                                {item.item.cost.ep ? (
+                                    <span className={`${styles.costItem} ${styles.ep}`}>{item.item.cost.ep}EP</span>
+                                ) : null}
+                                {item.item.cost.sp ? (
+                                    <span className={`${styles.costItem} ${styles.sp}`}>{item.item.cost.sp}SP</span>
+                                ) : null}
+                                {item.item.cost.cp ? (
+                                    <span className={`${styles.costItem} ${styles.cp}`}>{item.item.cost.cp}CP</span>
+                                ) : null}
+                            </div>
+                        ) : null}
+                    </>
+                )}
+            </div>
+
+            {!editItem ? (
+                <div className={styles.actions}>
+                    <EditButton onClick={() => setEditItem(!editItem)} alignCenter={true} />
+                </div>
+            ) : null}
             {isOpen && (
                 <FloatingPortal>
                     <div
@@ -919,41 +956,39 @@ export const PlayerPartyInventoryItems = ({ party }: { party: PartyOut }) => {
     }
 
     return (
-        <div>
-            <select
-                style={{ width: "200px" }}
-                onChange={(e) => setSort(e.target.value as "name" | "rarity")}
-                value={sort}
-            >
-                <option value={"name"}>Sort by name</option>
-                <option value={"rarity"}>Sort by rarity</option>
-            </select>
-            {inventory?.items
-                ?.sort((a, b) => sortInventory(a, b, sort))
-                .map((item) => {
-                    return (
-                        <PlayerPartyInventoryItem
-                            key={item.id}
-                            item={item}
-                            partyId={party.id}
-                            statblocks={party.statblocks ?? []}
-                            inventoryId={party.inventory?.id ?? 0}
-                        />
-                    );
-                })}
+        <div className={styles.inventoryContainer}>
+            <div className={styles.controls}>
+                <select
+                    className={styles.select}
+                    onChange={(e) => setSort(e.target.value as "name" | "rarity")}
+                    value={sort}
+                >
+                    <option value={"name"}>Sort by name</option>
+                    <option value={"rarity"}>Sort by rarity</option>
+                </select>
+            </div>
+            <div className={styles.inventoryList}>
+                {inventory?.items
+                    ?.sort((a, b) => sortInventory(a, b, sort))
+                    .map((item) => {
+                        return (
+                            <PlayerPartyInventoryItem
+                                key={item.id}
+                                item={item}
+                                partyId={party.id}
+                                inventoryId={party.inventory?.id ?? 0}
+                            />
+                        );
+                    })}
+            </div>
         </div>
     );
 };
 
 export const PlayerPartyInventory = ({ party }: { party: PartyOut }) => {
     return (
-        <PartyCollapse storageKey={`${ID}.party.player.money.collapsed`} heading={"Party Inventory"}>
-            <div
-                className={styles.moneyContainer}
-                style={{ background: "rgba(0, 0, 0, 0.2)", padding: "1.2ch", borderRadius: "8px" }}
-            >
-                <PlayerPartyInventoryItems party={party} />
-            </div>
+        <PartyCollapse storageKey={`${ID}.party.player.inventory.collapsed`} heading={"Party Inventory"}>
+            <PlayerPartyInventoryItems party={party} />
         </PartyCollapse>
     );
 };

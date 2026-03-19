@@ -588,7 +588,7 @@ const addPartyStatblockEquipment = ({
     });
 };
 
-export const useAddPartyStatblockEquipment = (partyId: number) => {
+export const useAddPartyStatblockEquipment = (partyId: number, slug: string) => {
     const queryClient = useQueryClient();
     const token = useMetadataContext.getState().room?.tabletopAlmanacAPIKey;
 
@@ -607,6 +607,7 @@ export const useAddPartyStatblockEquipment = (partyId: number) => {
         onSuccess: (_data, variables) => {
             queryClient.invalidateQueries({ queryKey: ["partyInventory", partyId] });
             queryClient.invalidateQueries({ queryKey: ["equipment", partyId, variables.partyStatblockId] });
+            queryClient.invalidateQueries({ queryKey: ["slug", slug] });
         },
     });
 };
