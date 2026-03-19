@@ -291,10 +291,16 @@ export const PlayerStatblockMoney = ({ statblock, party }: { statblock: E5Statbl
                         <EditPlayerStatblockMoney statblock={statblock} party={party} setEdit={setEdit} />
                     ) : (
                         <>
-                            <div className={styles.moneyDisplay}>{formatMoney(money)}</div>
+                            <div
+                                className={styles.moneyDisplay}
+                                style={{ background: "rgba(0, 0, 0, 0.2)", padding: "1.2ch", borderRadius: "8px" }}
+                            >
+                                {formatMoney(money)}
+                            </div>
                             <Tippy content={"Edit Money"}>
                                 <button
                                     className={styles.editButton}
+                                    style={{ alignSelf: "center" }}
                                     onClick={() => {
                                         setEdit(!edit);
                                     }}
@@ -697,8 +703,15 @@ export const PlayerPartyStatblocks = ({ party }: { party: PartyOut }) => {
 
 export const PlayerPartyMoney = ({ party }: { party: PartyOut }) => {
     return (
-        <PartyCollapse storageKey={`${ID}.party.player.money.collapsed`} heading={"Money"}>
-            {formatMoney(party.money)}
+        <PartyCollapse storageKey={`${ID}.party.player.money.collapsed`} heading={"Party Money"}>
+            <div
+                className={styles.moneyContainer}
+                style={{ background: "rgba(0, 0, 0, 0.2)", padding: "1.2ch", borderRadius: "8px" }}
+            >
+                <div className={styles.moneyDisplay} style={{ justifyContent: "center", fontSize: "1rem" }}>
+                    {formatMoney(party.money ?? undefined)}
+                </div>
+            </div>
         </PartyCollapse>
     );
 };

@@ -104,6 +104,7 @@ export const useGetParty = (partyId: number | undefined) => {
         },
         enabled: !!partyId,
         refetchOnWindowFocus: true,
+        refetchInterval: 10000,
     });
 };
 

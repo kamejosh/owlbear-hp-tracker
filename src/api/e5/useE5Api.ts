@@ -69,6 +69,8 @@ export const useE5GetStatblock = (slug: string, apiKey?: string) => {
         queryKey: ["slug", slug],
         queryFn: () => fetchStatblock(slug, apiKey),
         enabled: slug !== "",
+        refetchOnWindowFocus: true,
+        refetchInterval: 10000,
     });
 };
 
