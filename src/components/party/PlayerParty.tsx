@@ -53,8 +53,6 @@ import { E5Statblock } from "../../api/e5/useE5Api.ts";
 import { useForm, useWatch } from "react-hook-form";
 import { sortInventory } from "./PartyInventory.tsx";
 import { EditButton } from "../form/EditButton.tsx";
-import { NumberInput, SelectInput } from "../form/RHFInputs.tsx";
-import { SubmitButton } from "../form/SubmitButton.tsx";
 
 export type Money = {
     cp: number;
@@ -795,31 +793,36 @@ const EditPlayerPartyInventoryItem = ({
 
     return availableStatblocks.length > 0 && item.count > 0 ? (
         <form onSubmit={form.handleSubmit(handleSubmit)} className={styles.editItemForm}>
-            <div style={{ display: "flex", flexGrow: 1, gap: "0.5ch" }}>
-                <NumberInput
-                    form={form}
-                    fieldName={"data.count"}
-                    label={"Count"}
-                    required={true}
-                    min={0}
-                    max={item.count}
-                />
-                <SelectInput
-                    form={form}
-                    fieldName={"partyStatblockId"}
-                    label={"Statblock"}
-                    required={true}
-                    options={availableStatblocks.map((s) => {
-                        // @ts-ignore we test above that statblock is not null
-                        return { key: s.partyStatblockId.toString(), value: s.statblock.name };
+            <div className={styles.formInput}>
+                <label>Count</label>
+                <input
+                    type="number"
+                    {...form.register("data.count", {
+                        required: true,
+                        min: 0,
+                        max: item.count,
+                        valueAsNumber: true,
                     })}
                 />
             </div>
-            <div className={styles.actions}>
-                <SubmitButton
-                    form={form}
-                    pending={addPartyStatblockEquipment.isPending || updatePartyInventory.isPending}
-                />
+            <div className={styles.formInput}>
+                <label>To</label>
+                <select {...form.register("partyStatblockId", { required: true, valueAsNumber: true })}>
+                    {availableStatblocks.map((s) => (
+                        <option key={s.partyStatblockId} value={s.partyStatblockId}>
+                            {s.statblock?.name}
+                        </option>
+                    ))}
+                </select>
+            </div>
+            <div className={styles.formActions}>
+                <button
+                    type="submit"
+                    className={`${styles.actionButton} ${styles.confirm}`}
+                    disabled={addPartyStatblockEquipment.isPending || updatePartyInventory.isPending}
+                >
+                    <CheckRounded />
+                </button>
                 <button
                     type="button"
                     className={`${styles.actionButton} ${styles.cancel}`}
