@@ -30,6 +30,12 @@ import {
     useUpdatePartyStatblockEquipment,
     useUpdatePlayerStatblock,
     convertE5StatblockOutToStatblockIn,
+    useGetPartyInventory,
+    PartyInventoryOut,
+    PartyItemOut,
+    PartyStatblockOut,
+    useAddPartyStatblockEquipment,
+    StatblockItemIn,
 } from "../../api/tabletop-almanac/useParty.ts";
 import {
     autoUpdate,
@@ -46,6 +52,10 @@ import { ItemHover } from "../gmgrimoire/items/ItemHover.tsx";
 import { useTokenListContext } from "../../context/TokenContext.tsx";
 import { E5Statblock } from "../../api/e5/useE5Api.ts";
 import { useForm } from "react-hook-form";
+import { PartyInventoryItems, sortInventory } from "./PartyInventory.tsx";
+import { EditButton } from "../form/EditButton.tsx";
+import { NumberInput, SelectInput } from "../form/RHFInputs.tsx";
+import { SubmitButton } from "../form/SubmitButton.tsx";
 
 export type Money = {
     cp: number;
@@ -716,6 +726,238 @@ export const PlayerPartyMoney = ({ party }: { party: PartyOut }) => {
     );
 };
 
+const EditPlayerPartyInventoryItem = ({
+    item,
+    partyId,
+    setEditItem,
+    inventoryId,
+}: {
+    item: PartyItemOut;
+    partyId: number;
+    setEditItem: (state: boolean) => void;
+    inventoryId: number;
+}) => {
+    const addPartyStatblockEquipment = useAddPartyStatblockEquipment(partyId);
+    const updatePartyInventory = useUpdatePartyInventory(partyId, inventoryId);
+    const player = usePlayerContext();
+    const members = usePartyStore((state) => state.currentParty?.members);
+
+    const availableStatblocks =
+        members?.filter((member) => {
+            return member.playerId === player.id;
+        }) ?? [];
+
+    const form = useForm<{ data: StatblockItemIn; partyStatblockId: number }>({
+        defaultValues: {
+            data: {
+                equipped: item.item.can_equip,
+                attuned: item.item.requires_attuning,
+                proficient: true,
+                item: item.item.id,
+                count: item.count,
+            },
+            partyStatblockId:
+                availableStatblocks && availableStatblocks.length > 0
+                    ? availableStatblocks[0].partyStatblockId
+                    : undefined,
+        },
+    });
+
+    const handleSubmit = async (data: { data: StatblockItemIn; partyStatblockId: number }) => {
+        try {
+            await updatePartyInventory.mutateAsync({
+                item_updates: [{ remove: data.data.count, item_id: item.item.id }],
+            });
+            await addPartyStatblockEquipment.mutateAsync(data);
+            setEditItem(false);
+        } catch (e) {
+            console.error(e);
+        }
+        setEditItem(false);
+    };
+
+    return availableStatblocks.length > 0 && item.count > 0 ? (
+        <form onSubmit={form.handleSubmit(handleSubmit)} className={partyStyles.editItemCount}>
+            <NumberInput
+                form={form}
+                fieldName={"data.count"}
+                label={"Count"}
+                required={true}
+                min={0}
+                max={item.count}
+            />
+            <SelectInput
+                form={form}
+                fieldName={"partyStatblockId"}
+                label={"Statblock"}
+                required={true}
+                className={partyStyles.wideSelect}
+                options={availableStatblocks.map((s) => {
+                    // @ts-ignore we test above that statblock is not null
+                    return { key: s.id.toString(), value: s.statblock.name };
+                })}
+            />
+            <button
+                className={"button delete"}
+                type={"button"}
+                onClick={() => setEditItem(false)}
+                style={{ marginTop: "10px" }}
+            >
+                Cancel
+            </button>
+            <SubmitButton
+                form={form}
+                pending={addPartyStatblockEquipment.isPending || updatePartyInventory.isPending}
+            />
+        </form>
+    ) : (
+        <button
+            className={"button delete"}
+            type={"button"}
+            onClick={() => setEditItem(false)}
+            style={{ marginTop: "10px" }}
+        >
+            {availableStatblocks.length === 0 ? "No Available Statblocks: Cancel" : "No Items available: Cancel"}
+        </button>
+    );
+};
+
+export const PlayerPartyInventoryItem = ({
+    item,
+    partyId,
+    inventoryId,
+    statblocks,
+}: {
+    item: PartyItemOut;
+    partyId: number;
+    inventoryId: number;
+    statblocks: PartyStatblockOut[];
+}) => {
+    const [editItem, setEditItem] = useState<boolean>(false);
+
+    const [isOpen, setIsOpen] = useState(false);
+
+    const { refs, floatingStyles, context } = useFloating({
+        open: isOpen,
+        onOpenChange: setIsOpen,
+        whileElementsMounted: autoUpdate,
+        placement: "top",
+        middleware: [offset(10), flip(), shift()],
+    });
+
+    const hover = useHover(context, {
+        handleClose: safePolygon(),
+        delay: { open: 200, close: 100 },
+    });
+
+    const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
+
+    return (
+        <div className={partyStyles.partyInventoryItem}>
+            <span>
+                {`${item.count} x `}
+                <b ref={refs.setReference} {...getReferenceProps()}>
+                    {item.item.name}
+                </b>
+                , <span style={{ fontStyle: "italic", fontSize: "0.8rem" }}>{item.item.rarity}</span>
+                {item.item.cost ? (
+                    <span style={{ marginLeft: "10px", fontSize: "0.8rem" }}>
+                        {item.item.cost.pp ? `${item.item.cost?.pp}PP` : null}{" "}
+                        {item.item.cost.gp ? `${item.item.cost?.gp}GP` : null}{" "}
+                        {item.item.cost.ep ? `${item.item.cost?.ep}EP` : null}{" "}
+                        {item.item.cost.sp ? `${item.item.cost?.sp}SP` : null}{" "}
+                        {item.item.cost.cp ? `${item.item.cost?.cp}CP` : null}
+                    </span>
+                ) : null}
+                {editItem ? (
+                    <EditPlayerPartyInventoryItem
+                        item={item}
+                        partyId={partyId}
+                        statblocks={statblocks}
+                        inventoryId={inventoryId}
+                        setEditItem={setEditItem}
+                    />
+                ) : null}
+            </span>
+            <span></span>
+            <EditButton onClick={() => setEditItem(!editItem)} alignCenter={true} />
+            {isOpen && (
+                <FloatingPortal>
+                    <div
+                        ref={refs.setFloating}
+                        style={{
+                            ...floatingStyles,
+                            backgroundColor: "#2b2a33dd",
+                            border: "1px solid #ddd",
+                            padding: "8px",
+                            borderRadius: "8px",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                            zIndex: 100,
+                        }}
+                        {...getFloatingProps()}
+                    >
+                        <ItemHover item={item.item} />
+                    </div>
+                </FloatingPortal>
+            )}
+        </div>
+    );
+};
+
+export const PlayerPartyInventoryItems = ({ party }: { party: PartyOut }) => {
+    const inventoryQuery = useGetPartyInventory(party.id, party.inventory?.id ?? 0);
+    const [sort, setSort] = useState<"name" | "rarity">("name");
+
+    if (inventoryQuery.isLoading) {
+        return <Loader />;
+    }
+
+    const inventory = inventoryQuery.data as PartyInventoryOut;
+
+    if (inventory?.items?.length === 0) {
+        return <div>No items in inventory</div>;
+    }
+
+    return (
+        <div>
+            <select
+                style={{ width: "200px" }}
+                onChange={(e) => setSort(e.target.value as "name" | "rarity")}
+                value={sort}
+            >
+                <option value={"name"}>Sort by name</option>
+                <option value={"rarity"}>Sort by rarity</option>
+            </select>
+            {inventory?.items
+                ?.sort((a, b) => sortInventory(a, b, sort))
+                .map((item) => {
+                    return (
+                        <PlayerPartyInventoryItem
+                            key={item.id}
+                            item={item}
+                            partyId={party.id}
+                            statblocks={party.statblocks ?? []}
+                            inventoryId={party.inventory?.id ?? 0}
+                        />
+                    );
+                })}
+        </div>
+    );
+};
+
+export const PlayerPartyInventory = ({ party }: { party: PartyOut }) => {
+    return (
+        <PartyCollapse storageKey={`${ID}.party.player.money.collapsed`} heading={"Party Inventory"}>
+            <div
+                className={styles.moneyContainer}
+                style={{ background: "rgba(0, 0, 0, 0.2)", padding: "1.2ch", borderRadius: "8px" }}
+            >
+                <PlayerPartyInventoryItems party={party} />
+            </div>
+        </PartyCollapse>
+    );
+};
+
 export const PlayerParty = () => {
     const currentParty = usePartyStore((state) => state.currentParty);
     const partyQuery = useGetParty(currentParty?.id ?? 0);
@@ -734,6 +976,7 @@ export const PlayerParty = () => {
         <>
             <PlayerPartyStatblocks party={party} />
             <PlayerPartyMoney party={party} />
+            <PlayerPartyInventory party={party} />
         </>
     );
 };
