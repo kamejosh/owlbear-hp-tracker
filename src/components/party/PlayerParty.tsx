@@ -132,8 +132,14 @@ export const EditPlayerStatblockMoney = ({
             pp: statblock?.money?.pp ?? 0,
         },
     });
+    const {
+        register,
+        watch,
+        formState: { isSubmitting },
+    } = form;
+    const watchedValues = watch();
 
-    const handleSubmit = async (data: MoneyIn) => {
+    const onSubmit = async (data: MoneyIn) => {
         try {
             const partyMoney = {
                 cp: Math.min(Math.max(maxValues.cp - (data.cp ?? 0), 0), maxValues.cp),
@@ -163,8 +169,72 @@ export const EditPlayerStatblockMoney = ({
         } catch (e) {}
     };
 
+    const getChanges = () => {
+        const changes: Partial<Money> = {};
+        let hasGains = false;
+        let hasLosses = false;
+
+        (["pp", "gp", "ep", "sp", "cp"] as const).forEach((currency) => {
+            const current = statblock?.money?.[currency] ?? 0;
+            const target = watchedValues[currency] ?? 0;
+            const diff = target - current;
+            if (diff !== 0) {
+                changes[currency] = diff;
+                if (diff > 0) hasGains = true;
+                if (diff < 0) hasLosses = true;
+            }
+        });
+
+        if (Object.keys(changes).length === 0) return null;
+
+        const formatChange = (c: Partial<Money>) => {
+            return (["pp", "gp", "ep", "sp", "cp"] as const)
+                .filter((curr) => c[curr] !== undefined && c[curr] !== 0)
+                .map((curr) => (
+                    <span key={curr} className={`${styles.costItem} ${styles[curr]}`}>
+                        {Math.abs(c[curr]!)}
+                        {curr}
+                    </span>
+                ));
+        };
+
+        if (hasGains && !hasLosses) {
+            return <div className={styles.moneyChangeMessage}>You will receive {formatChange(changes)}</div>;
+        }
+
+        if (!hasGains && hasLosses) {
+            return (
+                <div className={styles.moneyChangeMessage}>
+                    {formatChange(changes)} will be moved to the party inventory
+                </div>
+            );
+        }
+
+        const gains: Partial<Money> = {};
+        const losses: Partial<Money> = {};
+        (Object.keys(changes) as (keyof Money)[]).forEach((curr) => {
+            if (changes[curr]! > 0) gains[curr] = changes[curr];
+            else losses[curr] = changes[curr];
+        });
+
+        return (
+            <div className={styles.moneyChangeMessage} style={{ flexDirection: "column", alignItems: "flex-end" }}>
+                {Object.keys(gains).length > 0 && (
+                    <div style={{ display: "flex", gap: "0.5ch", alignItems: "center" }}>
+                        Receive {formatChange(gains)}
+                    </div>
+                )}
+                {Object.keys(losses).length > 0 && (
+                    <div style={{ display: "flex", gap: "0.5ch", alignItems: "center" }}>
+                        Move {formatChange(losses)} to party
+                    </div>
+                )}
+            </div>
+        );
+    };
+
     return (
-        <form onSubmit={form.handleSubmit(handleSubmit)} className={styles.moneyEditForm}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className={styles.moneyEditForm}>
             <div className={styles.moneyInputList}>
                 {(["pp", "gp", "ep", "sp", "cp"] as const).map((currency) => (
                     <div key={currency} className={styles.moneyInput}>
@@ -174,7 +244,7 @@ export const EditPlayerStatblockMoney = ({
                                 type="number"
                                 min={0}
                                 max={maxValues[currency]}
-                                {...form.register(currency, {
+                                {...register(currency, {
                                     valueAsNumber: true,
                                     max: maxValues[currency],
                                     min: 0,
@@ -185,17 +255,24 @@ export const EditPlayerStatblockMoney = ({
                 ))}
             </div>
             <div className={styles.formActions}>
-                <button type="submit" className="button" disabled={updateMoney.isPending || updateStatblock.isPending}>
-                    <CheckRounded />
-                </button>
-                <button
-                    type="button"
-                    className="button"
-                    onClick={() => setEdit(false)}
-                    disabled={updateMoney.isPending || updateStatblock.isPending}
-                >
-                    <CloseRounded />
-                </button>
+                {getChanges()}
+                <div style={{ display: "flex", gap: "1ch" }}>
+                    <button
+                        type="submit"
+                        className={`${styles.actionButton} ${styles.confirm}`}
+                        disabled={updateMoney.isPending || updateStatblock.isPending || isSubmitting}
+                    >
+                        <CheckRounded />
+                    </button>
+                    <button
+                        type="button"
+                        className={`${styles.actionButton} ${styles.cancel}`}
+                        onClick={() => setEdit(false)}
+                        disabled={updateMoney.isPending || updateStatblock.isPending || isSubmitting}
+                    >
+                        <CloseRounded />
+                    </button>
+                </div>
             </div>
         </form>
     );
@@ -207,28 +284,31 @@ export const PlayerStatblockMoney = ({ statblock, party }: { statblock: E5Statbl
     const money = statblock.money;
 
     return (
-        <>
+        <div className={styles.moneyContainer}>
             {money ? (
-                <div style={{ display: "flex", gap: "2rem", alignItems: "center" }}>
+                <>
                     {edit ? (
                         <EditPlayerStatblockMoney statblock={statblock} party={party} setEdit={setEdit} />
                     ) : (
-                        <div>{formatMoney(money)}</div>
+                        <>
+                            <div className={styles.moneyDisplay}>{formatMoney(money)}</div>
+                            <Tippy content={"Edit Money"}>
+                                <button
+                                    className={styles.editButton}
+                                    onClick={() => {
+                                        setEdit(!edit);
+                                    }}
+                                >
+                                    <CurrencyExchangeRounded />
+                                </button>
+                            </Tippy>
+                        </>
                     )}
-                    <button
-                        className={"button"}
-                        style={{ justifySelf: "flex-end", alignSelf: "flex-start" }}
-                        onClick={() => {
-                            setEdit(!edit);
-                        }}
-                    >
-                        <CurrencyExchangeRounded />
-                    </button>
-                </div>
+                </>
             ) : (
                 "Statblock has no money"
             )}
-        </>
+        </div>
     );
 };
 
