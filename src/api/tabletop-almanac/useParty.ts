@@ -23,6 +23,38 @@ export type StatblockEquipmentUpdate = components["schemas"]["StatblockEquipment
 export type E5StatblockOut = components["schemas"]["E5StatblockOut"];
 export type E5StatblockIn = components["schemas"]["E5StatblockIn"];
 
+export const convertE5StatblockOutToStatblockIn = (
+    statblockOut: E5StatblockOut,
+    excludeItem: boolean = false,
+): E5StatblockIn => {
+    const spells = statblockOut.spells?.map((spell) => spell.id);
+    const equipment = statblockOut.equipment?.map((e) => {
+        if (!excludeItem) {
+            return {
+                item: e.item.id,
+                equipped: e.equipped,
+                proficient: e.proficient,
+                embedded: e.embedded,
+                loot: e.loot,
+                attuned: e.attuned,
+                itemOut: e.item,
+                count: e.count,
+            };
+        } else {
+            return {
+                item: e.item.id,
+                equipped: e.equipped,
+                proficient: e.proficient,
+                embedded: e.embedded,
+                loot: e.loot,
+                attuned: e.attuned,
+                count: e.count,
+            };
+        }
+    });
+    return { ...statblockOut, spells: spells, equipment: equipment };
+};
+
 export type ListPartiesParams = NonNullable<operations["list_parties"]["parameters"]["query"]>;
 
 export const listParties = async ({ params, token }: { params: ListPartiesParams; token: string }) => {
@@ -376,7 +408,7 @@ export const updatePlayerStatblock = (id: string, statblockUpdate: E5StatblockIn
     });
 };
 
-export const useUpdatePlayerStatblock = (id: string) => {
+export const useUpdatePlayerStatblock = (id: string, slug: string) => {
     const token = useMetadataContext.getState().room?.tabletopAlmanacAPIKey;
     const queryClient = useQueryClient();
 
@@ -387,6 +419,7 @@ export const useUpdatePlayerStatblock = (id: string) => {
         },
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["player-statblock", id] });
+            await queryClient.invalidateQueries({ queryKey: ["slug", slug] });
         },
     });
 };

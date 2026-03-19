@@ -8,20 +8,28 @@ import { useE5GetStatblock } from "../../api/e5/useE5Api.ts";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
 import Tippy from "@tippyjs/react";
 import { Loader } from "../general/Loader.tsx";
-import { PaidRounded, ScaleRounded } from "@mui/icons-material";
+import { CurrencyExchangeRounded, ScaleRounded } from "@mui/icons-material";
 import styles from "./party-inventory.module.scss";
 import {
     VerifiedUser as EquippedIcon,
     GroupRounded,
     AutoAwesomeOutlined as UnattunedIcon,
     AutoAwesome as AttunedIcon,
+    CheckRounded,
+    CloseRounded,
 } from "@mui/icons-material";
 import RemoveModeratorIcon from "@mui/icons-material/RemoveModerator";
 import { handleEquipmentChange, StatblockItems } from "../../helper/equipmentHelpers.ts";
 import {
+    E5StatblockOut,
+    MoneyIn,
+    PartyOut,
     useGetParty,
     useUpdatePartyInventory,
+    useUpdatePartyMoney,
     useUpdatePartyStatblockEquipment,
+    useUpdatePlayerStatblock,
+    convertE5StatblockOutToStatblockIn,
 } from "../../api/tabletop-almanac/useParty.ts";
 import {
     autoUpdate,
@@ -37,6 +45,192 @@ import {
 import { ItemHover } from "../gmgrimoire/items/ItemHover.tsx";
 import { useTokenListContext } from "../../context/TokenContext.tsx";
 import { E5Statblock } from "../../api/e5/useE5Api.ts";
+import { useForm } from "react-hook-form";
+
+export type Money = {
+    cp: number;
+    sp: number;
+    ep: number;
+    gp: number;
+    pp: number;
+};
+
+const formatMoney = (money?: Money) => {
+    if (!money) {
+        return null;
+    }
+    const { pp, gp, ep, sp, cp } = money;
+    const parts = [];
+    if (pp)
+        parts.push(
+            <span key="pp" className={`${styles.costItem} ${styles.pp}`}>
+                {pp}pp
+            </span>,
+        );
+    if (gp)
+        parts.push(
+            <span key="gp" className={`${styles.costItem} ${styles.gp}`}>
+                {gp}gp
+            </span>,
+        );
+    if (ep)
+        parts.push(
+            <span key="ep" className={`${styles.costItem} ${styles.ep}`}>
+                {ep}ep
+            </span>,
+        );
+    if (sp)
+        parts.push(
+            <span key="sp" className={`${styles.costItem} ${styles.sp}`}>
+                {sp}sp
+            </span>,
+        );
+    if (cp)
+        parts.push(
+            <span key="cp" className={`${styles.costItem} ${styles.cp}`}>
+                {cp}cp
+            </span>,
+        );
+
+    if (parts.length === 0) {
+        return (
+            <span className={`${styles.costItem} ${styles.cp}`} style={{ opacity: 0.5 }}>
+                0cp
+            </span>
+        );
+    }
+
+    return <div style={{ display: "flex", gap: "0.5ch" }}>{parts}</div>;
+};
+
+export const EditPlayerStatblockMoney = ({
+    statblock,
+    party,
+    setEdit,
+}: {
+    statblock: E5Statblock;
+    party: PartyOut;
+    setEdit: (edit: boolean) => void;
+}) => {
+    const updateMoney = useUpdatePartyMoney(party.id, party.money?.id ?? 0);
+    const updateStatblock = useUpdatePlayerStatblock(statblock.id ?? "", statblock.slug ?? "");
+
+    const maxValues: Money = {
+        cp: (party.money?.cp ?? 0) + (statblock?.money?.cp ?? 0),
+        sp: (party.money?.sp ?? 0) + (statblock?.money?.sp ?? 0),
+        ep: (party.money?.ep ?? 0) + (statblock?.money?.ep ?? 0),
+        gp: (party.money?.gp ?? 0) + (statblock?.money?.gp ?? 0),
+        pp: (party.money?.pp ?? 0) + (statblock?.money?.pp ?? 0),
+    };
+
+    const form = useForm<MoneyIn>({
+        defaultValues: {
+            cp: statblock?.money?.cp ?? 0,
+            sp: statblock?.money?.sp ?? 0,
+            ep: statblock?.money?.ep ?? 0,
+            gp: statblock?.money?.gp ?? 0,
+            pp: statblock?.money?.pp ?? 0,
+        },
+    });
+
+    const handleSubmit = async (data: MoneyIn) => {
+        try {
+            const partyMoney = {
+                cp: Math.min(Math.max(maxValues.cp - (data.cp ?? 0), 0), maxValues.cp),
+                sp: Math.min(Math.max(maxValues.sp - (data.sp ?? 0), 0), maxValues.sp),
+                ep: Math.min(Math.max(maxValues.ep - (data.ep ?? 0), 0), maxValues.ep),
+                gp: Math.min(Math.max(maxValues.gp - (data.gp ?? 0), 0), maxValues.gp),
+                pp: Math.min(Math.max(maxValues.pp - (data.pp ?? 0), 0), maxValues.pp),
+            };
+
+            const statblockUpdate = convertE5StatblockOutToStatblockIn(statblock);
+
+            const statblockMoney: Money = {
+                cp: Math.min(Math.max(maxValues.cp - partyMoney.cp, 0), maxValues.cp),
+                sp: Math.min(Math.max(maxValues.sp - partyMoney.sp, 0), maxValues.sp),
+                ep: Math.min(Math.max(maxValues.ep - partyMoney.ep, 0), maxValues.ep),
+                gp: Math.min(Math.max(maxValues.gp - partyMoney.gp, 0), maxValues.gp),
+                pp: Math.min(Math.max(maxValues.pp - partyMoney.pp, 0), maxValues.pp),
+            };
+
+            await updateMoney.mutateAsync(partyMoney);
+            await updateStatblock.mutateAsync({
+                ...statblockUpdate,
+                money: statblockMoney,
+            });
+
+            setEdit(false);
+        } catch (e) {}
+    };
+
+    return (
+        <form onSubmit={form.handleSubmit(handleSubmit)} className={styles.moneyEditForm}>
+            <div className={styles.moneyInputList}>
+                {(["pp", "gp", "ep", "sp", "cp"] as const).map((currency) => (
+                    <div key={currency} className={styles.moneyInput}>
+                        <label className={styles[currency]}>{currency}</label>
+                        <Tippy content={`Max available: ${maxValues[currency]}`}>
+                            <input
+                                type="number"
+                                min={0}
+                                max={maxValues[currency]}
+                                {...form.register(currency, {
+                                    valueAsNumber: true,
+                                    max: maxValues[currency],
+                                    min: 0,
+                                })}
+                            />
+                        </Tippy>
+                    </div>
+                ))}
+            </div>
+            <div className={styles.formActions}>
+                <button type="submit" className="button" disabled={updateMoney.isPending || updateStatblock.isPending}>
+                    <CheckRounded />
+                </button>
+                <button
+                    type="button"
+                    className="button"
+                    onClick={() => setEdit(false)}
+                    disabled={updateMoney.isPending || updateStatblock.isPending}
+                >
+                    <CloseRounded />
+                </button>
+            </div>
+        </form>
+    );
+};
+
+export const PlayerStatblockMoney = ({ statblock, party }: { statblock: E5StatblockOut; party: PartyOut }) => {
+    const [edit, setEdit] = useState<boolean>(false);
+
+    const money = statblock.money;
+
+    return (
+        <>
+            {money ? (
+                <div style={{ display: "flex", gap: "2rem", alignItems: "center" }}>
+                    {edit ? (
+                        <EditPlayerStatblockMoney statblock={statblock} party={party} setEdit={setEdit} />
+                    ) : (
+                        <div>{formatMoney(money)}</div>
+                    )}
+                    <button
+                        className={"button"}
+                        style={{ justifySelf: "flex-end", alignSelf: "flex-start" }}
+                        onClick={() => {
+                            setEdit(!edit);
+                        }}
+                    >
+                        <CurrencyExchangeRounded />
+                    </button>
+                </div>
+            ) : (
+                "Statblock has no money"
+            )}
+        </>
+    );
+};
 
 export const PlayerPartyStatblockItem = ({
     item,
@@ -251,7 +445,7 @@ export const PlayerPartyStatblockEquipment = ({ member }: { member: PartyStoreSt
     );
 };
 
-export const PlayerPartyStatblock = ({ member }: { member: PartyStoreStatblock }) => {
+export const PlayerPartyStatblock = ({ member, party }: { member: PartyStoreStatblock; party: PartyOut }) => {
     const player = usePlayerContext();
     const [obrParty, setObrParty] = useState<Player[]>([]);
     const apiKey = useMetadataContext((state) => state.room?.tabletopAlmanacAPIKey);
@@ -272,53 +466,30 @@ export const PlayerPartyStatblock = ({ member }: { member: PartyStoreStatblock }
     const totalWeight =
         statblock?.equipment?.reduce((acc, eq) => acc + (eq.item.weight ?? 0) * (eq.count ?? 1), 0) ?? 0;
 
-    const formatMoney = () => {
-        if (!statblock?.money) return null;
-        const { pp, gp, ep, sp, cp } = statblock.money;
-        const parts = [];
-        if (pp)
-            parts.push(
-                <span key="pp" className={`${styles.costItem} ${styles.pp}`}>
-                    {pp}pp
-                </span>,
-            );
-        if (gp)
-            parts.push(
-                <span key="gp" className={`${styles.costItem} ${styles.gp}`}>
-                    {gp}gp
-                </span>,
-            );
-        if (ep)
-            parts.push(
-                <span key="ep" className={`${styles.costItem} ${styles.ep}`}>
-                    {ep}ep
-                </span>,
-            );
-        if (sp)
-            parts.push(
-                <span key="sp" className={`${styles.costItem} ${styles.sp}`}>
-                    {sp}sp
-                </span>,
-            );
-        if (cp)
-            parts.push(
-                <span key="cp" className={`${styles.costItem} ${styles.cp}`}>
-                    {cp}cp
-                </span>,
-            );
+    if (statblockQuery.isLoading) {
+        return (
+            <li
+                style={{
+                    background: statblockPlayer?.color
+                        ? `linear-gradient(to right, ${statblockPlayer.color}, transparent 20px)`
+                        : "transparent",
+                    borderRadius: "8px",
+                    padding: "5px 24px",
+                    textAlign: "left",
+                    border: "1px solid white",
+                    display: "flex",
+                    gap: "1ch",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    flexWrap: "wrap",
+                }}
+            >
+                <Loader />
+            </li>
+        );
+    }
 
-        if (parts.length === 0) {
-            return (
-                <span className={`${styles.costItem} ${styles.cp}`} style={{ opacity: 0.5 }}>
-                    0cp
-                </span>
-            );
-        }
-
-        return <div style={{ display: "flex", gap: "0.5ch" }}>{parts}</div>;
-    };
-
-    if (!isOwner) {
+    if (!isOwner || !statblock) {
         return (
             <li
                 style={{
@@ -410,14 +581,16 @@ export const PlayerPartyStatblock = ({ member }: { member: PartyStoreStatblock }
                                 <ScaleRounded sx={{ fontSize: "1.2em", opacity: 0.6 }} />
                                 <span>{totalWeight.toFixed(1)}</span>
                             </div>
-                            <div style={{ display: "flex", alignItems: "center", gap: "0.8ch" }}>
-                                <PaidRounded sx={{ fontSize: "1.2em", opacity: 0.6 }} />
-                                {formatMoney()}
-                            </div>
                         </>
                     ) : null}
                 </div>
             </div>
+            <PartyCollapse
+                storageKey={`${ID}.party.player.${member.partyStatblockId}.money.collapsed`}
+                heading={"Money"}
+            >
+                <PlayerStatblockMoney statblock={statblock} party={party} />
+            </PartyCollapse>
             <PartyCollapse
                 storageKey={`${ID}.party.player.${member.partyStatblockId}.equipment.collapsed`}
                 heading={"Equiment"}
@@ -428,20 +601,46 @@ export const PlayerPartyStatblock = ({ member }: { member: PartyStoreStatblock }
     );
 };
 
-export const PlayerPartyStatblocks = () => {
+export const PlayerPartyStatblocks = ({ party }: { party: PartyOut }) => {
     const members = usePartyStore((state) => state.currentParty?.members);
 
     return (
         <PartyCollapse storageKey={`${ID}.party.player.members.collapsed`} heading={"Statblocks"}>
             <ul style={{ listStyle: "none", padding: 0, display: "flex", gap: "1ch", flexDirection: "column" }}>
                 {members?.map((member) => {
-                    return <PlayerPartyStatblock member={member} key={member.partyStatblockId} />;
+                    return <PlayerPartyStatblock member={member} party={party} key={member.partyStatblockId} />;
                 })}
             </ul>
         </PartyCollapse>
     );
 };
 
+export const PlayerPartyMoney = ({ party }: { party: PartyOut }) => {
+    return (
+        <PartyCollapse storageKey={`${ID}.party.player.money.collapsed`} heading={"Money"}>
+            {formatMoney(party.money)}
+        </PartyCollapse>
+    );
+};
+
 export const PlayerParty = () => {
-    return <PlayerPartyStatblocks />;
+    const currentParty = usePartyStore((state) => state.currentParty);
+    const partyQuery = useGetParty(currentParty?.id ?? 0);
+
+    const party = partyQuery.isSuccess ? partyQuery.data : undefined;
+
+    if (partyQuery.isLoading) {
+        return <Loader />;
+    }
+
+    if (!currentParty || !party) {
+        return <div>Issues loading Party</div>;
+    }
+
+    return (
+        <>
+            <PlayerPartyStatblocks party={party} />
+            <PlayerPartyMoney party={party} />
+        </>
+    );
 };
