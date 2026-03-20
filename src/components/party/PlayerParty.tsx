@@ -53,6 +53,7 @@ import { E5Statblock } from "../../api/e5/useE5Api.ts";
 import { useForm, useWatch } from "react-hook-form";
 import { sortInventory } from "./PartyInventory.tsx";
 import { EditButton } from "../form/EditButton.tsx";
+import { PartyLinks } from "./PartyLinks.tsx";
 
 export type Money = {
     cp: number;
@@ -1012,6 +1013,7 @@ export const PlayerParty = () => {
 
     return (
         <>
+            <PartyLinks />
             <PlayerPartyStatblocks party={party} />
             <PlayerPartyMoney party={party} />
             <PlayerPartyInventory party={party} />

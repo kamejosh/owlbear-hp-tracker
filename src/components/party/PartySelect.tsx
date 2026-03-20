@@ -9,7 +9,7 @@ import { partyStore } from "../../context/PartyStore.tsx";
 
 export const PartySelect = () => {
     const room = useMetadataContext((state) => state.room);
-    const [partyId, setPartyId] = useState<number | undefined>(room?.partyId);
+    const [partyId, setPartyId] = useState<number | undefined>(room?.partyId ?? undefined);
     const addParty = partyStore.getState().addParty;
     const debouncedPartyId = useDebounce(partyId, { wait: 500 });
     const partyQuery = useListParties({ limit: 100, offset: 0 });
@@ -55,9 +55,13 @@ export const PartySelect = () => {
             <select
                 value={partyId}
                 onChange={(e) => {
+                    if (e.target.value === "") {
+                        setPartyId(undefined);
+                    }
                     setPartyId(Number(e.target.value));
                 }}
             >
+                <option value={""}></option>
                 {parties?.map((party) => {
                     return (
                         <option key={party.id} value={party.id}>

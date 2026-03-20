@@ -80,7 +80,7 @@ const GMContent = () => {
         <div className={styles.partyModal}>
             <PartySelect />
 
-            {currentParty ? (
+            {currentParty && room.partyId ? (
                 <div className={styles.partyModalContent}>
                     <h2 style={{ marginBottom: "0.5rem" }}>{currentParty?.name}</h2>
                     <PartyStatblocks />
@@ -89,16 +89,17 @@ const GMContent = () => {
                     <PartyLinks />
                 </div>
             ) : (
-                <div className={styles.partyModalContent}>No party selected</div>
+                <h2 className={styles.partyModalContent}>No party selected</h2>
             )}
         </div>
     );
 };
 
 const PlayerContent = () => {
+    const room = useMetadataContext((state) => state.room);
     const currentParty = usePartyStore((state) => state.currentParty);
 
-    if (!currentParty) {
+    if (!currentParty || !room?.partyId) {
         return <div>No party selected</div>;
     }
 

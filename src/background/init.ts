@@ -494,18 +494,16 @@ const initParty = async () => {
 
     // subscribe to token changes
     OBR.scene.items.onChange((items) => {
+        const newTokens: Array<Item> = [];
         const currentParty = partyStore.getState().currentParty;
         const partyStatblocks = currentParty?.members.map((member) => member.statblock?.slug) || [];
-        const newTokens: Array<Item> = [];
         items.forEach((item) => {
-            if (item.type === "IMAGE") {
+            if (item.type === "IMAGE" && (item.layer === "CHARACTER" || item.layer === "MOUNT")) {
                 const image = item as Image;
                 if (itemMetadataKey in item.metadata) {
                     const data = item.metadata[itemMetadataKey] as GMGMetadata;
-
                     if (data.sheet && partyStatblocks.includes(data.sheet)) {
                         const member = currentParty?.members.find((member) => member.statblock?.slug === data.sheet);
-
                         if (member) {
                             const newMember: PartyStoreStatblock = { ...member };
 
@@ -528,7 +526,7 @@ const initParty = async () => {
                     }
                 } else {
                     const member = currentParty?.members.find((member) => member.imageUrl === image.image.url);
-                    if (member && member.metadata) {
+                    if (member && member.metadata && !_.isEqual(member.metadata, item.metadata)) {
                         void OBR.scene.items.updateItems([item], (items) => {
                             for (const i of items) {
                                 // we checked before but this makes typescript happy
@@ -546,13 +544,12 @@ const initParty = async () => {
                             }
                         });
                     }
-
-                    if (newTokens.length > 0) {
-                        initItems();
-                    }
                 }
             }
         });
+        if (newTokens.length > 0) {
+            initItems();
+        }
     });
 };
 

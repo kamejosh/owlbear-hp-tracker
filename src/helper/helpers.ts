@@ -28,6 +28,7 @@ import { AbilityShareEntry } from "../context/AbilityShareStore.tsx";
 import { abilityShareRoute } from "../background/api.ts";
 import { replaceStatWithMod } from "./limitHelpers.ts";
 import { Stats } from "../components/general/DiceRoller/DiceButtonWrapper.tsx";
+import { partyStore } from "../context/PartyStore.tsx";
 
 export const getYOffset = async (height: number) => {
     const metadata = (await OBR.room.getMetadata()) as Metadata;
@@ -842,6 +843,8 @@ export const getTokenName = (token: Image) => {
 };
 
 export const prepareTokenForGrimoire = async (contextItems: Array<Image>) => {
+    const currentParty = partyStore.getState().currentParty;
+    const members = currentParty?.members ?? [];
     const tokenIds: Array<string> = [];
     const settings = await getTASettings();
     const itemStatblocks = await getInitialValues(contextItems as Array<Image>, settings?.assign_ss_darkvision);
@@ -877,8 +880,13 @@ export const prepareTokenForGrimoire = async (contextItems: Array<Image>) => {
                         playerList: settings?.default_token_settings?.playerList || false,
                     };
                     if (item.id in itemStatblocks) {
+                        const member = members.find(
+                            (member) => member.statblock?.slug === itemStatblocks[item.id].slug,
+                        );
                         defaultMetadata.sheet = itemStatblocks[item.id].slug;
+                        defaultMetadata.hp = itemStatblocks[item.id].hp;
                         defaultMetadata.ruleset = itemStatblocks[item.id].ruleset;
+                        defaultMetadata.group = member ? currentParty?.group : undefined;
                         defaultMetadata.maxHp = itemStatblocks[item.id].hp;
                         defaultMetadata.hp = itemStatblocks[item.id].hp;
                         defaultMetadata.armorClass = itemStatblocks[item.id].ac;

@@ -173,7 +173,6 @@ const AddInventoryItem = ({
                     onSelect={(itemId, item) => {
                         form.setValue("new_items.0.item_id", itemId);
                         setItem(item);
-                        console.log(itemId);
                     }}
                 />
                 <Tippy content={"Count of items to add"}>
