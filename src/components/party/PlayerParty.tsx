@@ -549,8 +549,9 @@ export const PlayerPartyStatblock = ({ member, party }: { member: PartyStoreStat
     const [obrParty, setObrParty] = useState<Player[]>([]);
     const apiKey = useMetadataContext((state) => state.room?.tabletopAlmanacAPIKey);
     const isOwner = player.id === member.playerId;
+    const isGM = player.role === "GM";
 
-    const statblockQuery = useE5GetStatblock(isOwner ? (member.statblock?.slug ?? "") : "", apiKey);
+    const statblockQuery = useE5GetStatblock(isOwner || isGM ? (member.statblock?.slug ?? "") : "", apiKey);
 
     useEffect(() => {
         const init = async () => {
@@ -588,7 +589,7 @@ export const PlayerPartyStatblock = ({ member, party }: { member: PartyStoreStat
         );
     }
 
-    if (!isOwner || !statblock) {
+    if ((!isOwner && !isGM) || !statblock) {
         return (
             <li
                 style={{
@@ -620,7 +621,7 @@ export const PlayerPartyStatblock = ({ member, party }: { member: PartyStoreStat
         <li
             style={{
                 background: player?.color
-                    ? `linear-gradient(to right, ${player.color}, transparent 20px)`
+                    ? `linear-gradient(to right, ${isOwner ? player.color : statblockPlayer?.color}, transparent 20px)`
                     : "transparent",
                 borderRadius: "8px",
                 padding: "5px 24px",
@@ -729,7 +730,7 @@ export const PlayerPartyMoney = ({ party }: { party: PartyOut }) => {
     );
 };
 
-const EditPlayerPartyInventoryItem = ({
+export const EditPlayerPartyInventoryItem = ({
     item,
     partyId,
     setEditItem,
@@ -747,9 +748,11 @@ const EditPlayerPartyInventoryItem = ({
     const members = usePartyStore((state) => state.currentParty?.members);
 
     const availableStatblocks =
-        members?.filter((member) => {
-            return member.playerId === player.id;
-        }) ?? [];
+        player.role === "GM"
+            ? (members ?? [])
+            : (members?.filter((member) => {
+                  return member.playerId === player.id;
+              }) ?? []);
 
     const form = useForm<{ data: StatblockItemIn; partyStatblockId: number }>({
         defaultValues: {

@@ -34,6 +34,8 @@ import styles from "./party-inventory.module.scss";
 import { CancelButton } from "../form/CancelButton.tsx";
 import { ItemHover } from "../gmgrimoire/items/ItemHover.tsx";
 import { PartyCollapse } from "./PartyCollapse.tsx";
+import { EditPlayerPartyInventoryItem } from "./PlayerParty.tsx";
+import { PersonAddAlt1 } from "@mui/icons-material";
 
 export const AutoCompleteItemInput = (props: { error: string; onSelect: (value: number, item: ItemOut) => void }) => {
     const [items, setItems] = useState<Array<ItemOut>>([]);
@@ -196,8 +198,7 @@ const AddInventoryItem = ({
                     {...getFloatingProps()}
                     style={{ ...floatingStyles }}
                 >
-                    {/*TODO <ItemComponent item={item} />*/}
-                    Hier kommt das item rein
+                    <ItemHover item={item} />
                 </div>
             )}
         </form>
@@ -249,6 +250,7 @@ export const PartyInventoryItem = ({
 }) => {
     const updatePartyInventory = useUpdatePartyInventory(partyId, inventoryId);
     const [editItem, setEditItem] = useState<boolean>(false);
+    const [moveItem, setMoveItem] = useState<boolean>(false);
 
     const [isOpen, setIsOpen] = useState(false);
 
@@ -273,7 +275,18 @@ export const PartyInventoryItem = ({
                 {editItem ? (
                     <EditItemCount item={item} partyId={partyId} inventoryId={inventoryId} setEditItem={setEditItem} />
                 ) : (
-                    <span>{item.count} x </span>
+                    <>
+                        {moveItem ? (
+                            <EditPlayerPartyInventoryItem
+                                item={item}
+                                partyId={partyId}
+                                setEditItem={setMoveItem}
+                                inventoryId={inventoryId}
+                            />
+                        ) : (
+                            <span>{item.count} x </span>
+                        )}
+                    </>
                 )}
                 <>
                     <div className={styles.itemInfo}>
@@ -307,6 +320,12 @@ export const PartyInventoryItem = ({
             </div>
 
             <div className={styles.actions}>
+                <button
+                    onClick={() => setMoveItem(!moveItem)}
+                    className={`${styles.editButton} ${styles.editButtonTop}`}
+                >
+                    <PersonAddAlt1 />
+                </button>
                 <EditButton onClick={() => setEditItem(!editItem)} alignCenter={true} />
                 <DeleteButton
                     message={`Do you want to delete ${item.item.name}`}
