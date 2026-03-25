@@ -5,12 +5,12 @@ import { Link } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useDebounce } from "ahooks";
 import { updateRoomMetadata } from "../../helper/helpers.ts";
-import { partyStore } from "../../context/PartyStore.tsx";
+import { usePartyStore } from "../../context/PartyStore.tsx";
 
 export const PartySelect = () => {
     const room = useMetadataContext((state) => state.room);
     const [partyId, setPartyId] = useState<number | undefined>(room?.partyId ?? undefined);
-    const addParty = partyStore.getState().addParty;
+    const addParty = usePartyStore((state) => state.addParty);
     const debouncedPartyId = useDebounce(partyId, { wait: 500 });
     const partyQuery = useListParties({ limit: 100, offset: 0 });
 

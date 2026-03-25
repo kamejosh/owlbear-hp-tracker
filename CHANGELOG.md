@@ -34,6 +34,7 @@
 + Fix issues on FF + Linux that bricks equipping and unequipping items
 + Fix issue where scene metadata did not get updated with the newest version
 + Fix if skill is set to 0 it should use 0 and not the calculated value
++ Reset Temp HP on Long Rest
 
 # 3.6.0
 

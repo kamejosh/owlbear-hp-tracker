@@ -40,20 +40,24 @@ export const partyStore = createStore<PartyStore>()(
 
             addParty: (party) =>
                 set((state) => {
+                    const existingParty = state.parties.find((p) => p.id === party.id);
+
+                    const newMembers: Array<PartyStoreStatblock> =
+                        party.statblocks?.map((s) => {
+                            const existingMember = existingParty?.members.find((m) => m.partyStatblockId === s.id);
+                            return {
+                                ...existingMember,
+                                partyStatblockId: s.id,
+                                statblock: s.statblock,
+                            };
+                        }) ?? [];
+
                     const newParty: PartySettings = {
                         id: party.id,
                         name: party.name,
                         group: party.group_name ?? "Default",
-                        members:
-                            party.statblocks?.map((s) => {
-                                return {
-                                    partyStatblockId: s.id,
-                                    statblock: s.statblock,
-                                    storeMetadata: true,
-                                };
-                            }) ?? [],
+                        members: newMembers,
                     };
-                    const existingParty = state.parties.find((p) => p.id === party.id);
 
                     if (!existingParty) {
                         return {
@@ -81,7 +85,7 @@ export const partyStore = createStore<PartyStore>()(
                     if (party) {
                         return { currentParty: party };
                     }
-                    return {};
+                    return { currentParty: null };
                 }),
             updateMember: (member) =>
                 set((state) => {

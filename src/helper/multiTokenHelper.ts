@@ -1,6 +1,6 @@
 import { itemMetadataKey } from "./variables.ts";
 import { GMGMetadata, Limit, RoomMetadata } from "./types.ts";
-import { Image, Item } from "@owlbear-rodeo/sdk";
+import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
 import { updateHp } from "./hpHelpers.ts";
 import { updateAc } from "./acHelper.ts";
 import { updateItems, updateList } from "./obrHelper.ts";
@@ -211,18 +211,20 @@ export const rest = async (list: Array<Item>, restType: string) => {
                 });
 
                 (item.metadata[itemMetadataKey] as GMGMetadata).stats.limits = newLimits;
-                if (restType === "Long Rest" && data.hp !== data.maxHp + (data.stats?.tempHp ?? 0)) {
-                    (item.metadata[itemMetadataKey] as GMGMetadata).hp = data.maxHp + (data.stats?.tempHp ?? 0);
+                if (restType === "Long Rest" && data.hp !== data.maxHp) {
+                    (item.metadata[itemMetadataKey] as GMGMetadata).hp = data.maxHp;
+                    (item.metadata[itemMetadataKey] as GMGMetadata).stats.tempHp = 0;
                     hpUpdated.push(item.id);
                 }
             }
         },
     );
 
-    const updated = list.filter((i) => hpUpdated.includes(i.id));
+    const updated = list.filter((i) => hpUpdated.includes(i.id)).map((i) => i.id);
 
     await updateList(updated, 2, async (subList) => {
-        for (const item of subList) {
+        const items = await OBR.scene.items.getItems(subList);
+        for (const item of items) {
             const data = item.metadata[itemMetadataKey] as GMGMetadata;
             await updateHp(item, { ...data, hp: data.maxHp + (data.stats?.tempHp ?? 0) });
         }
