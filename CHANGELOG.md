@@ -32,6 +32,8 @@
 + Fix hidden by default is not used when rolling advantage or crits
 + Fix issue with inventory filters
 + Fix issues on FF + Linux that bricks equipping and unequipping items
++ Fix issue where scene metadata did not get updated with the newest version
++ Fix if skill is set to 0 it should use 0 and not the calculated value
 
 # 3.6.0
 

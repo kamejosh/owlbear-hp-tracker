@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ContextWrapper, TabletopAlmanacSettingsContext } from "../ContextWrapper.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
-import { changelogModal, itemMetadataKey, version } from "../../helper/variables.ts";
+import { itemMetadataKey, version } from "../../helper/variables.ts";
 import { GMGMetadata, SORT } from "../../helper/types.ts";
 import { PlayerTokenList } from "./TokenList.tsx";
 import { useCharSheet } from "../../context/CharacterContext.ts";
@@ -17,7 +17,6 @@ import {
     sortItemsInitiative,
     updateSceneMetadata,
 } from "../../helper/helpers.ts";
-import { compare } from "compare-versions";
 import { Helpbuttons } from "../general/Helpbuttons/Helpbuttons.tsx";
 import { DiceTray } from "../general/DiceRoller/DiceTray.tsx";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
@@ -79,29 +78,6 @@ const Content = () => {
     }, [battleFocus, playerContext.role]);
 
     useEffect(() => {
-        const initGrimoire = async () => {
-            if (
-                playerContext.role === "GM" &&
-                !room?.ignoreUpdateNotification &&
-                scene?.version &&
-                compare(scene.version, version, "<")
-            ) {
-                const width = await OBR.viewport.getWidth();
-                await OBR.modal.open({
-                    ...changelogModal,
-                    fullScreen: false,
-                    height: 600,
-                    width: Math.min(width * 0.9, 600),
-                });
-            } else if (playerContext.role === "GM" && scene?.version && compare(scene.version, version, "<")) {
-                setIgnoredChanges(true);
-                await OBR.notification.show(`GM's Grimoire has been updated to version ${version}`, "SUCCESS");
-            }
-            if (scene && scene?.version && compare(scene.version, version, "<")) {
-                await updateSceneMetadata(scene, { version: version });
-            }
-        };
-
         const initAction = async () => {
             if (playerContext.role === "PLAYER") {
                 await OBR.action.setHeight(700);
@@ -110,7 +86,6 @@ const Content = () => {
         };
 
         if (isReady) {
-            void initGrimoire();
             void initAction();
         }
     }, [isReady]);
