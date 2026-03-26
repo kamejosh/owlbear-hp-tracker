@@ -36,9 +36,9 @@ button,
     background-color: var(--bg-color);
 
     &.battle-focus {
-        grid-template-columns: repeat(2, 15px);
+        grid-template-columns: repeat(4, 15px);
         @media (min-width: 380px) {
-            grid-template-columns: repeat(2, 25px);
+            grid-template-columns: repeat(4, 25px);
         }
     }
 
