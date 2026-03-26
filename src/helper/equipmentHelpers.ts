@@ -2,7 +2,7 @@ import { components } from "../api/schema";
 import { LimitType } from "../components/gmgrimoire/statblocks/LimitComponent.tsx";
 import { Ability } from "../components/gmgrimoire/statblocks/e5/E5Ability.tsx";
 import { Stats } from "../components/general/DiceRoller/DiceButtonWrapper.tsx";
-import { GMGMetadata } from "./types.ts";
+import { GMGMetadata, Loot } from "./types.ts";
 import { updateTokenMetadata } from "./tokenHelper.ts";
 import { updateHp } from "./hpHelpers.ts";
 import { updateAc } from "./acHelper.ts";
@@ -61,6 +61,7 @@ export type EquipmentBonuses = {
     charges: Array<ItemCharges>;
     stats: Stats;
     ac: number | null;
+    loot: Loot;
 };
 
 const getStatValue = (stats: Stats, modifiers: Array<Modifier>): Stats => {
@@ -133,6 +134,7 @@ export const getEquipmentBonuses = (
     stats: StatblockStats,
     equipment: Array<StatblockItems>,
 ): EquipmentBonuses => {
+    const loot: Loot = { items: [], money: { cp: 0, gp: 0, sp: 0, pp: 0, ep: 0 } };
     const bonuses: StatblockBonuses = {
         spells: [],
         hpBonus: 0,
@@ -199,6 +201,14 @@ export const getEquipmentBonuses = (
     const modifiers: Array<Modifier> = [];
 
     equipment?.forEach((item) => {
+        if (item.loot) {
+            const lootItem = loot.items.find((i) => i.id === item.item.id);
+            if (lootItem) {
+                lootItem.count += item.count ?? 1;
+            } else {
+                loot.items.push({ id: item.item.id, name: item.item.name, count: item.count ?? 1 });
+            }
+        }
         if (isItemAttuned(data, item) || isItemEquipped(data, item)) {
             if (item.item.spells) {
                 bonuses.spells.push({ itemId: item.item.id, spells: item.item.spells });
@@ -410,6 +420,7 @@ export const getEquipmentBonuses = (
         charges: charges,
         stats: totalStats,
         ac: itemACs.length === 0 ? null : Math.max(...itemACs),
+        loot: loot,
     };
 };
 

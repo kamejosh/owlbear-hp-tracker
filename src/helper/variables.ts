@@ -4,9 +4,12 @@ import { Stats } from "../components/general/DiceRoller/DiceButtonWrapper.tsx";
 
 export const ID = "com.bitperfect-software.hp-tracker";
 export const GMG_ID = "com.tabletop-almanac.gmg";
+export const GMI_ID = "com.tabletop-almanac.gmi";
 export const metadataKey = `${ID}/metadata`;
 export const itemMetadataKey = `${ID}/data`;
 export const infoMetadataKey = `${ID}/text`;
+export const shopMetadataKey = `${GMI_ID}/shop`;
+export const lootMetadataKey = `${GMI_ID}/loot`;
 
 export const modalId = `${ID}/modal`;
 export const diceTrayModalId = `${ID}/diceTrayModal`;

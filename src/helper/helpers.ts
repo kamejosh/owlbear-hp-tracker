@@ -29,6 +29,7 @@ import { abilityShareRoute } from "../background/api.ts";
 import { replaceStatWithMod } from "./limitHelpers.ts";
 import { Stats } from "../components/general/DiceRoller/DiceButtonWrapper.tsx";
 import { partyStore } from "../context/PartyStore.tsx";
+import { Money } from "../components/party/PlayerParty.tsx";
 
 export const getYOffset = async (height: number) => {
     const metadata = (await OBR.room.getMetadata()) as Metadata;
@@ -726,6 +727,22 @@ export const getInitialValues = async (items: Array<Image>, getDarkVision: boole
 
                             const combinedAC = equipmentBonuses.ac || statblock.armor_class.value;
 
+                            const statblockMoney: Money = statblock.money
+                                ? {
+                                      cp: statblock.money.cp,
+                                      sp: statblock.money.sp,
+                                      ep: statblock.money.ep,
+                                      gp: statblock.money.gp,
+                                      pp: statblock.money.pp,
+                                  }
+                                : {
+                                      cp: 0,
+                                      sp: 0,
+                                      ep: 0,
+                                      gp: 0,
+                                      pp: 0,
+                                  };
+
                             bestMatch = {
                                 source: statblock.source,
                                 distance: dist,
@@ -745,6 +762,10 @@ export const getInitialValues = async (items: Array<Image>, getDarkVision: boole
                                                   ?.replace(/\D/g, ""),
                                           )
                                         : null,
+                                    loot: {
+                                        ...equipmentBonuses.loot,
+                                        money: statblockMoney,
+                                    },
                                 },
                             };
                         }
@@ -788,6 +809,7 @@ export const getInitialValues = async (items: Array<Image>, getDarkVision: boole
                                     ruleset: "pf",
                                     limits: getLimitsPf(statblock),
                                     darkvision: null,
+                                    loot: null,
                                 },
                             };
                         }
