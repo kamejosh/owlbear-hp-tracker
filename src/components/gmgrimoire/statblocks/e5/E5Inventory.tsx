@@ -125,6 +125,19 @@ export const E5Item = ({ equipment }: { equipment: StatblockItems }) => {
                         />
                     </label>
                 ) : null}
+                {equipment.item.consumable && member ? (
+                    <Tippy content={"Consumes item (if quantity is brought to 0 item will be removed)"}>
+                        <button
+                            className={`button ${updateStatblockEquipment.isPending ? "loading" : ""}`}
+                            disabled={updateStatblockEquipment.isPending}
+                            onClick={async () => {
+                                await updateStatblockEquipment.mutateAsync({ remove: 1 });
+                            }}
+                        >
+                            consume
+                        </button>
+                    </Tippy>
+                ) : null}
             </span>
             <ItemCharges equippedItem={equipment.item} />
             <About
