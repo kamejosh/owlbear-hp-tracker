@@ -41,6 +41,7 @@ export const ContextWrapper = (props: ContextWrapperProps) => {
     const [role, setRole] = useState<string | null>(null);
     const [playerId, setPlayerId] = useState<string | null>(null);
     const [playerName, setPlayerName] = useState<string | null>(null);
+    const [playerColor, setPlayerColor] = useState<string | null>(null);
     const [ready, setReady] = useState<boolean>(false);
     const [room, scene, setSceneMetadata, setRoomMetadata] = useMetadataContext(
         useShallow((state) => [state.room, state.scene, state.setSceneMetadata, state.setRoomMetadata]),
@@ -64,11 +65,13 @@ export const ContextWrapper = (props: ContextWrapperProps) => {
             setRole(await OBR.player.getRole());
             setPlayerId(OBR.player.id);
             setPlayerName(await OBR.player.getName());
+            setPlayerColor(await OBR.player.getColor());
 
             OBR.player.onChange(async (player) => {
                 setRole(player.role);
                 setPlayerId(player.id);
                 setPlayerName(player.name);
+                setPlayerColor(player.color);
             });
 
             // this throws an error when creating a new room so we catch it
@@ -133,7 +136,7 @@ export const ContextWrapper = (props: ContextWrapperProps) => {
         }
     }, [isReady, taSettings, scene, role]);
 
-    const playerContext: PlayerContextType = { role: role, id: playerId, name: playerName };
+    const playerContext: PlayerContextType = { role: role, id: playerId, name: playerName, color: playerColor };
 
     return (
         <PluginGate>

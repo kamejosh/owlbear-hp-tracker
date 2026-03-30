@@ -2,6 +2,7 @@ import OBR from "@owlbear-rodeo/sdk";
 import {
     changelogModal,
     helpModal,
+    partyModal,
     settingsModal,
     statblockPopover,
     statblockPopoverId,
@@ -18,6 +19,7 @@ import { useShallow } from "zustand/react/shallow";
 import { useAbilityShareStore } from "../../../context/AbilityShareStore.tsx";
 import styles from "./help-buttons.module.scss";
 import { useUISettingsContext } from "../../../context/UISettingsContext.ts";
+import { SupervisedUserCircle } from "@mui/icons-material";
 
 type HelpButtonsProps = {
     ignoredChanges?: boolean;
@@ -101,28 +103,50 @@ export const Helpbuttons = (props: HelpButtonsProps) => {
                             </div>
                         </Tippy>
                     ) : null}
-                    {playerContext.role == "GM" ? (
-                        <Tippy content={"Open Settings"}>
-                            <button
-                                className={"settings-button top-button"}
-                                onClick={async () => {
-                                    let width = 600;
-                                    let height = 900;
-                                    try {
-                                        width = await OBR.viewport.getWidth();
-                                        height = await OBR.viewport.getHeight();
-                                    } catch {}
-                                    await OBR.modal.open({
-                                        ...settingsModal,
-                                        width: Math.min(500, width * 0.9),
-                                        height: Math.min(800, height * 0.9),
-                                    });
-                                }}
-                                title={"Settings"}
-                            >
-                                <SettingsSvg />
-                            </button>
-                        </Tippy>
+                    <Tippy content={"Open Party Settings"}>
+                        <button
+                            className={"top-button party-button"}
+                            onClick={async () => {
+                                let width = 600;
+                                let height = 900;
+                                try {
+                                    width = await OBR.viewport.getWidth();
+                                    height = (await OBR.viewport.getHeight()) - 60;
+                                } catch {}
+                                await OBR.modal.open({
+                                    ...partyModal,
+                                    width: Math.min(500, width * 0.9),
+                                    height: Math.min(800, height * 0.9),
+                                });
+                            }}
+                        >
+                            <SupervisedUserCircle />
+                        </button>
+                    </Tippy>
+                    {playerContext.role === "GM" ? (
+                        <>
+                            <Tippy content={"Open Settings"}>
+                                <button
+                                    className={"settings-button top-button"}
+                                    onClick={async () => {
+                                        let width = 600;
+                                        let height = 900;
+                                        try {
+                                            width = await OBR.viewport.getWidth();
+                                            height = await OBR.viewport.getHeight();
+                                        } catch {}
+                                        await OBR.modal.open({
+                                            ...settingsModal,
+                                            width: Math.min(500, width * 0.9),
+                                            height: Math.min(800, height * 0.9),
+                                        });
+                                    }}
+                                    title={"Settings"}
+                                >
+                                    <SettingsSvg />
+                                </button>
+                            </Tippy>
+                        </>
                     ) : null}
                     <a
                         href={"https://www.patreon.com/TTRPGAPI"}
@@ -190,6 +214,26 @@ export const Helpbuttons = (props: HelpButtonsProps) => {
                 </>
             ) : (
                 <>
+                    <Tippy content={"Open Party Settings"}>
+                        <button
+                            className={"top-button party-button"}
+                            onClick={async () => {
+                                let width = 600;
+                                let height = 900;
+                                try {
+                                    width = await OBR.viewport.getWidth();
+                                    height = (await OBR.viewport.getHeight()) - 60;
+                                } catch {}
+                                await OBR.modal.open({
+                                    ...partyModal,
+                                    width: Math.min(500, width * 0.9),
+                                    height: Math.min(800, height * 0.9),
+                                });
+                            }}
+                        >
+                            <SupervisedUserCircle />
+                        </button>
+                    </Tippy>
                     <Tippy content={playerStatblockPopoverOpen ? "Close Statblock Popover" : "Open Statblock Popover"}>
                         <button
                             className={`statblock-button top-button ${playerStatblockPopoverOpen ? "open" : ""}`}

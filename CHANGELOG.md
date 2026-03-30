@@ -1,4 +1,19 @@
-# Current
+# 3.7.0
+
+### New Features
+
++ Party Management:
+  + Introduced Party functionality to track and manage group resources.
+  + **Party Inventory:** Centralized storage for items shared among the party.
+  + **Party Money:** Track and manage group currency (Gold, Silver, Copper, etc.).
+  + **Party Links:** Share important links and documents with the whole party.
+  + **Party Statblocks:** Quick access to statblocks relevant to the entire group.
++ Inventory & Money Exchange:
+  + Added the ability to exchange items and currency between players and the party inventory.
++ Player Party UI:
+  + New dedicated UI for players to view and interact with party resources.
+
+### Improvements and Fixes
 
 + Fix an issue where the hp input values would not refresh in the statblock popover
 + Allow equations for maxHp
@@ -19,6 +34,7 @@
 + Fix issues on FF + Linux that bricks equipping and unequipping items
 + Fix issue where scene metadata did not get updated with the newest version
 + Fix if skill is set to 0 it should use 0 and not the calculated value
++ Reset Temp HP on Long Rest
 
 # 3.6.0
 

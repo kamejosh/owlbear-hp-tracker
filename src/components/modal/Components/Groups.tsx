@@ -4,6 +4,8 @@ import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { updateSceneMetadata } from "../../../helper/helpers.ts";
 import { DragDropContext, Draggable, Droppable, DropResult } from "@hello-pangea/dnd";
 import { useShallow } from "zustand/react/shallow";
+import { usePartyStore } from "../../../context/PartyStore.tsx";
+import Tippy from "@tippyjs/react";
 
 const updateGroups = (value: string, groups: Array<string>) => {
     if (value !== "") {
@@ -26,6 +28,8 @@ const updateGroups = (value: string, groups: Array<string>) => {
 
 const DraggableGroupList = React.memo(function DraggableGroupList() {
     const scene = useMetadataContext(useShallow((state) => state.scene));
+    const party = usePartyStore((state) => state.currentParty);
+
     return (
         <div className={"group-list"}>
             {scene && scene.groups
@@ -33,29 +37,31 @@ const DraggableGroupList = React.memo(function DraggableGroupList() {
                       return (
                           <Draggable key={group} draggableId={group} index={index}>
                               {(provided) => (
-                                  <div
-                                      className={"group"}
-                                      ref={provided.innerRef}
-                                      {...provided.draggableProps}
-                                      {...provided.dragHandleProps}
-                                  >
-                                      {group}{" "}
-                                      {group !== "Default" ? (
-                                          <button
-                                              className={"remove"}
-                                              onClick={async () => {
-                                                  const groups = Array.from(scene.groups || []);
-                                                  groups.splice(groups.indexOf(group), 1);
-                                                  if (!groups.includes("Default")) {
-                                                      groups.splice(0, 0, "Default");
-                                                  }
-                                                  await updateSceneMetadata(scene, { groups: groups });
-                                              }}
-                                          >
-                                              X
-                                          </button>
-                                      ) : null}
-                                  </div>
+                                  <Tippy content={"Party default group"} disabled={group !== party?.group}>
+                                      <div
+                                          className={`group ${party?.group === group ? "party-group" : ""}`}
+                                          ref={provided.innerRef}
+                                          {...provided.draggableProps}
+                                          {...provided.dragHandleProps}
+                                      >
+                                          {group}
+                                          {group !== "Default" && group !== party?.group ? (
+                                              <button
+                                                  className={"remove"}
+                                                  onClick={async () => {
+                                                      const groups = Array.from(scene.groups || []);
+                                                      groups.splice(groups.indexOf(group), 1);
+                                                      if (!groups.includes("Default")) {
+                                                          groups.splice(0, 0, "Default");
+                                                      }
+                                                      await updateSceneMetadata(scene, { groups: groups });
+                                                  }}
+                                              >
+                                                  X
+                                              </button>
+                                          ) : null}
+                                      </div>
+                                  </Tippy>
                               )}
                           </Draggable>
                       );

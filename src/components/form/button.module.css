@@ -1,0 +1,96 @@
+:root {
+    --dark-color: #161616;
+    --warning-color: #8a3838;
+}
+
+.deleteButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    border: 2px solid var(--dark-color);
+    border-radius: 4px;
+    background-color: var(--warning-color);
+    padding: 4px 8px;
+    height: 32px;
+    color: white;
+
+    svg {
+        fill: white;
+        width: 20px;
+        height: 20px;
+    }
+}
+
+.editButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    border: 2px solid var(--dark-color);
+    border-radius: 4px;
+    background-color: #555;
+    padding: 4px 8px;
+    height: 32px;
+    color: white;
+
+    svg {
+        fill: white;
+        width: 20px;
+        height: 20px;
+    }
+
+    &:hover {
+        background-color: #666;
+    }
+}
+
+.editGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5ch;
+}
+
+.formLeft {
+    :nth-child(2) {
+        &:not(button) {
+            align-self: flex-start;
+        }
+    }
+}
+
+.formRight {
+    :nth-child(2) {
+        &:not(button) {
+            align-self: flex-end;
+        }
+    }
+
+    .top {
+        justify-content: flex-end;
+    }
+}
+
+.editButtonTop {
+    align-self: flex-start;
+}
+
+.submitButton {
+    display: flex;
+    align-items: center;
+    background-color: #555;
+}
+
+.cancelButton {
+    display: flex;
+    align-items: center;
+    background-color: var(--warning-color);
+}
+
+.top {
+    display: flex;
+    align-items: center;
+    gap: 1ch;
+}

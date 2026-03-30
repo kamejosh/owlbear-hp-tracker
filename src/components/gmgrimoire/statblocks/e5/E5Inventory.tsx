@@ -12,8 +12,18 @@ import {
 } from "../../../../helper/equipmentHelpers.ts";
 import { useInventoryFilterContext } from "../../../../context/InventoryFilter.tsx";
 import { E5ItemFilter } from "./E5ItemFilter.tsx";
+import { usePartyStore } from "../../../../context/PartyStore.tsx";
+import { useUpdatePartyStatblockEquipment } from "../../../../api/tabletop-almanac/useParty.ts";
 export const E5Item = ({ equipment }: { equipment: StatblockItems }) => {
     const { statblock, stats, data, item } = useE5StatblockContext();
+    const currentParty = usePartyStore((state) => state.currentParty);
+    const member = currentParty?.members.find((m) => m.statblock?.slug === statblock.slug);
+    const updateStatblockEquipment = useUpdatePartyStatblockEquipment(
+        currentParty?.id ?? 0,
+        member?.partyStatblockId ?? 0,
+        equipment.id,
+        statblock.slug,
+    );
 
     return (
         <li key={equipment.id}>
@@ -82,6 +92,9 @@ export const E5Item = ({ equipment }: { equipment: StatblockItems }) => {
                                         1,
                                     );
                                 }
+                                if (member) {
+                                    await updateStatblockEquipment.mutateAsync({ equipped: e.target.checked });
+                                }
                                 await handleEquipmentChange(data, equipped, attuned, statblock, item);
                             }}
                         />
@@ -104,10 +117,26 @@ export const E5Item = ({ equipment }: { equipment: StatblockItems }) => {
                                         1,
                                     );
                                 }
+                                if (member) {
+                                    await updateStatblockEquipment.mutateAsync({ attuned: e.target.checked });
+                                }
                                 await handleEquipmentChange(data, equipped, attuned, statblock, item);
                             }}
                         />
                     </label>
+                ) : null}
+                {equipment.item.consumable && member ? (
+                    <Tippy content={"Consumes item (if quantity is brought to 0 item will be removed)"}>
+                        <button
+                            className={`button ${updateStatblockEquipment.isPending ? "loading" : ""}`}
+                            disabled={updateStatblockEquipment.isPending}
+                            onClick={async () => {
+                                await updateStatblockEquipment.mutateAsync({ remove: 1 });
+                            }}
+                        >
+                            consume
+                        </button>
+                    </Tippy>
                 ) : null}
             </span>
             <ItemCharges equippedItem={equipment.item} />

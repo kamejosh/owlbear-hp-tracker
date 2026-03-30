@@ -31,7 +31,14 @@
         <li><a href="#multi-selection">Multi Selection</a></li>
       </ul>
       <li><a href="#statblock-popover">Statblock Popover</a></li>
-      <li><a href="#shared-abilits">Shared Abilites</a></li>
+      <li><a href="#shared-abilities">Shared Abilities</a></li>
+      <li><a href="#party-management">Party Management</a></li>
+      <ul>
+        <li><a href="#party-inventory">Party Inventory</a></li>
+        <li><a href="#party-money">Party Money</a></li>
+        <li><a href="#party-links">Party Links</a></li>
+        <li><a href="#party-statblocks">Party Statblocks</a></li>
+      </ul>
     </ul>
     <li><a href="#custom-statblocks">Custom Statblocks</a></li>
     <li><a href="#dice-roller">Dice Roller</a></li>
@@ -134,10 +141,11 @@ The Action Window can be opened by clicking the GMG Action Icon in the Owlbear s
 
 ![Action Window Top](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/action_window_top.png)
 
-At the top of the action window the current version of the extension is displayed as well as the link to the Tabletop Almanac (to create custom statblocks), three system buttons, the statblock popover button, a link to the GMG Patreon page, a link to the GMG/Tabletop Almanac Discord, and the [Token List Buttons](#token-list-buttons).  
+At the top of the action window the current version of the extension is displayed as well as the link to the Tabletop Almanac (to create custom statblocks), four system buttons, the statblock popover button, a link to the GMG Patreon page, a link to the GMG/Tabletop Almanac Discord, and the [Token List Buttons](#token-list-buttons).
 
 The system buttons open a new modal:
 + The [⛭] buttons opens the [Settings](#settings).
++ The [👤] button opens the [Party Management](#party-management).
 + The [i] button opens the changelog so you can see recent changes
 + The [?] button opens the help menu which displays the same help information you are currently reading
 
@@ -153,7 +161,7 @@ The Token List Buttons are always visible and stick to the upper left corner, ev
 + The Battle Buttons
 
 The Token List Settings consist of the "Player Preview Toggle"-Button, "Toggle Battle Focus"-Button, and the "Sort by Initiative"-Section. When the "Player Preview" is active, the Token Images in the Token List display an approximation of what players will see (HP Bar, HP Text, AC). 
-When activating "Battle Focus" the UI get's smaller and only shows the elements necessary to manage a battle.
+When activating "Battle Focus" the UI gets smaller and only shows the elements necessary to manage a battle.
 
 When the Sort by Initiative Checkbox is active you can choose between ascending and descending to automatically sort all tokens in all groups by initiative. New Tokens added to a group will also automatically be sorted by initiative. You will still be able to sort Tokens manually if they have the same initiative value and the same initiative bonus.
 
@@ -192,7 +200,7 @@ The following settings are available:
 + Allow negative HP/AC: By default negative HP and AC are not allowed but when this settings is checked then HP and AC can be set to negative numbers. The HP Bar will always display negative HP the same as when it is 0.
 + Sort Tokens in Player View: When active, the [Player Action Window](#player-action-window) will display Tokens ordered by their initiative value. If not active, Tokens will have the same order as they were added to the scene (so kind of random).
 + Set Initiative Dice: This setting decides with which "dice" the roll initiative button in the groups and the token works. The default is 20, meaning a value from 1 to 20 (excl. modifiers) can be rolled. By setting it to 10 the value can only range from 1 to 10. When using 3D dice only values that are available in the selected theme should be used.
-+ Statblock Popover dimensions: This settings allows to set the width and height of the statblock popover. The default is 600x500. When changing the value (either press enter or move cursor outside of input field) while the statblock popover is open the size of the open statblock popover is automatically adjusted so you can preview what size fits you. The width and height cannot be lower than 200 and settings bigger than the viewport will be overwritten by the max viewport size.
++ Statblock Popover dimensions: This setting allows to set the width and height of the statblock popover. The default is 600x500. When changing the value (either press enter or move cursor outside of input field) while the statblock popover is open the size of the open statblock popover is automatically adjusted so you can preview what size fits you. The width and height cannot be lower than 200 and settings bigger than the viewport will be overwritten by the max viewport size.
 + Don't show Changelog on updates: This will disable the automatic popup when a new version of GMG is loaded. If not selected a notification will be shown once the update process has been finished and the changelog icon will flash for 30 seconds to indicate that there are new changes available.
 
 <h5 id="scene-settings">Scene Settings</h5>
@@ -359,7 +367,7 @@ The Player Action Window has reduced functionality compared to the GM Action Win
 
 For tokens that have their HP and AC revealed to the players their values are shown. Tokens that are assigned to players also have an option to access the assigned statblock. Otherwise, just the dynamic-color background is there to indicate the current status of the creature.
 
-Tokens don't follow the drag and drop order in the [GM Action Window](#hp-tracker-action-window). But when activated in the [Settings](#settings) Tokens will be ordered by their initiative value, disregarding which group they belong to.
+Tokens don't follow the drag and drop order in the [GM Action Window](#game-masters-grimoire-action-window). But when activated in the [Settings](#settings) Tokens will be ordered by their initiative value, disregarding which group they belong to.
 
 <h3 id="game-masters-grimoire-context-menu">Game Master's Grimoire Context Menu</h3>
 
@@ -398,13 +406,52 @@ The Popover displays all available statblocks indicating which statblock is curr
 
 ![Statblock Popover](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/statblock_popover.png)
 
-By default when selecting a Token either in the [Game Master's Grimoire Action Window](#game-masters-grimoire-action-window) or in the Scene. The associated statblock of the selected Token is displayed except when the statblock is collapsed. This can be prevented by "pinning" a statblocks. While pinned no automatic switching is done even when another statblock is selected. To reactivate automatic switching unselect the pin on the currently active statblock.
+By default when selecting a Token either in the [Game Master's Grimoire Action Window](#game-masters-grimoire-action-window) or in the Scene. The associated statblock of the selected Token is displayed except when the statblock is collapsed. This can be prevented by "pinning" a statblock. While pinned no automatic switching is done even when another statblock is selected. To reactivate automatic switching unselect the pin on the currently active statblock.
 
 ![Statblock Demo](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/statblock_demo.gif)
 
-<h4 id="shared-abilits">Shared Abilities</h4>
+<h4 id="shared-abilities">Shared Abilities</h4>
 
 The Statblock Popover also shows a list of all abilities that have been shared with you. You can pin and search these abilities. They are still connected with the token they've been shared from, so in case you use a limited ability it will reduce the uses for the statblock.
+
+<h1 id="party-management">Party Management</h1>
+
+See the [Tutorial](https://youtu.be/uakBb5yFhmo) for a walkthrough of the party management features.
+
+Party Management allows tracking group resources like items, money, and shared links. It can be accessed via the [👤] button in the action window top bar.
+
+To use party features, you must have a valid [Tabletop Almanac API Key](#room-settings) entered. All party data, including tokens, inventory, and currency, is automatically synced with your Tabletop Almanac account, ensuring your data is safe and accessible across different sessions and devices.
+
+When a token associated with a party member is added to a scene, it will automatically continue where it left off, restoring its previous HP, AC, inventory, and other status details.
+
+<h2 id="party-inventory">Party Inventory</h2>
+
+The Party Inventory is a shared storage space for all party members. 
+
++ **Adding Items:** Items can be added by searching the Tabletop Almanac database.
++ **Exchange:** Items can be moved between individual player inventories and the party inventory. Players can "take" items added by the GM, equip them, and they will automatically appear in their statblock and sync to Tabletop Almanac.
++ **Tracking:** Each item tracks its quantity and can have detailed descriptions or stat modifications.
+
+<h2 id="party-money">Party Money</h2>
+
+Tracks the party's shared currency.
+
++ Supports standard currency types (Platinum, Gold, Electrum, Silver, Copper).
++ Players and GMs can add or remove currency from the pool.
++ Players can manage their assigned Party Token's money and inventory directly, with all changes syncing instantly to Tabletop Almanac.
++ Every change is logged to keep track of the party's spending.
+
+<h2 id="party-links">Party Links</h2>
+
+A place to store and share important URLs for the party, such as shared notes, map links, or external handouts.
+
+<h2 id="party-statblocks">Party Statblocks</h2>
+
+All statblocks that you added to the party are shown here. You can change their equipment and money directly. If an Image is shown the party member is connected with a OBR Token and the Token will be auto initialized when added to a new scene.
+
+<h2 id="party-player-view">Player View</h2>
+
+Players can see all members of the party but can only edit their assigned Party Members. They can move equipment to the party inventory and back or exchange money with the party. All changes are synced instantly to Tabletop Almanac so you can always continue your session where you last left it.
 
 
 <h1 id="custom-statblocks">Custom Statblocks</h1>

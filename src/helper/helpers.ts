@@ -28,6 +28,8 @@ import { AbilityShareEntry } from "../context/AbilityShareStore.tsx";
 import { abilityShareRoute } from "../background/api.ts";
 import { replaceStatWithMod } from "./limitHelpers.ts";
 import { Stats } from "../components/general/DiceRoller/DiceButtonWrapper.tsx";
+import { partyStore } from "../context/PartyStore.tsx";
+import { Money } from "../components/party/PlayerParty.tsx";
 
 export const getYOffset = async (height: number) => {
     const metadata = (await OBR.room.getMetadata()) as Metadata;
@@ -725,6 +727,22 @@ export const getInitialValues = async (items: Array<Image>, getDarkVision: boole
 
                             const combinedAC = equipmentBonuses.ac || statblock.armor_class.value;
 
+                            const statblockMoney: Money = statblock.money
+                                ? {
+                                      cp: statblock.money.cp,
+                                      sp: statblock.money.sp,
+                                      ep: statblock.money.ep,
+                                      gp: statblock.money.gp,
+                                      pp: statblock.money.pp,
+                                  }
+                                : {
+                                      cp: 0,
+                                      sp: 0,
+                                      ep: 0,
+                                      gp: 0,
+                                      pp: 0,
+                                  };
+
                             bestMatch = {
                                 source: statblock.source,
                                 distance: dist,
@@ -744,6 +762,10 @@ export const getInitialValues = async (items: Array<Image>, getDarkVision: boole
                                                   ?.replace(/\D/g, ""),
                                           )
                                         : null,
+                                    loot: {
+                                        ...equipmentBonuses.loot,
+                                        money: statblockMoney,
+                                    },
                                 },
                             };
                         }
@@ -787,6 +809,7 @@ export const getInitialValues = async (items: Array<Image>, getDarkVision: boole
                                     ruleset: "pf",
                                     limits: getLimitsPf(statblock),
                                     darkvision: null,
+                                    loot: null,
                                 },
                             };
                         }
@@ -842,6 +865,8 @@ export const getTokenName = (token: Image) => {
 };
 
 export const prepareTokenForGrimoire = async (contextItems: Array<Image>) => {
+    const currentParty = partyStore.getState().currentParty;
+    const members = currentParty?.members ?? [];
     const tokenIds: Array<string> = [];
     const settings = await getTASettings();
     const itemStatblocks = await getInitialValues(contextItems as Array<Image>, settings?.assign_ss_darkvision);
@@ -877,8 +902,13 @@ export const prepareTokenForGrimoire = async (contextItems: Array<Image>) => {
                         playerList: settings?.default_token_settings?.playerList || false,
                     };
                     if (item.id in itemStatblocks) {
+                        const member = members.find(
+                            (member) => member.statblock?.slug === itemStatblocks[item.id].slug,
+                        );
                         defaultMetadata.sheet = itemStatblocks[item.id].slug;
+                        defaultMetadata.hp = itemStatblocks[item.id].hp;
                         defaultMetadata.ruleset = itemStatblocks[item.id].ruleset;
+                        defaultMetadata.group = member ? currentParty?.group : undefined;
                         defaultMetadata.maxHp = itemStatblocks[item.id].hp;
                         defaultMetadata.hp = itemStatblocks[item.id].hp;
                         defaultMetadata.armorClass = itemStatblocks[item.id].ac;

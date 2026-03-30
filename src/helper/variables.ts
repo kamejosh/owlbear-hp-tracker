@@ -4,9 +4,12 @@ import { Stats } from "../components/general/DiceRoller/DiceButtonWrapper.tsx";
 
 export const ID = "com.bitperfect-software.hp-tracker";
 export const GMG_ID = "com.tabletop-almanac.gmg";
+export const GMI_ID = "com.tabletop-almanac.gmi";
 export const metadataKey = `${ID}/metadata`;
 export const itemMetadataKey = `${ID}/data`;
 export const infoMetadataKey = `${ID}/text`;
+export const shopMetadataKey = `${GMI_ID}/shop`;
+export const lootMetadataKey = `${GMI_ID}/loot`;
 
 export const modalId = `${ID}/modal`;
 export const diceTrayModalId = `${ID}/diceTrayModal`;
@@ -21,7 +24,7 @@ export const prettySordidID = "com.pretty-initiative";
 
 export const dicePlusAvailableKey = `${GMG_ID}/dice-plus-available`;
 
-export const version = "3.6.0";
+export const version = "3.7.0";
 
 export const changelogModal: Modal = {
     id: modalId,
@@ -41,6 +44,11 @@ export const settingsModal: Modal = {
 export const diceModal: Modal = {
     id: modalId,
     url: "/modal.html?content=dddice",
+};
+
+export const partyModal: Modal = {
+    id: modalId,
+    url: "/party.html",
 };
 
 export const diceTrayModal: Modal = {

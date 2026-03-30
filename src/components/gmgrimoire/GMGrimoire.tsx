@@ -33,6 +33,7 @@ import Tippy from "@tippyjs/react";
 import { updateItems } from "../../helper/obrHelper.ts";
 import { useShallow } from "zustand/react/shallow";
 import { FocusSvg } from "../svgs/FocusSvg.tsx";
+import { AddGroup } from "../general/AddGroup.tsx";
 
 export const GMGrimoire = () => {
     return (
@@ -369,6 +370,7 @@ const Content = () => {
                                     />
                                 )}
                             </DragDropContext>
+                            <AddGroup />
                         </>
                     ) : (
                         <PlayerTokenList tokens={playerTokens} selected={selectedTokens} tokenLists={tokenLists} />
