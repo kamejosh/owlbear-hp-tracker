@@ -24,7 +24,7 @@ export const prettySordidID = "com.pretty-initiative";
 
 export const dicePlusAvailableKey = `${GMG_ID}/dice-plus-available`;
 
-export const version = "3.6.0";
+export const version = "3.7.0";
 
 export const changelogModal: Modal = {
     id: modalId,

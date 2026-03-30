@@ -416,6 +416,8 @@ The Statblock Popover also shows a list of all abilities that have been shared w
 
 <h1 id="party-management">Party Management</h1>
 
+See the [Tutorial](https://youtu.be/uakBb5yFhmo) for a walkthrough of the party management features.
+
 Party Management allows tracking group resources like items, money, and shared links. It can be accessed via the [👤] button in the action window top bar.
 
 To use party features, you must have a valid [Tabletop Almanac API Key](#room-settings) entered. All party data, including tokens, inventory, and currency, is automatically synced with your Tabletop Almanac account, ensuring your data is safe and accessible across different sessions and devices.
@@ -445,11 +447,11 @@ A place to store and share important URLs for the party, such as shared notes, m
 
 <h2 id="party-statblocks">Party Statblocks</h2>
 
-TODO
+All statblocks that you added to the party are shown here. You can change their equipment and money directly. If an Image is shown the party member is connected with a OBR Token and the Token will be auto initialized when added to a new scene.
 
 <h2 id="party-player-view">Player View</h2>
 
-TODO
+Players can see all members of the party but can only edit their assigned Party Members. They can move equipment to the party inventory and back or exchange money with the party. All changes are synced instantly to Tabletop Almanac so you can always continue your session where you last left it.
 
 
 <h1 id="custom-statblocks">Custom Statblocks</h1>

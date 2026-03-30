@@ -45,7 +45,14 @@ learn-more: https://github.com/kamejosh/owlbear-hp-tracker
         <li><a href="#multi-selection">Multi Selection</a></li>
       </ul>
       <li><a href="#statblock-popover">Statblock Popover</a></li>
-      <li><a href="#shared-abilits">Shared Abilites</a></li>
+      <li><a href="#shared-abilities">Shared Abilities</a></li>
+      <li><a href="#party-management">Party Management</a></li>
+      <ul>
+        <li><a href="#party-inventory">Party Inventory</a></li>
+        <li><a href="#party-money">Party Money</a></li>
+        <li><a href="#party-links">Party Links</a></li>
+        <li><a href="#party-statblocks">Party Statblocks</a></li>
+      </ul>
     </ul>
     <li><a href="#custom-statblocks">Custom Statblocks</a></li>
     <li><a href="#dice-roller">Dice Roller</a></li>
@@ -96,9 +103,9 @@ Your players rest at a campsite, but they fell asleep during their watch and wer
 + Copy the Hobgoblin Token four times
 + Roll initiative for the whole group and sort by initiative
 + Optional:
-    + Activate the participating groups for battle
-    + Start the battle using the "Start Battle"-Button
-    + Use The "Next" or "Back" button to circle through the battle participants and highlight the current token.
+  + Activate the participating groups for battle
+  + Start the battle using the "Start Battle"-Button
+  + Use The "Next" or "Back" button to circle through the battle participants and highlight the current token.
 
 <h2 id="video-example">Video Example</h2>
 
@@ -148,10 +155,11 @@ The Action Window can be opened by clicking the GMG Action Icon in the Owlbear s
 
 ![Action Window Top](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/action_window_top.png)
 
-At the top of the action window the current version of the extension is displayed as well as the link to the Tabletop Almanac (to create custom statblocks), three system buttons, the statblock popover button, a link to the GMG Patreon page, a link to the GMG/Tabletop Almanac Discord, and the [Token List Buttons](#token-list-buttons).
+At the top of the action window the current version of the extension is displayed as well as the link to the Tabletop Almanac (to create custom statblocks), four system buttons, the statblock popover button, a link to the GMG Patreon page, a link to the GMG/Tabletop Almanac Discord, and the [Token List Buttons](#token-list-buttons).
 
 The system buttons open a new modal:
 + The [⛭] buttons opens the [Settings](#settings).
++ The [👤] button opens the [Party Management](#party-management).
 + The [i] button opens the changelog so you can see recent changes
 + The [?] button opens the help menu which displays the same help information you are currently reading
 
@@ -167,7 +175,7 @@ The Token List Buttons are always visible and stick to the upper left corner, ev
 + The Battle Buttons
 
 The Token List Settings consist of the "Player Preview Toggle"-Button, "Toggle Battle Focus"-Button, and the "Sort by Initiative"-Section. When the "Player Preview" is active, the Token Images in the Token List display an approximation of what players will see (HP Bar, HP Text, AC).
-When activating "Battle Focus" the UI get's smaller and only shows the elements necessary to manage a battle.
+When activating "Battle Focus" the UI gets smaller and only shows the elements necessary to manage a battle.
 
 When the Sort by Initiative Checkbox is active you can choose between ascending and descending to automatically sort all tokens in all groups by initiative. New Tokens added to a group will also automatically be sorted by initiative. You will still be able to sort Tokens manually if they have the same initiative value and the same initiative bonus.
 
@@ -206,7 +214,7 @@ The following settings are available:
 + Allow negative HP/AC: By default negative HP and AC are not allowed but when this settings is checked then HP and AC can be set to negative numbers. The HP Bar will always display negative HP the same as when it is 0.
 + Sort Tokens in Player View: When active, the [Player Action Window](#player-action-window) will display Tokens ordered by their initiative value. If not active, Tokens will have the same order as they were added to the scene (so kind of random).
 + Set Initiative Dice: This setting decides with which "dice" the roll initiative button in the groups and the token works. The default is 20, meaning a value from 1 to 20 (excl. modifiers) can be rolled. By setting it to 10 the value can only range from 1 to 10. When using 3D dice only values that are available in the selected theme should be used.
-+ Statblock Popover dimensions: This settings allows to set the width and height of the statblock popover. The default is 600x500. When changing the value (either press enter or move cursor outside of input field) while the statblock popover is open the size of the open statblock popover is automatically adjusted so you can preview what size fits you. The width and height cannot be lower than 200 and settings bigger than the viewport will be overwritten by the max viewport size.
++ Statblock Popover dimensions: This setting allows to set the width and height of the statblock popover. The default is 600x500. When changing the value (either press enter or move cursor outside of input field) while the statblock popover is open the size of the open statblock popover is automatically adjusted so you can preview what size fits you. The width and height cannot be lower than 200 and settings bigger than the viewport will be overwritten by the max viewport size.
 + Don't show Changelog on updates: This will disable the automatic popup when a new version of GMG is loaded. If not selected a notification will be shown once the update process has been finished and the changelog icon will flash for 30 seconds to indicate that there are new changes available.
 
 <h5 id="scene-settings">Scene Settings</h5>
@@ -242,8 +250,8 @@ Double-clicking a token focuses the scene on the corresponding icon:
 GMG's groups offer a lot of functionality besides grouping tokens together. There are multiple reasons to consider groups:
 
 + For larger maps it makes sense to group creatures of areas together to keep a better overview
-    + collapsing groups of creatures currently not seen by the players
-    + keeping an overview over which creatures will be fighting in the next battle.
+  + collapsing groups of creatures currently not seen by the players
+  + keeping an overview over which creatures will be fighting in the next battle.
 + The group buttons allow you to change every token of the group at the same time
 + You want to keep a group as reserve not yet part of the initiative order and activate it once it's time
 
@@ -267,30 +275,30 @@ A token in the GMG represents a single Owlbear Item where the GMG Extension has 
 
 + Dynamic Color Background (based on ratio between HP and max HP)
 + Player Preview
-    + Shows an approximation what players will see
-    + Long Press the Icon to resync the Token with TA (if you changed any values there)
+  + Shows an approximation what players will see
+  + Long Press the Icon to resync the Token with TA (if you changed any values there)
 + HP Section
-    + Red Heart shows the current HP state
-    + Blue Heart shows if temporary HP are active for a token
-    + current HP / max HP on the top row
-    + temp HP / [Map Button](#map-button) on the bottom row
+  + Red Heart shows the current HP state
+  + Blue Heart shows if temporary HP are active for a token
+  + current HP / max HP on the top row
+  + temp HP / [Map Button](#map-button) on the bottom row
 + AC Section
-    + Input for the AC
-    + [Map Button](#map-button)
+  + Input for the AC
+  + [Map Button](#map-button)
 + Initiative Section
-    + Input for the current initiative
-    + Dice Button to roll Initiative (automatically sets the current initiative) with initiative bonus modifier
-    + Input for initiative Bonus
-        + Is automatically prefilled by the selected statblock (DEX modifier for DnD and perception value for PF2e)
-    + Player List Button: When selected the token shows up in the [Player Action Window](#player-action-window)
+  + Input for the current initiative
+  + Dice Button to roll Initiative (automatically sets the current initiative) with initiative bonus modifier
+  + Input for initiative Bonus
+    + Is automatically prefilled by the selected statblock (DEX modifier for DnD and perception value for PF2e)
+  + Player List Button: When selected the token shows up in the [Player Action Window](#player-action-window)
 + Statblock Section
-    + Open the assigned statblock or delete it
-    + If no statblock is assigned open the statblock search
-    + transfer token ownership to a player
-        + If this is set, a square in the players color indicates that this token is assigned to a player
-        + This player will have full access to the statblock
-        + This player will see this token in their Player Action Window (no matter the Player List Button setting)
-        + This works together with Smoke & Specter token ownership as it uses the base owlbear rodeo token ownership setting
+  + Open the assigned statblock or delete it
+  + If no statblock is assigned open the statblock search
+  + transfer token ownership to a player
+    + If this is set, a square in the players color indicates that this token is assigned to a player
+    + This player will have full access to the statblock
+    + This player will see this token in their Player Action Window (no matter the Player List Button setting)
+    + This works together with Smoke & Specter token ownership as it uses the base owlbear rodeo token ownership setting
 
 A token that is selected in the scene has a white border. A token whose turn it is in the current battle has a red border.
 
@@ -305,7 +313,7 @@ Values can be changed in a few different ways:
 + Arithmetic operations: for the HP field the value can be changed via arithmetic (+ and -) operations. If the current value is `"10"` and you edit the field like this `"10 + 3"` the field value will be changed to `"13"` once you select anything outside of the field or press enter.
 + Arrow Keys: when focus is on HP, maxHP, tempHP or AC you can increase or decrease the values by 1 by pressing up or down arrow key respectively
 + Entering a number: when focused on any field, you can delete its content and enter a new value.
-    + Note that changing the maxHP or tempHP field influences the HP field.
+  + Note that changing the maxHP or tempHP field influences the HP field.
 + Rolling Initiative: When clicking the Initiative Button a random number between 1 and the chosen [Initiative Dice](#settings) (default: 20) is rolled and the dexterity modifier (5e) or perception (pf2e) from the [Statblock](#statblock) (if selected) is added and entered as the final initiative value. You can also change the initiative bonus to any number, once a statblock is assigned. By default a 3D dice is rolled to determine the random value.
 
 **Note: The HP value can never exceed the maxHP value ([except when maxHP is 0](#initializing-token)). It can also not be a negative number if the [Setting](#settings) for "Allow negative numbers" is not selected. All symbols except numbers will be removed to maintain a compatible value.**
@@ -373,7 +381,7 @@ The Player Action Window has reduced functionality compared to the GM Action Win
 
 For tokens that have their HP and AC revealed to the players their values are shown. Tokens that are assigned to players also have an option to access the assigned statblock. Otherwise, just the dynamic-color background is there to indicate the current status of the creature.
 
-Tokens don't follow the drag and drop order in the [GM Action Window](#hp-tracker-action-window). But when activated in the [Settings](#settings) Tokens will be ordered by their initiative value, disregarding which group they belong to.
+Tokens don't follow the drag and drop order in the [GM Action Window](#game-masters-grimoire-action-window). But when activated in the [Settings](#settings) Tokens will be ordered by their initiative value, disregarding which group they belong to.
 
 <h3 id="game-masters-grimoire-context-menu">Game Master's Grimoire Context Menu</h3>
 
@@ -412,13 +420,52 @@ The Popover displays all available statblocks indicating which statblock is curr
 
 ![Statblock Popover](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/statblock_popover.png)
 
-By default when selecting a Token either in the [Game Master's Grimoire Action Window](#game-masters-grimoire-action-window) or in the Scene. The associated statblock of the selected Token is displayed except when the statblock is collapsed. This can be prevented by "pinning" a statblocks. While pinned no automatic switching is done even when another statblock is selected. To reactivate automatic switching unselect the pin on the currently active statblock.
+By default when selecting a Token either in the [Game Master's Grimoire Action Window](#game-masters-grimoire-action-window) or in the Scene. The associated statblock of the selected Token is displayed except when the statblock is collapsed. This can be prevented by "pinning" a statblock. While pinned no automatic switching is done even when another statblock is selected. To reactivate automatic switching unselect the pin on the currently active statblock.
 
 ![Statblock Demo](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/statblock_demo.gif)
 
-<h4 id="shared-abilits">Shared Abilities</h4>
+<h4 id="shared-abilities">Shared Abilities</h4>
 
 The Statblock Popover also shows a list of all abilities that have been shared with you. You can pin and search these abilities. They are still connected with the token they've been shared from, so in case you use a limited ability it will reduce the uses for the statblock.
+
+<h1 id="party-management">Party Management</h1>
+
+See the [Tutorial](https://youtu.be/uakBb5yFhmo) for a walkthrough of the party management features.
+
+Party Management allows tracking group resources like items, money, and shared links. It can be accessed via the [👤] button in the action window top bar.
+
+To use party features, you must have a valid [Tabletop Almanac API Key](#room-settings) entered. All party data, including tokens, inventory, and currency, is automatically synced with your Tabletop Almanac account, ensuring your data is safe and accessible across different sessions and devices.
+
+When a token associated with a party member is added to a scene, it will automatically continue where it left off, restoring its previous HP, AC, inventory, and other status details.
+
+<h2 id="party-inventory">Party Inventory</h2>
+
+The Party Inventory is a shared storage space for all party members.
+
++ **Adding Items:** Items can be added by searching the Tabletop Almanac database.
++ **Exchange:** Items can be moved between individual player inventories and the party inventory. Players can "take" items added by the GM, equip them, and they will automatically appear in their statblock and sync to Tabletop Almanac.
++ **Tracking:** Each item tracks its quantity and can have detailed descriptions or stat modifications.
+
+<h2 id="party-money">Party Money</h2>
+
+Tracks the party's shared currency.
+
++ Supports standard currency types (Platinum, Gold, Electrum, Silver, Copper).
++ Players and GMs can add or remove currency from the pool.
++ Players can manage their assigned Party Token's money and inventory directly, with all changes syncing instantly to Tabletop Almanac.
++ Every change is logged to keep track of the party's spending.
+
+<h2 id="party-links">Party Links</h2>
+
+A place to store and share important URLs for the party, such as shared notes, map links, or external handouts.
+
+<h2 id="party-statblocks">Party Statblocks</h2>
+
+All statblocks that you added to the party are shown here. You can change their equipment and money directly. If an Image is shown the party member is connected with a OBR Token and the Token will be auto initialized when added to a new scene.
+
+<h2 id="party-player-view">Player View</h2>
+
+Players can see all members of the party but can only edit their assigned Party Members. They can move equipment to the party inventory and back or exchange money with the party. All changes are synced instantly to Tabletop Almanac so you can always continue your session where you last left it.
 
 
 <h1 id="custom-statblocks">Custom Statblocks</h1>
@@ -485,16 +532,16 @@ While hovering over a dice button the little dice inside the button begins to sh
 These optional parameters are:
 
 + ADV
-    + changes the dice roll to 2d20kh1 (roll 2 d20 and keep the highest one) + modifier
+  + changes the dice roll to 2d20kh1 (roll 2 d20 and keep the highest one) + modifier
 + DIS
-    + changes the dice roll to 2d20dh1 (roll 2 d20 and drop the highest one) + modifier
+  + changes the dice roll to 2d20dh1 (roll 2 d20 and drop the highest one) + modifier
 + HIDE
-    + Dice roll will only be visible for you other people will not be notified and it will not show up in their dice log
+  + Dice roll will only be visible for you other people will not be notified and it will not show up in their dice log
 
 Dice that are marked as Damage Dice have optional roll button:
 
 + CRIT
-    + automatically rolls the damage as a crit based on the selected crit rules on [Tabletop Almanac](https://tabletop-almanac.com)
+  + automatically rolls the damage as a crit based on the selected crit rules on [Tabletop Almanac](https://tabletop-almanac.com)
 
 ![Dice Button Hover](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/dice_button_hover.png)
 
