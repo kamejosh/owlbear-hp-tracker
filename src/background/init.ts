@@ -1,4 +1,4 @@
-import OBR, { Image, Item, Metadata } from "@owlbear-rodeo/sdk";
+import OBR, { Image, Metadata } from "@owlbear-rodeo/sdk";
 import { changelogModal, ID, itemMetadataKey, metadataKey, nextTurnChannel, version } from "../helper/variables.ts";
 import { compare } from "compare-versions";
 import {
@@ -37,15 +37,13 @@ import { migrateTo350 } from "../migrations/v350.ts";
 import { setupDicePlus } from "./diceplus.ts";
 import { registerMessageHandlers } from "./api.ts";
 import _, { isNull, isUndefined } from "lodash";
-import { useMetadataContext } from "../context/MetadataContext.ts";
-import { partyStore, PartyStoreStatblock } from "../context/PartyStore.tsx";
-import { listParties, PartyPagination } from "../api/tabletop-almanac/useParty.ts";
+import { initParty, initPlayerParty } from "./party.ts";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
  * This ensures that further handling can be done properly
  */
-const initItems = async () => {
+export const initItems = async () => {
     const tokens = await OBR.scene.items.getItems(
         (item) => itemMetadataKey in item.metadata && (item.metadata[itemMetadataKey] as GMGMetadata).hpTrackerActive,
     );
@@ -437,157 +435,6 @@ const initMessageBus = async () => {
         const data = event.data as { name: string; playerId: string };
         if (data.playerId === OBR.player.id) {
             OBR.notification.show(`Heads up ${data.name}! You're next in initiative!`, "WARNING");
-        }
-    });
-};
-
-const initPlayerPartyMembers = async (items: Array<Item>) => {
-    const currentParty = partyStore.getState().currentParty;
-    const partyStatblocks = currentParty?.members.map((member) => member.statblock?.slug) || [];
-    items.forEach((item) => {
-        if (item.type === "IMAGE") {
-            const image = item as Image;
-            if (itemMetadataKey in item.metadata) {
-                const data = item.metadata[itemMetadataKey] as GMGMetadata;
-
-                if (data.sheet && partyStatblocks.includes(data.sheet)) {
-                    const member = currentParty?.members.find((member) => member.statblock?.slug === data.sheet);
-
-                    if (member) {
-                        const newMember: PartyStoreStatblock = { ...member };
-
-                        if (item.createdUserId !== member.playerId) {
-                            newMember.playerId = item.createdUserId;
-                        }
-
-                        if (!member.imageUrl) {
-                            newMember.imageUrl = image.image.url;
-                        }
-
-                        if (!_.isEqual(member, newMember)) {
-                            partyStore.getState().updateMember(newMember);
-                        }
-                    }
-                }
-            }
-        }
-    });
-};
-
-const initPlayerParty = async () => {
-    const room = await OBR.room.getMetadata();
-    const addParty = partyStore.getState().addParty;
-    if (metadataKey in room) {
-        const roomMetadata = room[metadataKey] as RoomMetadata;
-        const apiKey = roomMetadata.tabletopAlmanacAPIKey;
-        if (apiKey) {
-            try {
-                const partQuery = await listParties({ params: { limit: 100, offset: 0 }, token: apiKey });
-                const parties = partQuery.data as PartyPagination;
-                parties.page.forEach((party) => {
-                    addParty(party);
-                });
-                if (roomMetadata.partyId) {
-                    partyStore.getState().setCurrentParty(roomMetadata.partyId);
-                }
-            } catch (e) {
-                console.error("GM's Grimoire - Error while fetching parties", e);
-            }
-        }
-    }
-
-    const items = await OBR.scene.items.getItems();
-    await initPlayerPartyMembers(items);
-
-    OBR.room.onMetadataChange((metadata) => {
-        const currentParty = partyStore.getState().currentParty;
-        const room = useMetadataContext.getState().room;
-        const gmgMetadata = metadata[metadataKey] as RoomMetadata;
-        if (!_.isEqual(room, gmgMetadata) && gmgMetadata.partyId && gmgMetadata.partyId !== currentParty?.id) {
-            partyStore.getState().setCurrentParty(gmgMetadata.partyId);
-        }
-    });
-
-    OBR.scene.items.onChange((items) => {
-        initPlayerPartyMembers(items);
-    });
-};
-
-const initParty = async () => {
-    OBR.scene.onMetadataChange((metadata) => {
-        const party = partyStore.getState().currentParty;
-        const scene = metadata[metadataKey] as SceneMetadata;
-        if (party && scene?.groups && party.group && !scene.groups.includes(party.group)) {
-            updateSceneMetadata(scene, { groups: [...scene.groups, party.group] });
-        }
-    });
-
-    // subscribe to party changes
-    OBR.room.onMetadataChange((metadata) => {
-        const room = useMetadataContext.getState().room;
-        const gmgMetadata = metadata[metadataKey] as RoomMetadata;
-        if (!_.isEqual(room, gmgMetadata) && gmgMetadata.partyId) {
-            partyStore.getState().setCurrentParty(gmgMetadata.partyId);
-        }
-    });
-
-    // subscribe to token changes
-    OBR.scene.items.onChange((items) => {
-        const newTokens: Array<Item> = [];
-        const currentParty = partyStore.getState().currentParty;
-        const partyStatblocks = currentParty?.members.map((member) => member.statblock?.slug) || [];
-        items.forEach((item) => {
-            if (item.type === "IMAGE" && (item.layer === "CHARACTER" || item.layer === "MOUNT")) {
-                const image = item as Image;
-                if (itemMetadataKey in item.metadata) {
-                    const data = item.metadata[itemMetadataKey] as GMGMetadata;
-                    if (data.sheet && partyStatblocks.includes(data.sheet)) {
-                        const member = currentParty?.members.find((member) => member.statblock?.slug === data.sheet);
-                        if (member) {
-                            const newMember: PartyStoreStatblock = { ...member };
-
-                            if (item.createdUserId !== OBR.player.id && item.createdUserId !== member.playerId) {
-                                newMember.playerId = item.createdUserId;
-                            }
-
-                            if (!member.imageUrl) {
-                                newMember.imageUrl = image.image.url;
-                            }
-
-                            if (!_.isEqual(member.metadata, item.metadata)) {
-                                newMember.metadata = item.metadata;
-                            }
-
-                            if (!_.isEqual(member, newMember)) {
-                                partyStore.getState().updateMember(newMember);
-                            }
-                        }
-                    }
-                } else {
-                    const member = currentParty?.members.find((member) => member.imageUrl === image.image.url);
-                    if (member && member.metadata && !_.isEqual(member.metadata, item.metadata)) {
-                        void OBR.scene.items.updateItems([item], (items) => {
-                            for (const i of items) {
-                                // we checked before but this makes typescript happy
-                                if (member.metadata) {
-                                    if (itemMetadataKey in member.metadata) {
-                                        const data = member.metadata[itemMetadataKey] as GMGMetadata;
-                                        member.metadata[itemMetadataKey] = { ...data, group: currentParty?.group };
-                                    }
-                                    i.metadata = member.metadata;
-                                    newTokens.push(item);
-                                }
-                                if (member.playerId) {
-                                    i.createdUserId = member.playerId;
-                                }
-                            }
-                        });
-                    }
-                }
-            }
-        });
-        if (newTokens.length > 0) {
-            initItems();
         }
     });
 };

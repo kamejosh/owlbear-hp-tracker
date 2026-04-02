@@ -1,3 +1,8 @@
+### Unversioned
+
++ Fix that party changes on TA would not show up in GMG until the party was switched
++ Fix that the party group did sometimes not show up
+
 # 3.7.0
 
 ### New Features

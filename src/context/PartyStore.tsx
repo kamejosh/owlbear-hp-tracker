@@ -6,6 +6,7 @@ import { Metadata } from "@owlbear-rodeo/sdk";
 import { components } from "../api/schema";
 import { createStore } from "zustand/vanilla";
 import { withStorageDOMEvents } from "../helper/hooks.ts";
+import { subscribeWithSelector } from "zustand/middleware";
 import _, { isUndefined } from "lodash";
 
 export type SimpleE5StatblockOut = components["schemas"]["SimpleE5StatblockOut"];
@@ -34,81 +35,98 @@ export type PartyStore = {
 };
 
 export const partyStore = createStore<PartyStore>()(
-    persist<PartyStore>(
-        (set) => ({
-            parties: [],
+    subscribeWithSelector(
+        persist<PartyStore>(
+            (set) => ({
+                parties: [],
 
-            addParty: (party) =>
-                set((state) => {
-                    const existingParty = state.parties.find((p) => p.id === party.id);
+                addParty: (party) =>
+                    set((state) => {
+                        const existingParty = state.parties.find((p) => p.id === party.id);
 
-                    const newMembers: Array<PartyStoreStatblock> =
-                        party.statblocks?.map((s) => {
-                            const existingMember = existingParty?.members.find((m) => m.partyStatblockId === s.id);
+                        const newMembers: Array<PartyStoreStatblock> =
+                            party.statblocks?.map((s) => {
+                                const existingMember = existingParty?.members.find((m) => m.partyStatblockId === s.id);
+                                return {
+                                    ...existingMember,
+                                    partyStatblockId: s.id,
+                                    statblock: s.statblock,
+                                };
+                            }) ?? [];
+
+                        console.log(newMembers);
+
+                        const newParty: PartySettings = {
+                            id: party.id,
+                            name: party.name,
+                            group: party.group_name ?? "Default",
+                            members: newMembers,
+                        };
+
+                        if (!existingParty) {
                             return {
-                                ...existingMember,
-                                partyStatblockId: s.id,
-                                statblock: s.statblock,
+                                parties: [...state.parties, newParty],
                             };
-                        }) ?? [];
+                        } else if (!_.isEqual(existingParty, newParty)) {
+                            if (state.currentParty?.id === newParty.id) {
+                                return {
+                                    parties: state.parties.map((p) => {
+                                        if (p.id === party.id) {
+                                            return newParty;
+                                        } else {
+                                            return p;
+                                        }
+                                    }),
+                                    currentParty: newParty,
+                                };
+                            } else {
+                                return {
+                                    parties: state.parties.map((p) => {
+                                        if (p.id === party.id) {
+                                            return newParty;
+                                        } else {
+                                            return p;
+                                        }
+                                    }),
+                                };
+                            }
+                        }
+                        return {};
+                    }),
 
-                    const newParty: PartySettings = {
-                        id: party.id,
-                        name: party.name,
-                        group: party.group_name ?? "Default",
-                        members: newMembers,
-                    };
+                currentParty: null,
 
-                    if (!existingParty) {
-                        return {
-                            parties: [...state.parties, newParty],
-                        };
-                    } else if (!_.isEqual(existingParty, newParty)) {
-                        return {
-                            parties: state.parties.map((p) => {
-                                if (p.id === party.id) {
-                                    return newParty;
-                                } else {
-                                    return p;
-                                }
-                            }),
-                        };
-                    }
-                    return {};
-                }),
+                setCurrentParty: (id) =>
+                    set((state) => {
+                        const party = state.parties.find((p) => p.id === id);
+                        if (party) {
+                            return { currentParty: party };
+                        }
+                        return { currentParty: null };
+                    }),
+                updateMember: (member) =>
+                    set((state) => {
+                        const memberIndex = state.currentParty?.members.findIndex(
+                            (m) => m.partyStatblockId === member.partyStatblockId,
+                        );
 
-            currentParty: null,
+                        if (!isUndefined(memberIndex) && memberIndex >= 0 && state.currentParty) {
+                            const party = { ...state.currentParty };
+                            party.members[memberIndex] = member;
 
-            setCurrentParty: (id) =>
-                set((state) => {
-                    const party = state.parties.find((p) => p.id === id);
-                    if (party) {
-                        return { currentParty: party };
-                    }
-                    return { currentParty: null };
-                }),
-            updateMember: (member) =>
-                set((state) => {
-                    const memberIndex = state.currentParty?.members.findIndex(
-                        (m) => m.partyStatblockId === member.partyStatblockId,
-                    );
-
-                    if (!isUndefined(memberIndex) && memberIndex >= 0 && state.currentParty) {
-                        const party = { ...state.currentParty };
-                        party.members[memberIndex] = member;
-
-                        return {
-                            parties: state.parties.map((p) => (p.id === party.id ? party : p)),
-                            currentParty: party,
-                        };
-                    }
-                    return {};
-                }),
-        }),
-        {
-            name: `${ID}.party-store`,
-            storage: createJSONStorage(() => localStorage),
-        },
+                            return {
+                                parties: state.parties.map((p) => (p.id === party.id ? party : p)),
+                                currentParty: party,
+                            };
+                        }
+                        return {};
+                    }),
+            }),
+            {
+                name: `${ID}.party-store`,
+                storage: createJSONStorage(() => localStorage),
+            },
+        ),
     ),
 );
 
