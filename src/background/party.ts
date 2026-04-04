@@ -161,64 +161,59 @@ export const initParty = async () => {
     // subscribe to token changes
     OBR.scene.items.onChange(async (items) => {
         const newTokens: Array<Item> = [];
-        const room = await OBR.room.getMetadata();
-        const roomPartyId = metadataKey in room ? (room[metadataKey] as RoomMetadata).partyId : null;
         const currentParty = partyStore.getState().currentParty;
-        if (currentParty?.id !== roomPartyId) {
-            const partyStatblocks = currentParty?.members.map((member) => member.statblock?.slug) || [];
-            items.forEach((item) => {
-                if (item.type === "IMAGE" && (item.layer === "CHARACTER" || item.layer === "MOUNT")) {
-                    const image = item as Image;
-                    if (itemMetadataKey in item.metadata) {
-                        const data = item.metadata[itemMetadataKey] as GMGMetadata;
-                        if (data.sheet && partyStatblocks.includes(data.sheet)) {
-                            const member = currentParty?.members.find(
-                                (member) => member.statblock?.slug === data.sheet,
-                            );
-                            if (member) {
-                                const newMember: PartyStoreStatblock = { ...member };
+        const partyStatblocks = currentParty?.members.map((member) => member.statblock?.slug) || [];
+        items.forEach((item) => {
+            if (item.type === "IMAGE" && (item.layer === "CHARACTER" || item.layer === "MOUNT")) {
+                const image = item as Image;
+                if (itemMetadataKey in item.metadata) {
+                    const data = item.metadata[itemMetadataKey] as GMGMetadata;
+                    if (data.sheet && partyStatblocks.includes(data.sheet)) {
+                        const member = currentParty?.members.find((member) => member.statblock?.slug === data.sheet);
+                        if (member) {
+                            const newMember: PartyStoreStatblock = { ...member };
 
-                                if (item.createdUserId !== OBR.player.id && item.createdUserId !== member.playerId) {
-                                    newMember.playerId = item.createdUserId;
-                                }
+                            if (item.createdUserId !== OBR.player.id && item.createdUserId !== member.playerId) {
+                                newMember.playerId = item.createdUserId;
+                            }
 
-                                if (!member.imageUrl) {
-                                    newMember.imageUrl = image.image.url;
-                                }
+                            if (!member.imageUrl) {
+                                newMember.imageUrl = image.image.url;
+                            }
 
-                                if (!_.isEqual(member.metadata, item.metadata)) {
-                                    newMember.metadata = item.metadata;
-                                }
+                            if (!_.isEqual(member.metadata, item.metadata)) {
+                                newMember.metadata = item.metadata;
+                            }
 
-                                if (!_.isEqual(member, newMember)) {
-                                    partyStore.getState().updateMember(newMember);
-                                }
+                            if (!_.isEqual(member, newMember)) {
+                                partyStore.getState().updateMember(newMember);
                             }
                         }
-                    } else {
-                        const member = currentParty?.members.find((member) => member.imageUrl === image.image.url);
-                        if (member && member.metadata && !_.isEqual(member.metadata, item.metadata)) {
-                            void OBR.scene.items.updateItems([item], (items) => {
-                                for (const i of items) {
-                                    // we checked before but this makes typescript happy
-                                    if (member.metadata) {
-                                        if (itemMetadataKey in member.metadata) {
-                                            const data = member.metadata[itemMetadataKey] as GMGMetadata;
-                                            member.metadata[itemMetadataKey] = { ...data, group: currentParty?.group };
-                                        }
-                                        i.metadata = member.metadata;
-                                        newTokens.push(item);
+                    }
+                } else {
+                    const member = currentParty?.members.find((member) => member.imageUrl === image.image.url);
+                    if (member && member.metadata && !_.isEqual(member.metadata, item.metadata)) {
+                        void OBR.scene.items.updateItems([item], (items) => {
+                            for (const i of items) {
+                                // we checked before but this makes typescript happy
+                                if (member.metadata) {
+                                    if (itemMetadataKey in member.metadata) {
+                                        const data = member.metadata[itemMetadataKey] as GMGMetadata;
+                                        member.metadata[itemMetadataKey] = { ...data, group: currentParty?.group };
                                     }
-                                    if (member.playerId) {
-                                        i.createdUserId = member.playerId;
-                                    }
+                                    i.metadata = member.metadata;
+                                    newTokens.push(item);
                                 }
-                            });
-                        }
+                                if (member.playerId) {
+                                    i.createdUserId = member.playerId;
+                                }
+                            }
+                        });
                     }
                 }
-            });
-        }
+            }
+        });
+
         if (newTokens.length > 0) {
             initItems();
         }

@@ -54,8 +54,6 @@ export const partyStore = createStore<PartyStore>()(
                                 };
                             }) ?? [];
 
-                        console.log(newMembers);
-
                         const newParty: PartySettings = {
                             id: party.id,
                             name: party.name,
