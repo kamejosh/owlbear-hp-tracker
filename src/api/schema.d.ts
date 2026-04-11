@@ -670,6 +670,57 @@ export interface paths {
         patch: operations["edit_item"];
         trace?: never;
     };
+    "/api/v1/e5/item/loot": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Get Loot Items */
+        post: operations["get_loot_items"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/e5/item/shop": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Get Shop */
+        post: operations["get_shop"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/e5/item/types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Get Item Type */
+        post: operations["get_item_type"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/party/player/": {
         parameters: {
             query?: never;
@@ -830,6 +881,23 @@ export interface paths {
         head?: never;
         /** Update Party Statblock */
         patch: operations["update_party_statblock"];
+        trace?: never;
+    };
+    "/api/v1/party/{party_id}/statblock/{statblock_id}/money": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Party Statblock Money */
+        patch: operations["update_party_statblock_money"];
         trace?: never;
     };
     "/api/v1/party/{party_id}/statblock/{party_statblock_id}/equipment/": {
@@ -1177,7 +1245,7 @@ export interface components {
             group?: string | null;
             /** Alignment */
             alignment?: string | null;
-            armor_class: components["schemas"]["src__model_types__e5__base__ArmorClass"];
+            armor_class: components["schemas"]["src__model_types__pf__statblock__ArmorClass"];
             hp: components["schemas"]["src__model_types__e5__base__Hitpoints"];
             speed: components["schemas"]["Speed"];
             stats: components["schemas"]["src__model_types__e5__base__Stats"];
@@ -1255,7 +1323,7 @@ export interface components {
             group?: string | null;
             /** Alignment */
             alignment?: string | null;
-            armor_class: components["schemas"]["src__model_types__e5__base__ArmorClass"];
+            armor_class: components["schemas"]["src__model_types__pf__statblock__ArmorClass"];
             hp: components["schemas"]["src__model_types__e5__base__Hitpoints"];
             speed: components["schemas"]["Speed"];
             stats: components["schemas"]["src__model_types__e5__base__Stats"];
@@ -1613,7 +1681,7 @@ export interface components {
         };
         /** ItemStatsIn */
         ItemStatsIn: {
-            armor_class?: components["schemas"]["src__model_types__e5__base__ArmorClass"] | null;
+            armor_class?: components["schemas"]["src__model_types__pf__statblock__ArmorClass"] | null;
             hp?: components["schemas"]["src__model_types__e5__base__Hitpoints"] | null;
             /** Senses */
             senses?: string[] | null;
@@ -1638,7 +1706,7 @@ export interface components {
         };
         /** ItemStatsOut */
         ItemStatsOut: {
-            armor_class?: components["schemas"]["src__model_types__e5__base__ArmorClass"] | null;
+            armor_class?: components["schemas"]["src__model_types__pf__statblock__ArmorClass"] | null;
             hp?: components["schemas"]["src__model_types__e5__base__Hitpoints"] | null;
             /** Senses */
             senses?: string[] | null;
@@ -1667,6 +1735,20 @@ export interface components {
         LoggedIn: {
             /** Logged In */
             logged_in: boolean;
+        };
+        /** LootRequest */
+        LootRequest: {
+            /** Statblock Slug */
+            statblock_slug?: string | null;
+            /** Avg Party Level */
+            avg_party_level?: number | null;
+            /** Item Types */
+            item_types?: string[] | null;
+            /**
+             * Max Items
+             * @default 10
+             */
+            max_items: number;
         };
         /** ModifierStats */
         ModifierStats: {
@@ -1760,7 +1842,7 @@ export interface components {
             stats: components["schemas"]["src__model_types__pf__statblock__Stats"];
             /** Items */
             items?: string[] | null;
-            armor_class: components["schemas"]["src__model_types__e5__base__ArmorClass"];
+            armor_class: components["schemas"]["src__model_types__pf__statblock__ArmorClass"];
             saving_throws: components["schemas"]["src__model_types__pf__statblock__SavingThrows"];
             hp: components["schemas"]["src__model_types__pf__statblock__Hitpoints"];
             /** Immunities */
@@ -1805,7 +1887,7 @@ export interface components {
             stats: components["schemas"]["src__model_types__pf__statblock__Stats"];
             /** Items */
             items?: string[] | null;
-            armor_class: components["schemas"]["src__model_types__e5__base__ArmorClass"];
+            armor_class: components["schemas"]["src__model_types__pf__statblock__ArmorClass"];
             saving_throws: components["schemas"]["src__model_types__pf__statblock__SavingThrows"];
             hp: components["schemas"]["src__model_types__pf__statblock__Hitpoints"];
             /** Immunities */
@@ -2189,6 +2271,20 @@ export interface components {
              * @default false
              */
             notify_next_turn: boolean;
+        };
+        /** ShopRequest */
+        ShopRequest: {
+            /** Shop Type */
+            shop_type?: string | null;
+            /** Avg Party Level */
+            avg_party_level?: number | null;
+            /** Item Types */
+            item_types?: string[] | null;
+            /**
+             * Max Items
+             * @default 20
+             */
+            max_items: number;
         };
         /** SimpleE5StatblockOut */
         SimpleE5StatblockOut: {
@@ -4280,13 +4376,6 @@ export interface components {
             damage_dice?: string | null;
             limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
         };
-        /** ArmorClass */
-        src__model_types__e5__base__ArmorClass: {
-            /** Value */
-            value: number;
-            /** Special */
-            special?: string | null;
-        };
         /** Hitpoints */
         src__model_types__e5__base__Hitpoints: {
             /** Value */
@@ -4540,6 +4629,13 @@ export interface components {
             constant?: string | null;
             limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
         };
+        /** ArmorClass */
+        src__model_types__pf__statblock__ArmorClass: {
+            /** Value */
+            value: number;
+            /** Special */
+            special?: string | null;
+        };
         /** Hitpoints */
         src__model_types__pf__statblock__Hitpoints: {
             /** Value */
@@ -4594,6 +4690,8 @@ export interface components {
             spells: number;
             /** Items */
             items: number;
+            /** Parties */
+            parties: number;
             /** Patreon */
             patreon?: number | null;
         };
@@ -6347,6 +6445,92 @@ export interface operations {
             };
         };
     };
+    get_loot_items: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LootRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_shop: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ShopRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_item_type: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
+                };
+            };
+        };
+    };
     list_player_parties: {
         parameters: {
             query?: {
@@ -6936,6 +7120,42 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PartyStatblockOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_party_statblock_money: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                party_id: number;
+                statblock_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MoneyIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MoneyOut"];
                 };
             };
             /** @description Validation Error */
