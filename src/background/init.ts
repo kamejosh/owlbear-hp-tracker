@@ -1,5 +1,15 @@
 import OBR, { Image, Metadata } from "@owlbear-rodeo/sdk";
-import { changelogModal, ID, itemMetadataKey, metadataKey, nextTurnChannel, version } from "../helper/variables.ts";
+import {
+    changelogModal,
+    GMI_ID,
+    ID,
+    itemMetadataKey,
+    lootMetadataKey,
+    lootPopover,
+    metadataKey,
+    nextTurnChannel,
+    version,
+} from "../helper/variables.ts";
 import { compare } from "compare-versions";
 import {
     ACItemChanges,
@@ -177,6 +187,20 @@ const setupContextMenu = async () => {
     });
 
     await OBR.contextMenu.create({
+        id: `${GMI_ID}/loot/context`,
+        icons: [
+            {
+                icon: "/iconPopover.svg",
+                label: "Loot",
+                filter: {
+                    some: [{ key: ["metadata", `${lootMetadataKey}`, "lootAvailable"], value: true }],
+                    max: 1,
+                },
+            },
+        ],
+    });
+
+    await OBR.contextMenu.create({
         id: `${ID}/remove`,
         icons: [
             {
@@ -319,6 +343,78 @@ const setupContextMenu = async () => {
                     await updateTokenMetadata(metadata, [token.id]);
                 }
             }
+        },
+    });
+
+    await OBR.contextMenu.create({
+        id: `${GMI_ID}/loot`,
+        icons: [
+            {
+                icon: "/icon.svg",
+                label: "Add Loot",
+                filter: {
+                    every: [{ key: ["metadata", `${itemMetadataKey}`], value: undefined }],
+                    some: [
+                        { key: "layer", value: "CHARACTER", coordinator: "||" },
+                        { key: "layer", value: "MOUNT", coordinator: "||" },
+                        { key: "layer", value: "PROP", coordinator: "||" },
+                        { key: "layer", value: "DRAWING" },
+                    ],
+                    roles: ["GM"],
+                },
+            },
+        ],
+        onClick: async () => {
+            // width needs to be big, to position statblock popover to the right
+            let width = 10000;
+            let height = 600;
+            try {
+                width = await OBR.viewport.getWidth();
+                height = await OBR.viewport.getHeight();
+            } catch {}
+            await OBR.popover.open({
+                ...lootPopover,
+                width: Math.min(500, width),
+                height: Math.min(600, height),
+                anchorPosition: { top: 55, left: width - 70 },
+            });
+        },
+    });
+
+    await OBR.contextMenu.create({
+        id: `${GMI_ID}/loot`,
+        icons: [
+            {
+                icon: "/icon.svg",
+                label: "Manage Loot",
+                filter: {
+                    every: [{ key: ["metadata", `${lootMetadataKey}`], value: undefined, operator: "!=" }],
+                    roles: ["GM"],
+                },
+            },
+            {
+                icon: "/icon.svg",
+                label: "Loot",
+                filter: {
+                    every: [{ key: ["metadata", `${lootMetadataKey}`, "lootAvailable"], value: true }],
+                    roles: ["PLAYER"],
+                },
+            },
+        ],
+        onClick: async () => {
+            // width needs to be big, to position statblock popover to the right
+            let width = 10000;
+            let height = 600;
+            try {
+                width = await OBR.viewport.getWidth();
+                height = await OBR.viewport.getHeight();
+            } catch {}
+            await OBR.popover.open({
+                ...lootPopover,
+                width: Math.min(500, width),
+                height: Math.min(600, height),
+                anchorPosition: { top: 55, left: width - 70 },
+            });
         },
     });
 };

@@ -19,11 +19,6 @@ export type Limit = {
     formula?: string | null;
 };
 
-export type Loot = {
-    items: Array<{ id: number; name: string; count: number }>;
-    money: Money;
-};
-
 export type GMGMetadata = {
     hp: number;
     maxHp: number;
@@ -56,7 +51,6 @@ export type GMGMetadata = {
     isCurrent?: boolean;
     isNext?: boolean;
     endRound?: boolean;
-    loot?: Loot | null;
 };
 
 /**
@@ -158,11 +152,17 @@ export type InitialStatblockData = {
         attuned: Array<string>;
     };
     darkvision: number | undefined | null;
-    loot: Loot | null;
+    lootMetadata?: LootMetadata | null;
 };
 
 export type BestMatch = {
     distance: number;
     source: string | undefined | null;
     statblock: InitialStatblockData;
+};
+
+export type LootMetadata = {
+    items: Array<{ id: number; name: string; count: number }>;
+    money: Money;
+    lootAvailable: boolean;
 };

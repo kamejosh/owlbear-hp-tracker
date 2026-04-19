@@ -2,7 +2,7 @@ import { components } from "../api/schema";
 import { LimitType } from "../components/gmgrimoire/statblocks/LimitComponent.tsx";
 import { Ability } from "../components/gmgrimoire/statblocks/e5/E5Ability.tsx";
 import { Stats } from "../components/general/DiceRoller/DiceButtonWrapper.tsx";
-import { GMGMetadata, Loot } from "./types.ts";
+import { GMGMetadata, LootMetadata } from "./types.ts";
 import { updateTokenMetadata } from "./tokenHelper.ts";
 import { updateHp } from "./hpHelpers.ts";
 import { updateAc } from "./acHelper.ts";
@@ -61,7 +61,7 @@ export type EquipmentBonuses = {
     charges: Array<ItemCharges>;
     stats: Stats;
     ac: number | null;
-    loot: Loot;
+    loot: LootMetadata;
 };
 
 const getStatValue = (stats: Stats, modifiers: Array<Modifier>): Stats => {
@@ -134,7 +134,7 @@ export const getEquipmentBonuses = (
     stats: StatblockStats,
     equipment: Array<StatblockItems>,
 ): EquipmentBonuses => {
-    const loot: Loot = { items: [], money: { cp: 0, gp: 0, sp: 0, pp: 0, ep: 0 } };
+    const loot: LootMetadata = { items: [], money: { cp: 0, gp: 0, sp: 0, pp: 0, ep: 0 }, lootAvailable: false };
     const bonuses: StatblockBonuses = {
         spells: [],
         hpBonus: 0,

@@ -540,6 +540,7 @@ export const PlayerPartyStatblock = ({ member, party }: { member: PartyStoreStat
 
     const totalWeight =
         statblock?.equipment?.reduce((acc, eq) => acc + (eq.item.weight ?? 0) * (eq.count ?? 1), 0) ?? 0;
+    const maxWeight = (statblock?.stats.strength ?? 10) * 15;
 
     if (statblockQuery.isLoading) {
         return (
@@ -654,7 +655,9 @@ export const PlayerPartyStatblock = ({ member, party }: { member: PartyStoreStat
                                 }}
                             >
                                 <ScaleRounded sx={{ fontSize: "1.2em", opacity: 0.6 }} />
-                                <span>{totalWeight.toFixed(1)}</span>
+                                <span>
+                                    {totalWeight.toFixed(1)} (max: {maxWeight})
+                                </span>
                             </div>
                         </>
                     ) : null}

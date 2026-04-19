@@ -17,6 +17,7 @@ export default defineConfig({
                 statblock: resolve(__dirname, "statblock.html"),
                 rolllog: resolve(__dirname, "rolllog.html"),
                 party: resolve(__dirname, "party.html"),
+                loot: resolve(__dirname, "loot.html"),
             },
             /**
              * Ignore "use client" waning since we are not using SSR
