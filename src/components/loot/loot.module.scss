@@ -1,0 +1,182 @@
+.header {
+    display: flex;
+    align-items: center;
+    gap: 1ch;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0.5rem;
+    width: 100%;
+}
+
+.tokenImage {
+    height: 40px;
+}
+
+.tokenName {
+    flex-grow: 1;
+    margin: 0;
+}
+
+.statusButton {
+    display: flex;
+    align-items: center;
+    justify-self: flex-end;
+    gap: 0.5ch;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 4px 12px;
+    color: white;
+    font-weight: bold;
+
+    &.lootable {
+        background-color: #448844;
+    }
+
+    &.locked {
+        background-color: #666;
+    }
+}
+
+.statusDot {
+    display: inline-block;
+    border-radius: 50%;
+    width: 8px;
+    height: 8px;
+
+    &.lootable {
+        box-shadow: 0 0 5px #00ff00;
+        background-color: #00ff00;
+    }
+
+    &.locked {
+        background-color: #ff4444;
+    }
+}
+
+.section {
+    margin-bottom: 1.5rem;
+
+    &.last {
+        margin-bottom: 0;
+    }
+}
+
+.sectionTitle {
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.itemRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.03);
+    padding: 4px 8px;
+}
+
+.itemName {
+    font-weight: bold;
+}
+
+.itemCount {
+    opacity: 0.8;
+}
+
+.noItems {
+    opacity: 0.5;
+    padding: 4px 8px;
+    font-style: italic;
+}
+
+.errorContainer {
+    margin-bottom: 8px;
+    border: 1px solid rgba(255, 0, 0, 0.2);
+    border-radius: 4px;
+    background-color: rgba(255, 0, 0, 0.1);
+    padding: 8px;
+    color: #ff4444;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.moneyContainer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.5ch;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.03);
+    padding: 8px;
+}
+
+.moneyItem {
+    display: flex;
+    align-items: center;
+    gap: 0.5ch;
+}
+
+.moneyInput {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 4px 6px;
+    width: 7ch;
+    color: inherit;
+    font-size: 0.9rem;
+}
+
+.moneyValue {
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.moneyLabel {
+    opacity: 0.8;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.editActions {
+    display: flex;
+    align-items: center;
+    gap: 1ch;
+    margin-left: auto;
+}
+
+.diffContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.5ch;
+    margin-right: 1ch;
+    font-size: 0.8rem;
+}
+
+.diffItem {
+    border-radius: 4px;
+    padding: 2px 4px;
+    font-weight: bold;
+
+    &.positive {
+        background-color: rgba(68, 255, 68, 0.1);
+        color: #44ff44;
+    }
+
+    &.negative {
+        background-color: rgba(255, 68, 68, 0.1);
+        color: #ff4444;
+    }
+}
+
+.initContainer {
+    display: flex;
+    align-items: center;
+    gap: 1ch;
+}
+
+.initTitle {
+    margin: 0;
+}

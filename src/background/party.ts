@@ -197,11 +197,11 @@ export const initParty = async () => {
                             for (const i of items) {
                                 // we checked before but this makes typescript happy
                                 if (member.metadata) {
+                                    let data = member.metadata[itemMetadataKey] as GMGMetadata;
                                     if (itemMetadataKey in member.metadata) {
-                                        const data = member.metadata[itemMetadataKey] as GMGMetadata;
-                                        member.metadata[itemMetadataKey] = { ...data, group: currentParty?.group };
+                                        data.group = currentParty?.group;
                                     }
-                                    i.metadata = member.metadata;
+                                    i.metadata[itemMetadataKey] = data;
                                     newTokens.push(item);
                                 }
                                 if (member.playerId) {

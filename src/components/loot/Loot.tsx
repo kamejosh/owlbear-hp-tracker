@@ -1,16 +1,18 @@
 import { ContextWrapper } from "../ContextWrapper.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
-import { useMetadataContext } from "../../context/MetadataContext.ts";
-import { usePartyStore } from "../../context/PartyStore.tsx";
 import { useEffect } from "react";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
-import OBR, { Image } from "@owlbear-rodeo/sdk";
+import OBR from "@owlbear-rodeo/sdk";
 import { useLootTokenContext } from "../../context/LootTokenContext.tsx";
-import { lootPopover } from "../../helper/variables.ts";
+import { lootMetadataKey, lootPopover } from "../../helper/variables.ts";
+import _ from "lodash";
+import { LootMetadata } from "../../helper/types.ts";
+import { LootGM } from "./LootGM.tsx";
+import { LootPlayer } from "./LootPlayer.tsx";
 
 const TopButtons = () => {
     return (
-        <div style={{ position: "absolute", top: "1ch", right: "1ch", display: "flex", gap: "1ch" }}>
+        <div style={{ position: "absolute", top: "4px", right: "16px", display: "flex", gap: "1ch" }}>
             <button
                 onClick={async () => {
                     await OBR.popover.close(lootPopover.id);
@@ -25,6 +27,8 @@ const TopButtons = () => {
 export const Loot = () => {
     const setToken = useLootTokenContext((state) => state.setToken);
     const token = useLootTokenContext((state) => state.token);
+    const data = useLootTokenContext((state) => state.data);
+    const setData = useLootTokenContext((state) => state.setData);
     const { isReady } = SceneReadyContext();
 
     const initPopover = async () => {
@@ -44,6 +48,21 @@ export const Loot = () => {
             }
         });
     };
+
+    useEffect(() => {
+        if (token) {
+            return OBR.scene.items.onChange(async (items) => {
+                const item = items.find((i) => i.id === token.id);
+                if (item && lootMetadataKey in item.metadata) {
+                    if (!_.isEqual(data, item.metadata[lootMetadataKey])) {
+                        setData(item.metadata[lootMetadataKey] as LootMetadata);
+                    }
+                } else {
+                    setData(null);
+                }
+            });
+        }
+    }, [token, data]);
 
     useEffect(() => {
         if (isReady) {
@@ -70,45 +89,3 @@ const Content = () => {
         return <LootPlayer />;
     }
 };
-
-const LootGM = () => {
-    const data = useLootTokenContext((state) => state.data);
-    const token = useLootTokenContext((state) => state.token);
-    const room = useMetadataContext((state) => state.room);
-    const currentParty = usePartyStore((state) => state.currentParty);
-
-    if (!token) {
-        return <div>No token selected for loot</div>;
-    }
-
-    return (
-        <>
-            <div style={{ display: "flex", gap: "1ch", alignItems: "center" }}>
-                <div>
-                    {token.type === "IMAGE" ? (
-                        <img src={(token as Image).image.url} alt={token.name} style={{ height: "40px" }} />
-                    ) : null}
-                </div>
-                <h2 style={{ margin: 0 }}>{token.name}</h2>
-            </div>
-            <div>
-                <h2>Money</h2>
-                {data?.money.cp}
-            </div>
-            <div>
-                <h2>Items</h2>
-                {data?.items.map((item) => {
-                    return (
-                        <div key={item.id}>
-                            <h3>
-                                {item.count}x {item.name}
-                            </h3>
-                        </div>
-                    );
-                })}
-            </div>
-        </>
-    );
-};
-
-const LootPlayer = () => {};

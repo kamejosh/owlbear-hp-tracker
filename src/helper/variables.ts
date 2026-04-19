@@ -55,7 +55,7 @@ export const partyModal: Modal = {
 export const lootPopover: Popover = {
     id: `${modalId}/loot`,
     url: "/loot.html",
-    width: 500,
+    width: 400,
     height: 600,
     transformOrigin: { vertical: "TOP", horizontal: "RIGHT" },
     marginThreshold: 10,
@@ -105,7 +105,7 @@ export const defaultStats: Stats = {
 };
 
 export const defaultLoot: LootMetadata = {
-    lootAvailable: true,
+    lootAvailable: false,
     money: { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 },
     items: [],
 };
