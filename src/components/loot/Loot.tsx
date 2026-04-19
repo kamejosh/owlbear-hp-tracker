@@ -9,6 +9,7 @@ import _ from "lodash";
 import { LootMetadata } from "../../helper/types.ts";
 import { LootGM } from "./LootGM.tsx";
 import { LootPlayer } from "./LootPlayer.tsx";
+import { LootTokenSelect } from "./LootTokenSelect.tsx";
 
 const TopButtons = () => {
     return (
@@ -70,11 +71,19 @@ export const Loot = () => {
         }
     }, [isReady]);
 
+    if (token && !["CHARACTER", "MOUNT", "PROP"].includes(token.layer)) {
+        return (
+            <div style={{ textAlign: "left" }}>
+                Only Items on the Character, Mount and Prop Layers can be used for Loot.
+            </div>
+        );
+    }
+
     return (
         <ContextWrapper component={"modal"}>
             <div style={{ textAlign: "left" }}>
                 <TopButtons />
-                {token ? <Content /> : <div>Loot is only available for a single item at a time.</div>}
+                {token ? <Content /> : <LootTokenSelect />}
             </div>
         </ContextWrapper>
     );

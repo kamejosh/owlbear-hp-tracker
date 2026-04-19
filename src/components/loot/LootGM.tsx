@@ -12,6 +12,7 @@ import styles from "../party/party-inventory.module.scss";
 import lootStyles from "./loot.module.scss";
 import { defaultLoot } from "../../helper/variables.ts";
 import Tippy from "@tippyjs/react";
+import { CloseSvg } from "../svgs/CloseSvg.tsx";
 
 const RATES = {
     pp: 1000,
@@ -135,6 +136,7 @@ const resolveCalculation = (input: string, currentValue: number): number => {
 export const LootGM = () => {
     const data = useLootTokenContext((state) => state.data);
     const token = useLootTokenContext((state) => state.token);
+    const setToken = useLootTokenContext((state) => state.setToken);
 
     if (!token) {
         return <div>No token selected for loot</div>;
@@ -144,21 +146,29 @@ export const LootGM = () => {
         return (
             <>
                 <div className={lootStyles.header}>
-                    <div>
+                    <Tippy content={"Unselect Token"}>
+                        <button className={lootStyles.unselectButton} onClick={() => setToken(null)}>
+                            <CloseSvg />
+                        </button>
+                    </Tippy>
+                    <div className={lootStyles.tokenImage}>
                         {token.type === "IMAGE" ? (
                             <img src={(token as Image).image.url} alt={token.name} className={lootStyles.tokenImage} />
                         ) : null}
                     </div>
                     <h2 className={lootStyles.tokenName}>{token.name}</h2>
                 </div>
-                Initialize Loot for Token:{" "}
-                <button
-                    onClick={() => {
-                        void updateLootMetadata(defaultLoot, [token.id]);
-                    }}
-                >
-                    Initialize
-                </button>
+                <div className={lootStyles.initContainer}>
+                    Initialize Loot for Token:{" "}
+                    <button
+                        className={"button"}
+                        onClick={() => {
+                            void updateLootMetadata(defaultLoot, [token.id]);
+                        }}
+                    >
+                        Initialize
+                    </button>
+                </div>
             </>
         );
     }
@@ -166,6 +176,11 @@ export const LootGM = () => {
     return (
         <>
             <div className={lootStyles.header}>
+                <Tippy content={"Unselect Token"}>
+                    <button className={lootStyles.unselectButton} onClick={() => setToken(null)}>
+                        <CloseSvg />
+                    </button>
+                </Tippy>
                 <div>
                     {token.type === "IMAGE" ? (
                         <img src={(token as Image).image.url} alt={token.name} className={lootStyles.tokenImage} />

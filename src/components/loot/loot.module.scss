@@ -12,6 +12,30 @@
     height: 40px;
 }
 
+.unselectButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    border: none;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 4px;
+    width: 32px;
+    height: 32px;
+    color: white;
+
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
 .tokenName {
     flex-grow: 1;
     margin: 0;
@@ -179,4 +203,120 @@
 
 .initTitle {
     margin: 0;
+}
+
+.filterSelect {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: white !important;
+
+    :global(.MuiOutlinedInput-notchedOutline) {
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    &:hover :global(.MuiOutlinedInput-notchedOutline) {
+        border-color: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    :global(.MuiSvgIcon-root) {
+        color: white !important;
+    }
+
+    &.Mui-focused :global(.MuiOutlinedInput-notchedOutline) {
+        border-color: #448844 !important;
+    }
+}
+
+.filterLabel {
+    color: rgba(255, 255, 255, 0.7) !important;
+
+    &.Mui-focused {
+        color: #448844 !important;
+    }
+}
+
+.autocompleteField {
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.05);
+
+    :global(.MuiOutlinedInput-root) {
+        color: white !important;
+
+        :global(.MuiOutlinedInput-notchedOutline) {
+            border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        &:hover :global(.MuiOutlinedInput-notchedOutline) {
+            border-color: rgba(255, 255, 255, 0.3) !important;
+        }
+
+        &.Mui-focused :global(.MuiOutlinedInput-notchedOutline) {
+            border-color: #448844 !important;
+        }
+    }
+
+    :global(.MuiInputLabel-root) {
+        color: rgba(255, 255, 255, 0.7) !important;
+
+        &.Mui-focused {
+            color: #448844 !important;
+        }
+    }
+
+    :global(.MuiSvgIcon-root) {
+        color: white !important;
+    }
+}
+
+:global(.MuiPaper-root.MuiAutocomplete-paper) {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: #222 !important;
+    color: white !important;
+
+    :global(.MuiAutocomplete-option) {
+        &[aria-selected="true"] {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        &.Mui-focused {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+        }
+
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.08) !important;
+        }
+    }
+}
+
+:global(.MuiMenu-paper) {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: #222 !important;
+    color: white !important;
+
+    :global(.MuiMenuItem-root) {
+        &.Mui-selected {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+
+            &:hover {
+                background-color: rgba(255, 255, 255, 0.15) !important;
+            }
+        }
+
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.08) !important;
+        }
+    }
+}
+
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.8rem;
+
+    input[type="checkbox"] {
+        cursor: pointer;
+        accent-color: #448844;
+    }
 }
