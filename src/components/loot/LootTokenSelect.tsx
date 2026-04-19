@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { useDebounceFn } from "ahooks";
 import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
 import { TextField, Box, Typography, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
 import { infoMetadataKey, itemMetadataKey, lootMetadataKey } from "../../helper/variables.ts";
@@ -7,7 +8,7 @@ import { useLootTokenContext } from "../../context/LootTokenContext.tsx";
 import lootStyles from "./loot.module.scss";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import Tippy from "@tippyjs/react";
-import { updateLootMetadata } from "../../helper/tokenHelper.ts";
+import { handleOnPlayerDoubleClick, updateLootMetadata } from "../../helper/tokenHelper.ts";
 
 const RATES = {
     pp: 1000,
@@ -72,6 +73,25 @@ export const LootTokenSelect = () => {
     const [itemsFilter, setItemsFilter] = useState<boolean>(false);
     const [sortBy, setSortBy] = useState<SortOption>("name");
     const [searchQuery, setSearchQuery] = useState<string>("");
+    const [isWaiting, setIsWaiting] = useState(false);
+    const { run: runSingleClick, cancel: cancelSingleClick } = useDebounceFn(
+        (token: Item) => {
+            setToken(token);
+            setIsWaiting(false);
+        },
+        { wait: 200 },
+    );
+
+    const handleTokenClick = (token: Item) => {
+        if (isWaiting) {
+            cancelSingleClick();
+            setIsWaiting(false);
+            void handleOnPlayerDoubleClick(token.id);
+        } else {
+            setIsWaiting(true);
+            runSingleClick(token);
+        }
+    };
 
     useEffect(() => {
         const init = async () => {
@@ -283,7 +303,7 @@ export const LootTokenSelect = () => {
                                 key={token.id}
                                 className={lootStyles.tokenListItem}
                                 sx={{ display: "flex", gap: 1, p: 1, alignItems: "center" }}
-                                onClick={() => setToken(token)}
+                                onClick={() => handleTokenClick(token)}
                             >
                                 {token.type === "IMAGE" && (
                                     <img

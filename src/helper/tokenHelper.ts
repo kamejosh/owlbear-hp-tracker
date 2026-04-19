@@ -1,5 +1,5 @@
 import { GMGMetadata, LootMetadata, RoomMetadata } from "./types.ts";
-import { Image, Item } from "@owlbear-rodeo/sdk";
+import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
 import { itemMetadataKey, lootMetadataKey } from "./variables.ts";
 import { evalString } from "./helpers.ts";
 import { updateHp } from "./hpHelpers.ts";
@@ -153,4 +153,13 @@ export const changeArmorClass = (newAc: number, data: GMGMetadata, item: Image, 
     const newData = { ...data, armorClass: newAc };
     updateAc(item, newData);
     updateTokenMetadata(newData, [item.id]);
+};
+
+export const handleOnPlayerDoubleClick = async (id: string) => {
+    const bounds = await OBR.scene.items.getItemBounds([id]);
+    await OBR.viewport.animateToBounds({
+        ...bounds,
+        min: { x: bounds.min.x - 1000, y: bounds.min.y - 1000 },
+        max: { x: bounds.max.x + 1000, y: bounds.max.y + 1000 },
+    });
 };
