@@ -44,8 +44,6 @@ export const Loot = () => {
             const token = await OBR.scene.items.getItems(player.selection);
             if (token.length === 1) {
                 setToken(token[0]);
-            } else {
-                setToken(null);
             }
         });
     };

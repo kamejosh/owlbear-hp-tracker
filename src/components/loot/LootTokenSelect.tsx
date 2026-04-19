@@ -1,11 +1,13 @@
 import { useEffect, useState, useMemo } from "react";
 import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
-import { Autocomplete, TextField, Box, Typography, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
-import { lootMetadataKey } from "../../helper/variables.ts";
-import { LootMetadata } from "../../helper/types.ts";
+import { TextField, Box, Typography, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
+import { infoMetadataKey, itemMetadataKey, lootMetadataKey } from "../../helper/variables.ts";
+import { GMGMetadata, LootMetadata } from "../../helper/types.ts";
 import { useLootTokenContext } from "../../context/LootTokenContext.tsx";
 import lootStyles from "./loot.module.scss";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
+import Tippy from "@tippyjs/react";
+import { updateLootMetadata } from "../../helper/tokenHelper.ts";
 
 const RATES = {
     pp: 1000,
@@ -69,21 +71,36 @@ export const LootTokenSelect = () => {
     const [moneyFilter, setMoneyFilter] = useState<boolean>(false);
     const [itemsFilter, setItemsFilter] = useState<boolean>(false);
     const [sortBy, setSortBy] = useState<SortOption>("name");
+    const [searchQuery, setSearchQuery] = useState<string>("");
 
     useEffect(() => {
         const init = async () => {
-            const allTokens = await OBR.scene.items.getItems((i) => ["CHARACTER", "PROP", "MOUNT"].includes(i.layer));
+            const allTokens = await OBR.scene.items.getItems(
+                (i) => ["CHARACTER", "PROP", "MOUNT"].includes(i.layer) && !(infoMetadataKey in i.metadata),
+            );
             setTokens(allTokens);
         };
         init();
         return OBR.scene.items.onChange((items) => {
-            const filtered = items.filter((i) => ["CHARACTER", "PROP", "MOUNT"].includes(i.layer));
+            const filtered = items.filter(
+                (i) => ["CHARACTER", "PROP", "MOUNT"].includes(i.layer) && !(infoMetadataKey in i.metadata),
+            );
             setTokens(filtered);
         });
     }, []);
 
     const filteredAndSortedTokens = useMemo(() => {
         let result = [...tokens];
+
+        const query = searchQuery.toLowerCase().trim();
+        if (query !== "") {
+            result = result.filter((t) => {
+                if (t.name.toLowerCase().includes(query)) return true;
+                const loot = t.metadata[lootMetadataKey] as LootMetadata | undefined;
+                if (loot?.items?.some((item) => item.name.toLowerCase().includes(query))) return true;
+                return false;
+            });
+        }
 
         if (typeFilter !== "ALL") {
             result = result.filter((t) => t.type === typeFilter);
@@ -124,8 +141,20 @@ export const LootTokenSelect = () => {
             return 0;
         });
 
-        return result;
-    }, [tokens, typeFilter, layerFilter, moneyFilter, itemsFilter, sortBy]);
+        return result.map((t) => {
+            const loot = t.metadata[lootMetadataKey] as LootMetadata | undefined;
+            const matches: string[] = [];
+            if (searchQuery.trim() !== "" && loot?.items) {
+                const query = searchQuery.toLowerCase();
+                loot.items.forEach((item) => {
+                    if (item.name.toLowerCase().includes(query)) {
+                        matches.push(item.name);
+                    }
+                });
+            }
+            return { token: t, matchedItems: matches };
+        });
+    }, [tokens, searchQuery, typeFilter, layerFilter, moneyFilter, itemsFilter, sortBy]);
 
     if (tokens.length === 0) {
         return <div className={lootStyles.noItems}>No tokens found in scene</div>;
@@ -136,7 +165,7 @@ export const LootTokenSelect = () => {
     }
 
     return (
-        <Box sx={{ p: 2, display: "flex", flexDirection: "column", gap: 2 }}>
+        <Box sx={{ p: 0, display: "flex", flexDirection: "column", gap: 2 }}>
             <Typography variant="h6" className={lootStyles.sectionTitle}>
                 Select Token for Loot
             </Typography>
@@ -229,60 +258,101 @@ export const LootTokenSelect = () => {
                 </Box>
             </Box>
 
-            <Autocomplete
-                options={filteredAndSortedTokens}
-                getOptionLabel={(option) => option.name}
-                onChange={(_, value) => {
-                    if (value) setToken(value);
-                }}
-                filterOptions={(options, { inputValue }) => {
-                    return options.filter((option) => option.name.toLowerCase().includes(inputValue.toLowerCase()));
-                }}
-                renderOption={(props, option) => {
-                    const { key, ...optionProps } = props as any;
-                    const loot = option.metadata[lootMetadataKey] as LootMetadata | undefined;
-                    const hasLoot = !!loot;
-                    const totalCP = hasLoot ? toCP(loot.money) : 0;
-                    const itemCount = hasLoot ? loot.items?.reduce((acc, item) => acc + item.count, 0) || 0 : 0;
+            <TextField
+                label="Search Tokens"
+                variant="outlined"
+                size="small"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={lootStyles.searchField}
+                fullWidth
+            />
 
-                    return (
-                        <Box component="li" key={option.id} {...optionProps} sx={{ display: "flex", gap: 1, py: 1 }}>
-                            {option.type === "IMAGE" && (
-                                <img
-                                    src={(option as Image).image.url}
-                                    alt=""
-                                    style={{ width: 32, height: 32, objectFit: "contain" }}
-                                />
-                            )}
-                            <Box sx={{ flexGrow: 1 }}>
-                                <Typography variant="body1">{option.name}</Typography>
+            <Box className={lootStyles.tokenList}>
+                {filteredAndSortedTokens.length === 0 ? (
+                    <Typography sx={{ p: 2, textAlign: "center", opacity: 0.5 }}>No tokens match filters</Typography>
+                ) : (
+                    filteredAndSortedTokens.map(({ token, matchedItems }) => {
+                        const loot = token.metadata[lootMetadataKey] as LootMetadata | undefined;
+                        const hasLoot = !!loot;
+                        const totalCP = hasLoot ? toCP(loot.money) : 0;
+                        const itemCount = hasLoot ? loot.items?.reduce((acc, item) => acc + item.count, 0) || 0 : 0;
+
+                        return (
+                            <Box
+                                key={token.id}
+                                className={lootStyles.tokenListItem}
+                                sx={{ display: "flex", gap: 1, p: 1, alignItems: "center" }}
+                                onClick={() => setToken(token)}
+                            >
+                                {token.type === "IMAGE" && (
+                                    <img
+                                        src={(token as Image).image.url}
+                                        alt=""
+                                        style={{ width: 32, height: 32, objectFit: "contain" }}
+                                    />
+                                )}
+                                <Box sx={{ flexGrow: 1 }}>
+                                    <Typography variant="body1">{token.name}</Typography>
+                                    {hasLoot && (
+                                        <Box sx={{ display: "flex", gap: 1, alignItems: "center", opacity: 0.7 }}>
+                                            <Typography variant="caption">
+                                                {formatCPShort(totalCP)} | {itemCount} items
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                    {matchedItems.length > 0 && (
+                                        <Box sx={{ mt: 0.5, opacity: 0.8 }}>
+                                            <Typography
+                                                variant="caption"
+                                                sx={{ fontStyle: "italic", display: "block" }}
+                                            >
+                                                Found in:
+                                            </Typography>
+                                            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                                                {matchedItems.map((itemName, i) => (
+                                                    <span key={i} className={lootStyles.matchedItemHighlight}>
+                                                        {itemName}
+                                                    </span>
+                                                ))}
+                                            </Box>
+                                        </Box>
+                                    )}
+                                </Box>
                                 {hasLoot && (
-                                    <Box sx={{ display: "flex", gap: 1, alignItems: "center", opacity: 0.7 }}>
-                                        <div
-                                            className={`${lootStyles.statusDot} ${
+                                    <Tippy
+                                        content={
+                                            loot.lootAvailable
+                                                ? "Looting is enabled for players"
+                                                : "Looting is disabled for players"
+                                        }
+                                    >
+                                        <button
+                                            className={`${lootStyles.compactStatusButton} ${
                                                 loot.lootAvailable ? lootStyles.lootable : lootStyles.locked
                                             }`}
-                                            style={{ width: 6, height: 6 }}
-                                        />
-                                        <Typography variant="caption">
-                                            {formatCPShort(totalCP)} | {itemCount} items
-                                        </Typography>
-                                    </Box>
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                void updateLootMetadata(
+                                                    { ...loot, lootAvailable: !loot.lootAvailable },
+                                                    [token.id],
+                                                );
+                                            }}
+                                        >
+                                            <span
+                                                className={`${lootStyles.statusDot} ${
+                                                    loot.lootAvailable ? lootStyles.lootable : lootStyles.locked
+                                                }`}
+                                            />
+                                            {loot.lootAvailable ? "Lootable" : "Locked"}
+                                        </button>
+                                    </Tippy>
                                 )}
                             </Box>
-                        </Box>
-                    );
-                }}
-                renderInput={(params) => (
-                    <TextField
-                        {...params}
-                        label="Search Tokens"
-                        variant="outlined"
-                        size="small"
-                        className={lootStyles.autocompleteField}
-                    />
+                        );
+                    })
                 )}
-            />
+            </Box>
         </Box>
     );
 };

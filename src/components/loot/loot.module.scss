@@ -234,7 +234,7 @@
     }
 }
 
-.autocompleteField {
+.searchField {
     border-radius: 4px;
     background-color: rgba(255, 255, 255, 0.05);
 
@@ -264,6 +264,48 @@
 
     :global(.MuiSvgIcon-root) {
         color: white !important;
+    }
+}
+
+.tokenList {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.03);
+    max-height: 400px;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.1);
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    }
+}
+
+.tokenListItem {
+    transition: background-color 0.2s;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.08);
     }
 }
 
@@ -319,4 +361,44 @@
         cursor: pointer;
         accent-color: #448844;
     }
+}
+
+.compactStatusButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5ch;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 2px 8px;
+    color: white;
+    font-weight: bold;
+    font-size: 0.75rem;
+
+    &.lootable {
+        background-color: #448844;
+        &:hover {
+            background-color: #55aa55;
+        }
+    }
+
+    &.locked {
+        background-color: #444;
+        &:hover {
+            background-color: #555;
+        }
+    }
+}
+
+.matchedItemHighlight {
+    display: inline-block;
+    margin-right: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    background-color: rgba(68, 136, 68, 0.3);
+    padding: 0 4px;
+    color: #ccffcc;
+    font-weight: bold;
+    font-size: 0.7rem;
 }
