@@ -161,8 +161,15 @@ export type BestMatch = {
     statblock: InitialStatblockData;
 };
 
+export type LootItemType = {
+    id: number;
+    name: string;
+    count: number;
+    slug: string;
+};
+
 export type LootMetadata = {
-    items: Array<{ id: number; name: string; count: number }>;
+    items: Array<LootItemType>;
     money: Money;
     lootAvailable: boolean;
 };

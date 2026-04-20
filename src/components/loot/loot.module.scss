@@ -4,7 +4,7 @@
     gap: 1ch;
     margin-bottom: 1rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 0.5rem;
+    padding-block: 1rem 0.5rem;
     width: 100%;
 }
 
@@ -232,6 +232,40 @@
     &.Mui-focused {
         color: #448844 !important;
     }
+}
+
+.transferContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 1rem;
+}
+
+.transferTitle {
+    margin: 0;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.transferRecipient {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.transferAmount {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1ch;
+}
+
+.transferActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1ch;
 }
 
 .searchField {

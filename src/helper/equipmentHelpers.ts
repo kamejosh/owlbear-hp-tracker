@@ -206,7 +206,12 @@ export const getEquipmentBonuses = (
             if (lootItem) {
                 lootItem.count += item.count ?? 1;
             } else {
-                loot.items.push({ id: item.item.id, name: item.item.name, count: item.count ?? 1 });
+                loot.items.push({
+                    id: item.item.id,
+                    name: item.item.name,
+                    count: item.count ?? 1,
+                    slug: item.item.slug,
+                });
             }
         }
         if (isItemAttuned(data, item) || isItemEquipped(data, item)) {

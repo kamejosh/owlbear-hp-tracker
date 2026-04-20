@@ -533,10 +533,23 @@ OBR.onReady(async () => {
             console.warn("GM's Grimoire - error while initializing Token event handler", e);
         }
     } else {
-        try {
-            await initPlayerParty();
-        } catch (e) {
-            console.warn("GM's Grimoire - error while initializing Player Party", e);
+        OBR.scene.onReadyChange(async (isReady) => {
+            if (isReady) {
+                try {
+                    await initPlayerParty();
+                } catch (e) {
+                    console.warn("GM's Grimoire - error while initializing Player Party", e);
+                }
+            }
+        });
+
+        const isReady = await OBR.scene.isReady();
+        if (isReady) {
+            try {
+                await initPlayerParty();
+            } catch (e) {
+                console.warn("GM's Grimoire - error while initializing Player Party", e);
+            }
         }
     }
     try {

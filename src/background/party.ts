@@ -53,40 +53,36 @@ export const stopPartyPolling = () => {
 };
 
 const initPlayerPartyMembers = async (items: Array<Item>) => {
-    const room = await OBR.room.getMetadata();
-    const roomPartyId = metadataKey in room ? (room[metadataKey] as RoomMetadata).partyId : null;
     const currentParty = partyStore.getState().currentParty;
-    if (currentParty?.id !== roomPartyId) {
-        const partyStatblocks = currentParty?.members.map((member) => member.statblock?.slug) || [];
-        items.forEach((item) => {
-            if (item.type === "IMAGE") {
-                const image = item as Image;
-                if (itemMetadataKey in item.metadata) {
-                    const data = item.metadata[itemMetadataKey] as GMGMetadata;
+    const partyStatblocks = currentParty?.members.map((member) => member.statblock?.slug) || [];
+    items.forEach((item) => {
+        if (item.type === "IMAGE") {
+            const image = item as Image;
+            if (itemMetadataKey in item.metadata) {
+                const data = item.metadata[itemMetadataKey] as GMGMetadata;
 
-                    if (data.sheet && partyStatblocks.includes(data.sheet)) {
-                        const member = currentParty?.members.find((member) => member.statblock?.slug === data.sheet);
+                if (data.sheet && partyStatblocks.includes(data.sheet)) {
+                    const member = currentParty?.members.find((member) => member.statblock?.slug === data.sheet);
 
-                        if (member) {
-                            const newMember: PartyStoreStatblock = { ...member };
+                    if (member) {
+                        const newMember: PartyStoreStatblock = { ...member };
 
-                            if (item.createdUserId !== member.playerId) {
-                                newMember.playerId = item.createdUserId;
-                            }
+                        if (item.createdUserId !== member.playerId) {
+                            newMember.playerId = item.createdUserId;
+                        }
 
-                            if (!member.imageUrl) {
-                                newMember.imageUrl = image.image.url;
-                            }
+                        if (!member.imageUrl) {
+                            newMember.imageUrl = image.image.url;
+                        }
 
-                            if (!_.isEqual(member, newMember)) {
-                                partyStore.getState().updateMember(newMember);
-                            }
+                        if (!_.isEqual(member, newMember)) {
+                            partyStore.getState().updateMember(newMember);
                         }
                     }
                 }
             }
-        });
-    }
+        }
+    });
 };
 
 export const initPlayerParty = async () => {

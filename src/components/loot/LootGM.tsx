@@ -1,8 +1,14 @@
 import { useLootTokenContext } from "../../context/LootTokenContext.tsx";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { useDebounceFn } from "ahooks";
 import { useForm } from "react-hook-form";
-import { MoneyIn } from "../../api/tabletop-almanac/useParty.ts";
-import { evalString } from "../../helper/helpers.ts";
+import {
+    MoneyIn,
+    useGetParty,
+    useUpdatePartyMoney,
+    useUpdatePartyStatblockMoney,
+} from "../../api/tabletop-almanac/useParty.ts";
+import { useE5GetStatblock } from "../../api/e5/useE5Api.ts";
 import { Image } from "@owlbear-rodeo/sdk";
 import { updateLootMetadata } from "../../helper/tokenHelper.ts";
 import { EditGroup } from "../form/EditButton.tsx";
@@ -13,125 +19,12 @@ import lootStyles from "./loot.module.scss";
 import { defaultLoot } from "../../helper/variables.ts";
 import Tippy from "@tippyjs/react";
 import { CloseSvg } from "../svgs/CloseSvg.tsx";
-
-const RATES = {
-    pp: 1000,
-    gp: 100,
-    ep: 50,
-    sp: 10,
-    cp: 1,
-};
-
-const normalizeToCP = (money: MoneyIn): MoneyIn => {
-    let pp = Number(money.pp) || 0;
-    let gp = Number(money.gp) || 0;
-    let ep = Number(money.ep) || 0;
-    let sp = Number(money.sp) || 0;
-    let cp = Number(money.cp) || 0;
-
-    if (pp < 0) {
-        const needed = Math.abs(pp) * 10;
-        gp -= needed;
-        pp = 0;
-    }
-    if (gp < 0) {
-        const needed = Math.abs(gp) * 2;
-        ep -= needed;
-        gp = 0;
-    }
-    if (ep < 0) {
-        const needed = Math.abs(ep) * 5;
-        sp -= needed;
-        ep = 0;
-    }
-    if (sp < 0) {
-        const needed = Math.abs(sp) * 10;
-        cp -= needed;
-        sp = 0;
-    }
-
-    if (cp < 0) {
-        const needed = Math.ceil(Math.abs(cp) / 10);
-        sp -= needed;
-        cp += needed * 10;
-    }
-    if (sp < 0) {
-        const needed = Math.ceil(Math.abs(sp) / 5);
-        ep -= needed;
-        sp += needed * 5;
-    }
-    if (ep < 0) {
-        const needed = Math.ceil(Math.abs(ep) / 2);
-        gp -= needed;
-        ep += needed * 2;
-    }
-    if (gp < 0) {
-        const needed = Math.ceil(Math.abs(gp) / 10);
-        pp -= needed;
-        gp += needed * 10;
-    }
-
-    if (cp < 0 || sp < 0 || ep < 0 || gp < 0) {
-        return normalizeToCP({ pp, gp, ep, sp, cp });
-    }
-
-    return { pp, gp, ep, sp, cp };
-};
-
-const toCP = (money: MoneyIn): number => {
-    return (
-        (Number(money.pp) || 0) * RATES.pp +
-        (Number(money.gp) || 0) * RATES.gp +
-        (Number(money.ep) || 0) * RATES.ep +
-        (Number(money.sp) || 0) * RATES.sp +
-        (Number(money.cp) || 0) * RATES.cp
-    );
-};
-
-const formatCP = (totalCP: number): string => {
-    let remaining = Math.abs(totalCP);
-    const parts: string[] = [];
-
-    if (remaining >= RATES.pp) {
-        const amount = Math.floor(remaining / RATES.pp);
-        parts.push(`${amount}pp`);
-        remaining %= RATES.pp;
-    }
-    if (remaining >= RATES.gp) {
-        const amount = Math.floor(remaining / RATES.gp);
-        parts.push(`${amount}gp`);
-        remaining %= RATES.gp;
-    }
-    if (remaining >= RATES.ep) {
-        const amount = Math.floor(remaining / RATES.ep);
-        parts.push(`${amount}ep`);
-        remaining %= RATES.ep;
-    }
-    if (remaining >= RATES.sp) {
-        const amount = Math.floor(remaining / RATES.sp);
-        parts.push(`${amount}sp`);
-        remaining %= RATES.sp;
-    }
-    if (remaining > 0) {
-        parts.push(`${remaining}cp`);
-    }
-
-    return parts.join(" ");
-};
-
-const resolveCalculation = (input: string, currentValue: number): number => {
-    let value: number;
-    if (input.startsWith("+") || input.startsWith("-")) {
-        const result = evalString(input);
-        value = Number(currentValue) + Number(result);
-    } else if (input.includes("+") || input.includes("-")) {
-        value = Number(evalString(input));
-    } else {
-        const parsed = parseFloat(input);
-        value = isNaN(parsed) ? currentValue : parsed;
-    }
-    return value;
-};
+import { useMetadataContext } from "../../context/MetadataContext.ts";
+import { MenuItem, Select, FormControl, InputLabel } from "@mui/material";
+import { CurrencyExchangeRounded } from "@mui/icons-material";
+import { Money } from "../party/PlayerParty.tsx";
+import { LootItems } from "./LootItems.tsx";
+import { formatCP, normalizeToCP, resolveCalculation, toCP } from "../../helper/moneyHelpers.ts";
 
 export const LootGM = () => {
     const data = useLootTokenContext((state) => state.data);
@@ -214,14 +107,7 @@ export const LootGM = () => {
             <div className={lootStyles.section + " " + lootStyles.last}>
                 <h2 className={lootStyles.sectionTitle}>Items</h2>
                 {data?.items.length > 0 ? (
-                    data.items.map((item) => {
-                        return (
-                            <div key={item.id} className={lootStyles.itemRow}>
-                                <span className={lootStyles.itemName}>{item.name}</span>
-                                <span className={lootStyles.itemCount}>x{item.count}</span>
-                            </div>
-                        );
-                    })
+                    <LootItems items={data.items} />
                 ) : (
                     <div className={lootStyles.noItems}>No items in loot</div>
                 )}
@@ -234,10 +120,30 @@ const LootMoney = () => {
     const data = useLootTokenContext((state) => state.data);
     const token = useLootTokenContext((state) => state.token);
     const [isEditing, setIsEditing] = useState(false);
+    const [isTransferring, setIsTransferring] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [pending, setPending] = useState(false);
+    const apiKey = useMetadataContext((state) => state.room?.tabletopAlmanacAPIKey);
+    const [recipient, setRecipient] = useState<string>("party");
+
+    const partyId = useMetadataContext((state) => state.room?.partyId);
+    const { data: party } = useGetParty(partyId);
+
+    const updatePartyMoney = useUpdatePartyMoney(partyId ?? -1, party?.money?.id);
+
+    const { run: hideError } = useDebounceFn(() => setError(null), { wait: 3000 });
 
     const form = useForm<MoneyIn>({
+        defaultValues: {
+            pp: data?.money?.pp || 0,
+            gp: data?.money?.gp || 0,
+            ep: data?.money?.ep || 0,
+            sp: data?.money?.sp || 0,
+            cp: data?.money?.cp || 0,
+        },
+    });
+
+    const transferForm = useForm<MoneyIn>({
         defaultValues: {
             pp: data?.money?.pp || 0,
             gp: data?.money?.gp || 0,
@@ -259,9 +165,116 @@ const LootMoney = () => {
         }
     }, [data?.money, isEditing, form]);
 
+    useEffect(() => {
+        if (isTransferring && data?.money) {
+            transferForm.reset({
+                pp: data.money.pp || 0,
+                gp: data.money.gp || 0,
+                ep: data.money.ep || 0,
+                sp: data.money.sp || 0,
+                cp: data.money.cp || 0,
+            });
+        }
+    }, [data?.money, isTransferring, transferForm]);
+
+    const selectedStatblock = useMemo(() => {
+        if (recipient === "party") return null;
+        return party?.statblocks?.find((s) => s.id === Number(recipient));
+    }, [party, recipient]);
+
+    const { data: fullStatblock } = useE5GetStatblock(selectedStatblock?.statblock?.slug ?? "", apiKey);
+
+    const updateMemberMoney = useUpdatePartyStatblockMoney(
+        partyId ?? -1,
+        selectedStatblock?.id ?? -1,
+        selectedStatblock?.statblock?.slug ?? "",
+    );
+
     if (!token || !data) {
         return null;
     }
+
+    const onTransfer = async (formData: MoneyIn) => {
+        if (!partyId || !party) {
+            setError("No party selected in room settings");
+            hideError();
+            return;
+        }
+
+        setPending(true);
+
+        const transferValues: Money = {
+            pp: Number(formData.pp) || 0,
+            gp: Number(formData.gp) || 0,
+            ep: Number(formData.ep) || 0,
+            sp: Number(formData.sp) || 0,
+            cp: Number(formData.cp) || 0,
+        };
+
+        const transferCP = toCP(transferValues);
+        const availableCP = toCP(data.money);
+
+        if (transferCP <= 0) {
+            setError("Transfer amount must be greater than 0");
+            hideError();
+            setPending(false);
+            return;
+        }
+
+        if (transferCP > availableCP) {
+            setError("Cannot transfer more than available in loot");
+            hideError();
+            setPending(false);
+            return;
+        }
+
+        try {
+            if (recipient === "party") {
+                const currentPartyMoney = party.money || { pp: 0, gp: 0, ep: 0, sp: 0, cp: 0 };
+                const newPartyMoney: MoneyIn = {
+                    pp: (currentPartyMoney.pp || 0) + transferValues.pp,
+                    gp: (currentPartyMoney.gp || 0) + transferValues.gp,
+                    ep: (currentPartyMoney.ep || 0) + transferValues.ep,
+                    sp: (currentPartyMoney.sp || 0) + transferValues.sp,
+                    cp: (currentPartyMoney.cp || 0) + transferValues.cp,
+                };
+                await updatePartyMoney.mutateAsync(newPartyMoney);
+            } else if (selectedStatblock) {
+                if (!fullStatblock) {
+                    setError("Recipient details not loaded yet");
+                    hideError();
+                    setPending(false);
+                    return;
+                }
+                const currentMemberMoney = fullStatblock.money || { pp: 0, gp: 0, ep: 0, sp: 0, cp: 0 };
+                const newMemberMoney: MoneyIn = {
+                    pp: (currentMemberMoney.pp || 0) + transferValues.pp,
+                    gp: (currentMemberMoney.gp || 0) + transferValues.gp,
+                    ep: (currentMemberMoney.ep || 0) + transferValues.ep,
+                    sp: (currentMemberMoney.sp || 0) + transferValues.sp,
+                    cp: (currentMemberMoney.cp || 0) + transferValues.cp,
+                };
+                await updateMemberMoney.mutateAsync(newMemberMoney);
+            }
+
+            const remainingMoney: MoneyIn = {
+                pp: (data.money.pp || 0) - transferValues.pp,
+                gp: (data.money.gp || 0) - transferValues.gp,
+                ep: (data.money.ep || 0) - transferValues.ep,
+                sp: (data.money.sp || 0) - transferValues.sp,
+                cp: (data.money.cp || 0) - transferValues.cp,
+            };
+
+            const normalizedRemaining = normalizeToCP(remainingMoney);
+            await updateLootMetadata({ ...data, money: normalizedRemaining }, [token.id]);
+
+            setIsTransferring(false);
+        } catch (e: any) {
+            setError(`Transfer failed: ${e?.response?.data?.detail ?? e?.message ?? "Unknown error"}`);
+            hideError();
+        }
+        setPending(false);
+    };
 
     const onSubmit = async (formData: MoneyIn) => {
         setPending(true);
@@ -367,55 +380,144 @@ const LootMoney = () => {
 
     const diffs = getDiff();
 
-    return (
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-            {error && <div className={lootStyles.errorContainer}>{error}</div>}
-            <EditGroup heading={null} alignLeft={false} alignCenter={true} onClick={() => setIsEditing(!isEditing)}>
-                <div className={lootStyles.moneyContainer}>
+    if (isTransferring) {
+        return (
+            <div className={lootStyles.transferContainer}>
+                {error && <div className={lootStyles.errorContainer}>{error}</div>}
+                <div className={lootStyles.transferTitle}>Transfer Money to Recipient</div>
+
+                <div className={lootStyles.transferRecipient}>
+                    <FormControl fullWidth size="small">
+                        <InputLabel className={lootStyles.filterLabel}>Recipient</InputLabel>
+                        <Select
+                            value={recipient}
+                            label="Recipient"
+                            onChange={(e) => setRecipient(e.target.value)}
+                            className={lootStyles.filterSelect}
+                        >
+                            <MenuItem value="party">Party Inventory</MenuItem>
+                            {party?.statblocks?.map((sb) => (
+                                <MenuItem key={sb.id} value={String(sb.id)}>
+                                    {sb.statblock?.name || "Unknown Member"}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </div>
+
+                <div className={lootStyles.transferAmount}>
                     {currencies.map((currency) => (
                         <div key={currency.key} className={lootStyles.moneyItem}>
-                            {isEditing ? (
-                                <input
-                                    type="text"
-                                    {...form.register(currency.key)}
-                                    onBlur={() => onBlur(currency.key)}
-                                    onKeyDown={(e) => onKeyDown(e, currency.key)}
-                                    className={`${styles.costItem} ${styles[currency.key]} ${lootStyles.moneyInput}`}
-                                />
-                            ) : (
-                                <span className={`${styles.costItem} ${styles[currency.key]} ${lootStyles.moneyValue}`}>
-                                    {form.getValues(currency.key) || 0}
-                                </span>
-                            )}
+                            <input
+                                type="number"
+                                min={0}
+                                {...transferForm.register(currency.key, { valueAsNumber: true })}
+                                className={`${styles.costItem} ${styles[currency.key]} ${lootStyles.moneyInput}`}
+                            />
                             <span className={`${styles.costItem} ${styles[currency.key]} ${lootStyles.moneyLabel}`}>
                                 {currency.label}
                             </span>
                         </div>
                     ))}
-                    {isEditing && (
-                        <div className={lootStyles.editActions}>
-                            {diffs.length > 0 && (
-                                <div className={lootStyles.diffContainer}>
-                                    {diffs.map((diff, i) => (
-                                        <span
-                                            key={i}
-                                            className={`${lootStyles.diffItem} ${
-                                                diff.sign === "+" ? lootStyles.positive : lootStyles.negative
-                                            }`}
-                                        >
-                                            {diff.sign}
-                                            {diff.value}
-                                            {diff.label}
-                                        </span>
-                                    ))}
-                                </div>
-                            )}
-                            <SubmitButton form={form} pending={pending} />
-                            <CancelButton onClick={() => setIsEditing(false)} />
-                        </div>
-                    )}
                 </div>
-            </EditGroup>
+
+                <div className={lootStyles.transferActions}>
+                    <button
+                        className="button"
+                        disabled={pending}
+                        onClick={transferForm.handleSubmit(onTransfer)}
+                        style={{ display: "flex", alignItems: "center", gap: "0.5ch" }}
+                    >
+                        <CurrencyExchangeRounded fontSize="small" />
+                        Transfer
+                    </button>
+                    <CancelButton onClick={() => setIsTransferring(false)} />
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+            {error && <div className={lootStyles.errorContainer}>{error}</div>}
+            <div
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "0.5rem",
+                    alignItems: "center",
+                }}
+            >
+                <EditGroup heading={null} alignLeft={false} alignCenter={true} onClick={() => setIsEditing(!isEditing)}>
+                    <div className={lootStyles.moneyContainer}>
+                        {currencies.map((currency) => (
+                            <div key={currency.key} className={lootStyles.moneyItem}>
+                                {isEditing ? (
+                                    <input
+                                        type="text"
+                                        {...form.register(currency.key)}
+                                        onBlur={() => onBlur(currency.key)}
+                                        onKeyDown={(e) => onKeyDown(e, currency.key)}
+                                        className={`${styles.costItem} ${styles[currency.key]} ${
+                                            lootStyles.moneyInput
+                                        }`}
+                                    />
+                                ) : (
+                                    <span
+                                        className={`${styles.costItem} ${styles[currency.key]} ${
+                                            lootStyles.moneyValue
+                                        }`}
+                                    >
+                                        {form.getValues(currency.key) || 0}
+                                    </span>
+                                )}
+                                <span className={`${styles.costItem} ${styles[currency.key]} ${lootStyles.moneyLabel}`}>
+                                    {currency.label}
+                                </span>
+                            </div>
+                        ))}
+                        {isEditing && (
+                            <div className={lootStyles.editActions}>
+                                {diffs.length > 0 && (
+                                    <div className={lootStyles.diffContainer}>
+                                        {diffs.map((diff, i) => (
+                                            <span
+                                                key={i}
+                                                className={`${lootStyles.diffItem} ${
+                                                    diff.sign === "+" ? lootStyles.positive : lootStyles.negative
+                                                }`}
+                                            >
+                                                {diff.sign}
+                                                {diff.value}
+                                                {diff.label}
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+                                <SubmitButton form={form} pending={pending} />
+                                <CancelButton onClick={() => setIsEditing(false)} />
+                            </div>
+                        )}
+                    </div>
+                </EditGroup>
+                {!isEditing && partyId && (
+                    <button
+                        type="button"
+                        className="button"
+                        onClick={() => setIsTransferring(true)}
+                        style={{
+                            fontSize: "0.8rem",
+                            padding: "2px 8px",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.5ch",
+                        }}
+                    >
+                        <CurrencyExchangeRounded style={{ fontSize: "1rem" }} />
+                        Loot Money
+                    </button>
+                )}
+            </div>
         </form>
     );
 };
