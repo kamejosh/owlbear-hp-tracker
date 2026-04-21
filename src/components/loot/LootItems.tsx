@@ -23,6 +23,8 @@ import { CancelButton } from "../form/CancelButton.tsx";
 import { ItemOut } from "../../helper/equipmentHelpers.ts";
 import { updateLootMetadata } from "../../helper/tokenHelper.ts";
 import { Item } from "@owlbear-rodeo/sdk";
+import { DeleteButton } from "../form/DeleteButton.tsx";
+import { useLootTokenContext } from "../../context/LootTokenContext.tsx";
 
 export const AddLootItem = ({
     token,
@@ -109,6 +111,8 @@ export const AddLootItem = ({
 };
 
 export const LootItem = ({ item }: { item: LootItemType }) => {
+    const data = useLootTokenContext((state) => state.data);
+    const token = useLootTokenContext((state) => state.token);
     const [isOpen, setIsOpen] = useState(false);
 
     const itemQuery = useGetItem(item.slug);
@@ -133,8 +137,23 @@ export const LootItem = ({ item }: { item: LootItemType }) => {
     return (
         <>
             <div className={lootStyles.itemRow} ref={refs.setReference} {...getReferenceProps()}>
-                <span className={lootStyles.itemName}>{item.name}</span>
-                <span className={lootStyles.itemCount}>x{item.count}</span>
+                <div className={lootStyles.itemMain}>
+                    <span className={lootStyles.itemName}>{item.name}</span>
+                    <span className={lootStyles.itemCount}>x{item.count}</span>
+                </div>
+                <DeleteButton
+                    message={"Remove Item from Loot"}
+                    onClick={async () => {
+                        if (data && token) {
+                            const currentItems = [...data.items];
+                            currentItems.splice(
+                                currentItems.findIndex((i) => i.id === item.id),
+                                1,
+                            );
+                            await updateLootMetadata({ ...data, items: currentItems }, [token.id]);
+                        }
+                    }}
+                />
             </div>
             {isOpen && taItem && (
                 <div
