@@ -16,7 +16,7 @@ import { ItemHover } from "../gmgrimoire/items/ItemHover.tsx";
 import { useGetItem, useGetLoot } from "../../api/tabletop-almanac/useItem.ts";
 import { Controller, useForm } from "react-hook-form";
 import { AutoCompleteItemInput } from "../party/PartyInventory.tsx";
-import { NumberInput, TextInput } from "../form/RHFInputs.tsx";
+import { CheckboxInput, NumberInput, TextInput } from "../form/RHFInputs.tsx";
 import Tippy from "@tippyjs/react";
 import { SubmitButton } from "../form/SubmitButton.tsx";
 import { CancelButton } from "../form/CancelButton.tsx";
@@ -211,17 +211,21 @@ export const LootSuggestions = ({
 
     const form = useForm<{
         statblock_slug: string;
+        use_statblock_slug: boolean;
         avg_party_level: number;
         item_types: string[];
         max_items: number;
     }>({
         defaultValues: {
             statblock_slug: slug ?? "",
+            use_statblock_slug: !!slug,
             avg_party_level: Math.round(avgLevel),
             item_types: [],
             max_items: 5,
         },
     });
+
+    const useStatblockSlug = form.watch("use_statblock_slug");
 
     useEffect(() => {
         form.setValue("avg_party_level", Math.round(avgLevel));
@@ -232,13 +236,14 @@ export const LootSuggestions = ({
 
     const handleSubmit = async (formData: {
         statblock_slug: string;
+        use_statblock_slug: boolean;
         avg_party_level: number;
         item_types: string[];
         max_items: number;
     }) => {
         try {
             const results = await getLootQuery.mutateAsync({
-                statblock_slug: formData.statblock_slug || null,
+                statblock_slug: formData.use_statblock_slug ? slug || null : null,
                 avg_party_level: formData.avg_party_level,
                 item_types: formData.item_types.length > 0 ? formData.item_types : null,
                 max_items: formData.max_items,
@@ -276,17 +281,44 @@ export const LootSuggestions = ({
         <div className={lootStyles.suggestionsContainer}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className={styles.addForm}>
                 <div className={lootStyles.suggestionFormGrid}>
-                    <div className={lootStyles.suggestionFormRow}>
-                        <TextInput
-                            form={form}
-                            fieldName={"statblock_slug"}
-                            label={"Statblock Slug"}
-                            required={false}
-                            disabled={true}
-                            className={lootStyles.suggestionInput}
-                        />
-                    </div>
-                    <div className={lootStyles.suggestionFormRow}>
+                    {slug ? (
+                        <>
+                            <div className={lootStyles.statblockSlugHeader}>
+                                <label className={lootStyles.suggestionLabel}>Use Statblock not Party Level</label>
+                                {slug && (
+                                    <Tippy content={"Use statblock slug instead of party level"}>
+                                        <div className={lootStyles.checkboxWrapper}>
+                                            <CheckboxInput
+                                                form={form}
+                                                fieldName={"use_statblock_slug"}
+                                                label={"Use Statblock Slug"}
+                                                required={false}
+                                            />
+                                        </div>
+                                    </Tippy>
+                                )}
+                            </div>
+                            <div
+                                className={`${lootStyles.suggestionFormRow} ${
+                                    useStatblockSlug ? "" : lootStyles.suggestionInputDisabled
+                                }`}
+                            >
+                                <TextInput
+                                    form={form}
+                                    fieldName={"statblock_slug"}
+                                    label={"Statblock Slug"}
+                                    required={false}
+                                    disabled={true}
+                                    className={lootStyles.suggestionInput}
+                                />
+                            </div>
+                        </>
+                    ) : null}
+                    <div
+                        className={`${lootStyles.suggestionFormRow} ${
+                            useStatblockSlug ? lootStyles.suggestionInputDisabled : ""
+                        }`}
+                    >
                         <NumberInput
                             form={form}
                             fieldName={"avg_party_level"}

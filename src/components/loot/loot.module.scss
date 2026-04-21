@@ -493,6 +493,30 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
+
+    &.suggestionInputDisabled {
+        opacity: 0.5;
+        pointer-events: none;
+        text-decoration: line-through;
+    }
+}
+
+.statblockSlugHeader {
+    display: flex;
+    grid-column: span 3;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1ch;
+}
+
+.checkboxWrapper {
+    display: flex;
+    align-items: center;
+
+    input[type="checkbox"] {
+        cursor: pointer;
+        margin: 0;
+    }
 }
 
 .suggestionLabel {
