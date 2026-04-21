@@ -1,7 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { components } from "../schema";
 import { TTRPG_URL } from "../../config.ts";
+import { useMetadataContext } from "../../context/MetadataContext.ts";
+import { PartySettings } from "../../context/PartyStore.tsx";
 
 export type E5Statblock = components["schemas"]["E5StatblockOut"];
 export type E5SpellSlot = components["schemas"]["SpellSlots-Output"];
@@ -83,5 +85,23 @@ export const useE5GetStatblockMutation = () => {
             queryClient.invalidateQueries({ queryKey: ["slug", variables.slug] });
             return data;
         },
+    });
+};
+
+export const useGetMultipleStatblocks = (party: PartySettings | null) => {
+    const token = useMetadataContext((state) => state.room?.tabletopAlmanacAPIKey);
+
+    return useQueries({
+        queries: (party?.members ?? []).map((m) => ({
+            queryKey: ["slug", m.statblock?.slug],
+            queryFn: async () => {
+                if (!m.statblock?.slug) {
+                    return null;
+                } else {
+                    return await fetchStatblock(m.statblock.slug, token);
+                }
+            },
+            enabled: !!m.statblock?.slug,
+        })),
     });
 };

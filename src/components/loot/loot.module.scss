@@ -471,3 +471,95 @@
         height: 20px;
     }
 }
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5ch;
+}
+
+.suggestionsContainer {
+    margin-bottom: 1rem;
+}
+
+.suggestionFormGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1ch;
+    margin-bottom: 0.5rem;
+}
+
+.suggestionFormRow {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.suggestionLabel {
+    opacity: 0.7;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    white-space: wrap;
+}
+
+.suggestionInput {
+    &::before {
+        display: block;
+        content: attr(aria-label);
+        font-size: 0.8rem;
+    }
+
+    input {
+
+    }
+}
+
+.suggestionsList {
+    margin-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 0.5rem;
+}
+
+.suggestionsTitle {
+    margin-block: 0 0.5rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.suggestionItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 4px 8px;
+
+    .itemMain {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .itemName {
+        font-weight: bold;
+        font-size: 0.85rem;
+    }
+
+    .itemMeta {
+        opacity: 0.6;
+        font-style: italic;
+        font-size: 0.75rem;
+    }
+
+    .addButton {
+        padding: 2px;
+        width: 24px;
+        height: 24px;
+
+        svg {
+            width: 16px;
+            height: 16px;
+        }
+    }
+}
