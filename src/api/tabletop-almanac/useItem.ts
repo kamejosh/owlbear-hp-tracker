@@ -63,7 +63,7 @@ export const useGetItem = (slug: string) => {
 
 const getLoot = (lootRequest: LootRequest, token: string) => {
     return axios.request({
-        url: `${TTRPG_URL}/e5/loot`,
+        url: `${TTRPG_URL}/e5/item/loot`,
         headers: {
             Authorization: `Bearer ${token}`,
         },

@@ -274,6 +274,7 @@ export const LootSuggestions = ({
                             fieldName={"statblock_slug"}
                             label={"Statblock Slug"}
                             required={false}
+                            disabled={true}
                             className={lootStyles.suggestionInput}
                         />
                     </div>
@@ -301,7 +302,7 @@ export const LootSuggestions = ({
                     </div>
                 </div>
                 <div className={lootStyles.suggestionFormRow}>
-                    <label className={lootStyles.suggestionLabel}>Item Types</label>
+                    <label className={lootStyles.suggestionLabel}>Limit by Item Types</label>
                     <Controller
                         name="item_types"
                         control={form.control}
@@ -336,10 +337,12 @@ export const LootSuggestions = ({
                                         sx={{
                                             "& .MuiInputBase-root": {
                                                 color: "white",
-                                                backgroundColor: "rgba(0,0,0,0.2)",
-                                                padding: "4px 8px",
                                                 borderRadius: "4px",
                                                 "&:before, &:after": { display: "none" },
+                                            },
+                                            "& .MuiInputBase-input": {
+                                                paddingLeft: "4px !important",
+                                                color: "white",
                                             },
                                         }}
                                     />
