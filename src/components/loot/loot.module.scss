@@ -496,10 +496,7 @@
 }
 
 .suggestionLabel {
-    opacity: 0.7;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    white-space: wrap;
+    font-size: 0.8rem;
 }
 
 .suggestionInput {
@@ -508,11 +505,11 @@
         display: block;
         content: attr(aria-label);
         font-size: 0.8rem;
+        white-space: nowrap;
     }
 
     input {
-        max-width: fit-content;
-
+        width: fit-content;
         &:disabled {
             color: grey;
         }

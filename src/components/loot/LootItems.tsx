@@ -219,7 +219,7 @@ export const LootSuggestions = ({
             statblock_slug: slug ?? "",
             avg_party_level: Math.round(avgLevel),
             item_types: [],
-            max_items: 2,
+            max_items: 5,
         },
     });
 
@@ -251,13 +251,21 @@ export const LootSuggestions = ({
 
     const addSuggestion = async (item: ItemOut) => {
         try {
-            const newItem: LootItemType = {
-                id: Date.now(),
-                name: item.name,
-                count: 1,
-                slug: item.slug,
-            };
-            const updatedItems = [...data.items, newItem];
+            const existingItem = data.items.find((i) => i.id === item.id);
+            let updatedItems: LootItemType[];
+
+            if (existingItem) {
+                updatedItems = data.items.map((i) => (i.id === item.id ? { ...i, count: i.count + 1 } : i));
+            } else {
+                const newItem: LootItemType = {
+                    id: item.id,
+                    name: item.name,
+                    count: 1,
+                    slug: item.slug,
+                };
+                updatedItems = [...data.items, newItem];
+            }
+
             await updateLootMetadata({ ...data, items: updatedItems }, [token.id]);
         } catch (e) {
             console.error(e);
@@ -283,7 +291,7 @@ export const LootSuggestions = ({
                             form={form}
                             fieldName={"avg_party_level"}
                             label={"Avg Party Level"}
-                            required={true}
+                            required={false}
                             min={1}
                             max={20}
                             className={lootStyles.suggestionInput}
@@ -294,7 +302,7 @@ export const LootSuggestions = ({
                             form={form}
                             fieldName={"max_items"}
                             label={"Max Items"}
-                            required={true}
+                            required={false}
                             min={1}
                             max={50}
                             className={lootStyles.suggestionInput}
@@ -313,9 +321,9 @@ export const LootSuggestions = ({
                                 options={standardItemTypes}
                                 value={field.value}
                                 onChange={(_, newValue) => field.onChange(newValue)}
-                                renderTags={(value: string[], getTagProps) =>
+                                renderValue={(value: string[], getItemProps) =>
                                     value.map((option: string, index: number) => {
-                                        const { key, ...tagProps } = getTagProps({ index });
+                                        const { key, ...tagProps } = getItemProps({ index });
                                         return (
                                             <Chip
                                                 key={key}
@@ -323,7 +331,16 @@ export const LootSuggestions = ({
                                                 label={option}
                                                 size="small"
                                                 {...tagProps}
-                                                sx={{ color: "white", borderColor: "rgba(255,255,255,0.2)" }}
+                                                sx={{
+                                                    color: "white",
+                                                    borderColor: "rgba(255,255,255,0.2)",
+                                                    "& .MuiChip-deleteIcon": {
+                                                        color: "rgba(255, 255, 255, 0.7)",
+                                                        "&:hover": {
+                                                            color: "white",
+                                                        },
+                                                    },
+                                                }}
                                             />
                                         );
                                     })

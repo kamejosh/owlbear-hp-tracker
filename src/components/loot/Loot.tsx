@@ -13,7 +13,16 @@ import { LootTokenSelect } from "./LootTokenSelect.tsx";
 
 const TopButtons = () => {
     return (
-        <div style={{ position: "absolute", top: "16px", right: "16px", display: "flex", gap: "1ch" }}>
+        <div
+            style={{
+                position: "fixed",
+                top: "16px",
+                right: "16px",
+                display: "flex",
+                gap: "1ch",
+                boxShadow: "0 0 10px #000",
+            }}
+        >
             <button
                 onClick={async () => {
                     await OBR.popover.close(lootPopover.id);
