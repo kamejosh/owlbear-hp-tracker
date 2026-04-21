@@ -120,3 +120,11 @@ export const resolveCalculation = (input: string, currentValue: number): number 
     }
     return value;
 };
+
+export const currencies: Array<{ key: keyof MoneyIn; label: string }> = [
+    { key: "pp", label: "pp" },
+    { key: "gp", label: "gp" },
+    { key: "ep", label: "ep" },
+    { key: "sp", label: "sp" },
+    { key: "cp", label: "cp" },
+];
