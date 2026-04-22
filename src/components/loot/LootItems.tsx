@@ -226,15 +226,19 @@ export const LootItem = ({ item }: { item: LootItemType }) => {
                     <span className={lootStyles.itemCount}>x{item.count}</span>
                 </div>
                 <div className={lootStyles.itemActions}>
-                    <Tippy content={"Transfer Item"}>
-                        <button
-                            className={lootStyles.transferButton}
-                            ref={menuRefs.setReference}
-                            {...getMenuReferenceProps()}
-                            disabled={!taItem}
-                        >
-                            <Send />
-                        </button>
+                    <Tippy
+                        content={`${!taItem || !party ? "To transfer an Item a Party is required" : "Transfer Item to Party"}`}
+                    >
+                        <div>
+                            <button
+                                className={lootStyles.transferButton}
+                                ref={menuRefs.setReference}
+                                {...getMenuReferenceProps()}
+                                disabled={!taItem || !party}
+                            >
+                                <Send />
+                            </button>
+                        </div>
                     </Tippy>
                     <DeleteButton
                         message={"Remove Item from Loot"}

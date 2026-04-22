@@ -5,6 +5,7 @@ import {
     ID,
     itemMetadataKey,
     lootMetadataKey,
+    lootModal,
     lootPopover,
     metadataKey,
     nextTurnChannel,
@@ -347,14 +348,6 @@ const setupContextMenu = async () => {
                     roles: ["GM"],
                 },
             },
-            {
-                icon: "/icon.svg",
-                label: "Loot",
-                filter: {
-                    every: [{ key: ["metadata", `${lootMetadataKey}`, "lootAvailable"], value: true }],
-                    roles: ["PLAYER"],
-                },
-            },
         ],
         onClick: async () => {
             // width needs to be big, to position statblock popover to the right
@@ -370,6 +363,23 @@ const setupContextMenu = async () => {
                 height: Math.min(600, height),
                 anchorPosition: { top: 55, left: width - 70 },
             });
+        },
+    });
+
+    await OBR.contextMenu.create({
+        id: `${GMI_ID}/loot`,
+        icons: [
+            {
+                icon: "/icon.svg",
+                label: "Loot",
+                filter: {
+                    every: [{ key: ["metadata", `${lootMetadataKey}`, "lootAvailable"], value: true }],
+                    roles: ["PLAYER"],
+                },
+            },
+        ],
+        onClick: async () => {
+            await OBR.modal.open(lootModal);
         },
     });
 };

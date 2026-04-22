@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import OBR from "@owlbear-rodeo/sdk";
 import { useLootTokenContext } from "../../context/LootTokenContext.tsx";
-import { lootMetadataKey, lootPopover } from "../../helper/variables.ts";
+import { lootMetadataKey, lootModal, lootPopover } from "../../helper/variables.ts";
 import _ from "lodash";
 import { LootMetadata } from "../../helper/types.ts";
 import { LootGM } from "./LootGM.tsx";
@@ -25,6 +25,8 @@ const TopButtons = () => {
         >
             <button
                 onClick={async () => {
+                    // we try both because it's a modal for players and a popover for GMs
+                    await OBR.modal.close(lootModal.id);
                     await OBR.popover.close(lootPopover.id);
                 }}
             >

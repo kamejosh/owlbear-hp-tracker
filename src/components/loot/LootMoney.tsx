@@ -20,6 +20,7 @@ import { MenuItem, Select, FormControl, InputLabel } from "@mui/material";
 import { CurrencyExchangeRounded } from "@mui/icons-material";
 import { Money } from "../party/PlayerParty.tsx";
 import { currencies, formatCP, normalizeToCP, resolveCalculation, toCP } from "../../helper/moneyHelpers.ts";
+import Tippy from "@tippyjs/react";
 
 export const LootMoneyTransfer = ({ setIsTransferring }: { setIsTransferring: (value: boolean) => void }) => {
     const apiKey = useMetadataContext((state) => state.room?.tabletopAlmanacAPIKey);
@@ -208,6 +209,7 @@ export const LootMoney = () => {
     const [pending, setPending] = useState(false);
 
     const partyId = useMetadataContext((state) => state.room?.partyId);
+    const tabletopAlmanacAPIKey = useMetadataContext((state) => state.room?.tabletopAlmanacAPIKey);
 
     const form = useForm<MoneyIn>({
         defaultValues: {
@@ -398,23 +400,30 @@ export const LootMoney = () => {
                         )}
                     </div>
                 </EditGroup>
-                {!isEditing && partyId && (
-                    <button
-                        type="button"
-                        className="button"
-                        onClick={() => setIsTransferring(true)}
-                        style={{
-                            fontSize: "0.8rem",
-                            padding: "2px 8px",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "0.5ch",
-                        }}
+                {!isEditing ? (
+                    <Tippy
+                        content={`${!partyId || !tabletopAlmanacAPIKey ? "A Party is required to transfer money directly" : "Transfer money"}`}
                     >
-                        <CurrencyExchangeRounded style={{ fontSize: "1rem" }} />
-                        Loot Money
-                    </button>
-                )}
+                        <div>
+                            <button
+                                type="button"
+                                className="button"
+                                disabled={!partyId || !tabletopAlmanacAPIKey}
+                                onClick={() => setIsTransferring(true)}
+                                style={{
+                                    fontSize: "0.8rem",
+                                    padding: "2px 8px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "0.5ch",
+                                }}
+                            >
+                                <CurrencyExchangeRounded style={{ fontSize: "1rem" }} />
+                                Loot Money
+                            </button>
+                        </div>
+                    </Tippy>
+                ) : null}
             </div>
         </form>
     );

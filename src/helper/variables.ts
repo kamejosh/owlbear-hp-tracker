@@ -52,6 +52,13 @@ export const partyModal: Modal = {
     url: "/party.html",
 };
 
+export const lootModal: Modal = {
+    id: `${modalId}/loot`,
+    url: "/loot.html",
+    width: 400,
+    height: 600,
+};
+
 export const lootPopover: Popover = {
     id: `${modalId}/loot`,
     url: "/loot.html",
