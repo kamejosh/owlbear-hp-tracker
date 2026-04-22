@@ -25,7 +25,7 @@ import { SubmitButton } from "../form/SubmitButton.tsx";
 import { CancelButton } from "../form/CancelButton.tsx";
 import { ItemOut } from "../../helper/equipmentHelpers.ts";
 import { updateLootMetadata } from "../../helper/tokenHelper.ts";
-import { Item } from "@owlbear-rodeo/sdk";
+import OBR, { Item } from "@owlbear-rodeo/sdk";
 import { DeleteButton } from "../form/DeleteButton.tsx";
 import { useLootTokenContext } from "../../context/LootTokenContext.tsx";
 import { Autocomplete, Chip, TextField } from "@mui/material";
@@ -39,6 +39,7 @@ import {
     useGetParty,
     useUpdatePartyInventory,
 } from "../../api/tabletop-almanac/useParty.ts";
+import { usePlayerContext } from "../../context/PlayerContext.ts";
 
 export const AddLootItem = ({
     token,
@@ -124,9 +125,10 @@ export const AddLootItem = ({
     );
 };
 
-export const LootItem = ({ item }: { item: LootItemType }) => {
+export const LootItem = ({ item, readOnly = false }: { item: LootItemType; readOnly?: boolean }) => {
     const data = useLootTokenContext((state) => state.data);
     const token = useLootTokenContext((state) => state.token);
+    const playerContext = usePlayerContext();
     const [isOpen, setIsOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -140,6 +142,8 @@ export const LootItem = ({ item }: { item: LootItemType }) => {
 
     const addStatblockEquipment = useAddPartyStatblockEquipment(currentParty?.id ?? 0, item.slug);
     const updatePartyInventory = useUpdatePartyInventory(currentParty?.id ?? 0, party?.inventory?.id ?? 0);
+
+    const members = currentParty?.members ?? [];
 
     const { refs, floatingStyles, context } = useFloating({
         open: isOpen,
@@ -220,8 +224,8 @@ export const LootItem = ({ item }: { item: LootItemType }) => {
 
     return (
         <>
-            <div className={lootStyles.itemRow} ref={refs.setReference} {...getReferenceProps()}>
-                <div className={lootStyles.itemMain}>
+            <div className={lootStyles.itemRow}>
+                <div className={lootStyles.itemMain} ref={refs.setReference} {...getReferenceProps()}>
                     <span className={lootStyles.itemName}>{item.name}</span>
                     <span className={lootStyles.itemCount}>x{item.count}</span>
                 </div>
@@ -240,12 +244,14 @@ export const LootItem = ({ item }: { item: LootItemType }) => {
                             </button>
                         </div>
                     </Tippy>
-                    <DeleteButton
-                        message={"Remove Item from Loot"}
-                        onClick={async () => {
-                            await removeItemFromLoot();
-                        }}
-                    />
+                    {!readOnly && (
+                        <DeleteButton
+                            message={"Remove Item from Loot"}
+                            onClick={async () => {
+                                await removeItemFromLoot();
+                            }}
+                        />
+                    )}
                 </div>
             </div>
             {isMenuOpen && (
@@ -259,15 +265,20 @@ export const LootItem = ({ item }: { item: LootItemType }) => {
                     <button className={lootStyles.transferOption} onClick={transferToInventory}>
                         <Inventory /> Party Inventory
                     </button>
-                    {party?.statblocks?.map((sb) => (
-                        <button
-                            key={sb.id}
-                            className={lootStyles.transferOption}
-                            onClick={() => transferToMember(sb.id)}
-                        >
-                            <Person /> {sb.statblock?.name}
-                        </button>
-                    ))}
+                    {party?.statblocks?.map((sb) => {
+                        const member = members.find((m) => m.partyStatblockId === sb.id);
+                        if (playerContext.role === "GM" || (member && member.playerId === OBR.player.id)) {
+                            return (
+                                <button
+                                    key={sb.id}
+                                    className={lootStyles.transferOption}
+                                    onClick={() => transferToMember(sb.id)}
+                                >
+                                    <Person /> {sb.statblock?.name}
+                                </button>
+                            );
+                        }
+                    })}
                 </div>
             )}
             {isOpen && taItem && (
@@ -284,11 +295,11 @@ export const LootItem = ({ item }: { item: LootItemType }) => {
     );
 };
 
-export const LootItems = ({ items }: { items: Array<LootItemType> }) => {
+export const LootItems = ({ items, readOnly = false }: { items: Array<LootItemType>; readOnly?: boolean }) => {
     return (
         <>
             {items.map((item) => {
-                return <LootItem item={item} key={item.id} />;
+                return <LootItem item={item} key={item.id} readOnly={readOnly} />;
             })}
         </>
     );

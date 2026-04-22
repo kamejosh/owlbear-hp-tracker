@@ -339,6 +339,13 @@ export const LootTokenSelect = () => {
                                         </Box>
                                     )}
                                 </Box>
+                                <button
+                                    onClick={() => {
+                                        token.visible;
+                                    }}
+                                >
+                                    Hide/Unhide
+                                </button>
                                 {hasLoot && (
                                     <Tippy
                                         content={

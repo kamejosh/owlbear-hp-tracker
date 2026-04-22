@@ -36,6 +36,17 @@ const TopButtons = () => {
     );
 };
 
+const Content = () => {
+    const playerContext = usePlayerContext();
+    const token = useLootTokenContext((state) => state.token);
+
+    if (playerContext.role === "GM") {
+        return token ? <LootGM /> : <LootTokenSelect />;
+    } else {
+        return <LootPlayer />;
+    }
+};
+
 export const Loot = () => {
     const setToken = useLootTokenContext((state) => state.setToken);
     const token = useLootTokenContext((state) => state.token);
@@ -92,18 +103,8 @@ export const Loot = () => {
         <ContextWrapper component={"modal"}>
             <div style={{ textAlign: "left" }}>
                 <TopButtons />
-                {token ? <Content /> : <LootTokenSelect />}
+                <Content />
             </div>
         </ContextWrapper>
     );
-};
-
-const Content = () => {
-    const playerContext = usePlayerContext();
-
-    if (playerContext.role === "GM") {
-        return <LootGM />;
-    } else {
-        return <LootPlayer />;
-    }
 };

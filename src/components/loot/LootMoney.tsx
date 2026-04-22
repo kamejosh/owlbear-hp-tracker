@@ -21,15 +21,22 @@ import { CurrencyExchangeRounded } from "@mui/icons-material";
 import { Money } from "../party/PlayerParty.tsx";
 import { currencies, formatCP, normalizeToCP, resolveCalculation, toCP } from "../../helper/moneyHelpers.ts";
 import Tippy from "@tippyjs/react";
+import { usePlayerContext } from "../../context/PlayerContext.ts";
+import { usePartyStore } from "../../context/PartyStore.tsx";
+import OBR from "@owlbear-rodeo/sdk";
 
 export const LootMoneyTransfer = ({ setIsTransferring }: { setIsTransferring: (value: boolean) => void }) => {
     const apiKey = useMetadataContext((state) => state.room?.tabletopAlmanacAPIKey);
     const partyId = useMetadataContext((state) => state.room?.partyId);
+    const currentParty = usePartyStore((state) => state.currentParty);
     const data = useLootTokenContext((state) => state.data);
     const token = useLootTokenContext((state) => state.token);
+    const playerContext = usePlayerContext();
     const [recipient, setRecipient] = useState<string>("party");
     const [error, setError] = useState<string | null>(null);
     const [pending, setPending] = useState(false);
+
+    const members = currentParty?.members ?? [];
 
     const { run: hideError } = useDebounceFn(() => setError(null), { wait: 3000 });
     const { data: party } = useGetParty(partyId);
@@ -159,11 +166,16 @@ export const LootMoneyTransfer = ({ setIsTransferring }: { setIsTransferring: (v
                         className={lootStyles.filterSelect}
                     >
                         <MenuItem value="party">Party Inventory</MenuItem>
-                        {party?.statblocks?.map((sb) => (
-                            <MenuItem key={sb.id} value={String(sb.id)}>
-                                {sb.statblock?.name || "Unknown Member"}
-                            </MenuItem>
-                        ))}
+                        {party?.statblocks?.map((sb) => {
+                            const member = members.find((m) => m.partyStatblockId === sb.id);
+                            if (playerContext.role === "GM" || (member && member.playerId === OBR.player.id)) {
+                                return (
+                                    <MenuItem key={sb.id} value={String(sb.id)}>
+                                        {sb.statblock?.name || "Unknown Member"}
+                                    </MenuItem>
+                                );
+                            }
+                        })}
                     </Select>
                 </FormControl>
             </div>
@@ -200,7 +212,7 @@ export const LootMoneyTransfer = ({ setIsTransferring }: { setIsTransferring: (v
     );
 };
 
-export const LootMoney = () => {
+export const LootMoney = ({ readOnly = false }: { readOnly?: boolean }) => {
     const data = useLootTokenContext((state) => state.data);
     const token = useLootTokenContext((state) => state.token);
     const [isEditing, setIsEditing] = useState(false);
@@ -348,58 +360,82 @@ export const LootMoney = () => {
                     alignItems: "center",
                 }}
             >
-                <EditGroup heading={null} alignLeft={false} alignCenter={true} onClick={() => setIsEditing(!isEditing)}>
+                {!readOnly ? (
+                    <EditGroup
+                        heading={null}
+                        alignLeft={false}
+                        alignCenter={true}
+                        onClick={() => setIsEditing(!isEditing)}
+                    >
+                        <div className={lootStyles.moneyContainer}>
+                            {currencies.map((currency) => (
+                                <div key={currency.key} className={lootStyles.moneyItem}>
+                                    {isEditing ? (
+                                        <input
+                                            type="text"
+                                            {...form.register(currency.key)}
+                                            onBlur={() => onBlur(currency.key)}
+                                            onKeyDown={(e) => onKeyDown(e, currency.key)}
+                                            className={`${styles.costItem} ${styles[currency.key]} ${
+                                                lootStyles.moneyInput
+                                            }`}
+                                        />
+                                    ) : (
+                                        <span
+                                            className={`${styles.costItem} ${styles[currency.key]} ${
+                                                lootStyles.moneyValue
+                                            }`}
+                                        >
+                                            {form.getValues(currency.key) || 0}
+                                        </span>
+                                    )}
+                                    <span
+                                        className={`${styles.costItem} ${styles[currency.key]} ${
+                                            lootStyles.moneyLabel
+                                        }`}
+                                    >
+                                        {currency.label}
+                                    </span>
+                                </div>
+                            ))}
+                            {isEditing && (
+                                <div className={lootStyles.editActions}>
+                                    {diffs.length > 0 && (
+                                        <div className={lootStyles.diffContainer}>
+                                            {diffs.map((diff, i) => (
+                                                <span
+                                                    key={i}
+                                                    className={`${lootStyles.diffItem} ${
+                                                        diff.sign === "+" ? lootStyles.positive : lootStyles.negative
+                                                    }`}
+                                                >
+                                                    {diff.sign}
+                                                    {diff.value}
+                                                    {diff.label}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+                                    <SubmitButton form={form} pending={pending} />
+                                    <CancelButton onClick={() => setIsEditing(false)} />
+                                </div>
+                            )}
+                        </div>
+                    </EditGroup>
+                ) : (
                     <div className={lootStyles.moneyContainer}>
                         {currencies.map((currency) => (
                             <div key={currency.key} className={lootStyles.moneyItem}>
-                                {isEditing ? (
-                                    <input
-                                        type="text"
-                                        {...form.register(currency.key)}
-                                        onBlur={() => onBlur(currency.key)}
-                                        onKeyDown={(e) => onKeyDown(e, currency.key)}
-                                        className={`${styles.costItem} ${styles[currency.key]} ${
-                                            lootStyles.moneyInput
-                                        }`}
-                                    />
-                                ) : (
-                                    <span
-                                        className={`${styles.costItem} ${styles[currency.key]} ${
-                                            lootStyles.moneyValue
-                                        }`}
-                                    >
-                                        {form.getValues(currency.key) || 0}
-                                    </span>
-                                )}
+                                <span className={`${styles.costItem} ${styles[currency.key]} ${lootStyles.moneyValue}`}>
+                                    {form.getValues(currency.key) || 0}
+                                </span>
                                 <span className={`${styles.costItem} ${styles[currency.key]} ${lootStyles.moneyLabel}`}>
                                     {currency.label}
                                 </span>
                             </div>
                         ))}
-                        {isEditing && (
-                            <div className={lootStyles.editActions}>
-                                {diffs.length > 0 && (
-                                    <div className={lootStyles.diffContainer}>
-                                        {diffs.map((diff, i) => (
-                                            <span
-                                                key={i}
-                                                className={`${lootStyles.diffItem} ${
-                                                    diff.sign === "+" ? lootStyles.positive : lootStyles.negative
-                                                }`}
-                                            >
-                                                {diff.sign}
-                                                {diff.value}
-                                                {diff.label}
-                                            </span>
-                                        ))}
-                                    </div>
-                                )}
-                                <SubmitButton form={form} pending={pending} />
-                                <CancelButton onClick={() => setIsEditing(false)} />
-                            </div>
-                        )}
                     </div>
-                </EditGroup>
+                )}
                 {!isEditing ? (
                     <Tippy
                         content={`${!partyId || !tabletopAlmanacAPIKey ? "A Party is required to transfer money directly" : "Transfer money"}`}

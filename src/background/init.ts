@@ -367,7 +367,7 @@ const setupContextMenu = async () => {
     });
 
     await OBR.contextMenu.create({
-        id: `${GMI_ID}/loot`,
+        id: `${GMI_ID}/loot_player`,
         icons: [
             {
                 icon: "/icon.svg",
