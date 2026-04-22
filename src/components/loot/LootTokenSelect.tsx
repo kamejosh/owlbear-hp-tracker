@@ -1,7 +1,18 @@
 import { useEffect, useState, useMemo } from "react";
 import { useDebounceFn } from "ahooks";
 import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
-import { TextField, Box, Typography, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
+import {
+    TextField,
+    Box,
+    Typography,
+    MenuItem,
+    Select,
+    FormControl,
+    InputLabel,
+    Tooltip,
+    IconButton,
+} from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { infoMetadataKey, lootMetadataKey } from "../../helper/variables.ts";
 import { LootMetadata } from "../../helper/types.ts";
 import { useLootTokenContext } from "../../context/LootTokenContext.tsx";
@@ -339,13 +350,26 @@ export const LootTokenSelect = () => {
                                         </Box>
                                     )}
                                 </Box>
-                                <button
-                                    onClick={() => {
-                                        token.visible;
-                                    }}
-                                >
-                                    Hide/Unhide
-                                </button>
+                                <Tooltip title={token.visible ? "Hide Token" : "Show Token"}>
+                                    <IconButton
+                                        size="small"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            void OBR.scene.items.updateItems([token.id], (items) => {
+                                                for (const item of items) {
+                                                    item.visible = !item.visible;
+                                                }
+                                            });
+                                        }}
+                                        sx={{ color: "white", opacity: token.visible ? 1 : 0.5 }}
+                                    >
+                                        {token.visible ? (
+                                            <Visibility fontSize="small" />
+                                        ) : (
+                                            <VisibilityOff fontSize="small" />
+                                        )}
+                                    </IconButton>
+                                </Tooltip>
                                 {hasLoot && (
                                     <Tippy
                                         content={
