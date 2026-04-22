@@ -96,10 +96,91 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 8px;
     margin-bottom: 4px;
     border-radius: 4px;
     background-color: rgba(255, 255, 255, 0.03);
     padding: 4px 8px;
+}
+
+.itemActions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.transferButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 4px;
+    color: white;
+
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    svg {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+.transferMenu {
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    background-color: #2b2a33;
+    padding: 4px;
+    min-width: 150px;
+}
+
+.transferOption {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    border: none;
+    border-radius: 2px;
+    background: none;
+    padding: 8px 12px;
+    width: 100%;
+    color: white;
+    text-align: left;
+
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    svg {
+        opacity: 0.7;
+        width: 16px;
+        height: 16px;
+    }
+}
+
+.transferHeader {
+    margin: 4px 8px 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 4px;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: bold;
+    font-size: 0.7rem;
+    text-transform: uppercase;
 }
 
 .itemMain {

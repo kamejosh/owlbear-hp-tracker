@@ -7,13 +7,16 @@ import {
     offset,
     safePolygon,
     shift,
+    useClick,
+    useDismiss,
     useFloating,
     useHover,
     useInteractions,
+    useRole,
 } from "@floating-ui/react";
 import styles from "../party/party-inventory.module.scss";
 import { ItemHover } from "../gmgrimoire/items/ItemHover.tsx";
-import { useGetItem, useGetLoot } from "../../api/tabletop-almanac/useItem.ts";
+import { useGetItem, useGetItemTypes, useGetLoot } from "../../api/tabletop-almanac/useItem.ts";
 import { Controller, useForm } from "react-hook-form";
 import { AutoCompleteItemInput } from "../party/PartyInventory.tsx";
 import { CheckboxInput, NumberInput, TextInput } from "../form/RHFInputs.tsx";
@@ -26,11 +29,16 @@ import { Item } from "@owlbear-rodeo/sdk";
 import { DeleteButton } from "../form/DeleteButton.tsx";
 import { useLootTokenContext } from "../../context/LootTokenContext.tsx";
 import { Autocomplete, Chip, TextField } from "@mui/material";
-import { Add } from "@mui/icons-material";
+import { Add, Inventory, Person, Send } from "@mui/icons-material";
 import { itemMetadataKey } from "../../helper/variables.ts";
 import { usePartyStore } from "../../context/PartyStore.tsx";
 import { useGetMultipleStatblocks } from "../../api/e5/useE5Api.ts";
 import { useEffect, useMemo } from "react";
+import {
+    useAddPartyStatblockEquipment,
+    useGetParty,
+    useUpdatePartyInventory,
+} from "../../api/tabletop-almanac/useParty.ts";
 
 export const AddLootItem = ({
     token,
@@ -120,10 +128,18 @@ export const LootItem = ({ item }: { item: LootItemType }) => {
     const data = useLootTokenContext((state) => state.data);
     const token = useLootTokenContext((state) => state.token);
     const [isOpen, setIsOpen] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const itemQuery = useGetItem(item.slug);
-
     const taItem = itemQuery.isSuccess ? itemQuery.data : null;
+
+    const currentParty = usePartyStore((state) => state.currentParty);
+    const partyQuery = useGetParty(currentParty?.id ?? 0);
+
+    const party = partyQuery.isSuccess ? partyQuery.data : null;
+
+    const addStatblockEquipment = useAddPartyStatblockEquipment(currentParty?.id ?? 0, item.slug);
+    const updatePartyInventory = useUpdatePartyInventory(currentParty?.id ?? 0, party?.inventory?.id ?? 0);
 
     const { refs, floatingStyles, context } = useFloating({
         open: isOpen,
@@ -140,6 +156,68 @@ export const LootItem = ({ item }: { item: LootItemType }) => {
 
     const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
 
+    const {
+        refs: menuRefs,
+        floatingStyles: menuFloatingStyles,
+        context: menuContext,
+    } = useFloating({
+        open: isMenuOpen,
+        onOpenChange: setIsMenuOpen,
+        whileElementsMounted: autoUpdate,
+        placement: "bottom-end",
+        middleware: [offset(5), flip(), shift()],
+    });
+
+    const click = useClick(menuContext);
+    const dismiss = useDismiss(menuContext);
+    const role = useRole(menuContext);
+
+    const { getReferenceProps: getMenuReferenceProps, getFloatingProps: getMenuFloatingProps } = useInteractions([
+        click,
+        dismiss,
+        role,
+    ]);
+
+    const removeItemFromLoot = async () => {
+        if (data && token) {
+            const currentItems = [...data.items];
+            const index = currentItems.findIndex((i) => i.id === item.id);
+            if (index > -1) {
+                currentItems.splice(index, 1);
+                await updateLootMetadata({ ...data, items: currentItems }, [token.id]);
+            }
+        }
+    };
+
+    const transferToInventory = async () => {
+        if (!party?.inventory) {
+            return;
+        }
+        try {
+            await updatePartyInventory.mutateAsync({
+                new_items: [{ item_id: item.id, count: item.count }],
+            });
+            await removeItemFromLoot();
+            setIsMenuOpen(false);
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    const transferToMember = async (partyStatblockId: number) => {
+        if (!taItem) return;
+        try {
+            await addStatblockEquipment.mutateAsync({
+                partyStatblockId: partyStatblockId,
+                data: { item: taItem.id, count: item.count },
+            });
+            await removeItemFromLoot();
+            setIsMenuOpen(false);
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
     return (
         <>
             <div className={lootStyles.itemRow} ref={refs.setReference} {...getReferenceProps()}>
@@ -147,20 +225,47 @@ export const LootItem = ({ item }: { item: LootItemType }) => {
                     <span className={lootStyles.itemName}>{item.name}</span>
                     <span className={lootStyles.itemCount}>x{item.count}</span>
                 </div>
-                <DeleteButton
-                    message={"Remove Item from Loot"}
-                    onClick={async () => {
-                        if (data && token) {
-                            const currentItems = [...data.items];
-                            currentItems.splice(
-                                currentItems.findIndex((i) => i.id === item.id),
-                                1,
-                            );
-                            await updateLootMetadata({ ...data, items: currentItems }, [token.id]);
-                        }
-                    }}
-                />
+                <div className={lootStyles.itemActions}>
+                    <Tippy content={"Transfer Item"}>
+                        <button
+                            className={lootStyles.transferButton}
+                            ref={menuRefs.setReference}
+                            {...getMenuReferenceProps()}
+                            disabled={!taItem}
+                        >
+                            <Send />
+                        </button>
+                    </Tippy>
+                    <DeleteButton
+                        message={"Remove Item from Loot"}
+                        onClick={async () => {
+                            await removeItemFromLoot();
+                        }}
+                    />
+                </div>
             </div>
+            {isMenuOpen && (
+                <div
+                    ref={menuRefs.setFloating}
+                    style={menuFloatingStyles}
+                    className={lootStyles.transferMenu}
+                    {...getMenuFloatingProps()}
+                >
+                    <div className={lootStyles.transferHeader}>Transfer to...</div>
+                    <button className={lootStyles.transferOption} onClick={transferToInventory}>
+                        <Inventory /> Party Inventory
+                    </button>
+                    {party?.statblocks?.map((sb) => (
+                        <button
+                            key={sb.id}
+                            className={lootStyles.transferOption}
+                            onClick={() => transferToMember(sb.id)}
+                        >
+                            <Person /> {sb.statblock?.name}
+                        </button>
+                    ))}
+                </div>
+            )}
             {isOpen && taItem && (
                 <div
                     ref={refs.setFloating}
@@ -185,8 +290,6 @@ export const LootItems = ({ items }: { items: Array<LootItemType> }) => {
     );
 };
 
-const standardItemTypes = ["weapon", "wand", "wondrous item", "armor", "shield", "potion", "scroll", "staff", "ring"];
-
 export const LootSuggestions = ({
     token,
     data,
@@ -200,6 +303,7 @@ export const LootSuggestions = ({
     const party = usePartyStore((state) => state.currentParty);
 
     const partyQueries = useGetMultipleStatblocks(party);
+    const itemTypesQuery = useGetItemTypes();
 
     const avgLevel = useMemo(() => {
         const levels = partyQueries.map((q) => q.data?.cr).filter((cr): cr is number => typeof cr === "number");
@@ -224,6 +328,8 @@ export const LootSuggestions = ({
             max_items: 5,
         },
     });
+
+    const itemTypes = itemTypesQuery.isSuccess ? itemTypesQuery.data : [];
 
     const useStatblockSlug = form.watch("use_statblock_slug");
 
@@ -348,9 +454,9 @@ export const LootSuggestions = ({
                         control={form.control}
                         render={({ field }) => (
                             <Autocomplete
+                                loading={itemTypesQuery.isLoading}
                                 multiple
-                                freeSolo
-                                options={standardItemTypes}
+                                options={itemTypes}
                                 value={field.value}
                                 onChange={(_, newValue) => field.onChange(newValue)}
                                 renderValue={(value: string[], getItemProps) =>

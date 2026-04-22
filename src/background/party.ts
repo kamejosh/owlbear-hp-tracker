@@ -34,8 +34,8 @@ export const startPartyPolling = async (params: ListPartiesParams) => {
         } catch (error) {
             console.error("Failed to poll parties:", error);
         } finally {
-            // Schedule the next poll exactly 10 seconds after this one finishes
-            pollingTimeout = setTimeout(poll, 10000);
+            // Schedule the next poll exactly 30 seconds after this one finishes
+            pollingTimeout = setTimeout(poll, 30000);
         }
     };
 

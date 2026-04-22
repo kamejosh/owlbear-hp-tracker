@@ -83,3 +83,25 @@ export const useGetLoot = () => {
         },
     });
 };
+
+const getItemTypes = (token: string) => {
+    return axios.request({
+        url: `${TTRPG_URL}/e5/item/types`,
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+        method: "POST",
+    });
+};
+
+export const useGetItemTypes = () => {
+    const token = useMetadataContext((state) => state.room?.tabletopAlmanacAPIKey);
+
+    return useQuery<Array<string>, unknown>({
+        queryKey: ["item-types", token ?? ""],
+        queryFn: async () => {
+            const response = await getItemTypes(token ?? "");
+            return response.data as Array<string>;
+        },
+    });
+};
