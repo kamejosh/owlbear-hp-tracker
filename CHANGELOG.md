@@ -1,7 +1,20 @@
-### Unversioned
+# 3.7.1
 
+### New Features
+
++ Loot Management:
+  + **Loot on Tokens:** Manage items and currency directly on Owlbear Rodeo tokens.
+  + **Loot Suggestions:** Algorithmic-driven loot suggestions based on token statblocks, party level, and item types.
+  + **Player Looting:** Players can view and transfer loot to the party inventory or individual members.
+  + **TA Persistence:** All looting data is persisted on Tabletop Almanac for cross-session consistency.
+
+### Improvements and Fixes
+
++ Atomic Party Money Exchange: Currency transfers between players and the party are now handled atomically on Tabletop Almanac to prevent data desync.
++ Improved Currency Handling: Centralized money calculation logic to ensure consistent behavior across Party and Loot management.
 + Fix that party changes on TA would not show up in GMG until the party was switched
 + Fix that the party group did sometimes not show up
++ Fix Embedded Items no longer show up in the party statblock inventory
 
 # 3.7.0
 
