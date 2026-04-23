@@ -11,7 +11,7 @@
     "engines": {
         "node": ">=18"
     },
-    "packageManager": "yarn@4.13.0",
+    "packageManager": "yarn@4.14.1",
     "prettier": {
         "$schema": "http://json.schemastore.org/prettierrc",
         "tabWidth": 4,
