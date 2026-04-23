@@ -51,7 +51,7 @@ export const AutoCompleteItemInput = (props: { error: string; onSelect: (value: 
 
     return (
         <Autocomplete
-            style={{ flexGrow: 1, minWidth: "200px", backgroundColor: "#2b2a33", color: "white" }}
+            style={{ flexGrow: 1, minWidth: "200px", backgroundColor: "#2b2a33" }}
             options={items}
             getOptionLabel={(option) => option.name}
             filterOptions={(x) => x}
@@ -75,6 +75,16 @@ export const AutoCompleteItemInput = (props: { error: string; onSelect: (value: 
                         },
                     },
                 },
+                popupIndicator: {
+                    sx: {
+                        color: "white",
+                    },
+                },
+                clearIndicator: {
+                    sx: {
+                        color: "white",
+                    },
+                },
             }}
             renderInput={(params) => (
                 <TextField
@@ -82,8 +92,17 @@ export const AutoCompleteItemInput = (props: { error: string; onSelect: (value: 
                     error={!!props.error}
                     placeholder="Type to search..."
                     size="small"
+                    variant="standard"
                     sx={{
                         "& .MuiInputBase-root": {
+                            color: "white",
+                            padding: "4px 8px",
+                            "&:before, &:after": {
+                                display: "none",
+                            },
+                        },
+                        "& .MuiInputBase-input": {
+                            paddingLeft: "4px !important",
                             color: "white",
                         },
                     }}
@@ -95,9 +114,7 @@ export const AutoCompleteItemInput = (props: { error: string; onSelect: (value: 
                     <li key={item.slug} {...optionProps}>
                         <div className={styles.autoCompleteOption}>
                             <div className={styles.optionMain}>
-                                <Tippy content={item.name}>
-                                    <span className={styles.itemName}>{item.name}</span>
-                                </Tippy>
+                                <span className={styles.itemName}>{item.name}</span>
                                 <span className={styles.optionIndicators}>
                                     {item.stats ? (
                                         <Tippy content={"Item is sentient"}>

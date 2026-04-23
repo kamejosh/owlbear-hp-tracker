@@ -26,15 +26,13 @@ import {
     PartyOut,
     useGetParty,
     useUpdatePartyInventory,
-    useUpdatePartyMoney,
     useUpdatePartyStatblockEquipment,
-    useUpdatePlayerStatblock,
-    convertE5StatblockOutToStatblockIn,
     useGetPartyInventory,
     PartyInventoryOut,
     PartyItemOut,
     useAddPartyStatblockEquipment,
     StatblockItemIn,
+    useUpdatePartyStatblockMoney,
 } from "../../api/tabletop-almanac/useParty.ts";
 import {
     autoUpdate,
@@ -120,16 +118,9 @@ export const EditPlayerStatblockMoney = ({
     party: PartyOut;
     setEdit: (edit: boolean) => void;
 }) => {
-    const updateMoney = useUpdatePartyMoney(party.id, party.money?.id ?? 0);
-    const updateStatblock = useUpdatePlayerStatblock(statblock.id ?? "", statblock.slug ?? "");
-
-    const maxValues: Money = {
-        cp: (party.money?.cp ?? 0) + (statblock?.money?.cp ?? 0),
-        sp: (party.money?.sp ?? 0) + (statblock?.money?.sp ?? 0),
-        ep: (party.money?.ep ?? 0) + (statblock?.money?.ep ?? 0),
-        gp: (party.money?.gp ?? 0) + (statblock?.money?.gp ?? 0),
-        pp: (party.money?.pp ?? 0) + (statblock?.money?.pp ?? 0),
-    };
+    const [error, setError] = useState<string | null>(null);
+    const partyStatblock = party.statblocks?.find((sb) => sb.statblock?.slug === statblock.slug);
+    const updateMoney = useUpdatePartyStatblockMoney(party.id, partyStatblock?.id ?? -1, statblock.slug);
 
     const form = useForm<MoneyIn>({
         defaultValues: {
@@ -148,33 +139,15 @@ export const EditPlayerStatblockMoney = ({
     const watchedValues = watch();
 
     const onSubmit = async (data: MoneyIn) => {
+        setError(null);
         try {
-            const partyMoney = {
-                cp: Math.min(Math.max(maxValues.cp - (data.cp ?? 0), 0), maxValues.cp),
-                sp: Math.min(Math.max(maxValues.sp - (data.sp ?? 0), 0), maxValues.sp),
-                ep: Math.min(Math.max(maxValues.ep - (data.ep ?? 0), 0), maxValues.ep),
-                gp: Math.min(Math.max(maxValues.gp - (data.gp ?? 0), 0), maxValues.gp),
-                pp: Math.min(Math.max(maxValues.pp - (data.pp ?? 0), 0), maxValues.pp),
-            };
-
-            const statblockUpdate = convertE5StatblockOutToStatblockIn(statblock);
-
-            const statblockMoney: Money = {
-                cp: Math.min(Math.max(maxValues.cp - partyMoney.cp, 0), maxValues.cp),
-                sp: Math.min(Math.max(maxValues.sp - partyMoney.sp, 0), maxValues.sp),
-                ep: Math.min(Math.max(maxValues.ep - partyMoney.ep, 0), maxValues.ep),
-                gp: Math.min(Math.max(maxValues.gp - partyMoney.gp, 0), maxValues.gp),
-                pp: Math.min(Math.max(maxValues.pp - partyMoney.pp, 0), maxValues.pp),
-            };
-
-            await updateMoney.mutateAsync(partyMoney);
-            await updateStatblock.mutateAsync({
-                ...statblockUpdate,
-                money: statblockMoney,
-            });
+            await updateMoney.mutateAsync(data);
 
             setEdit(false);
-        } catch (e) {}
+        } catch (e: any) {
+            setError(`Error updating money: ${e?.response?.data?.detail ?? e?.message ?? "Unknown error"}`);
+            console.error("Error updating money:", e);
+        }
     };
 
     const getChanges = () => {
@@ -247,28 +220,29 @@ export const EditPlayerStatblockMoney = ({
                 {(["pp", "gp", "ep", "sp", "cp"] as const).map((currency) => (
                     <div key={currency} className={styles.moneyInput}>
                         <label className={styles[currency]}>{currency}</label>
-                        <Tippy content={`Max available: ${maxValues[currency]}`}>
-                            <input
-                                type="number"
-                                min={0}
-                                max={maxValues[currency]}
-                                {...register(currency, {
-                                    valueAsNumber: true,
-                                    max: maxValues[currency],
-                                    min: 0,
-                                })}
-                            />
-                        </Tippy>
+                        <input
+                            type="number"
+                            min={0}
+                            {...register(currency, {
+                                valueAsNumber: true,
+                                min: 0,
+                            })}
+                        />
                     </div>
                 ))}
             </div>
+            {error && (
+                <div className={styles.error} style={{ color: "red" }}>
+                    {error}
+                </div>
+            )}
             <div className={styles.formActions}>
                 {getChanges()}
                 <div style={{ display: "flex", gap: "1ch" }}>
                     <button
                         type="submit"
                         className={`${styles.actionButton} ${styles.confirm}`}
-                        disabled={updateMoney.isPending || updateStatblock.isPending || isSubmitting}
+                        disabled={updateMoney.isPending || isSubmitting}
                     >
                         <CheckRounded />
                     </button>
@@ -276,7 +250,7 @@ export const EditPlayerStatblockMoney = ({
                         type="button"
                         className={`${styles.actionButton} ${styles.cancel}`}
                         onClick={() => setEdit(false)}
-                        disabled={updateMoney.isPending || updateStatblock.isPending || isSubmitting}
+                        disabled={updateMoney.isPending || isSubmitting}
                     >
                         <CloseRounded />
                     </button>
@@ -528,7 +502,8 @@ export const PlayerPartyStatblockEquipment = ({ member }: { member: PartyStoreSt
     return (
         <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "1ch" }}>
             {statblock?.equipment
-                ?.sort((a, b) => a.item.name.localeCompare(b.item.name))
+                ?.filter((eq) => !eq.embedded)
+                .sort((a, b) => a.item.name.localeCompare(b.item.name))
                 .map((item, index) => (
                     <PlayerPartyStatblockItem
                         item={item}
@@ -565,6 +540,7 @@ export const PlayerPartyStatblock = ({ member, party }: { member: PartyStoreStat
 
     const totalWeight =
         statblock?.equipment?.reduce((acc, eq) => acc + (eq.item.weight ?? 0) * (eq.count ?? 1), 0) ?? 0;
+    const maxWeight = (statblock?.stats.strength ?? 10) * 15;
 
     if (statblockQuery.isLoading) {
         return (
@@ -679,7 +655,9 @@ export const PlayerPartyStatblock = ({ member, party }: { member: PartyStoreStat
                                 }}
                             >
                                 <ScaleRounded sx={{ fontSize: "1.2em", opacity: 0.6 }} />
-                                <span>{totalWeight.toFixed(1)}</span>
+                                <span>
+                                    {totalWeight.toFixed(1)} (max: {maxWeight})
+                                </span>
                             </div>
                         </>
                     ) : null}

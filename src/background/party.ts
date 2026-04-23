@@ -34,8 +34,8 @@ export const startPartyPolling = async (params: ListPartiesParams) => {
         } catch (error) {
             console.error("Failed to poll parties:", error);
         } finally {
-            // Schedule the next poll exactly 10 seconds after this one finishes
-            pollingTimeout = setTimeout(poll, 10000);
+            // Schedule the next poll exactly 30 seconds after this one finishes
+            pollingTimeout = setTimeout(poll, 30000);
         }
     };
 
@@ -53,40 +53,36 @@ export const stopPartyPolling = () => {
 };
 
 const initPlayerPartyMembers = async (items: Array<Item>) => {
-    const room = await OBR.room.getMetadata();
-    const roomPartyId = metadataKey in room ? (room[metadataKey] as RoomMetadata).partyId : null;
     const currentParty = partyStore.getState().currentParty;
-    if (currentParty?.id !== roomPartyId) {
-        const partyStatblocks = currentParty?.members.map((member) => member.statblock?.slug) || [];
-        items.forEach((item) => {
-            if (item.type === "IMAGE") {
-                const image = item as Image;
-                if (itemMetadataKey in item.metadata) {
-                    const data = item.metadata[itemMetadataKey] as GMGMetadata;
+    const partyStatblocks = currentParty?.members.map((member) => member.statblock?.slug) || [];
+    items.forEach((item) => {
+        if (item.type === "IMAGE") {
+            const image = item as Image;
+            if (itemMetadataKey in item.metadata) {
+                const data = item.metadata[itemMetadataKey] as GMGMetadata;
 
-                    if (data.sheet && partyStatblocks.includes(data.sheet)) {
-                        const member = currentParty?.members.find((member) => member.statblock?.slug === data.sheet);
+                if (data.sheet && partyStatblocks.includes(data.sheet)) {
+                    const member = currentParty?.members.find((member) => member.statblock?.slug === data.sheet);
 
-                        if (member) {
-                            const newMember: PartyStoreStatblock = { ...member };
+                    if (member) {
+                        const newMember: PartyStoreStatblock = { ...member };
 
-                            if (item.createdUserId !== member.playerId) {
-                                newMember.playerId = item.createdUserId;
-                            }
+                        if (item.createdUserId !== member.playerId) {
+                            newMember.playerId = item.createdUserId;
+                        }
 
-                            if (!member.imageUrl) {
-                                newMember.imageUrl = image.image.url;
-                            }
+                        if (!member.imageUrl) {
+                            newMember.imageUrl = image.image.url;
+                        }
 
-                            if (!_.isEqual(member, newMember)) {
-                                partyStore.getState().updateMember(newMember);
-                            }
+                        if (!_.isEqual(member, newMember)) {
+                            partyStore.getState().updateMember(newMember);
                         }
                     }
                 }
             }
-        });
-    }
+        }
+    });
 };
 
 export const initPlayerParty = async () => {
@@ -197,11 +193,11 @@ export const initParty = async () => {
                             for (const i of items) {
                                 // we checked before but this makes typescript happy
                                 if (member.metadata) {
+                                    let data = member.metadata[itemMetadataKey] as GMGMetadata;
                                     if (itemMetadataKey in member.metadata) {
-                                        const data = member.metadata[itemMetadataKey] as GMGMetadata;
-                                        member.metadata[itemMetadataKey] = { ...data, group: currentParty?.group };
+                                        data.group = currentParty?.group;
                                     }
-                                    i.metadata = member.metadata;
+                                    i.metadata[itemMetadataKey] = data;
                                     newTokens.push(item);
                                 }
                                 if (member.playerId) {

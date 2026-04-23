@@ -43,7 +43,6 @@
 }
 
 .itemName {
-    cursor: help;
     max-width: 200px;
     font-weight: bold;
     text-align: left;
@@ -99,7 +98,7 @@
 
 .addFormRow {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     gap: 10px;
 }
 
@@ -164,39 +163,67 @@
 
 .addItemCount {
     input {
-        height: 35px;
+        width: 25px;
+        height: 33px;
     }
 }
 
 .autoCompleteOption {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 3px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 4px 0;
     width: 100%;
 
     .optionMain {
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        gap: 10px;
+        width: 100%;
+    }
+
+    .itemName {
+        color: #fff;
+        font-weight: bold;
+        font-size: 0.9rem;
     }
 
     .optionIndicators {
         display: flex;
         align-items: center;
-        gap: 2px;
-        color: #aaa;
+        gap: 4px;
+        color: #cdb597;
         font-weight: bold;
-        font-size: 0.8em;
+        font-size: 0.75rem;
+
+        span {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid currentColor;
+            border-radius: 2px;
+            padding: 0 3px;
+            min-width: 14px;
+        }
     }
 
     .optionMeta {
         display: flex;
-        flex-shrink: 0;
         align-items: center;
-        gap: 10px;
-        opacity: 0.7;
-        font-size: 0.8em;
+        gap: 8px;
+        opacity: 0.8;
+        color: #bbb;
+        font-size: 0.75rem;
+
+        .source {
+            font-style: italic;
+            &::before {
+                opacity: 0.5;
+                margin-right: 8px;
+                content: "•";
+            }
+        }
     }
 }
 

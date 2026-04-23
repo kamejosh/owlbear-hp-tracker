@@ -668,3 +668,55 @@ export const useUpdatePartyStatblockEquipment = (
         },
     });
 };
+
+const updatePartyStatblockMoney = ({
+    partyId,
+    partyStatblockId,
+    data,
+    token,
+}: {
+    partyId: number;
+    partyStatblockId: number;
+    data: MoneyIn;
+    token: string | null | undefined;
+}) => {
+    const headers = {
+        "X-API-Key": token,
+    };
+    return axios.request({
+        url: `${TTRPG_URL}/party/${partyId}/statblock/${partyStatblockId}/money`,
+        headers: headers,
+        data: data,
+        method: "PATCH",
+    });
+};
+
+export const useUpdatePartyStatblockMoney = (partyId: number, partyStatblockId: number, slug: string) => {
+    const queryClient = useQueryClient();
+    const token = useMetadataContext.getState().room?.tabletopAlmanacAPIKey;
+
+    return useMutation({
+        mutationKey: ["money", partyId, partyStatblockId],
+        mutationFn: async (data: MoneyIn) => {
+            return (
+                await updatePartyStatblockMoney({
+                    partyId: partyId,
+                    partyStatblockId: partyStatblockId,
+                    data: data,
+                    token: token,
+                })
+            ).data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["parties"],
+            });
+            queryClient.invalidateQueries({
+                queryKey: ["parties", partyId],
+            });
+            queryClient.invalidateQueries({
+                queryKey: ["slug", slug],
+            });
+        },
+    });
+};

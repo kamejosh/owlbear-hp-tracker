@@ -1,11 +1,12 @@
 import OBR, { Image, Item, Metadata } from "@owlbear-rodeo/sdk";
-import { infoMetadataKey, itemMetadataKey, metadataKey } from "./variables.ts";
+import { infoMetadataKey, itemMetadataKey, lootMetadataKey, metadataKey } from "./variables.ts";
 import {
     AttachmentMetadata,
     BestMatch,
     GMGMetadata,
     InitialStatblockData,
     Limit,
+    LootMetadata,
     RoomMetadata,
     SceneMetadata,
 } from "./types.ts";
@@ -762,7 +763,7 @@ export const getInitialValues = async (items: Array<Image>, getDarkVision: boole
                                                   ?.replace(/\D/g, ""),
                                           )
                                         : null,
-                                    loot: {
+                                    lootMetadata: {
                                         ...equipmentBonuses.loot,
                                         money: statblockMoney,
                                     },
@@ -809,7 +810,7 @@ export const getInitialValues = async (items: Array<Image>, getDarkVision: boole
                                     ruleset: "pf",
                                     limits: getLimitsPf(statblock),
                                     darkvision: null,
-                                    loot: null,
+                                    lootMetadata: null,
                                 },
                             };
                         }
@@ -916,6 +917,14 @@ export const prepareTokenForGrimoire = async (contextItems: Array<Image>) => {
                         defaultMetadata.stats.initial = true;
                         defaultMetadata.stats.limits = itemStatblocks[item.id].limits;
                         defaultMetadata.equipment = itemStatblocks[item.id].equipment;
+
+                        if (itemStatblocks[item.id].lootMetadata) {
+                            // we check above if it's defined
+                            const loot = itemStatblocks[item.id].lootMetadata as LootMetadata;
+                            if (loot.items.length > 0) {
+                                item.metadata[lootMetadataKey] = loot;
+                            }
+                        }
                     }
                     item.metadata[itemMetadataKey] = defaultMetadata;
                     if (settings?.assign_ss_darkvision && itemStatblocks[item.id]?.darkvision) {

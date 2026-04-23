@@ -14,7 +14,7 @@ export const Changelog = () => {
     }, []);
     return (
         <>
-            <button className={"close-button"} onClick={async () => await OBR.modal.close(modalId)}>
+            <button className={"close-button"} onClick={async () => await OBR.modal.close(`${modalId}/changelog`)}>
                 X
             </button>
             <h1>GM's Grimoire Changelog</h1>

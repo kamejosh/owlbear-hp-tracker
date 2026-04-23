@@ -39,6 +39,15 @@
         <li><a href="#party-links">Party Links</a></li>
         <li><a href="#party-statblocks">Party Statblocks</a></li>
       </ul>
+      <li><a href="#loot-management">Loot Management</a></li>
+      <ul>
+        <li><a href="#summary">Summary</a></li>
+        <li><a href="#user-workflow">User Workflow</a></li>
+        <ul>
+          <li><a href="#gm-workflow">GM Workflow</a></li>
+          <li><a href="#player-workflow">Player Workflow</a></li>
+        </ul>
+      </ul>
     </ul>
     <li><a href="#custom-statblocks">Custom Statblocks</a></li>
     <li><a href="#dice-roller">Dice Roller</a></li>
@@ -452,6 +461,48 @@ All statblocks that you added to the party are shown here. You can change their 
 <h2 id="party-player-view">Player View</h2>
 
 Players can see all members of the party but can only edit their assigned Party Members. They can move equipment to the party inventory and back or exchange money with the party. All changes are synced instantly to Tabletop Almanac so you can always continue your session where you last left it.
+
+<h1 id="loot-management">Loot Management</h1>
+
+Loot Management allows Dungeon Masters (GMs) to manage items and currency directly on Owlbear Rodeo tokens. It provides a streamlined way to handle loot drops and distribute rewards to players.
+
+All looting information is persisted on **Tabletop Almanac**, ensuring that loot remains consistent across different scenes and sessions.
+
+<h2 id="summary">Summary</h2>
+
+The Loot Management feature solves the problem of tracking rewards and inventory for individual tokens (e.g., a defeated boss or a treasure chest) within Owlbear Rodeo. Instead of manual notes, GMs can attach items and money directly to a token's metadata. Players can then interact with these tokens to view and claim their rewards, which are automatically synced to the party's inventory or individual player statblocks.
+
+<h2 id="user-workflow">User Workflow</h2>
+
+<h3 id="gm-workflow">Game Master Workflow</h3>
+
+1.  **Initialization:**
+    *   Select a token in the scene.
+    *   Open the Loot Management window.
+    *   If the token has no loot metadata, click the **"Initialize"** button.
+2.  **Managing Money:**
+    *   In the **Money** section, GMs can add or remove currency (Platinum, Gold, Electrum, Silver, Copper).
+    *   Arithmetic operations (e.g., `+50`) are supported for quick updates.
+3.  **Managing Items:**
+    *   **Add Item:** Click the [+] button to search the Tabletop Almanac database and add items to the token.
+    *   **Loot Suggestions:** Click the magic wand icon to get matchting loot suggestions based on the token's statblock or the party's average level.
+    *   **Remove Item:** Click the delete icon next to an item to remove it from the token.
+4.  **Toggling Visibility:**
+    *   Use the **"Lootable / Locked"** toggle in the header to control whether players can see and interact with the loot.
+    *   GMs can also toggle the visibility of the token itself directly from the loot selection screen.
+
+<h3 id="player-workflow">Player Workflow</h3>
+
+1.  **Accessing Loot:**
+    *   Select a token that has been marked as **"Lootable"** by the GM.
+    *   Open the Loot Management window.
+2.  **Viewing Rewards:**
+    *   Players can see the list of items and the amount of money available on the token.
+3.  **Transferring Loot:**
+    *   **Transfer Items:** Click the transfer icon next to an item. Players can choose to move the item to the **Party Inventory** or directly to a **Party Member's Statblock** they have been assigned to.
+    *   **Loot Money:** Click the **"Loot Money"** button to transfer currency to the party's shared funds or a specific member.
+4.  **Automatic Sync:**
+    *   Once an item or money is "taken," it is removed from the token and added to the selected destination on Tabletop Almanac instantly.
 
 
 <h1 id="custom-statblocks">Custom Statblocks</h1>

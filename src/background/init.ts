@@ -1,5 +1,16 @@
 import OBR, { Image, Metadata } from "@owlbear-rodeo/sdk";
-import { changelogModal, ID, itemMetadataKey, metadataKey, nextTurnChannel, version } from "../helper/variables.ts";
+import {
+    changelogModal,
+    GMI_ID,
+    ID,
+    itemMetadataKey,
+    lootMetadataKey,
+    lootModal,
+    lootPopover,
+    metadataKey,
+    nextTurnChannel,
+    version,
+} from "../helper/variables.ts";
 import { compare } from "compare-versions";
 import {
     ACItemChanges,
@@ -321,6 +332,56 @@ const setupContextMenu = async () => {
             }
         },
     });
+
+    await OBR.contextMenu.create({
+        id: `${GMI_ID}/loot`,
+        icons: [
+            {
+                icon: "/icon.svg",
+                label: "Manage Loot",
+                filter: {
+                    some: [
+                        { key: "layer", value: "CHARACTER", coordinator: "||" },
+                        { key: "layer", value: "MOUNT", coordinator: "||" },
+                        { key: "layer", value: "PROP", coordinator: "||" },
+                    ],
+                    roles: ["GM"],
+                },
+            },
+        ],
+        onClick: async () => {
+            // width needs to be big, to position statblock popover to the right
+            let width = 10000;
+            let height = 600;
+            try {
+                width = await OBR.viewport.getWidth();
+                height = await OBR.viewport.getHeight();
+            } catch {}
+            await OBR.popover.open({
+                ...lootPopover,
+                width: Math.min(400, width),
+                height: Math.min(600, height),
+                anchorPosition: { top: 55, left: width - 70 },
+            });
+        },
+    });
+
+    await OBR.contextMenu.create({
+        id: `${GMI_ID}/loot_player`,
+        icons: [
+            {
+                icon: "/icon.svg",
+                label: "Loot",
+                filter: {
+                    every: [{ key: ["metadata", `${lootMetadataKey}`, "lootAvailable"], value: true }],
+                    roles: ["PLAYER"],
+                },
+            },
+        ],
+        onClick: async () => {
+            await OBR.modal.open(lootModal);
+        },
+    });
 };
 
 const initGrimoire = async () => {
@@ -482,10 +543,23 @@ OBR.onReady(async () => {
             console.warn("GM's Grimoire - error while initializing Token event handler", e);
         }
     } else {
-        try {
-            await initPlayerParty();
-        } catch (e) {
-            console.warn("GM's Grimoire - error while initializing Player Party", e);
+        OBR.scene.onReadyChange(async (isReady) => {
+            if (isReady) {
+                try {
+                    await initPlayerParty();
+                } catch (e) {
+                    console.warn("GM's Grimoire - error while initializing Player Party", e);
+                }
+            }
+        });
+
+        const isReady = await OBR.scene.isReady();
+        if (isReady) {
+            try {
+                await initPlayerParty();
+            } catch (e) {
+                console.warn("GM's Grimoire - error while initializing Player Party", e);
+            }
         }
     }
     try {
