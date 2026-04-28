@@ -494,3 +494,14 @@ export const handleEquipmentChange = async (
     await updateHp(item, newData);
     await updateAc(item, newData);
 };
+
+export const cleanStats = (stats: StatblockStats): Stats => {
+    return {
+        strength: stats.strength ?? 10,
+        dexterity: stats.dexterity ?? 10,
+        constitution: stats.constitution ?? 10,
+        intelligence: stats.intelligence ?? 10,
+        wisdom: stats.wisdom ?? 10,
+        charisma: stats.charisma ?? 10,
+    };
+};

@@ -13,6 +13,11 @@ import { updateHp } from "../../../helper/hpHelpers.ts";
 import Tippy from "@tippyjs/react";
 import { useShallow } from "zustand/react/shallow";
 import { useDebounce } from "ahooks";
+import { useE5GetStatblock } from "../../../api/e5/useE5Api.ts";
+import { DiceRoll } from "@dice-roller/rpg-dice-roller";
+import { ContextPopover } from "../../general/ContextPopover.tsx";
+import { replaceStatWithMod } from "../../../helper/limitHelpers.ts";
+import { cleanStats } from "../../../helper/equipmentHelpers.ts";
 
 export const HP = ({ id }: { id: string }) => {
     const playerContext = usePlayerContext();
@@ -20,6 +25,20 @@ export const HP = ({ id }: { id: string }) => {
     const token = useTokenListContext(useShallow((state) => state.tokens?.get(id)));
     const data = token?.data as GMGMetadata;
     const item = token?.item as Image;
+    const [contextEvent, setContextEvent] = useState<MouseEvent | null>(null);
+
+    const ruleset = data.ruleset ?? room?.ruleset;
+    const statblockQuery = useE5GetStatblock(ruleset === "e5" ? data.sheet : "", room?.tabletopAlmanacAPIKey);
+    const statblock = statblockQuery.isSuccess ? statblockQuery.data : null;
+    const hitDice = statblock
+        ? replaceStatWithMod(
+              statblock.hp?.hit_dice ?? "",
+              cleanStats(statblock.stats),
+              statblock.skills,
+              statblock.proficiency_bonus ?? 0,
+          )
+        : "";
+
     const [hpFields, setHpFields] = useState<HpFields & { persist: boolean }>({
         hp: data.hp.toString(),
         maxHp: data.maxHp.toString(),
@@ -56,6 +75,24 @@ export const HP = ({ id }: { id: string }) => {
             }
         }
     }, [debouncedHpFields]);
+
+    const rollHitDice = () => {
+        if (hitDice) {
+            try {
+                const roll = new DiceRoll(hitDice);
+                const newHpFields = getNewHpFieldValues("maxHp", data, roll.total, undefined, room);
+                if (!isEqual(newHpFields, hpFields)) {
+                    setHpFields({
+                        ...newHpFields,
+                        hp: newHpFields.maxHp,
+                        persist: true,
+                    });
+                }
+            } catch (e) {
+                console.error("Failed to roll hit dice", e);
+            }
+        }
+    };
 
     return (
         <div className={"token-hp"}>
@@ -119,10 +156,29 @@ export const HP = ({ id }: { id: string }) => {
                     />
                 </Tippy>
                 <span className={"divider"}></span>
+                <ContextPopover context={contextEvent}>
+                    <div className={"hp-context-menu"}>
+                        <div
+                            className={"hp-context-menu-item"}
+                            onClick={() => {
+                                rollHitDice();
+                                setContextEvent(null);
+                            }}
+                        >
+                            Roll Max HP ({hitDice})
+                        </div>
+                    </div>
+                </ContextPopover>
                 <Tippy content={"Set max HP"}>
                     <input
                         type={"text"}
                         value={hpFields.maxHp}
+                        onContextMenu={(e) => {
+                            if (data.sheet && hitDice) {
+                                e.preventDefault();
+                                setContextEvent(e.nativeEvent);
+                            }
+                        }}
                         onKeyDown={(e) => {
                             if (e.key === "ArrowUp") {
                                 const newHpFields = getNewHpFieldValues(
