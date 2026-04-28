@@ -10,9 +10,12 @@ import { listParties } from "../api/tabletop-almanac/useParty.ts";
 import { updateHp } from "../helper/hpHelpers.ts";
 import { updateAc } from "../helper/acHelper.ts";
 
-let pollingTimeout: ReturnType<typeof setTimeout>;
+let pollingTimeout: ReturnType<typeof setTimeout> | null = null;
+let failedToken: string | null = null;
+let retryCount = 0;
 
 export const startPartyPolling = async (params: ListPartiesParams) => {
+    stopPartyPolling();
     const addParty = partyStore.getState().addParty;
     const poll = async () => {
         try {
@@ -22,20 +25,50 @@ export const startPartyPolling = async (params: ListPartiesParams) => {
                 metadataKey in roomMetadata ? (roomMetadata[metadataKey] as RoomMetadata).tabletopAlmanacAPIKey : null;
 
             if (token) {
-                const response = await listParties({ params, token });
-                const newData = response.data as PartyPagination;
+                if (token === failedToken) {
+                    return;
+                }
 
-                newData.page.forEach((party) => {
-                    addParty(party);
-                });
+                try {
+                    const response = await listParties({ params, token });
+                    const newData = response.data as PartyPagination;
+
+                    newData.page.forEach((party) => {
+                        addParty(party);
+                    });
+
+                    // Reset on success
+                    retryCount = 0;
+                    failedToken = null;
+                } catch (error: any) {
+                    if (error?.status === 401 || error?.response?.status === 401) {
+                        retryCount++;
+                        if (retryCount >= 2) {
+                            failedToken = token;
+                            console.warn("Game Master's Grimoire - Syncing Parties stopped: Unauthorized");
+                            return;
+                        }
+                    }
+                    console.error("Game Master's Grimoire - Failed to fetch parties:", error);
+                }
             } else {
-                // console.warn("Polling skipped: No API key available.");
+                return;
             }
         } catch (error) {
-            // console.error("Failed to poll parties:", error);
+            console.error("Game Master's Grimoire - Failed to fetch parties:", error);
         } finally {
             // Schedule the next poll exactly 30 seconds after this one finishes
-            pollingTimeout = setTimeout(poll, 30000);
+            // Only if we haven't returned early (halted)
+            if (!failedToken) {
+                const roomMetadata = await OBR.room.getMetadata();
+                const token =
+                    metadataKey in roomMetadata
+                        ? (roomMetadata[metadataKey] as RoomMetadata).tabletopAlmanacAPIKey
+                        : null;
+                if (token) {
+                    pollingTimeout = setTimeout(poll, 30000);
+                }
+            }
         }
     };
 
@@ -49,6 +82,7 @@ export const startPartyPolling = async (params: ListPartiesParams) => {
 export const stopPartyPolling = () => {
     if (pollingTimeout) {
         clearTimeout(pollingTimeout);
+        pollingTimeout = null;
     }
 };
 
@@ -112,8 +146,15 @@ export const initPlayerParty = async () => {
 
     OBR.room.onMetadataChange((metadata) => {
         const gmgMetadata = metadata[metadataKey] as RoomMetadata;
-        if (gmgMetadata && gmgMetadata.partyId !== partyStore.getState().currentPartyId) {
-            partyStore.getState().setCurrentParty(gmgMetadata.partyId);
+        if (gmgMetadata) {
+            if (gmgMetadata.partyId !== partyStore.getState().currentPartyId) {
+                partyStore.getState().setCurrentParty(gmgMetadata.partyId);
+            }
+
+            const apiKey = gmgMetadata.tabletopAlmanacAPIKey;
+            if (apiKey && apiKey !== failedToken && !pollingTimeout) {
+                void startPartyPolling({ limit: 100, offset: 0 });
+            }
         }
     });
 
@@ -127,8 +168,15 @@ export const initParty = async () => {
     // subscribe to party changes
     OBR.room.onMetadataChange((metadata) => {
         const gmgMetadata = metadata[metadataKey] as RoomMetadata;
-        if (gmgMetadata && gmgMetadata.partyId !== partyStore.getState().currentPartyId) {
-            partyStore.getState().setCurrentParty(gmgMetadata.partyId);
+        if (gmgMetadata) {
+            if (gmgMetadata.partyId !== partyStore.getState().currentPartyId) {
+                partyStore.getState().setCurrentParty(gmgMetadata.partyId);
+            }
+
+            const apiKey = gmgMetadata.tabletopAlmanacAPIKey;
+            if (apiKey && apiKey !== failedToken && !pollingTimeout) {
+                void startPartyPolling({ limit: 100, offset: 0 });
+            }
         }
     });
 

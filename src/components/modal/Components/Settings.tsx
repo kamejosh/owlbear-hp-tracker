@@ -3,7 +3,7 @@ import {
     diceTrayModal,
     diceTrayModalId,
     itemMetadataKey,
-    modalId,
+    settingsModal,
 } from "../../../helper/variables.ts";
 import OBR from "@owlbear-rodeo/sdk";
 import { updateHp, updateHpOffset } from "../../../helper/hpHelpers.ts";
@@ -37,7 +37,7 @@ export const Settings = () => {
 
     return (
         <>
-            <button className={"close-button"} onClick={async () => await OBR.modal.close(modalId)}>
+            <button className={"close-button"} onClick={async () => await OBR.modal.close(settingsModal.id)}>
                 X
             </button>
             <div className={"global-setting"}>
