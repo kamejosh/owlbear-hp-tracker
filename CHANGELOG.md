@@ -1,3 +1,9 @@
+## Unversioned
+
+* Fix issues where party wouldn't update metadata when dropping tokens into the scene
+* Fix issue with unauthenticated party syncing
+* Add Context Menu to roll for max HP
+
 # 3.7.1
 
 ### New Features

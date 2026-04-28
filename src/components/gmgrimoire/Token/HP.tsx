@@ -18,14 +18,22 @@ import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 import { ContextPopover } from "../../general/ContextPopover.tsx";
 import { replaceStatWithMod } from "../../../helper/limitHelpers.ts";
 import { cleanStats } from "../../../helper/equipmentHelpers.ts";
+import { Loader } from "../../general/Loader.tsx";
 
-export const HP = ({ id }: { id: string }) => {
-    const playerContext = usePlayerContext();
-    const room = useMetadataContext(useShallow((state) => state.room));
+export const RollMaxHp = ({
+    id,
+    hpFields,
+    setHpFields,
+    setContextEvent,
+}: {
+    id: string;
+    hpFields: HpFields;
+    setHpFields: (hpFields: HpFields & { persist: boolean }) => void;
+    setContextEvent: (contextEvent: MouseEvent | null) => void;
+}) => {
     const token = useTokenListContext(useShallow((state) => state.tokens?.get(id)));
     const data = token?.data as GMGMetadata;
-    const item = token?.item as Image;
-    const [contextEvent, setContextEvent] = useState<MouseEvent | null>(null);
+    const room = useMetadataContext(useShallow((state) => state.room));
 
     const ruleset = data.ruleset ?? room?.ruleset;
     const statblockQuery = useE5GetStatblock(ruleset === "e5" ? data.sheet : "", room?.tabletopAlmanacAPIKey);
@@ -38,6 +46,51 @@ export const HP = ({ id }: { id: string }) => {
               statblock.proficiency_bonus ?? 0,
           )
         : "";
+
+    const rollHitDice = () => {
+        if (hitDice) {
+            try {
+                const roll = new DiceRoll(hitDice);
+                const newHpFields = getNewHpFieldValues("maxHp", data, roll.total, undefined, room);
+                if (!isEqual(newHpFields, hpFields)) {
+                    setHpFields({
+                        ...newHpFields,
+                        hp: newHpFields.maxHp,
+                        persist: true,
+                    });
+                }
+            } catch (e) {
+                console.error("Failed to roll hit dice", e);
+            }
+        }
+    };
+
+    if (statblockQuery.isLoading) {
+        return <Loader />;
+    }
+
+    return (
+        <div className={"hp-context-menu"}>
+            <div
+                className={"hp-context-menu-item"}
+                onClick={() => {
+                    rollHitDice();
+                    setContextEvent(null);
+                }}
+            >
+                Roll Max HP ({hitDice})
+            </div>
+        </div>
+    );
+};
+
+export const HP = ({ id }: { id: string }) => {
+    const playerContext = usePlayerContext();
+    const room = useMetadataContext(useShallow((state) => state.room));
+    const token = useTokenListContext(useShallow((state) => state.tokens?.get(id)));
+    const data = token?.data as GMGMetadata;
+    const item = token?.item as Image;
+    const [contextEvent, setContextEvent] = useState<MouseEvent | null>(null);
 
     const [hpFields, setHpFields] = useState<HpFields & { persist: boolean }>({
         hp: data.hp.toString(),
@@ -75,24 +128,6 @@ export const HP = ({ id }: { id: string }) => {
             }
         }
     }, [debouncedHpFields]);
-
-    const rollHitDice = () => {
-        if (hitDice) {
-            try {
-                const roll = new DiceRoll(hitDice);
-                const newHpFields = getNewHpFieldValues("maxHp", data, roll.total, undefined, room);
-                if (!isEqual(newHpFields, hpFields)) {
-                    setHpFields({
-                        ...newHpFields,
-                        hp: newHpFields.maxHp,
-                        persist: true,
-                    });
-                }
-            } catch (e) {
-                console.error("Failed to roll hit dice", e);
-            }
-        }
-    };
 
     return (
         <div className={"token-hp"}>
@@ -157,24 +192,19 @@ export const HP = ({ id }: { id: string }) => {
                 </Tippy>
                 <span className={"divider"}></span>
                 <ContextPopover context={contextEvent}>
-                    <div className={"hp-context-menu"}>
-                        <div
-                            className={"hp-context-menu-item"}
-                            onClick={() => {
-                                rollHitDice();
-                                setContextEvent(null);
-                            }}
-                        >
-                            Roll Max HP ({hitDice})
-                        </div>
-                    </div>
+                    <RollMaxHp
+                        id={id}
+                        hpFields={hpFields}
+                        setHpFields={setHpFields}
+                        setContextEvent={setContextEvent}
+                    />
                 </ContextPopover>
                 <Tippy content={"Set max HP"}>
                     <input
                         type={"text"}
                         value={hpFields.maxHp}
                         onContextMenu={(e) => {
-                            if (data.sheet && hitDice) {
+                            if (data.sheet) {
                                 e.preventDefault();
                                 setContextEvent(e.nativeEvent);
                             }
