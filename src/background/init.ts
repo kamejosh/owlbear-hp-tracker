@@ -49,6 +49,7 @@ import { setupDicePlus } from "./diceplus.ts";
 import { registerMessageHandlers } from "./api.ts";
 import _, { isNull, isUndefined } from "lodash";
 import { initParty, initPlayerParty } from "./party.ts";
+import { HOSTING_NOTIFICATION } from "../config.ts";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -574,4 +575,12 @@ OBR.onReady(async () => {
         console.warn("GM's Grimoire - error while intializing diceroller", e);
     }
     console.info(`GM's Grimoire - initialization done`);
+
+    // render hosting warning
+    if (HOSTING_NOTIFICATION) {
+        await OBR.notification.show(
+            "You are using an old url for GMG - it will be removed in August. Please remove the extension and install it directly from the OBR Extension store. Your data will be preserved.",
+            "WARNING",
+        );
+    }
 });

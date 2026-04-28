@@ -29,10 +29,10 @@ export const startPartyPolling = async (params: ListPartiesParams) => {
                     addParty(party);
                 });
             } else {
-                console.warn("Polling skipped: No API key available.");
+                // console.warn("Polling skipped: No API key available.");
             }
         } catch (error) {
-            console.error("Failed to poll parties:", error);
+            // console.error("Failed to poll parties:", error);
         } finally {
             // Schedule the next poll exactly 30 seconds after this one finishes
             pollingTimeout = setTimeout(poll, 30000);
