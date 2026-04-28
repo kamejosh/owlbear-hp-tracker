@@ -30,8 +30,10 @@ export type PartyStore = {
     parties: Array<PartySettings>;
     addParty: (party: PartyOut) => void;
     currentParty: PartySettings | null;
-    setCurrentParty: (id: number) => void;
+    currentPartyId: number | null;
+    setCurrentParty: (id?: number | null) => void;
     updateMember: (member: PartyStoreStatblock) => void;
+    updateMembers: (members: PartyStoreStatblock[]) => void;
 };
 
 export const partyStore = createStore<PartyStore>()(
@@ -39,6 +41,7 @@ export const partyStore = createStore<PartyStore>()(
         persist<PartyStore>(
             (set) => ({
                 parties: [],
+                currentPartyId: null,
 
                 addParty: (party) =>
                     set((state) => {
@@ -61,46 +64,30 @@ export const partyStore = createStore<PartyStore>()(
                             members: newMembers,
                         };
 
+                        let newState: Partial<PartyStore> = {};
+
                         if (!existingParty) {
-                            return {
-                                parties: [...state.parties, newParty],
-                            };
+                            newState.parties = [...state.parties, newParty];
                         } else if (!_.isEqual(existingParty, newParty)) {
-                            if (state.currentParty?.id === newParty.id) {
-                                return {
-                                    parties: state.parties.map((p) => {
-                                        if (p.id === party.id) {
-                                            return newParty;
-                                        } else {
-                                            return p;
-                                        }
-                                    }),
-                                    currentParty: newParty,
-                                };
-                            } else {
-                                return {
-                                    parties: state.parties.map((p) => {
-                                        if (p.id === party.id) {
-                                            return newParty;
-                                        } else {
-                                            return p;
-                                        }
-                                    }),
-                                };
-                            }
+                            newState.parties = state.parties.map((p) => (p.id === party.id ? newParty : p));
                         }
-                        return {};
+
+                        if (state.currentPartyId === newParty.id) {
+                            newState.currentParty = newParty;
+                        }
+
+                        return newState;
                     }),
 
                 currentParty: null,
 
                 setCurrentParty: (id) =>
                     set((state) => {
-                        const party = state.parties.find((p) => p.id === id);
-                        if (party) {
-                            return { currentParty: party };
+                        if (id === null || id === undefined) {
+                            return { currentPartyId: null, currentParty: null };
                         }
-                        return { currentParty: null };
+                        const party = state.parties.find((p) => p.id === id);
+                        return { currentPartyId: id, currentParty: party ?? null };
                     }),
                 updateMember: (member) =>
                     set((state) => {
@@ -110,8 +97,36 @@ export const partyStore = createStore<PartyStore>()(
 
                         if (!isUndefined(memberIndex) && memberIndex >= 0 && state.currentParty) {
                             const party = { ...state.currentParty };
+                            party.members = [...party.members];
                             party.members[memberIndex] = member;
 
+                            return {
+                                parties: state.parties.map((p) => (p.id === party.id ? party : p)),
+                                currentParty: party,
+                            };
+                        }
+                        return {};
+                    }),
+                updateMembers: (members) =>
+                    set((state) => {
+                        if (!state.currentParty) {
+                            return {};
+                        }
+                        const party = { ...state.currentParty };
+                        party.members = [...party.members];
+                        let changed = false;
+
+                        members.forEach((member) => {
+                            const memberIndex = party.members.findIndex(
+                                (m) => m.partyStatblockId === member.partyStatblockId,
+                            );
+                            if (memberIndex >= 0) {
+                                party.members[memberIndex] = member;
+                                changed = true;
+                            }
+                        });
+
+                        if (changed) {
                             return {
                                 parties: state.parties.map((p) => (p.id === party.id ? party : p)),
                                 currentParty: party,

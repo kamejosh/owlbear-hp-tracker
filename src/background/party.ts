@@ -5,10 +5,10 @@ import { PartyStoreStatblock } from "../context/PartyStore.tsx";
 import { itemMetadataKey, metadataKey } from "../helper/variables.ts";
 import { GMGMetadata, RoomMetadata, SceneMetadata } from "../helper/types.ts";
 import { updateSceneMetadata } from "../helper/helpers.ts";
-import { useMetadataContext } from "../context/MetadataContext.ts";
 import { partyStore } from "../context/PartyStore.tsx";
 import { listParties } from "../api/tabletop-almanac/useParty.ts";
-import { initItems } from "./init.ts";
+import { updateHp } from "../helper/hpHelpers.ts";
+import { updateAc } from "../helper/acHelper.ts";
 
 let pollingTimeout: ReturnType<typeof setTimeout>;
 
@@ -40,7 +40,7 @@ export const startPartyPolling = async (params: ListPartiesParams) => {
     };
 
     // Kick off the first request immediately
-    poll();
+    await poll();
 
     // Return a cleanup function so you can stop polling when needed
     return () => stopPartyPolling();
@@ -55,6 +55,7 @@ export const stopPartyPolling = () => {
 const initPlayerPartyMembers = async (items: Array<Item>) => {
     const currentParty = partyStore.getState().currentParty;
     const partyStatblocks = currentParty?.members.map((member) => member.statblock?.slug) || [];
+    const membersToUpdate: PartyStoreStatblock[] = [];
     items.forEach((item) => {
         if (item.type === "IMAGE") {
             const image = item as Image;
@@ -76,13 +77,17 @@ const initPlayerPartyMembers = async (items: Array<Item>) => {
                         }
 
                         if (!_.isEqual(member, newMember)) {
-                            partyStore.getState().updateMember(newMember);
+                            membersToUpdate.push(newMember);
                         }
                     }
                 }
             }
         }
     });
+
+    if (membersToUpdate.length > 0) {
+        partyStore.getState().updateMembers(membersToUpdate);
+    }
 };
 
 export const initPlayerParty = async () => {
@@ -106,10 +111,8 @@ export const initPlayerParty = async () => {
     await initPlayerPartyMembers(items);
 
     OBR.room.onMetadataChange((metadata) => {
-        const currentParty = partyStore.getState().currentParty;
-        const room = useMetadataContext.getState().room;
         const gmgMetadata = metadata[metadataKey] as RoomMetadata;
-        if (!_.isEqual(room, gmgMetadata) && gmgMetadata.partyId && gmgMetadata.partyId !== currentParty?.id) {
+        if (gmgMetadata && gmgMetadata.partyId !== partyStore.getState().currentPartyId) {
             partyStore.getState().setCurrentParty(gmgMetadata.partyId);
         }
     });
@@ -123,9 +126,8 @@ export const initParty = async () => {
     await startPartyPolling({ limit: 100, offset: 0 });
     // subscribe to party changes
     OBR.room.onMetadataChange((metadata) => {
-        const room = useMetadataContext.getState().room;
         const gmgMetadata = metadata[metadataKey] as RoomMetadata;
-        if (!_.isEqual(room, gmgMetadata) && gmgMetadata.partyId) {
+        if (gmgMetadata && gmgMetadata.partyId !== partyStore.getState().currentPartyId) {
             partyStore.getState().setCurrentParty(gmgMetadata.partyId);
         }
     });
@@ -159,6 +161,8 @@ export const initParty = async () => {
         const newTokens: Array<Item> = [];
         const currentParty = partyStore.getState().currentParty;
         const partyStatblocks = currentParty?.members.map((member) => member.statblock?.slug) || [];
+        const membersToUpdate: PartyStoreStatblock[] = [];
+
         items.forEach((item) => {
             if (item.type === "IMAGE" && (item.layer === "CHARACTER" || item.layer === "MOUNT")) {
                 const image = item as Image;
@@ -182,7 +186,7 @@ export const initParty = async () => {
                             }
 
                             if (!_.isEqual(member, newMember)) {
-                                partyStore.getState().updateMember(newMember);
+                                membersToUpdate.push(newMember);
                             }
                         }
                     }
@@ -192,15 +196,18 @@ export const initParty = async () => {
                         void OBR.scene.items.updateItems([item], (items) => {
                             for (const i of items) {
                                 // we checked before but this makes typescript happy
-                                if (member.metadata) {
-                                    let data = member.metadata[itemMetadataKey] as GMGMetadata;
+                                if (member.metadata && !_.isEqual(member.metadata, i.metadata)) {
+                                    let data = { ...member.metadata };
                                     if (itemMetadataKey in member.metadata) {
-                                        data.group = currentParty?.group;
+                                        data[itemMetadataKey] = {
+                                            ...(member.metadata[itemMetadataKey] as GMGMetadata),
+                                            group: currentParty?.group,
+                                        };
                                     }
-                                    i.metadata[itemMetadataKey] = data;
+                                    i.metadata = data;
                                     newTokens.push(item);
                                 }
-                                if (member.playerId) {
+                                if (member.playerId && member.playerId !== i.createdUserId) {
                                     i.createdUserId = member.playerId;
                                 }
                             }
@@ -210,8 +217,18 @@ export const initParty = async () => {
             }
         });
 
+        if (membersToUpdate.length > 0) {
+            partyStore.getState().updateMembers(membersToUpdate);
+        }
         if (newTokens.length > 0) {
-            initItems();
+            const newItems = await OBR.scene.items.getItems(newTokens.map((t) => t.id));
+            for (const token of newItems) {
+                if (itemMetadataKey in token.metadata) {
+                    const metadata = token.metadata[itemMetadataKey] as GMGMetadata;
+                    await updateHp(token, metadata);
+                    await updateAc(token, metadata);
+                }
+            }
         }
     });
 };
