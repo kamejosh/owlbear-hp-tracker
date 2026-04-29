@@ -55,3 +55,26 @@
         width: 100%;
     }
 }
+
+.hp-context-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border: 1px solid white;
+    border-radius: 4px;
+    background-color: var(--bg-color);
+    padding: 4px;
+
+    .hp-context-menu-item {
+        cursor: pointer;
+        border-radius: 2px;
+        padding: 4px 8px;
+        font-size: 12px;
+        white-space: nowrap;
+
+        &:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+    }
+}

@@ -5,14 +5,17 @@ import { PartyStoreStatblock } from "../context/PartyStore.tsx";
 import { itemMetadataKey, metadataKey } from "../helper/variables.ts";
 import { GMGMetadata, RoomMetadata, SceneMetadata } from "../helper/types.ts";
 import { updateSceneMetadata } from "../helper/helpers.ts";
-import { useMetadataContext } from "../context/MetadataContext.ts";
 import { partyStore } from "../context/PartyStore.tsx";
 import { listParties } from "../api/tabletop-almanac/useParty.ts";
-import { initItems } from "./init.ts";
+import { updateHp } from "../helper/hpHelpers.ts";
+import { updateAc } from "../helper/acHelper.ts";
 
-let pollingTimeout: ReturnType<typeof setTimeout>;
+let pollingTimeout: ReturnType<typeof setTimeout> | null = null;
+let failedToken: string | null = null;
+let retryCount = 0;
 
 export const startPartyPolling = async (params: ListPartiesParams) => {
+    stopPartyPolling();
     const addParty = partyStore.getState().addParty;
     const poll = async () => {
         try {
@@ -22,25 +25,55 @@ export const startPartyPolling = async (params: ListPartiesParams) => {
                 metadataKey in roomMetadata ? (roomMetadata[metadataKey] as RoomMetadata).tabletopAlmanacAPIKey : null;
 
             if (token) {
-                const response = await listParties({ params, token });
-                const newData = response.data as PartyPagination;
+                if (token === failedToken) {
+                    return;
+                }
 
-                newData.page.forEach((party) => {
-                    addParty(party);
-                });
+                try {
+                    const response = await listParties({ params, token });
+                    const newData = response.data as PartyPagination;
+
+                    newData.page.forEach((party) => {
+                        addParty(party);
+                    });
+
+                    // Reset on success
+                    retryCount = 0;
+                    failedToken = null;
+                } catch (error: any) {
+                    if (error?.status === 401 || error?.response?.status === 401) {
+                        retryCount++;
+                        if (retryCount >= 2) {
+                            failedToken = token;
+                            console.warn("Game Master's Grimoire - Syncing Parties stopped: Unauthorized");
+                            return;
+                        }
+                    }
+                    console.error("Game Master's Grimoire - Failed to fetch parties:", error);
+                }
             } else {
-                console.warn("Polling skipped: No API key available.");
+                return;
             }
         } catch (error) {
-            console.error("Failed to poll parties:", error);
+            console.error("Game Master's Grimoire - Failed to fetch parties:", error);
         } finally {
             // Schedule the next poll exactly 30 seconds after this one finishes
-            pollingTimeout = setTimeout(poll, 30000);
+            // Only if we haven't returned early (halted)
+            if (!failedToken) {
+                const roomMetadata = await OBR.room.getMetadata();
+                const token =
+                    metadataKey in roomMetadata
+                        ? (roomMetadata[metadataKey] as RoomMetadata).tabletopAlmanacAPIKey
+                        : null;
+                if (token) {
+                    pollingTimeout = setTimeout(poll, 30000);
+                }
+            }
         }
     };
 
     // Kick off the first request immediately
-    poll();
+    await poll();
 
     // Return a cleanup function so you can stop polling when needed
     return () => stopPartyPolling();
@@ -49,12 +82,14 @@ export const startPartyPolling = async (params: ListPartiesParams) => {
 export const stopPartyPolling = () => {
     if (pollingTimeout) {
         clearTimeout(pollingTimeout);
+        pollingTimeout = null;
     }
 };
 
 const initPlayerPartyMembers = async (items: Array<Item>) => {
     const currentParty = partyStore.getState().currentParty;
     const partyStatblocks = currentParty?.members.map((member) => member.statblock?.slug) || [];
+    const membersToUpdate: PartyStoreStatblock[] = [];
     items.forEach((item) => {
         if (item.type === "IMAGE") {
             const image = item as Image;
@@ -76,13 +111,17 @@ const initPlayerPartyMembers = async (items: Array<Item>) => {
                         }
 
                         if (!_.isEqual(member, newMember)) {
-                            partyStore.getState().updateMember(newMember);
+                            membersToUpdate.push(newMember);
                         }
                     }
                 }
             }
         }
     });
+
+    if (membersToUpdate.length > 0) {
+        partyStore.getState().updateMembers(membersToUpdate);
+    }
 };
 
 export const initPlayerParty = async () => {
@@ -106,11 +145,16 @@ export const initPlayerParty = async () => {
     await initPlayerPartyMembers(items);
 
     OBR.room.onMetadataChange((metadata) => {
-        const currentParty = partyStore.getState().currentParty;
-        const room = useMetadataContext.getState().room;
         const gmgMetadata = metadata[metadataKey] as RoomMetadata;
-        if (!_.isEqual(room, gmgMetadata) && gmgMetadata.partyId && gmgMetadata.partyId !== currentParty?.id) {
-            partyStore.getState().setCurrentParty(gmgMetadata.partyId);
+        if (gmgMetadata) {
+            if (gmgMetadata.partyId !== partyStore.getState().currentPartyId) {
+                partyStore.getState().setCurrentParty(gmgMetadata.partyId);
+            }
+
+            const apiKey = gmgMetadata.tabletopAlmanacAPIKey;
+            if (apiKey && apiKey !== failedToken && !pollingTimeout) {
+                void startPartyPolling({ limit: 100, offset: 0 });
+            }
         }
     });
 
@@ -123,10 +167,16 @@ export const initParty = async () => {
     await startPartyPolling({ limit: 100, offset: 0 });
     // subscribe to party changes
     OBR.room.onMetadataChange((metadata) => {
-        const room = useMetadataContext.getState().room;
         const gmgMetadata = metadata[metadataKey] as RoomMetadata;
-        if (!_.isEqual(room, gmgMetadata) && gmgMetadata.partyId) {
-            partyStore.getState().setCurrentParty(gmgMetadata.partyId);
+        if (gmgMetadata) {
+            if (gmgMetadata.partyId !== partyStore.getState().currentPartyId) {
+                partyStore.getState().setCurrentParty(gmgMetadata.partyId);
+            }
+
+            const apiKey = gmgMetadata.tabletopAlmanacAPIKey;
+            if (apiKey && apiKey !== failedToken && !pollingTimeout) {
+                void startPartyPolling({ limit: 100, offset: 0 });
+            }
         }
     });
 
@@ -159,6 +209,8 @@ export const initParty = async () => {
         const newTokens: Array<Item> = [];
         const currentParty = partyStore.getState().currentParty;
         const partyStatblocks = currentParty?.members.map((member) => member.statblock?.slug) || [];
+        const membersToUpdate: PartyStoreStatblock[] = [];
+
         items.forEach((item) => {
             if (item.type === "IMAGE" && (item.layer === "CHARACTER" || item.layer === "MOUNT")) {
                 const image = item as Image;
@@ -182,7 +234,7 @@ export const initParty = async () => {
                             }
 
                             if (!_.isEqual(member, newMember)) {
-                                partyStore.getState().updateMember(newMember);
+                                membersToUpdate.push(newMember);
                             }
                         }
                     }
@@ -192,15 +244,18 @@ export const initParty = async () => {
                         void OBR.scene.items.updateItems([item], (items) => {
                             for (const i of items) {
                                 // we checked before but this makes typescript happy
-                                if (member.metadata) {
-                                    let data = member.metadata[itemMetadataKey] as GMGMetadata;
+                                if (member.metadata && !_.isEqual(member.metadata, i.metadata)) {
+                                    let data = { ...member.metadata };
                                     if (itemMetadataKey in member.metadata) {
-                                        data.group = currentParty?.group;
+                                        data[itemMetadataKey] = {
+                                            ...(member.metadata[itemMetadataKey] as GMGMetadata),
+                                            group: currentParty?.group,
+                                        };
                                     }
-                                    i.metadata[itemMetadataKey] = data;
+                                    i.metadata = data;
                                     newTokens.push(item);
                                 }
-                                if (member.playerId) {
+                                if (member.playerId && member.playerId !== i.createdUserId) {
                                     i.createdUserId = member.playerId;
                                 }
                             }
@@ -210,8 +265,18 @@ export const initParty = async () => {
             }
         });
 
+        if (membersToUpdate.length > 0) {
+            partyStore.getState().updateMembers(membersToUpdate);
+        }
         if (newTokens.length > 0) {
-            initItems();
+            const newItems = await OBR.scene.items.getItems(newTokens.map((t) => t.id));
+            for (const token of newItems) {
+                if (itemMetadataKey in token.metadata) {
+                    const metadata = token.metadata[itemMetadataKey] as GMGMetadata;
+                    await updateHp(token, metadata);
+                    await updateAc(token, metadata);
+                }
+            }
         }
     });
 };

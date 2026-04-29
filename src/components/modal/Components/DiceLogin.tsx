@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import OBR from "@owlbear-rodeo/sdk";
-import { modalId } from "../../../helper/variables.ts";
+import { diceModal, modalId } from "../../../helper/variables.ts";
 import { useInterval } from "../../../helper/hooks.ts";
 import { updateRoomMetadataDiceUser } from "../../../helper/diceHelper.ts";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
@@ -62,7 +62,7 @@ export const DiceLogin = () => {
 
     return (
         <div className={"dddice-login-modal"}>
-            <button className={"close-button"} onClick={async () => await OBR.modal.close(modalId)}>
+            <button className={"close-button"} onClick={async () => await OBR.modal.close(diceModal.id)}>
                 X
             </button>
             <div className={"content"}>

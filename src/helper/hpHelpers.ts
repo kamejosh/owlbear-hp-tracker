@@ -59,7 +59,7 @@ export const createBar = async (percentage: number, tempHpPercentage: number, to
         .build();
 
     const tempHp = buildShape()
-        .width(tempHpPercentage === 0 ? 0 : (width - border * 2) * tempHpPercentage)
+        .width(tempHpPercentage === 0 ? 0 : (width - border * 2) * Math.min(tempHpPercentage, 1))
         .height(height - border * 2)
         .shapeType("RECTANGLE")
         .fillColor("blue")
