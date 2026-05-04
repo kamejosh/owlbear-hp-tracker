@@ -4,11 +4,12 @@ import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
 import { updateHp } from "./hpHelpers.ts";
 import { updateAc } from "./acHelper.ts";
 import { updateItems, updateList } from "./obrHelper.ts";
-import { useMetadataContext } from "../context/MetadataContext.ts";
+import { useMetadataContext, useTaSettingsStore } from "../context/MetadataContext.ts";
 import { syncLocalRoll } from "./diceHelper.ts";
 import { getTokenName } from "./helpers.ts";
 import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 import { rollLogStore } from "../context/RollLogContext.tsx";
+import { removeFromPrettySordid, setPrettySordidInitiative } from "./prettySordidHelpers.ts";
 
 export const getHpOnMap = (list: Array<Item>) => {
     const hpMap = list.map((token) => {
@@ -120,11 +121,22 @@ export const getTokenInPlayerList = (list: Array<Item>) => {
 };
 
 export const toggleTokenInPlayerList = async (list: Array<Item>) => {
+    const taSettings = useTaSettingsStore.getState().taSettings;
     const current = getTokenInPlayerList(list);
     await updateItems(list, (items) => {
         items.forEach((item) => {
             (item.metadata[itemMetadataKey] as GMGMetadata).playerList = !current;
         });
+    });
+    await updateList(list, 4, async (list) => {
+        for (const item of list) {
+            const data = item.metadata[itemMetadataKey] as GMGMetadata;
+            if (!current) {
+                void setPrettySordidInitiative(item.id, taSettings, data.initiative);
+            } else {
+                await removeFromPrettySordid(item.id, taSettings);
+            }
+        }
     });
 };
 
