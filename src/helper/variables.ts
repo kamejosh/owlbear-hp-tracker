@@ -59,6 +59,13 @@ export const lootModal: Modal = {
     height: 600,
 };
 
+export const shopModal: Modal = {
+    id: `${modalId}/shop`,
+    url: "/shop.html",
+    width: 500,
+    height: 700,
+};
+
 export const lootPopover: Popover = {
     id: `${modalId}/loot`,
     url: "/loot.html",

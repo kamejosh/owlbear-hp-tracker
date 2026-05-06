@@ -1,0 +1,673 @@
+.header {
+    display: flex;
+    align-items: center;
+    gap: 1ch;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-block: 1rem 0.5rem;
+    width: 100%;
+}
+
+.tokenImage {
+    height: 40px;
+}
+
+.unselectButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    border: none;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 4px;
+    width: 32px;
+    height: 32px;
+    color: white;
+
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+.tokenName {
+    flex-grow: 1;
+    margin: 0;
+}
+
+.statusButton {
+    display: flex;
+    align-items: center;
+    justify-self: flex-end;
+    gap: 0.5ch;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 4px 12px;
+    color: white;
+    font-weight: bold;
+
+    &.lootable {
+        background-color: #448844;
+    }
+
+    &.locked {
+        background-color: #666;
+    }
+}
+
+.statusDot {
+    display: inline-block;
+    border-radius: 50%;
+    width: 8px;
+    height: 8px;
+
+    &.lootable {
+        box-shadow: 0 0 5px #00ff00;
+        background-color: #00ff00;
+    }
+
+    &.locked {
+        background-color: #ff4444;
+    }
+}
+
+.section {
+    margin-bottom: 1.5rem;
+
+    &.last {
+        margin-bottom: 0;
+    }
+}
+
+.sectionTitle {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.itemRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.03);
+    padding: 4px 8px;
+}
+
+.itemActions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.transferButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 4px;
+    color: white;
+
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    svg {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+.transferMenu {
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    background-color: #2b2a33;
+    padding: 4px;
+    min-width: 150px;
+}
+
+.transferOption {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    border: none;
+    border-radius: 2px;
+    background: none;
+    padding: 8px 12px;
+    width: 100%;
+    color: white;
+    text-align: left;
+
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    svg {
+        opacity: 0.7;
+        width: 16px;
+        height: 16px;
+    }
+}
+
+.transferHeader {
+    margin: 4px 8px 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 4px;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: bold;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+}
+
+.itemMain {
+    display: flex;
+    align-items: center;
+    gap: 1ch;
+}
+
+.itemName {
+    font-weight: bold;
+}
+
+.itemCount {
+    opacity: 0.8;
+}
+
+.noItems {
+    opacity: 0.5;
+    padding: 4px 8px;
+    font-style: italic;
+}
+
+.errorContainer {
+    margin-bottom: 8px;
+    border: 1px solid rgba(255, 0, 0, 0.2);
+    border-radius: 4px;
+    background-color: rgba(255, 0, 0, 0.1);
+    padding: 8px;
+    color: #ff4444;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.moneyContainer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.5ch;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.03);
+    padding: 8px;
+}
+
+.moneyItem {
+    display: flex;
+    align-items: center;
+    gap: 0.5ch;
+}
+
+.moneyInput {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 4px 6px;
+    width: 7ch;
+    color: inherit;
+    font-size: 0.9rem;
+}
+
+.moneyValue {
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.moneyLabel {
+    opacity: 0.8;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.editActions {
+    display: flex;
+    align-items: center;
+    gap: 1ch;
+    margin-left: auto;
+}
+
+.diffContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.5ch;
+    margin-right: 1ch;
+    font-size: 0.8rem;
+}
+
+.diffItem {
+    border-radius: 4px;
+    padding: 2px 4px;
+    font-weight: bold;
+
+    &.positive {
+        background-color: rgba(68, 255, 68, 0.1);
+        color: #44ff44;
+    }
+
+    &.negative {
+        background-color: rgba(255, 68, 68, 0.1);
+        color: #ff4444;
+    }
+}
+
+.initContainer {
+    display: flex;
+    align-items: center;
+    gap: 1ch;
+}
+
+.initTitle {
+    margin: 0;
+}
+
+.filterSelect {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: white !important;
+
+    :global(.MuiOutlinedInput-notchedOutline) {
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    &:hover :global(.MuiOutlinedInput-notchedOutline) {
+        border-color: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    :global(.MuiSvgIcon-root) {
+        color: white !important;
+    }
+
+    &.Mui-focused :global(.MuiOutlinedInput-notchedOutline) {
+        border-color: #448844 !important;
+    }
+}
+
+.filterLabel {
+    color: rgba(255, 255, 255, 0.7) !important;
+
+    &.Mui-focused {
+        color: #448844 !important;
+    }
+}
+
+.transferContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 1rem;
+}
+
+.transferTitle {
+    margin: 0;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.transferRecipient {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.transferAmount {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1ch;
+}
+
+.transferActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1ch;
+}
+
+.searchField {
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.05);
+
+    :global(.MuiOutlinedInput-root) {
+        color: white !important;
+
+        :global(.MuiOutlinedInput-notchedOutline) {
+            border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        &:hover :global(.MuiOutlinedInput-notchedOutline) {
+            border-color: rgba(255, 255, 255, 0.3) !important;
+        }
+
+        &.Mui-focused :global(.MuiOutlinedInput-notchedOutline) {
+            border-color: #448844 !important;
+        }
+    }
+
+    :global(.MuiInputLabel-root) {
+        color: rgba(255, 255, 255, 0.7) !important;
+
+        &.Mui-focused {
+            color: #448844 !important;
+        }
+    }
+
+    :global(.MuiSvgIcon-root) {
+        color: white !important;
+    }
+}
+
+.tokenList {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.03);
+    max-height: 360px;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.1);
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    }
+}
+
+.tokenListItem {
+    transition: background-color 0.2s;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.08);
+    }
+}
+
+:global(.MuiPaper-root.MuiAutocomplete-paper) {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: #222 !important;
+    color: white !important;
+
+    :global(.MuiAutocomplete-option) {
+        &[aria-selected="true"] {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        &.Mui-focused {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+        }
+
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.08) !important;
+        }
+    }
+}
+
+:global(.MuiMenu-paper) {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: #222 !important;
+    color: white !important;
+
+    :global(.MuiMenuItem-root) {
+        &.Mui-selected {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+
+            &:hover {
+                background-color: rgba(255, 255, 255, 0.15) !important;
+            }
+        }
+
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.08) !important;
+        }
+    }
+}
+
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.8rem;
+
+    input[type="checkbox"] {
+        cursor: pointer;
+        accent-color: #448844;
+    }
+}
+
+.compactStatusButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5ch;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 2px 8px;
+    color: white;
+    font-weight: bold;
+    font-size: 0.75rem;
+
+    &.lootable {
+        background-color: #448844;
+        &:hover {
+            background-color: #55aa55;
+        }
+    }
+
+    &.locked {
+        background-color: #444;
+        &:hover {
+            background-color: #555;
+        }
+    }
+}
+
+.matchedItemHighlight {
+    display: inline-block;
+    margin-right: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    background-color: rgba(68, 136, 68, 0.3);
+    padding: 0 4px;
+    color: #ccffcc;
+    font-weight: bold;
+    font-size: 0.7rem;
+}
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.addButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 4px;
+    color: white;
+
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5ch;
+}
+
+.suggestionsContainer {
+    margin-bottom: 1rem;
+}
+
+.suggestionFormGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1ch;
+    margin-bottom: 0.5rem;
+}
+
+.suggestionFormRow {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    &.suggestionInputDisabled {
+        opacity: 0.5;
+        pointer-events: none;
+        text-decoration: line-through;
+    }
+}
+
+.statblockSlugHeader {
+    display: flex;
+    grid-column: span 3;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1ch;
+}
+
+.checkboxWrapper {
+    display: flex;
+    align-items: center;
+
+    input[type="checkbox"] {
+        cursor: pointer;
+        margin: 0;
+    }
+}
+
+.suggestionLabel {
+    font-size: 0.8rem;
+}
+
+.suggestionInput {
+    width: 100%;
+    &::before {
+        display: block;
+        content: attr(aria-label);
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+
+    input {
+        width: fit-content;
+        &:disabled {
+            color: grey;
+        }
+    }
+}
+
+.suggestionsList {
+    margin-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 0.5rem;
+}
+
+.suggestionsTitle {
+    margin-block: 0 0.5rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.suggestionItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 4px 8px;
+
+    .itemMain {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+    }
+
+    .itemName {
+        font-weight: bold;
+        font-size: 0.85rem;
+    }
+
+    .itemMeta {
+        opacity: 0.6;
+        font-style: italic;
+        font-size: 0.75rem;
+    }
+
+    .addButton {
+        padding: 2px;
+        width: 24px;
+        height: 24px;
+
+        svg {
+            width: 16px;
+            height: 16px;
+        }
+    }
+}

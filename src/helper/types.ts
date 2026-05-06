@@ -173,3 +173,17 @@ export type LootMetadata = {
     money: Money;
     lootAvailable: boolean;
 };
+
+export type ShopItemType = {
+    id: number;
+    name: string;
+    count: number;
+    money: Money;
+};
+
+export type ShopMetadata = {
+    items: Array<ShopItemType>;
+    cart: Record<string, { items: Array<ShopItemType>; price: Money }>;
+    money: Money;
+    shopAvailable: boolean;
+};

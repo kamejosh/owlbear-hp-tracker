@@ -900,6 +900,23 @@ export interface paths {
         patch: operations["update_party_statblock_money"];
         trace?: never;
     };
+    "/api/v1/party/{party_id}/statblock/{statblock_id}/item": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Buy Item For Party Statblock */
+        post: operations["buy_item_for_party_statblock"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/party/{party_id}/statblock/{party_statblock_id}/equipment/": {
         parameters: {
             query?: never;
@@ -2696,6 +2713,21 @@ export interface components {
             name: string;
             /** Value */
             value: string;
+        };
+        /** Transaction */
+        Transaction: {
+            cost: components["schemas"]["MoneyIn"];
+            /** Buy */
+            buy: components["schemas"]["TransactionItem"][];
+            /** Sell */
+            sell: components["schemas"]["TransactionItem"][];
+        };
+        /** TransactionItem */
+        TransactionItem: {
+            /** Item Id */
+            item_id: number;
+            /** Count */
+            count: number;
         };
         /** UpdateUserIn */
         UpdateUserIn: {
@@ -7156,6 +7188,42 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MoneyOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    buy_item_for_party_statblock: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                party_id: number;
+                statblock_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Transaction"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartyStatblockOut"];
                 };
             };
             /** @description Validation Error */
