@@ -900,7 +900,7 @@ export interface paths {
         patch: operations["update_party_statblock_money"];
         trace?: never;
     };
-    "/api/v1/party/{party_id}/statblock/{statblock_id}/item": {
+    "/api/v1/party/{party_id}/statblock/{statblock_id}/items": {
         parameters: {
             query?: never;
             header?: never;
@@ -1262,7 +1262,7 @@ export interface components {
             group?: string | null;
             /** Alignment */
             alignment?: string | null;
-            armor_class: components["schemas"]["src__model_types__pf__statblock__ArmorClass"];
+            armor_class: components["schemas"]["src__model_types__e5__base__ArmorClass"];
             hp: components["schemas"]["src__model_types__e5__base__Hitpoints"];
             speed: components["schemas"]["Speed"];
             stats: components["schemas"]["src__model_types__e5__base__Stats"];
@@ -1340,7 +1340,7 @@ export interface components {
             group?: string | null;
             /** Alignment */
             alignment?: string | null;
-            armor_class: components["schemas"]["src__model_types__pf__statblock__ArmorClass"];
+            armor_class: components["schemas"]["src__model_types__e5__base__ArmorClass"];
             hp: components["schemas"]["src__model_types__e5__base__Hitpoints"];
             speed: components["schemas"]["Speed"];
             stats: components["schemas"]["src__model_types__e5__base__Stats"];
@@ -1698,7 +1698,7 @@ export interface components {
         };
         /** ItemStatsIn */
         ItemStatsIn: {
-            armor_class?: components["schemas"]["src__model_types__pf__statblock__ArmorClass"] | null;
+            armor_class?: components["schemas"]["src__model_types__e5__base__ArmorClass"] | null;
             hp?: components["schemas"]["src__model_types__e5__base__Hitpoints"] | null;
             /** Senses */
             senses?: string[] | null;
@@ -1723,7 +1723,7 @@ export interface components {
         };
         /** ItemStatsOut */
         ItemStatsOut: {
-            armor_class?: components["schemas"]["src__model_types__pf__statblock__ArmorClass"] | null;
+            armor_class?: components["schemas"]["src__model_types__e5__base__ArmorClass"] | null;
             hp?: components["schemas"]["src__model_types__e5__base__Hitpoints"] | null;
             /** Senses */
             senses?: string[] | null;
@@ -1859,7 +1859,7 @@ export interface components {
             stats: components["schemas"]["src__model_types__pf__statblock__Stats"];
             /** Items */
             items?: string[] | null;
-            armor_class: components["schemas"]["src__model_types__pf__statblock__ArmorClass"];
+            armor_class: components["schemas"]["src__model_types__e5__base__ArmorClass"];
             saving_throws: components["schemas"]["src__model_types__pf__statblock__SavingThrows"];
             hp: components["schemas"]["src__model_types__pf__statblock__Hitpoints"];
             /** Immunities */
@@ -1904,7 +1904,7 @@ export interface components {
             stats: components["schemas"]["src__model_types__pf__statblock__Stats"];
             /** Items */
             items?: string[] | null;
-            armor_class: components["schemas"]["src__model_types__pf__statblock__ArmorClass"];
+            armor_class: components["schemas"]["src__model_types__e5__base__ArmorClass"];
             saving_throws: components["schemas"]["src__model_types__pf__statblock__SavingThrows"];
             hp: components["schemas"]["src__model_types__pf__statblock__Hitpoints"];
             /** Immunities */
@@ -2292,7 +2292,7 @@ export interface components {
         /** ShopRequest */
         ShopRequest: {
             /** Shop Type */
-            shop_type?: string | null;
+            shop_type?: ("blacksmith" | "alchemist" | "magic" | "general") | null;
             /** Avg Party Level */
             avg_party_level?: number | null;
             /** Item Types */
@@ -4408,6 +4408,13 @@ export interface components {
             damage_dice?: string | null;
             limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
         };
+        /** ArmorClass */
+        src__model_types__e5__base__ArmorClass: {
+            /** Value */
+            value: number;
+            /** Special */
+            special?: string | null;
+        };
         /** Hitpoints */
         src__model_types__e5__base__Hitpoints: {
             /** Value */
@@ -4660,13 +4667,6 @@ export interface components {
             /** Constant */
             constant?: string | null;
             limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
-        };
-        /** ArmorClass */
-        src__model_types__pf__statblock__ArmorClass: {
-            /** Value */
-            value: number;
-            /** Special */
-            special?: string | null;
         };
         /** Hitpoints */
         src__model_types__pf__statblock__Hitpoints: {

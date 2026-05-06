@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import OBR from "@owlbear-rodeo/sdk";
 import { useLootTokenContext } from "../../context/LootTokenContext.tsx";
-import { lootMetadataKey, lootModal, lootPopover, shopModal } from "../../helper/variables.ts";
+import { lootMetadataKey, shopModal } from "../../helper/variables.ts";
 import _ from "lodash";
 import { LootMetadata } from "../../helper/types.ts";
 

@@ -177,7 +177,7 @@ export type LootMetadata = {
 export type ShopItemType = {
     id: number;
     name: string;
-    count: number;
+    count?: number;
     money: Money;
 };
 
