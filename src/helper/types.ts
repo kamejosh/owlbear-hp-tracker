@@ -1,5 +1,3 @@
-import { Money } from "../components/party/PlayerParty.tsx";
-
 export enum SORT {
     DESC,
     ASC,
@@ -161,6 +159,14 @@ export type BestMatch = {
     statblock: InitialStatblockData;
 };
 
+export type Money = {
+    cp: number;
+    sp: number;
+    ep: number;
+    gp: number;
+    pp: number;
+};
+
 export type LootItemType = {
     id: number;
     name: string;
@@ -179,6 +185,7 @@ export type ShopItemType = {
     name: string;
     count?: number;
     money: Money;
+    slug: string;
 };
 
 export type ShopMetadata = {

@@ -163,7 +163,7 @@
 
 .addItemCount {
     input {
-        width: 25px;
+        width: 35px;
         height: 33px;
     }
 }
@@ -406,7 +406,7 @@
     border-radius: 8px;
     background: rgba(0, 0, 0, 0.2);
     padding: 8px;
-    width: 100%;
+    max-width: 100%;
 
     .moneyInputList {
         display: flex;

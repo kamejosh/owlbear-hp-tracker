@@ -606,12 +606,6 @@
 
 .suggestionInput {
     width: 100%;
-    &::before {
-        display: block;
-        content: attr(aria-label);
-        font-size: 0.8rem;
-        white-space: nowrap;
-    }
 
     input {
         width: fit-content;

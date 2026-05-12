@@ -3,6 +3,7 @@
 * Fix issues where party wouldn't update metadata when dropping tokens into the scene
 * Fix issue with unauthenticated party syncing
 * Add Context Menu to roll for max HP
+* Fix issue where the HP Bar was not disabled when changing HP values
 
 # 3.7.1
 

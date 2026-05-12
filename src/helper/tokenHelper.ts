@@ -1,6 +1,6 @@
-import { GMGMetadata, LootMetadata, RoomMetadata } from "./types.ts";
+import { GMGMetadata, LootMetadata, RoomMetadata, ShopMetadata } from "./types.ts";
 import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
-import { itemMetadataKey, lootMetadataKey } from "./variables.ts";
+import { itemMetadataKey, lootMetadataKey, shopMetadataKey } from "./variables.ts";
 import { evalString } from "./helpers.ts";
 import { updateHp } from "./hpHelpers.ts";
 import { updateAc } from "./acHelper.ts";
@@ -42,6 +42,22 @@ export const updateLootMetadata = async (lootData: LootMetadata, ids: Array<stri
         const errorName =
             isObject(e) && "error" in e && isObject(e.error) && "name" in e.error ? e.error.name : "Undefined Error";
         console.warn(`GM's Grimoire: Error while updating loot metadata of ${ids.length} tokens: ${errorName}`);
+    }
+};
+
+export const updateShopMetadata = async (shopData: ShopMetadata, ids: Array<string>) => {
+    try {
+        await updateList(ids, 16, async (subList) => {
+            await updateItems(subList, (items: Array<Item>) => {
+                items.forEach((item) => {
+                    item.metadata[shopMetadataKey] = { ...shopData };
+                });
+            });
+        });
+    } catch (e) {
+        const errorName =
+            isObject(e) && "error" in e && isObject(e.error) && "name" in e.error ? e.error.name : "Undefined Error";
+        console.warn(`GM's Grimoire: Error while updating shop metadata of ${ids.length} tokens: ${errorName}`);
     }
 };
 

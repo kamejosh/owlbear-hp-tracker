@@ -1,7 +1,7 @@
 import { Modal } from "@owlbear-rodeo/sdk/lib/types/Modal";
 import { Popover } from "@owlbear-rodeo/sdk";
 import { Stats } from "../components/general/DiceRoller/DiceButtonWrapper.tsx";
-import { LootMetadata } from "./types.ts";
+import { LootMetadata, ShopMetadata } from "./types.ts";
 
 export const ID = "com.bitperfect-software.hp-tracker";
 export const GMG_ID = "com.tabletop-almanac.gmg";
@@ -122,4 +122,11 @@ export const defaultLoot: LootMetadata = {
     lootAvailable: false,
     money: { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 },
     items: [],
+};
+
+export const defaultShop: ShopMetadata = {
+    shopAvailable: false,
+    items: [],
+    cart: {},
+    money: { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 },
 };

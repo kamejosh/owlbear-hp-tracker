@@ -3,10 +3,13 @@ import { usePlayerContext } from "../../context/PlayerContext.ts";
 import { useEffect } from "react";
 import { SceneReadyContext } from "../../context/SceneReadyContext.ts";
 import OBR from "@owlbear-rodeo/sdk";
-import { useLootTokenContext } from "../../context/LootTokenContext.tsx";
-import { lootMetadataKey, shopModal } from "../../helper/variables.ts";
+import { useShopTokenContext } from "../../context/ShopTokenContext.tsx";
+import { shopMetadataKey, shopModal } from "../../helper/variables.ts";
 import _ from "lodash";
-import { LootMetadata } from "../../helper/types.ts";
+import { ShopMetadata } from "../../helper/types.ts";
+import { ShopGM } from "./ShopGM.tsx";
+import { ShopPlayer } from "./ShopPlayer.tsx";
+import { ShopTokenSelect } from "./ShopTokenSelect.tsx";
 
 const TopButtons = () => {
     return (
@@ -32,31 +35,35 @@ const TopButtons = () => {
 };
 
 const Content = () => {
-    const playerContext = usePlayerContext();
-    const token = useLootTokenContext((state) => state.token);
+    const { role } = usePlayerContext();
+    const token = useShopTokenContext((state) => state.token);
 
-    return <></>;
+    if (role === "GM") {
+        return token ? <ShopGM /> : <ShopTokenSelect />;
+    } else {
+        return <ShopPlayer />;
+    }
 };
 
 export const Shop = () => {
-    const setToken = useLootTokenContext((state) => state.setToken);
-    const token = useLootTokenContext((state) => state.token);
-    const data = useLootTokenContext((state) => state.data);
-    const setData = useLootTokenContext((state) => state.setData);
+    const setToken = useShopTokenContext((state) => state.setToken);
+    const token = useShopTokenContext((state) => state.token);
+    const data = useShopTokenContext((state) => state.data);
+    const setData = useShopTokenContext((state) => state.setData);
     const { isReady } = SceneReadyContext();
 
-    const initPopover = async () => {
+    const initSelection = async () => {
         const selection = await OBR.player.getSelection();
         if (selection && selection.length === 1) {
-            const token = await OBR.scene.items.getItems(selection);
-            if (token.length === 1) {
-                setToken(token[0]);
+            const items = await OBR.scene.items.getItems(selection);
+            if (items.length === 1) {
+                setToken(items[0]);
             }
         }
-        OBR.player.onChange(async (player) => {
-            const token = await OBR.scene.items.getItems(player.selection);
-            if (token.length === 1) {
-                setToken(token[0]);
+        return OBR.player.onChange(async (player) => {
+            const items = await OBR.scene.items.getItems(player.selection);
+            if (items.length === 1) {
+                setToken(items[0]);
             }
         });
     };
@@ -65,27 +72,32 @@ export const Shop = () => {
         if (token) {
             return OBR.scene.items.onChange(async (items) => {
                 const item = items.find((i) => i.id === token.id);
-                if (item && lootMetadataKey in item.metadata) {
-                    if (!_.isEqual(data, item.metadata[lootMetadataKey])) {
-                        setData(item.metadata[lootMetadataKey] as LootMetadata);
+                if (item && shopMetadataKey in item.metadata) {
+                    const newMetadata = item.metadata[shopMetadataKey] as ShopMetadata;
+                    if (!_.isEqual(data, newMetadata)) {
+                        setData(newMetadata);
                     }
                 } else {
                     setData(null);
                 }
             });
         }
-    }, [token, data]);
+    }, [token, data, setData]);
 
     useEffect(() => {
         if (isReady) {
-            initPopover();
+            const promise = initSelection();
+            return () => {
+                promise.then((unsub) => unsub());
+            };
         }
     }, [isReady]);
 
     if (token && !["CHARACTER", "MOUNT", "PROP"].includes(token.layer)) {
         return (
-            <div style={{ textAlign: "left" }}>
-                Only Items on the Character, Mount and Prop Layers can be used for Loot.
+            <div style={{ textAlign: "left", padding: "16px" }}>
+                <TopButtons />
+                Only Items on the Character, Mount and Prop Layers can be used for Shops.
             </div>
         );
     }

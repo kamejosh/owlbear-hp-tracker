@@ -424,6 +424,7 @@ export const LootSuggestions = ({
                                     useStatblockSlug ? "" : lootStyles.suggestionInputDisabled
                                 }`}
                             >
+                                <label className={lootStyles.suggestionLabel}>Statblock</label>
                                 <TextInput
                                     form={form}
                                     fieldName={"statblock_slug"}
@@ -440,6 +441,7 @@ export const LootSuggestions = ({
                             useStatblockSlug ? lootStyles.suggestionInputDisabled : ""
                         }`}
                     >
+                        <label className={lootStyles.suggestionLabel}>Avg Level</label>
                         <NumberInput
                             form={form}
                             fieldName={"avg_party_level"}
@@ -451,6 +453,7 @@ export const LootSuggestions = ({
                         />
                     </div>
                     <div className={lootStyles.suggestionFormRow}>
+                        <label className={lootStyles.suggestionLabel}>Max Items</label>
                         <NumberInput
                             form={form}
                             fieldName={"max_items"}

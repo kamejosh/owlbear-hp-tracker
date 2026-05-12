@@ -11,6 +11,7 @@ import {
 } from "../../api/tabletop-almanac/useParty.ts";
 import { useEffect, useMemo, useState } from "react";
 import { ItemOut, StatblockItems } from "../../helper/equipmentHelpers.ts";
+import { MoneyDisplay } from "../money/MoneyDisplay.tsx";
 import { useForm } from "react-hook-form";
 import {
     autoUpdate,
@@ -36,6 +37,7 @@ import { ItemHover } from "../gmgrimoire/items/ItemHover.tsx";
 import { PartyCollapse } from "./PartyCollapse.tsx";
 import { EditPlayerPartyInventoryItem } from "./PlayerParty.tsx";
 import { PersonAddAlt1 } from "@mui/icons-material";
+import { setNullToZero } from "../../helper/moneyHelpers.ts";
 
 export const AutoCompleteItemInput = (props: { error: string; onSelect: (value: number, item: ItemOut) => void }) => {
     const [items, setItems] = useState<Array<ItemOut>>([]);
@@ -51,7 +53,13 @@ export const AutoCompleteItemInput = (props: { error: string; onSelect: (value: 
 
     return (
         <Autocomplete
-            style={{ flexGrow: 1, minWidth: "200px", backgroundColor: "#2b2a33" }}
+            style={{
+                flexGrow: 1,
+                minWidth: "200px",
+                backgroundColor: "#2b2a33",
+                borderRadius: "4px",
+                border: "1px solid grey",
+            }}
             options={items}
             getOptionLabel={(option) => option.name}
             filterOptions={(x) => x}
@@ -95,6 +103,7 @@ export const AutoCompleteItemInput = (props: { error: string; onSelect: (value: 
                     variant="standard"
                     sx={{
                         "& .MuiInputBase-root": {
+                            borderRadius: "8px",
                             color: "white",
                             padding: "4px 8px",
                             "&:before, &:after": {
@@ -104,6 +113,7 @@ export const AutoCompleteItemInput = (props: { error: string; onSelect: (value: 
                         "& .MuiInputBase-input": {
                             paddingLeft: "4px !important",
                             color: "white",
+                            border: "none",
                         },
                     }}
                 />
@@ -192,6 +202,7 @@ const AddInventoryItem = ({
                     onSelect={(itemId, item) => {
                         form.setValue("new_items.0.item_id", itemId);
                         setItem(item);
+                        form.setValue("new_items.0.count", 1);
                     }}
                 />
                 <Tippy content={"Count of items to add"}>
@@ -315,23 +326,7 @@ export const PartyInventoryItem = ({
                         </span>
                     </div>
                     {item.item.cost ? (
-                        <div className={styles.itemCost}>
-                            {item.item.cost.pp ? (
-                                <span className={`${styles.costItem} ${styles.pp}`}>{item.item.cost.pp}PP</span>
-                            ) : null}
-                            {item.item.cost.gp ? (
-                                <span className={`${styles.costItem} ${styles.gp}`}>{item.item.cost.gp}GP</span>
-                            ) : null}
-                            {item.item.cost.ep ? (
-                                <span className={`${styles.costItem} ${styles.ep}`}>{item.item.cost.ep}EP</span>
-                            ) : null}
-                            {item.item.cost.sp ? (
-                                <span className={`${styles.costItem} ${styles.sp}`}>{item.item.cost.sp}SP</span>
-                            ) : null}
-                            {item.item.cost.cp ? (
-                                <span className={`${styles.costItem} ${styles.cp}`}>{item.item.cost.cp}CP</span>
-                            ) : null}
-                        </div>
+                        <MoneyDisplay money={setNullToZero(item.item.cost)} className={styles.itemCost} />
                     ) : null}
                 </>
             </div>

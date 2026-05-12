@@ -18,7 +18,6 @@ export type Speed = components["schemas"]["Speed"];
 export type SavingThrows = components["schemas"]["src__model_types__e5__base__SavingThrows"];
 export type Skills = components["schemas"]["Skills"];
 export type Modifier = components["schemas"]["ModifierStats"];
-export type ItemAC = components["schemas"]["ItemAC"];
 export type StatblockStats = components["schemas"]["src__model_types__e5__base__Stats"];
 
 export type StatblockBonuses = {

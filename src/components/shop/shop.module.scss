@@ -559,13 +559,28 @@
     gap: 0.5ch;
 }
 
+.addItemCount {
+    flex-shrink: 0;
+    max-width: 80px;
+    height: 29px !important;
+}
+
 .suggestionsContainer {
     margin-bottom: 1rem;
 }
 
 .suggestionFormGrid {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1ch;
+    margin-bottom: 0.5rem;
+}
+
+.itemInput {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr auto;
+    align-items: center;
     gap: 1ch;
     margin-bottom: 0.5rem;
 }
@@ -574,6 +589,7 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
+    max-width: 100%;
 
     &.suggestionInputDisabled {
         opacity: 0.5;
@@ -606,18 +622,16 @@
 
 .suggestionInput {
     width: 100%;
-    &::before {
-        display: block;
-        content: attr(aria-label);
-        font-size: 0.8rem;
-        white-space: nowrap;
-    }
 
     input {
         width: fit-content;
         &:disabled {
             color: grey;
         }
+    }
+
+    select {
+        height: 26px;
     }
 }
 

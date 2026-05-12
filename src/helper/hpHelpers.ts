@@ -10,6 +10,7 @@ import {
 } from "./helpers.ts";
 import { itemMetadataKey, infoMetadataKey } from "./variables.ts";
 import { addItems, updateItems } from "./obrHelper.ts";
+import { useMetadataContext } from "../context/MetadataContext.ts";
 
 export const createBar = async (percentage: number, tempHpPercentage: number, token: Image) => {
     const bounds = await getImageBounds(token);
@@ -189,6 +190,7 @@ export const updateHpOffset = async (offset: number) => {
 export const updateHp = async (token: Item, data: GMGMetadata) => {
     const barAttachments = (await getAttachedItems(token.id, ["SHAPE"])).filter((a) => attachmentFilter(a, "BAR"));
     const textAttachments = (await getAttachedItems(token.id, ["TEXT"])).filter((a) => attachmentFilter(a, "HP"));
+    const disableHpBar = useMetadataContext.getState().room?.disableHpBar;
 
     if (!data.hpTrackerActive) {
         await deleteAttachments([...barAttachments, ...textAttachments]);
@@ -196,7 +198,7 @@ export const updateHp = async (token: Item, data: GMGMetadata) => {
         if (!data.hpBar && !data.hpOnMap) {
             await deleteAttachments([...barAttachments, ...textAttachments]);
         } else {
-            if (!data.hpBar) {
+            if (!data.hpBar || disableHpBar) {
                 await deleteAttachments(barAttachments);
             } else {
                 const barChanges = new Map<string, BarItemChanges>();

@@ -6,6 +6,8 @@ import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { components } from "../schema";
 
 export type LootRequest = components["schemas"]["LootRequest"];
+export type ShopRequest = components["schemas"]["ShopRequest"];
+export type ShopType = ("blacksmith" | "alchemist" | "magic" | "general") | null;
 
 const searchItem = (search: string, token?: string | null) => {
     let headers = {};
@@ -102,6 +104,29 @@ export const useGetItemTypes = () => {
         queryFn: async () => {
             const response = await getItemTypes(token ?? "");
             return response.data as Array<string>;
+        },
+    });
+};
+
+const getShop = (lootRequest: LootRequest, token: string) => {
+    return axios.request({
+        url: `${TTRPG_URL}/e5/item/shop`,
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+        method: "POST",
+        data: lootRequest,
+    });
+};
+
+export const useGetShopItems = () => {
+    const token = useMetadataContext((state) => state.room?.tabletopAlmanacAPIKey);
+
+    return useMutation<Array<ItemOut>, unknown, ShopRequest>({
+        mutationKey: ["shop", token ?? ""],
+        mutationFn: async (shopRequest: ShopRequest) => {
+            const response = await getShop(shopRequest, token ?? "");
+            return response.data as Array<ItemOut>;
         },
     });
 };

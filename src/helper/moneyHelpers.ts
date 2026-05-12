@@ -1,6 +1,6 @@
 import { MoneyIn } from "../api/tabletop-almanac/useParty.ts";
-import { Money } from "../components/party/PlayerParty.tsx";
 import { evalString } from "./helpers.ts";
+import { Money } from "./types.ts";
 
 export const RATES = {
     pp: 1000,
@@ -119,6 +119,16 @@ export const resolveCalculation = (input: string, currentValue: number): number 
         value = isNaN(parsed) ? currentValue : parsed;
     }
     return value;
+};
+
+export const setNullToZero = (money: MoneyIn): Money => {
+    return {
+        cp: money.cp ?? 0,
+        sp: money.sp ?? 0,
+        ep: money.ep ?? 0,
+        gp: money.gp ?? 0,
+        pp: money.pp ?? 0,
+    };
 };
 
 export const currencies: Array<{ key: keyof MoneyIn; label: string }> = [
