@@ -434,6 +434,8 @@ The Statblock Popover also shows a list of all abilities that have been shared w
 
 <h1 id="party-management">Party Management</h1>
 
+[Video Tutorial](https://youtu.be/uakBb5yFhmo)
+
 See the [Tutorial](https://youtu.be/uakBb5yFhmo) for a walkthrough of the party management features.
 
 Party Management allows tracking group resources like items, money, and shared links. It can be accessed via the [👤] button in the action window top bar.
@@ -472,6 +474,8 @@ All statblocks that you added to the party are shown here. You can change their 
 Players can see all members of the party but can only edit their assigned Party Members. They can move equipment to the party inventory and back or exchange money with the party. All changes are synced instantly to Tabletop Almanac so you can always continue your session where you last left it.
 
 <h1 id="loot-management">Loot Management</h1>
+
+[Video Tutorial](https://youtu.be/vAR2ZfLwmqE)
 
 Loot Management allows Dungeon Masters (GMs) to manage items and currency directly on Owlbear Rodeo tokens. It provides a streamlined way to handle loot drops and distribute rewards to players.
 
@@ -515,6 +519,8 @@ The Loot Management feature solves the problem of tracking rewards and inventory
 
 
 <h1 id="shop-management">Shop Management</h1>
+
+[Video Tutorial](https://youtu.be/JGILcK4fhO8)
 
 Shop Management allows Dungeon Masters (GMs) to create interactive shops directly on Owlbear Rodeo tokens. This feature enables a streamlined shopping experience where players can browse items, manage a personal cart, and purchase goods.
 
