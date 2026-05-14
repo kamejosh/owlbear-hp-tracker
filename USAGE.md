@@ -48,6 +48,15 @@
           <li><a href="#player-workflow">Player Workflow</a></li>
         </ul>
       </ul>
+      <li><a href="#shop-management">Shop Management</a></li>
+      <ul>
+        <li><a href="#shop-summary">Summary</a></li>
+        <li><a href="#shop-user-workflow">User Workflow</a></li>
+        <ul>
+          <li><a href="#shop-gm-workflow">GM Workflow</a></li>
+          <li><a href="#shop-player-workflow">Player Workflow</a></li>
+        </ul>
+      </ul>
     </ul>
     <li><a href="#custom-statblocks">Custom Statblocks</a></li>
     <li><a href="#dice-roller">Dice Roller</a></li>
@@ -503,6 +512,50 @@ The Loot Management feature solves the problem of tracking rewards and inventory
     *   **Loot Money:** Click the **"Loot Money"** button to transfer currency to the party's shared funds or a specific member.
 4.  **Automatic Sync:**
     *   Once an item or money is "taken," it is removed from the token and added to the selected destination on Tabletop Almanac instantly.
+
+
+<h1 id="shop-management">Shop Management</h1>
+
+Shop Management allows Dungeon Masters (GMs) to create interactive shops directly on Owlbear Rodeo tokens. This feature enables a streamlined shopping experience where players can browse items, manage a personal cart, and purchase goods.
+
+Like Loot and Party management, all shop transactions are synced with **Tabletop Almanac** to ensure persistence across sessions.
+
+<h2 id="shop-summary">Summary</h2>
+
+The Shop Management feature facilitates in-game commerce by allowing GMs to attach an inventory and price list to any token. Players can interact with these "merchant" tokens to see available stock, add items to their shopping cart, and checkout. The system automatically handles currency transactions and updates both the shop's stock and the player's inventory.
+
+<h2 id="shop-user-workflow">User Workflow</h2>
+
+<h3 id="shop-gm-workflow">Game Master Workflow</h3>
+
+1.  **Initialization:**
+    *   Select a token in the scene (e.g., a merchant NPC or a storefront).
+    *   Open the Shop Management window from the context menu.
+    *   If the token has no shop metadata, click the **"Initialize"** button.
+2.  **Inventory Management:**
+    *   **Add Item:** Click the [+] button to search the Tabletop Almanac database and add items to the shop.
+    *   **Pricing:** Set the cost for each item in the inventory.
+    *   **Stock Control:** Specify the quantity available for each item. Stock is automatically decremented when players add items to their carts.
+    *   **Shop Suggestions:** Use the magic wand icon to generate thematic shop inventories based on the merchant type or location.
+3.  **Managing Funds:**
+    *   The **Funds** section allows GMs to manage the currency held by the merchant.
+4.  **Shop Status:**
+    *   Use the **"Shop Open / Closed"** toggle in the header to control player access. When closed, players can see the shop exists but cannot browse or purchase.
+5.  **Active Carts:**
+    *   GMs can see all active player carts for the current shop, allowing them to monitor what players are considering.
+
+<h3 id="shop-player-workflow">Player Workflow</h3>
+
+1.  **Browsing the Shop:**
+    *   Select a merchant token and open the Shop Management window.
+    *   Browse available items, viewing their descriptions and prices.
+2.  **Managing the Cart:**
+    *   **Add to Cart:** Click the cart icon on an item to add it to your personal shopping bag.
+    *   **View Cart:** Click the bag icon in the header to review your selected items and total cost.
+    *   **Remove Items:** Remove items from the cart if you change your mind; stock will be returned to the shop.
+3.  **Checkout:**
+    *   **Select Customer:** Choose which party member is making the purchase.
+    *   **Purchase:** Complete the transaction. Items are automatically added to the player's statblock and currency is deducted.
 
 
 <h1 id="custom-statblocks">Custom Statblocks</h1>
