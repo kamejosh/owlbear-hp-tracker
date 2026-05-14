@@ -1,4 +1,4 @@
-import { Money } from "../components/party/PlayerParty.tsx";
+import { components } from "../api/schema";
 
 export enum SORT {
     DESC,
@@ -161,6 +161,14 @@ export type BestMatch = {
     statblock: InitialStatblockData;
 };
 
+export type Money = {
+    cp: number;
+    sp: number;
+    ep: number;
+    gp: number;
+    pp: number;
+};
+
 export type LootItemType = {
     id: number;
     name: string;
@@ -173,3 +181,29 @@ export type LootMetadata = {
     money: Money;
     lootAvailable: boolean;
 };
+
+export type ShopItemType = {
+    id: number;
+    name: string;
+    count?: number;
+    money: Money;
+    slug: string;
+};
+
+export type ShopMetadata = {
+    items: Array<ShopItemType>;
+    cart: Record<string, { items: Array<ShopItemType>; price: Money }>;
+    money: Money;
+    shopAvailable: boolean;
+};
+
+export type Stats = {
+    strength: number;
+    dexterity: number;
+    constitution: number;
+    intelligence: number;
+    wisdom: number;
+    charisma: number;
+};
+
+export type Ability = components["schemas"]["src__model_types__e5__base__Action"];

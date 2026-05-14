@@ -1,12 +1,11 @@
 import { useStore } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { ID } from "../helper/variables.ts";
-import { withStorageDOMEvents } from "../helper/hooks.ts";
 import { createStore } from "zustand/vanilla";
 import { components } from "../api/schema";
 import { Action, Reaction, SpecialAbility } from "../components/gmgrimoire/statblocks/pf/PfAbility.tsx";
 import { PfSpellOut } from "../components/gmgrimoire/statblocks/pf/PfSpells.tsx";
-import { Stats } from "../components/general/DiceRoller/DiceButtonWrapper.tsx";
+import { Stats } from "../helper/types.ts";
 
 export type E5Ability = components["schemas"]["src__model_types__e5__base__Action"];
 export type E5Spell = components["schemas"]["src__model_types__e5__spell__Spell"];
@@ -86,5 +85,3 @@ export function useAbilityShareStore<T>(selector: (state: AbilityShareStoreType)
 export function useAbilityShareStore<T>(selector?: (state: AbilityShareStoreType) => T) {
     return useStore(abilityShareStore, selector!);
 }
-
-withStorageDOMEvents(abilityShareStore);

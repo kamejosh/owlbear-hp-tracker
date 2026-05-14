@@ -101,6 +101,12 @@ export const withStorageDOMEvents = (store: any) => {
     };
 };
 
+export const useStorageSync = (store: any) => {
+    useEffect(() => {
+        return withStorageDOMEvents(store);
+    }, [store]);
+};
+
 export const useLongPress = (
     onLongPress: (e: LongpressEvent) => void,
     onClick: (e: LongpressEvent) => void,

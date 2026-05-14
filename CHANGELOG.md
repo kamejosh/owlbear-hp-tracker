@@ -1,8 +1,26 @@
-## Unversioned
+# 3.7.2
 
-* Fix issues where party wouldn't update metadata when dropping tokens into the scene
-* Fix issue with unauthenticated party syncing
-* Add Context Menu to roll for max HP
+### New Features
+
++ Shops:
+  + **Shop Management:** GMs can now create and manage shops from any token, including inventory and currency.
+  + **Player Shopping:** Dedicated UI for players to browse shops, manage their cart, and purchase items.
+  + **Multi-Cart Support:** Enables multiple players to shop simultaneously with independent carts.
+  + **Automated Transactions:** Handles currency exchange and balance checks during the checkout process.
+
+### Improvements and Fixes
+
++ Refined Money Management:
+  + Centralized money display and editing UI across Party, Loot, and Shop views.
+  + Improved currency calculation accuracy and synchronization.
++ Fixed persistent memory leaks in Zustand stores by refactoring synchronization to use React lifecycle hooks.
++ Enhanced dddice integration security with origin checks and improved reliability with deadlock prevention.
++ Performance optimizations for token visibility updates and scene initialization.
++ Fix issues where party wouldn't update metadata when dropping tokens into the scene
++ Fix issue with unauthenticated party syncing
++ Add Context Menu to roll for max HP
++ Fix issue where the HP Bar was not disabled when changing HP values
++ Fix TempHP overflowing when higher than max HP
 
 # 3.7.1
 

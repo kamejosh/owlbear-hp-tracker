@@ -5,7 +5,6 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { Metadata } from "@owlbear-rodeo/sdk";
 import { components } from "../api/schema";
 import { createStore } from "zustand/vanilla";
-import { withStorageDOMEvents } from "../helper/hooks.ts";
 import { subscribeWithSelector } from "zustand/middleware";
 import _, { isUndefined } from "lodash";
 
@@ -148,4 +147,3 @@ export function usePartyStore<T>(selector: (state: PartyStore) => T): T;
 export function usePartyStore<T>(selector?: (state: PartyStore) => T) {
     return useStore(partyStore, selector!);
 }
-withStorageDOMEvents(partyStore);

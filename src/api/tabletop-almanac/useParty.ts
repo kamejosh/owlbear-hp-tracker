@@ -720,3 +720,50 @@ export const useUpdatePartyStatblockMoney = (partyId: number, partyStatblockId: 
         },
     });
 };
+
+const buyPartyItem = ({
+    partyId,
+    partyStatblockId,
+    data,
+    token,
+}: {
+    partyId: number;
+    partyStatblockId: number;
+    data: components["schemas"]["Transaction"];
+    token: string | null | undefined;
+}) => {
+    const headers = {
+        "X-API-Key": token,
+    };
+    return axios.request({
+        url: `${TTRPG_URL}/party/${partyId}/statblock/${partyStatblockId}/items`,
+        headers: headers,
+        data: data,
+        method: "POST",
+    });
+};
+
+export const useBuyPartyItem = (partyId: number, slug: string) => {
+    const queryClient = useQueryClient();
+    const token = useMetadataContext.getState().room?.tabletopAlmanacAPIKey;
+
+    return useMutation({
+        mutationKey: ["partyInventory", partyId],
+        mutationFn: async (data: { data: components["schemas"]["Transaction"]; partyStatblockId: number }) => {
+            return (
+                await buyPartyItem({
+                    partyId: partyId,
+                    partyStatblockId: data.partyStatblockId,
+                    data: data.data,
+                    token: token,
+                })
+            ).data;
+        },
+        onSuccess: (_data, variables) => {
+            queryClient.invalidateQueries({ queryKey: ["party", partyId] });
+            queryClient.invalidateQueries({ queryKey: ["partyInventory", partyId] });
+            queryClient.invalidateQueries({ queryKey: ["equipment", partyId, variables.partyStatblockId] });
+            queryClient.invalidateQueries({ queryKey: ["slug", slug] });
+        },
+    });
+};

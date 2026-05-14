@@ -1,36 +1,36 @@
 import OBR, { Image, Item, Metadata } from "@owlbear-rodeo/sdk";
 import { infoMetadataKey, itemMetadataKey, lootMetadataKey, metadataKey } from "./variables.ts";
 import {
-    AttachmentMetadata,
-    BestMatch,
-    GMGMetadata,
-    InitialStatblockData,
-    Limit,
-    LootMetadata,
-    RoomMetadata,
-    SceneMetadata,
+    type Ability,
+    type AttachmentMetadata,
+    type BestMatch,
+    type GMGMetadata,
+    type InitialStatblockData,
+    type Limit,
+    type LootMetadata,
+    type Money,
+    type RoomMetadata,
+    type SceneMetadata,
+    type Stats,
 } from "./types.ts";
 import { isEqual, isNull, isObject, isUndefined } from "lodash";
-import { IRoll, IRoomParticipant } from "dddice-js";
-import { RollLogEntryType } from "../context/RollLogContext.tsx";
+import type { IRoll, IRoomParticipant } from "dddice-js";
+import type { RollLogEntryType } from "../context/RollLogContext.tsx";
 import { TTRPG_URL } from "../config.ts";
 import axios from "axios";
 import diff_match_patch from "./diff/diff_match_patch.ts";
-import { E5Statblock } from "../api/e5/useE5Api.ts";
-import { PfStatblock } from "../api/pf/usePfApi.ts";
+import type { E5Statblock } from "../api/e5/useE5Api.ts";
+import type { PfStatblock } from "../api/pf/usePfApi.ts";
 import axiosRetry from "axios-retry";
-import { Ability } from "../components/gmgrimoire/statblocks/e5/E5Ability.tsx";
 import { deleteItems, updateItems } from "./obrHelper.ts";
 import { getEquipmentBonuses, isItemInUse } from "./equipmentHelpers.ts";
-import { UserSettings } from "../api/tabletop-almanac/useUser.ts";
+import type { UserSettings } from "../api/tabletop-almanac/useUser.ts";
 import { updateHp } from "./hpHelpers.ts";
 import { updateAc } from "./acHelper.ts";
-import { AbilityShareEntry } from "../context/AbilityShareStore.tsx";
+import type { AbilityShareEntry } from "../context/AbilityShareStore.tsx";
 import { abilityShareRoute } from "../background/api.ts";
 import { replaceStatWithMod } from "./limitHelpers.ts";
-import { Stats } from "../components/general/DiceRoller/DiceButtonWrapper.tsx";
 import { partyStore } from "../context/PartyStore.tsx";
-import { Money } from "../components/party/PlayerParty.tsx";
 
 export const getYOffset = async (height: number) => {
     const metadata = (await OBR.room.getMetadata()) as Metadata;
@@ -853,13 +853,15 @@ export const updateLimit = async (itemId: string, limitValues: Limit, usage?: nu
     }
 };
 
-export const getTokenName = (token: Image) => {
+export const getTokenName = (token: Item) => {
     try {
-        if (token.text && token.text.plainText && token.text.plainText.replaceAll(" ", "").length > 0) {
-            return token.text.plainText;
-        } else {
-            return token.name;
+        if (token.type === "IMAGE") {
+            const image = token as Image;
+            if (image.text && image.text.plainText && image.text.plainText.replaceAll(" ", "").length > 0) {
+                return image.text.plainText;
+            }
         }
+        return token.name;
     } catch {
         return "";
     }

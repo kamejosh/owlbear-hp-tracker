@@ -10,6 +10,7 @@ import Tippy from "@tippyjs/react";
 import { Loader } from "../general/Loader.tsx";
 import { CurrencyExchangeRounded, ScaleRounded } from "@mui/icons-material";
 import styles from "./party-inventory.module.scss";
+import moneyStyles from "../money/money.module.scss";
 import {
     VerifiedUser as EquippedIcon,
     GroupRounded,
@@ -20,6 +21,9 @@ import {
 } from "@mui/icons-material";
 import RemoveModeratorIcon from "@mui/icons-material/RemoveModerator";
 import { handleEquipmentChange, StatblockItems } from "../../helper/equipmentHelpers.ts";
+import { Money } from "../../helper/types.ts";
+import { MoneyDisplay } from "../money/MoneyDisplay.tsx";
+import { MoneyEditInputs } from "../money/MoneyEditInputs.tsx";
 import {
     E5StatblockOut,
     MoneyIn,
@@ -52,62 +56,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { sortInventory } from "./PartyInventory.tsx";
 import { EditButton } from "../form/EditButton.tsx";
 import { PartyLinks } from "./PartyLinks.tsx";
-
-export type Money = {
-    cp: number;
-    sp: number;
-    ep: number;
-    gp: number;
-    pp: number;
-};
-
-const formatMoney = (money?: Money) => {
-    if (!money) {
-        return null;
-    }
-    const { pp, gp, ep, sp, cp } = money;
-    const parts = [];
-    if (pp)
-        parts.push(
-            <span key="pp" className={`${styles.costItem} ${styles.pp}`}>
-                {pp}pp
-            </span>,
-        );
-    if (gp)
-        parts.push(
-            <span key="gp" className={`${styles.costItem} ${styles.gp}`}>
-                {gp}gp
-            </span>,
-        );
-    if (ep)
-        parts.push(
-            <span key="ep" className={`${styles.costItem} ${styles.ep}`}>
-                {ep}ep
-            </span>,
-        );
-    if (sp)
-        parts.push(
-            <span key="sp" className={`${styles.costItem} ${styles.sp}`}>
-                {sp}sp
-            </span>,
-        );
-    if (cp)
-        parts.push(
-            <span key="cp" className={`${styles.costItem} ${styles.cp}`}>
-                {cp}cp
-            </span>,
-        );
-
-    if (parts.length === 0) {
-        return (
-            <span className={`${styles.costItem} ${styles.cp}`} style={{ opacity: 0.5 }}>
-                0cp
-            </span>
-        );
-    }
-
-    return <div style={{ display: "flex", gap: "0.5ch" }}>{parts}</div>;
-};
+import { setNullToZero } from "../../helper/moneyHelpers.ts";
 
 export const EditPlayerStatblockMoney = ({
     statblock,
@@ -132,7 +81,6 @@ export const EditPlayerStatblockMoney = ({
         },
     });
     const {
-        register,
         watch,
         formState: { isSubmitting },
     } = form;
@@ -157,7 +105,7 @@ export const EditPlayerStatblockMoney = ({
 
         (["pp", "gp", "ep", "sp", "cp"] as const).forEach((currency) => {
             const current = statblock?.money?.[currency] ?? 0;
-            const target = watchedValues[currency] ?? 0;
+            const target = Number(watchedValues[currency]) ?? 0;
             const diff = target - current;
             if (diff !== 0) {
                 changes[currency] = diff;
@@ -216,21 +164,11 @@ export const EditPlayerStatblockMoney = ({
 
     return (
         <form onSubmit={form.handleSubmit(onSubmit)} className={styles.moneyEditForm}>
-            <div className={styles.moneyInputList}>
-                {(["pp", "gp", "ep", "sp", "cp"] as const).map((currency) => (
-                    <div key={currency} className={styles.moneyInput}>
-                        <label className={styles[currency]}>{currency}</label>
-                        <input
-                            type="number"
-                            min={0}
-                            {...register(currency, {
-                                valueAsNumber: true,
-                                min: 0,
-                            })}
-                        />
-                    </div>
-                ))}
-            </div>
+            <MoneyEditInputs
+                form={form}
+                originalMoney={statblock.money ?? { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 }}
+                onError={setError}
+            />
             {error && (
                 <div className={styles.error} style={{ color: "red" }}>
                     {error}
@@ -274,10 +212,9 @@ export const PlayerStatblockMoney = ({ statblock, party }: { statblock: E5Statbl
                     ) : (
                         <>
                             <div
-                                className={styles.moneyDisplay}
-                                style={{ background: "rgba(0, 0, 0, 0.2)", padding: "1.2ch", borderRadius: "8px" }}
+                                className={moneyStyles.moneyContainer}
                             >
-                                {formatMoney(money)}
+                                <MoneyDisplay money={money} freeText="0cp" />
                             </div>
                             <Tippy content={"Edit Money"}>
                                 <button
@@ -394,23 +331,7 @@ export const PlayerPartyStatblockItem = ({
                         </Tippy>
                     ) : null}
                     {item.item.cost ? (
-                        <div className={styles.itemCost}>
-                            {item.item.cost.pp ? (
-                                <span className={`${styles.costItem} ${styles.pp}`}>{item.item.cost.pp}PP</span>
-                            ) : null}
-                            {item.item.cost.gp ? (
-                                <span className={`${styles.costItem} ${styles.gp}`}>{item.item.cost.gp}GP</span>
-                            ) : null}
-                            {item.item.cost.ep ? (
-                                <span className={`${styles.costItem} ${styles.ep}`}>{item.item.cost.ep}EP</span>
-                            ) : null}
-                            {item.item.cost.sp ? (
-                                <span className={`${styles.costItem} ${styles.sp}`}>{item.item.cost.sp}SP</span>
-                            ) : null}
-                            {item.item.cost.cp ? (
-                                <span className={`${styles.costItem} ${styles.cp}`}>{item.item.cost.cp}CP</span>
-                            ) : null}
-                        </div>
+                        <MoneyDisplay money={setNullToZero(item.item.cost)} className={styles.itemCost} />
                     ) : null}
                 </div>
             </div>
@@ -701,7 +622,7 @@ export const PlayerPartyMoney = ({ party }: { party: PartyOut }) => {
                 style={{ background: "rgba(0, 0, 0, 0.2)", padding: "1.2ch", borderRadius: "8px" }}
             >
                 <div className={styles.moneyDisplay} style={{ justifyContent: "center", fontSize: "1rem" }}>
-                    {formatMoney(party.money ?? undefined)}
+                    <MoneyDisplay money={party.money ?? undefined} freeText="0cp" />
                 </div>
             </div>
         </PartyCollapse>
@@ -876,23 +797,7 @@ export const PlayerPartyInventoryItem = ({
                             </span>
                         </div>
                         {item.item.cost ? (
-                            <div className={styles.itemCost}>
-                                {item.item.cost.pp ? (
-                                    <span className={`${styles.costItem} ${styles.pp}`}>{item.item.cost.pp}PP</span>
-                                ) : null}
-                                {item.item.cost.gp ? (
-                                    <span className={`${styles.costItem} ${styles.gp}`}>{item.item.cost.gp}GP</span>
-                                ) : null}
-                                {item.item.cost.ep ? (
-                                    <span className={`${styles.costItem} ${styles.ep}`}>{item.item.cost.ep}EP</span>
-                                ) : null}
-                                {item.item.cost.sp ? (
-                                    <span className={`${styles.costItem} ${styles.sp}`}>{item.item.cost.sp}SP</span>
-                                ) : null}
-                                {item.item.cost.cp ? (
-                                    <span className={`${styles.costItem} ${styles.cp}`}>{item.item.cost.cp}CP</span>
-                                ) : null}
-                            </div>
+                            <MoneyDisplay money={setNullToZero(item.item.cost)} className={styles.itemCost} />
                         ) : null}
                     </>
                 )}

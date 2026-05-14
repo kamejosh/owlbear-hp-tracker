@@ -1,7 +1,8 @@
 import { useE5StatblockContext } from "../../../../context/E5StatblockContext.tsx";
 import styles from "./statblock-actions.module.scss";
 import { FancyLineBreak, LineBreak } from "../../../general/LineBreak.tsx";
-import { Ability, E5Ability } from "./E5Ability.tsx";
+import { E5Ability } from "./E5Ability.tsx";
+import { Ability } from "../../../../helper/types.ts";
 import { ItemCharges } from "./ItemCharges.tsx";
 import { isItemInUse } from "../../../../helper/equipmentHelpers.ts";
 

@@ -1,6 +1,7 @@
 import { useLocalStorage } from "../../../helper/hooks.ts";
 import { ID } from "../../../helper/variables.ts";
-import { DiceButtonWrapper, Stats } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { DiceButtonWrapper } from "../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { Stats } from "../../../helper/types.ts";
 import { E5Statblock } from "../../../api/e5/useE5Api.ts";
 import { PfStatblock } from "../../../api/pf/usePfApi.ts";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";

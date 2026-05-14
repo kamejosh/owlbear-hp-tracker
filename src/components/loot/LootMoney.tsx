@@ -14,16 +14,18 @@ import { EditGroup } from "../form/EditButton.tsx";
 import { SubmitButton } from "../form/SubmitButton.tsx";
 import { CancelButton } from "../form/CancelButton.tsx";
 import styles from "../party/party-inventory.module.scss";
+import moneyStyles from "../money/money.module.scss";
 import lootStyles from "./loot.module.scss";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { MenuItem, Select, FormControl, InputLabel } from "@mui/material";
 import { CurrencyExchangeRounded } from "@mui/icons-material";
-import { Money } from "../party/PlayerParty.tsx";
 import { currencies, formatCP, normalizeToCP, resolveCalculation, toCP } from "../../helper/moneyHelpers.ts";
+import { MoneyEditInputs } from "../money/MoneyEditInputs.tsx";
 import Tippy from "@tippyjs/react";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import { usePartyStore } from "../../context/PartyStore.tsx";
 import OBR from "@owlbear-rodeo/sdk";
+import { Money } from "../../helper/types.ts";
 
 export const LootMoneyTransfer = ({ setIsTransferring }: { setIsTransferring: (value: boolean) => void }) => {
     const apiKey = useMetadataContext((state) => state.room?.tabletopAlmanacAPIKey);
@@ -180,21 +182,7 @@ export const LootMoneyTransfer = ({ setIsTransferring }: { setIsTransferring: (v
                 </FormControl>
             </div>
 
-            <div className={lootStyles.transferAmount}>
-                {currencies.map((currency) => (
-                    <div key={currency.key} className={lootStyles.moneyItem}>
-                        <input
-                            type="number"
-                            min={0}
-                            {...transferForm.register(currency.key, { valueAsNumber: true })}
-                            className={`${styles.costItem} ${styles[currency.key]} ${lootStyles.moneyInput}`}
-                        />
-                        <span className={`${styles.costItem} ${styles[currency.key]} ${lootStyles.moneyLabel}`}>
-                            {currency.label}
-                        </span>
-                    </div>
-                ))}
-            </div>
+            <MoneyEditInputs form={transferForm} originalMoney={undefined} />
 
             <div className={lootStyles.transferActions}>
                 <button
@@ -283,47 +271,6 @@ export const LootMoney = ({ readOnly = false }: { readOnly?: boolean }) => {
         setPending(false);
     };
 
-    const onBlur = (key: keyof MoneyIn) => {
-        const input = String(form.getValues(key));
-        if (!input) {
-            form.setValue(key, (data.money[key] || 0) as any);
-            return;
-        }
-
-        const currentValue = data.money[key] || 0;
-        const resolved = resolveCalculation(input, currentValue);
-
-        const currentFormValues = form.getValues();
-        const draftMoney = { ...currentFormValues, [key]: resolved };
-
-        const draftMoneyNumeric: MoneyIn = {
-            pp: Number(draftMoney.pp) || 0,
-            gp: Number(draftMoney.gp) || 0,
-            ep: Number(draftMoney.ep) || 0,
-            sp: Number(draftMoney.sp) || 0,
-            cp: Number(draftMoney.cp) || 0,
-        };
-
-        const totalCP = toCP(draftMoneyNumeric);
-
-        if (totalCP < 0) {
-            const deficit = formatCP(totalCP);
-            setError(`Not enough money present (Missing ${deficit})`);
-            setTimeout(() => setError(null), 3000);
-            form.setValue(key, currentValue as any);
-        } else {
-            const normalized = normalizeToCP(draftMoneyNumeric);
-            form.reset(normalized);
-        }
-    };
-
-    const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, key: keyof MoneyIn) => {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            onBlur(key);
-        }
-    };
-
     const getDiff = () => {
         if (!data?.money) return [];
         const diffs: Array<{ value: number; label: string; sign: string }> = [];
@@ -344,6 +291,14 @@ export const LootMoney = ({ readOnly = false }: { readOnly?: boolean }) => {
     };
 
     const diffs = getDiff();
+
+    const currenciesDisplay: Array<{ key: keyof MoneyIn; label: string }> = [
+        { key: "pp", label: "pp" },
+        { key: "gp", label: "gp" },
+        { key: "ep", label: "ep" },
+        { key: "sp", label: "sp" },
+        { key: "cp", label: "cp" },
+    ];
 
     if (isTransferring) {
         return <LootMoneyTransfer setIsTransferring={setIsTransferring} />;
@@ -367,20 +322,12 @@ export const LootMoney = ({ readOnly = false }: { readOnly?: boolean }) => {
                         alignCenter={true}
                         onClick={() => setIsEditing(!isEditing)}
                     >
-                        <div className={lootStyles.moneyContainer}>
-                            {currencies.map((currency) => (
-                                <div key={currency.key} className={lootStyles.moneyItem}>
-                                    {isEditing ? (
-                                        <input
-                                            type="text"
-                                            {...form.register(currency.key)}
-                                            onBlur={() => onBlur(currency.key)}
-                                            onKeyDown={(e) => onKeyDown(e, currency.key)}
-                                            className={`${styles.costItem} ${styles[currency.key]} ${
-                                                lootStyles.moneyInput
-                                            }`}
-                                        />
-                                    ) : (
+                        <div className={moneyStyles.moneyContainer}>
+                            {isEditing ? (
+                                <MoneyEditInputs form={form} originalMoney={data.money} onError={setError} />
+                            ) : (
+                                currenciesDisplay.map((currency) => (
+                                    <div key={currency.key} className={moneyStyles.moneyItem}>
                                         <span
                                             className={`${styles.costItem} ${styles[currency.key]} ${
                                                 lootStyles.moneyValue
@@ -388,16 +335,16 @@ export const LootMoney = ({ readOnly = false }: { readOnly?: boolean }) => {
                                         >
                                             {form.getValues(currency.key) || 0}
                                         </span>
-                                    )}
-                                    <span
-                                        className={`${styles.costItem} ${styles[currency.key]} ${
-                                            lootStyles.moneyLabel
-                                        }`}
-                                    >
-                                        {currency.label}
-                                    </span>
-                                </div>
-                            ))}
+                                        <span
+                                            className={`${styles.costItem} ${styles[currency.key]} ${
+                                                lootStyles.moneyLabel
+                                            }`}
+                                        >
+                                            {currency.label}
+                                        </span>
+                                    </div>
+                                ))
+                            )}
                             {isEditing && (
                                 <div className={lootStyles.editActions}>
                                     {diffs.length > 0 && (
@@ -424,7 +371,7 @@ export const LootMoney = ({ readOnly = false }: { readOnly?: boolean }) => {
                     </EditGroup>
                 ) : (
                     <div className={lootStyles.moneyContainer}>
-                        {currencies.map((currency) => (
+                        {currenciesDisplay.map((currency) => (
                             <div key={currency.key} className={lootStyles.moneyItem}>
                                 <span className={`${styles.costItem} ${styles[currency.key]} ${lootStyles.moneyValue}`}>
                                     {form.getValues(currency.key) || 0}

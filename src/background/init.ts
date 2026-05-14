@@ -9,6 +9,8 @@ import {
     lootPopover,
     metadataKey,
     nextTurnChannel,
+    shopMetadataKey,
+    shopModal,
     version,
 } from "../helper/variables.ts";
 import { compare } from "compare-versions";
@@ -381,6 +383,44 @@ const setupContextMenu = async () => {
         ],
         onClick: async () => {
             await OBR.modal.open(lootModal);
+        },
+    });
+
+    await OBR.contextMenu.create({
+        id: `${GMI_ID}/shop`,
+        icons: [
+            {
+                icon: "/icon.svg",
+                label: "Open Shop",
+                filter: {
+                    some: [
+                        { key: "layer", value: "CHARACTER", coordinator: "||" },
+                        { key: "layer", value: "MOUNT", coordinator: "||" },
+                        { key: "layer", value: "PROP", coordinator: "||" },
+                    ],
+                    roles: ["GM"],
+                },
+            },
+        ],
+        onClick: async () => {
+            await OBR.modal.open(shopModal);
+        },
+    });
+
+    await OBR.contextMenu.create({
+        id: `${GMI_ID}/shop_player`,
+        icons: [
+            {
+                icon: "/icon.svg",
+                label: "Open Shop",
+                filter: {
+                    every: [{ key: ["metadata", `${shopMetadataKey}`, "shopAvailable"], value: true }],
+                    roles: ["PLAYER"],
+                },
+            },
+        ],
+        onClick: async () => {
+            await OBR.modal.open(shopModal);
         },
     });
 };

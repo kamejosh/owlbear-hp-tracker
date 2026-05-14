@@ -1,7 +1,7 @@
 import { Modal } from "@owlbear-rodeo/sdk/lib/types/Modal";
 import { Popover } from "@owlbear-rodeo/sdk";
-import { Stats } from "../components/general/DiceRoller/DiceButtonWrapper.tsx";
-import { LootMetadata } from "./types.ts";
+import { Stats } from "./types.ts";
+import { LootMetadata, ShopMetadata } from "./types.ts";
 
 export const ID = "com.bitperfect-software.hp-tracker";
 export const GMG_ID = "com.tabletop-almanac.gmg";
@@ -25,7 +25,7 @@ export const prettySordidID = "com.pretty-initiative";
 
 export const dicePlusAvailableKey = `${GMG_ID}/dice-plus-available`;
 
-export const version = "3.7.1";
+export const version = "3.7.2";
 
 export const changelogModal: Modal = {
     id: `${modalId}/changelog`,
@@ -57,6 +57,13 @@ export const lootModal: Modal = {
     url: "/loot.html",
     width: 400,
     height: 600,
+};
+
+export const shopModal: Modal = {
+    id: `${modalId}/shop`,
+    url: "/shop.html",
+    width: 500,
+    height: 700,
 };
 
 export const lootPopover: Popover = {
@@ -115,4 +122,11 @@ export const defaultLoot: LootMetadata = {
     lootAvailable: false,
     money: { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 },
     items: [],
+};
+
+export const defaultShop: ShopMetadata = {
+    shopAvailable: false,
+    items: [],
+    cart: {},
+    money: { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 },
 };

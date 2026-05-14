@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { DiceButton, DiceButtonWrapper, Stats } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { DiceButton, DiceButtonWrapper } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { Stats } from "../../../../helper/types.ts";
 import { getDamage } from "../../../../helper/helpers.ts";
 import { PfSpell, usePfGetSpell } from "../../../../api/pf/usePfApi.ts";
 import { components } from "../../../../api/schema";

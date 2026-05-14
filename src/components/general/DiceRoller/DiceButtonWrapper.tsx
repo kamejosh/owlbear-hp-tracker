@@ -17,19 +17,11 @@ import { DiceRoll } from "@dice-roller/rpg-dice-roller";
 import { autoPlacement, safePolygon, useFloating, useHover, useInteractions } from "@floating-ui/react";
 import remarkBreaks from "remark-breaks";
 import { useComponentContext } from "../../../context/ComponentContext.tsx";
-import { DICE_ROLLER } from "../../../helper/types.ts";
+import { DICE_ROLLER, Stats } from "../../../helper/types.ts";
 import { DicePlusRollResultData } from "../../../background/diceplus.ts";
 import { replaceStatWithMod } from "../../../helper/limitHelpers.ts";
 import { Skills } from "../../../helper/equipmentHelpers.ts";
 
-export type Stats = {
-    strength: number;
-    dexterity: number;
-    constitution: number;
-    intelligence: number;
-    wisdom: number;
-    charisma: number;
-};
 
 type DiceButtonProps = {
     dice: string;

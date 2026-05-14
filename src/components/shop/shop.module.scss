@@ -1,3 +1,36 @@
+.customerSection {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 1rem;
+}
+
+.memberAvatar {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+}
+
+.memberSelect {
+    min-width: 200px;
+
+    :global(.MuiInputLabel-root) {
+        color: rgba(255, 255, 255, 0.7);
+    }
+}
+
+.customerMoney {
+    display: flex;
+    align-items: center;
+}
+
+.noMemberWarning {
+    margin-bottom: 1.5rem;
+    color: #ffcc00;
+    font-weight: bold;
+}
+
 .header {
     display: flex;
     align-items: center;
@@ -222,6 +255,12 @@
     border-radius: 8px;
     background-color: rgba(255, 255, 255, 0.03);
     padding: 8px;
+}
+
+.moneyItem {
+    display: flex;
+    align-items: center;
+    gap: 0.5ch;
 }
 
 .moneyInput {
@@ -553,13 +592,28 @@
     gap: 0.5ch;
 }
 
+.addItemCount {
+    flex-shrink: 0;
+    max-width: 80px;
+    height: 29px !important;
+}
+
 .suggestionsContainer {
     margin-bottom: 1rem;
 }
 
 .suggestionFormGrid {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1ch;
+    margin-bottom: 0.5rem;
+}
+
+.itemInput {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr auto;
+    align-items: center;
     gap: 1ch;
     margin-bottom: 0.5rem;
 }
@@ -568,6 +622,7 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
+    max-width: 100%;
 
     &.suggestionInputDisabled {
         opacity: 0.5;
@@ -606,6 +661,10 @@
         &:disabled {
             color: grey;
         }
+    }
+
+    select {
+        height: 26px;
     }
 }
 
@@ -658,4 +717,31 @@
             height: 16px;
         }
     }
+}
+
+.editButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 4px;
+    color: white;
+
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+.cartPriceRow {
+    display: flex;
+    gap: 1ch;
 }
