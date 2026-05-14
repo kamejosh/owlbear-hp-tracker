@@ -27,7 +27,11 @@ export default defineConfig({
                         if (id.includes("@mui") || id.includes("@emotion")) {
                             return "mui";
                         }
-                        if (id.includes("react") || id.includes("react-dom") || id.includes("scheduler")) {
+                        if (
+                            id.includes("node_modules/react/") ||
+                            id.includes("node_modules/react-dom/") ||
+                            id.includes("node_modules/scheduler/")
+                        ) {
                             return "react";
                         }
                         if (id.includes("@dice-roller") || id.includes("dddice-js")) {
