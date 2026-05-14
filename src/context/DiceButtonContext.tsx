@@ -1,7 +1,6 @@
 import { StateCreator, useStore } from "zustand";
 import { persist } from "zustand/middleware";
 import { ID } from "../helper/variables.ts";
-import { withStorageDOMEvents } from "../helper/hooks.ts";
 import { createStore } from "zustand/vanilla";
 
 export type CustomDieNotation = {
@@ -44,5 +43,3 @@ export function useDiceButtonsContext<T>(selector: (state: DiceButtonsContextTyp
 export function useDiceButtonsContext<T>(selector?: (state: DiceButtonsContextType) => T) {
     return useStore(diceButtonsStore, selector!);
 }
-
-withStorageDOMEvents(diceButtonsStore);

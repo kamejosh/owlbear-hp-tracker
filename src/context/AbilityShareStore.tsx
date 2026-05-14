@@ -1,7 +1,6 @@
 import { useStore } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { ID } from "../helper/variables.ts";
-import { withStorageDOMEvents } from "../helper/hooks.ts";
 import { createStore } from "zustand/vanilla";
 import { components } from "../api/schema";
 import { Action, Reaction, SpecialAbility } from "../components/gmgrimoire/statblocks/pf/PfAbility.tsx";
@@ -86,5 +85,3 @@ export function useAbilityShareStore<T>(selector: (state: AbilityShareStoreType)
 export function useAbilityShareStore<T>(selector?: (state: AbilityShareStoreType) => T) {
     return useStore(abilityShareStore, selector!);
 }
-
-withStorageDOMEvents(abilityShareStore);

@@ -14,6 +14,7 @@ import "tippy.js/dist/tippy.css";
 import { useGetSettings } from "../api/tabletop-almanac/useUser.ts";
 import { uniq } from "lodash";
 import { useShallow } from "zustand/react/shallow";
+import { StoreSync } from "./StoreSync.tsx";
 
 type ContextWrapperProps = PropsWithChildren & {
     component: string;
@@ -140,6 +141,7 @@ export const ContextWrapper = (props: ContextWrapperProps) => {
 
     return (
         <PluginGate>
+            <StoreSync />
             <QueryClientProvider client={queryClient}>
                 <PlayerContext.Provider value={playerContext}>
                     <Content>

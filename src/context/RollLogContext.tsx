@@ -2,7 +2,6 @@ import { useStore } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { ID } from "../helper/variables.ts";
 import { IRollValueImage } from "dddice-js";
-import { withStorageDOMEvents } from "../helper/hooks.ts";
 import { createStore } from "zustand/vanilla";
 
 export type RollLogEntryType = {
@@ -60,5 +59,3 @@ export function useRollLogContext<T>(selector: (state: RollLogContextType) => T)
 export function useRollLogContext<T>(selector?: (state: RollLogContextType) => T) {
     return useStore(rollLogStore, selector!);
 }
-
-withStorageDOMEvents(rollLogStore);
