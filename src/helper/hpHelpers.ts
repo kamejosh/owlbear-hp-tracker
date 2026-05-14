@@ -362,7 +362,7 @@ const handleBarAttachment = async (
                 change.color = "blue";
             }
         }
-        change.width = tempHpPercentage === 0 ? 0 : (width - border * 2) * tempHpPercentage;
+        change.width = tempHpPercentage === 0 ? 0 : (width - border * 2) * Math.min(tempHpPercentage, 1);
         if (shape.width !== change.width || (change.color && color !== change.color)) {
             return change;
         }
