@@ -1,6 +1,7 @@
 import { components } from "../../../../api/schema";
 import { useState } from "react";
-import { DiceButtonWrapper, Stats } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { DiceButtonWrapper } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { Stats } from "../../../../helper/types.ts";
 import { capitalize, isString } from "lodash";
 import { ShareAbilityButton } from "../../../general/ShareAbilityButton.tsx";
 import { usePFStatblockContext } from "../../../../context/PFStatblockContext.tsx";

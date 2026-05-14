@@ -1,8 +1,6 @@
 import { components } from "../api/schema";
 import { LimitType } from "../components/gmgrimoire/statblocks/LimitComponent.tsx";
-import { Ability } from "../components/gmgrimoire/statblocks/e5/E5Ability.tsx";
-import { Stats } from "../components/general/DiceRoller/DiceButtonWrapper.tsx";
-import { GMGMetadata, LootMetadata } from "./types.ts";
+import { Ability, Stats, GMGMetadata, LootMetadata } from "./types.ts";
 import { updateTokenMetadata } from "./tokenHelper.ts";
 import { updateHp } from "./hpHelpers.ts";
 import { updateAc } from "./acHelper.ts";

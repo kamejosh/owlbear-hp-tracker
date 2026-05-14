@@ -8,6 +8,7 @@ export default defineConfig({
     server: { host: "0.0.0.0", cors: true },
     assetsInclude: ["**/*.md"],
     build: {
+        chunkSizeWarningLimit: 1000,
         rollupOptions: {
             input: {
                 main: resolve(__dirname, "index.html"),
@@ -19,6 +20,37 @@ export default defineConfig({
                 party: resolve(__dirname, "party.html"),
                 loot: resolve(__dirname, "loot.html"),
                 shop: resolve(__dirname, "shop.html"),
+            },
+            output: {
+                manualChunks(id) {
+                    if (id.includes("node_modules")) {
+                        if (id.includes("@mui") || id.includes("@emotion")) {
+                            return "mui";
+                        }
+                        if (id.includes("react") || id.includes("react-dom") || id.includes("scheduler")) {
+                            return "react";
+                        }
+                        if (id.includes("@dice-roller") || id.includes("dddice-js")) {
+                            return "dice";
+                        }
+                        if (id.includes("@hello-pangea/dnd")) {
+                            return "dnd";
+                        }
+                        if (id.includes("react-markdown") || id.includes("remark") || id.includes("rehype")) {
+                            return "markdown";
+                        }
+                        if (id.includes("axios") || id.includes("lodash") || id.includes("ahooks") || id.includes("axios-retry")) {
+                            return "utils";
+                        }
+                        if (id.includes("@tanstack")) {
+                            return "tanstack";
+                        }
+                        if (id.includes("framer-motion") || id.includes("swiper")) {
+                            return "ui-libs";
+                        }
+                        return "vendor";
+                    }
+                },
             },
             /**
              * Ignore "use client" waning since we are not using SSR

@@ -1,3 +1,5 @@
+import { components } from "../api/schema";
+
 export enum SORT {
     DESC,
     ASC,
@@ -194,3 +196,14 @@ export type ShopMetadata = {
     money: Money;
     shopAvailable: boolean;
 };
+
+export type Stats = {
+    strength: number;
+    dexterity: number;
+    constitution: number;
+    intelligence: number;
+    wisdom: number;
+    charisma: number;
+};
+
+export type Ability = components["schemas"]["src__model_types__e5__base__Action"];

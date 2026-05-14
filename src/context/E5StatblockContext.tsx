@@ -1,4 +1,4 @@
-import { Stats } from "../components/general/DiceRoller/DiceButtonWrapper.tsx";
+import { Stats } from "../helper/types.ts";
 import { GMGMetadata } from "../helper/types.ts";
 import { Image } from "@owlbear-rodeo/sdk";
 import { createContext, PropsWithChildren, useContext } from "react";

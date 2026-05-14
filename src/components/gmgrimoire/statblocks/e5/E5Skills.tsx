@@ -2,7 +2,8 @@ import { useE5StatblockContext } from "../../../../context/E5StatblockContext.ts
 import { FancyLineBreak } from "../../../general/LineBreak.tsx";
 import styles from "./statblock-skills.module.scss";
 import { capitalize } from "lodash";
-import { DiceButton, Stats } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { DiceButton } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { Stats } from "../../../../helper/types.ts";
 
 const skillToStat = (skillName: string, stats: Stats) => {
     let value = 0;

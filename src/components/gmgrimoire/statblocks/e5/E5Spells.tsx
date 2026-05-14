@@ -1,6 +1,7 @@
 import { components } from "../../../../api/schema";
 import { useMemo, useState } from "react";
-import { DiceButton, DiceButtonWrapper, Stats } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { DiceButton, DiceButtonWrapper } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
+import { Stats } from "../../../../helper/types.ts";
 import { evalString, getDamage, updateLimit } from "../../../../helper/helpers.ts";
 import { SpellFilter } from "../SpellFilter.tsx";
 import { capitalize, isNull, isUndefined } from "lodash";

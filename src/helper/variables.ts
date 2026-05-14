@@ -1,6 +1,6 @@
 import { Modal } from "@owlbear-rodeo/sdk/lib/types/Modal";
 import { Popover } from "@owlbear-rodeo/sdk";
-import { Stats } from "../components/general/DiceRoller/DiceButtonWrapper.tsx";
+import { Stats } from "./types.ts";
 import { LootMetadata, ShopMetadata } from "./types.ts";
 
 export const ID = "com.bitperfect-software.hp-tracker";

@@ -1,5 +1,5 @@
 import { isNull, isUndefined } from "lodash";
-import { Stats } from "../components/general/DiceRoller/DiceButtonWrapper.tsx";
+import { Stats } from "./types.ts";
 import { useMetadataContext } from "../context/MetadataContext.ts";
 import { Skills } from "./equipmentHelpers.ts";
 

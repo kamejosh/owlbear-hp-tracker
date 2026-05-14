@@ -1,4 +1,3 @@
-import { components } from "../../../../api/schema";
 import { DiceButton } from "../../../general/DiceRoller/DiceButtonWrapper.tsx";
 import { capitalize, isInteger, isUndefined } from "lodash";
 import { LimitComponent } from "../LimitComponent.tsx";
@@ -10,7 +9,7 @@ import { About } from "../About.tsx";
 import { ShareAbilityButton } from "../../../general/ShareAbilityButton.tsx";
 import { usePlayerContext } from "../../../../context/PlayerContext.ts";
 
-export type Ability = components["schemas"]["src__model_types__e5__base__Action"];
+import { Ability } from "../../../../helper/types.ts";
 
 export const E5Ability = ({
     ability,
