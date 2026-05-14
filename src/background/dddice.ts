@@ -137,7 +137,7 @@ export const setupDddice = async () => {
     // handle dice rolls from dddice
     window.addEventListener("message", async (event) => {
         try {
-            if (event.type === "message") {
+            if (event.type === "message" && event.origin === "https://dddice.com") {
                 if (event.data.type === "roll:finished") {
                     await rollerCallback(event.data.roll, rollLogStore.getState().addRoll);
                 }
