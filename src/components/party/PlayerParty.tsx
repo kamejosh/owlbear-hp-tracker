@@ -10,6 +10,7 @@ import Tippy from "@tippyjs/react";
 import { Loader } from "../general/Loader.tsx";
 import { CurrencyExchangeRounded, ScaleRounded } from "@mui/icons-material";
 import styles from "./party-inventory.module.scss";
+import moneyStyles from "../money/money.module.scss";
 import {
     VerifiedUser as EquippedIcon,
     GroupRounded,
@@ -22,6 +23,7 @@ import RemoveModeratorIcon from "@mui/icons-material/RemoveModerator";
 import { handleEquipmentChange, StatblockItems } from "../../helper/equipmentHelpers.ts";
 import { Money } from "../../helper/types.ts";
 import { MoneyDisplay } from "../money/MoneyDisplay.tsx";
+import { MoneyEditInputs } from "../money/MoneyEditInputs.tsx";
 import {
     E5StatblockOut,
     MoneyIn,
@@ -79,7 +81,6 @@ export const EditPlayerStatblockMoney = ({
         },
     });
     const {
-        register,
         watch,
         formState: { isSubmitting },
     } = form;
@@ -104,7 +105,7 @@ export const EditPlayerStatblockMoney = ({
 
         (["pp", "gp", "ep", "sp", "cp"] as const).forEach((currency) => {
             const current = statblock?.money?.[currency] ?? 0;
-            const target = watchedValues[currency] ?? 0;
+            const target = Number(watchedValues[currency]) ?? 0;
             const diff = target - current;
             if (diff !== 0) {
                 changes[currency] = diff;
@@ -163,21 +164,11 @@ export const EditPlayerStatblockMoney = ({
 
     return (
         <form onSubmit={form.handleSubmit(onSubmit)} className={styles.moneyEditForm}>
-            <div className={styles.moneyInputList}>
-                {(["pp", "gp", "ep", "sp", "cp"] as const).map((currency) => (
-                    <div key={currency} className={styles.moneyInput}>
-                        <label className={styles[currency]}>{currency}</label>
-                        <input
-                            type="number"
-                            min={0}
-                            {...register(currency, {
-                                valueAsNumber: true,
-                                min: 0,
-                            })}
-                        />
-                    </div>
-                ))}
-            </div>
+            <MoneyEditInputs
+                form={form}
+                originalMoney={statblock.money ?? { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 }}
+                onError={setError}
+            />
             {error && (
                 <div className={styles.error} style={{ color: "red" }}>
                     {error}
@@ -221,8 +212,7 @@ export const PlayerStatblockMoney = ({ statblock, party }: { statblock: E5Statbl
                     ) : (
                         <>
                             <div
-                                className={styles.moneyDisplay}
-                                style={{ background: "rgba(0, 0, 0, 0.2)", padding: "1.2ch", borderRadius: "8px" }}
+                                className={moneyStyles.moneyContainer}
                             >
                                 <MoneyDisplay money={money} freeText="0cp" />
                             </div>

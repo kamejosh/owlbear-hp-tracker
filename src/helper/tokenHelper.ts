@@ -45,12 +45,24 @@ export const updateLootMetadata = async (lootData: LootMetadata, ids: Array<stri
     }
 };
 
-export const updateShopMetadata = async (shopData: ShopMetadata, ids: Array<string>) => {
+export const updateShopMetadata = async (
+    shopData: ShopMetadata | ((data: ShopMetadata) => ShopMetadata),
+    ids: Array<string>,
+) => {
     try {
         await updateList(ids, 16, async (subList) => {
             await updateItems(subList, (items: Array<Item>) => {
                 items.forEach((item) => {
-                    item.metadata[shopMetadataKey] = { ...shopData };
+                    if (typeof shopData === "function") {
+                        const currentData = (item.metadata[shopMetadataKey] as ShopMetadata) || {
+                            items: [],
+                            cart: {},
+                            shopAvailable: false,
+                        };
+                        item.metadata[shopMetadataKey] = shopData(currentData);
+                    } else {
+                        item.metadata[shopMetadataKey] = { ...shopData };
+                    }
                 });
             });
         });

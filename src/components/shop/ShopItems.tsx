@@ -1,3 +1,4 @@
+import { MoneyEditInputs } from "../money/MoneyEditInputs.tsx";
 import { Money, ShopItemType, ShopMetadata } from "../../helper/types.ts";
 import shopStyles from "./shop.module.scss";
 import { useState } from "react";
@@ -30,7 +31,7 @@ import { Add } from "@mui/icons-material";
 import { usePartyStore } from "../../context/PartyStore.tsx";
 import { useGetMultipleStatblocks } from "../../api/e5/useE5Api.ts";
 import { useEffect, useMemo } from "react";
-import { setNullToZero } from "../../helper/moneyHelpers.ts";
+import { normalizeToCP, setNullToZero } from "../../helper/moneyHelpers.ts";
 
 type AddItemFormType = {
     item_id: number;
@@ -38,34 +39,33 @@ type AddItemFormType = {
     money: Money;
 };
 
-const addItem = async (item: ItemOut, data: ShopMetadata, token: Item, count: number = 1) => {
+const addItem = async (item: ItemOut, token: Item, count: number = 1) => {
     try {
-        const existingItem = data.items.find((i) => i.id === item.id);
-        let updatedItems: ShopItemType[];
-        if (existingItem) {
-            updatedItems = data.items.map((i) => (i.id === item.id ? { ...i, count: (i.count ?? 0) + count } : i));
-        } else {
-            const newItem: ShopItemType = {
-                id: item.id,
-                name: item.name,
-                money: item.cost ? setNullToZero(item.cost) : { pp: 0, gp: 0, ep: 0, sp: 0, cp: 0 },
-                count: count,
-                slug: item.slug,
-            };
-            updatedItems = [...data.items, newItem];
-        }
-        await updateShopMetadata({ ...data, items: updatedItems }, [token.id]);
+        await updateShopMetadata(
+            (currentData) => {
+                const existingItem = currentData.items.find((i) => i.id === item.id);
+                let updatedItems: ShopItemType[];
+                if (existingItem) {
+                    updatedItems = currentData.items.map((i) =>
+                        i.id === item.id ? { ...i, count: (i.count ?? 0) + count } : i,
+                    );
+                } else {
+                    const newItem: ShopItemType = {
+                        id: item.id,
+                        name: item.name,
+                        money: item.cost ? setNullToZero(item.cost) : { pp: 0, gp: 0, ep: 0, sp: 0, cp: 0 },
+                        count: count,
+                        slug: item.slug,
+                    };
+                    updatedItems = [...currentData.items, newItem];
+                }
+                return { ...currentData, items: updatedItems };
+            },
+            [token.id],
+        );
     } catch (e) {
         console.error(e);
     }
-};
-
-const currencyNames = {
-    pp: "Platinum Pieces",
-    gp: "Gold Pieces",
-    ep: "Electrum Pieces",
-    sp: "Silver Pieces",
-    cp: "Copper Pieces",
 };
 
 const ShopItemForm = ({
@@ -74,15 +74,35 @@ const ShopItemForm = ({
     onCancel,
     itemInput,
     countTooltip,
+    originalMoney,
 }: {
     form: UseFormReturn<AddItemFormType>;
     onSubmit: (formData: AddItemFormType) => Promise<void>;
     onCancel: () => void;
     itemInput: React.ReactNode;
     countTooltip: string;
+    originalMoney: Money | undefined;
 }) => {
+    const [error, setError] = useState<string | null>(null);
+
     return (
         <form onSubmit={form.handleSubmit(onSubmit)} className={styles.addForm}>
+            {error && (
+                <div
+                    style={{
+                        backgroundColor: "rgba(255, 0, 0, 0.1)",
+                        color: "#ff4444",
+                        padding: "8px",
+                        borderRadius: "4px",
+                        marginBottom: "8px",
+                        fontSize: "0.8rem",
+                        textAlign: "center",
+                        border: "1px solid rgba(255, 0, 0, 0.2)",
+                    }}
+                >
+                    {error}
+                </div>
+            )}
             <div className={shopStyles.itemInput}>
                 {itemInput}
                 <div className={shopStyles.suggestionFormRow}>
@@ -101,28 +121,7 @@ const ShopItemForm = ({
             <div className={shopStyles.suggestionFormRow}>
                 <label className={shopStyles.suggestionLabel}>Price</label>
                 <div className={styles.moneyEditForm}>
-                    <div className={styles.moneyInputList}>
-                        {(["money.pp", "money.gp", "money.ep", "money.sp", "money.cp"] as const).map((currency) => {
-                            const currencyCode = currency.split(".")[1] as keyof typeof currencyNames;
-                            return (
-                                <div key={currency} className={styles.moneyInput}>
-                                    <Tooltip title={currencyNames[currencyCode]} arrow>
-                                        <label className={`${styles.costItem} ${styles[currencyCode]}`}>
-                                            {currencyCode}
-                                        </label>
-                                    </Tooltip>
-                                    <input
-                                        type="number"
-                                        min={0}
-                                        {...form.register(currency, {
-                                            valueAsNumber: true,
-                                            min: 0,
-                                        })}
-                                    />
-                                </div>
-                            );
-                        })}
-                    </div>
+                    <MoneyEditInputs form={form} basePath="money" originalMoney={originalMoney} onError={setError} />
                 </div>
             </div>
             <div className={styles.buttonGroup}>
@@ -136,12 +135,10 @@ const ShopItemForm = ({
 export const EditShopItem = ({
     item,
     token,
-    data,
     setEdit,
 }: {
     item: ShopItemType;
     token: Item;
-    data: ShopMetadata;
     setEdit: (state: boolean) => void;
 }) => {
     const form = useForm<AddItemFormType>({
@@ -153,10 +150,15 @@ export const EditShopItem = ({
     });
 
     const handleSubmit = async (formData: AddItemFormType) => {
-        const updatedItems = data.items.map((i) =>
-            i.id === item.id ? { ...i, count: formData.count, money: formData.money } : i
+        await updateShopMetadata(
+            (currentData) => {
+                const updatedItems = currentData.items.map((i) =>
+                    i.id === item.id ? { ...i, count: formData.count, money: formData.money } : i,
+                );
+                return { ...currentData, items: updatedItems };
+            },
+            [token.id],
         );
-        await updateShopMetadata({ ...data, items: updatedItems }, [token.id]);
         setEdit(false);
     };
 
@@ -166,6 +168,7 @@ export const EditShopItem = ({
             onSubmit={handleSubmit}
             onCancel={() => setEdit(false)}
             countTooltip="Number of items in stock"
+            originalMoney={item.money}
             itemInput={
                 <div className={shopStyles.suggestionFormRow}>
                     <Tooltip title="Item Name (Read Only)" arrow placement="top-start">
@@ -197,15 +200,7 @@ export const EditShopItem = ({
     );
 };
 
-export const AddShopItem = ({
-    token,
-    data,
-    setAddItem,
-}: {
-    token: Item;
-    data: ShopMetadata;
-    setAddItem: (state: boolean) => void;
-}) => {
+export const AddShopItem = ({ token, setAddItem }: { token: Item; setAddItem: (state: boolean) => void }) => {
     const form = useForm<AddItemFormType>({
         defaultValues: {
             count: 1,
@@ -223,7 +218,7 @@ export const AddShopItem = ({
     const handleSubmit = async (formData: AddItemFormType) => {
         if (!item) return;
 
-        await addItem({ ...item, cost: { ...formData.money, id: item.cost?.id ?? 0 } }, data, token, formData.count);
+        await addItem({ ...item, cost: { ...formData.money, id: item.cost?.id ?? 0 } }, token, formData.count);
         setAddItem(false);
     };
 
@@ -233,6 +228,7 @@ export const AddShopItem = ({
             onSubmit={handleSubmit}
             onCancel={() => setAddItem(false)}
             countTooltip="Number of items to add to stock"
+            originalMoney={item?.cost ? setNullToZero(item.cost) : undefined}
             itemInput={
                 <div className={shopStyles.suggestionFormRow}>
                     <Tooltip title="Search for an item to add to the shop" arrow placement="top-start">
@@ -258,15 +254,7 @@ export const AddShopItem = ({
     );
 };
 
-export const ShopSuggestions = ({
-    token,
-    data,
-    setOpen,
-}: {
-    token: Item;
-    data: ShopMetadata;
-    setOpen: (state: boolean) => void;
-}) => {
+export const ShopSuggestions = ({ token, setOpen }: { token: Item; setOpen: (state: boolean) => void }) => {
     const party = usePartyStore((state) => state.currentParty);
 
     const partyQueries = useGetMultipleStatblocks(party);
@@ -435,7 +423,7 @@ export const ShopSuggestions = ({
                                 <span className={shopStyles.itemName}>{item.name}</span>
                                 <span className={shopStyles.itemMeta}>{item.rarity}</span>
                             </div>
-                            <button className={shopStyles.addButton} onClick={() => addItem(item, data, token)}>
+                            <button className={shopStyles.addButton} onClick={() => addItem(item, token)}>
                                 <Add fontSize="small" />
                             </button>
                         </div>
@@ -449,7 +437,6 @@ export const ShopSuggestions = ({
 export const ShopItem = ({
     item,
     token,
-    data,
     readOnly = false,
     onAddToCart,
 }: {
@@ -476,12 +463,36 @@ export const ShopItem = ({
     const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
 
     const removeItem = async () => {
-        const updatedItems = data.items.filter((i) => i.id !== item.id);
-        await updateShopMetadata({ ...data, items: updatedItems }, [token.id]);
+        await updateShopMetadata(
+            (currentData) => {
+                const updatedItems = currentData.items.filter((i) => i.id !== item.id);
+                const updatedCarts = { ...currentData.cart };
+
+                Object.keys(updatedCarts).forEach((cartId) => {
+                    const cart = updatedCarts[cartId];
+                    const itemsToRemove = cart.items.filter((i) => i.id === item.id);
+                    if (itemsToRemove.length > 0) {
+                        const remainingItems = cart.items.filter((i) => i.id !== item.id);
+                        const newPrice = { ...cart.price };
+                        itemsToRemove.forEach((removedItem) => {
+                            newPrice.pp = (newPrice.pp || 0) - (removedItem.money.pp || 0);
+                            newPrice.gp = (newPrice.gp || 0) - (removedItem.money.gp || 0);
+                            newPrice.ep = (newPrice.ep || 0) - (removedItem.money.ep || 0);
+                            newPrice.sp = (newPrice.sp || 0) - (removedItem.money.sp || 0);
+                            newPrice.cp = (newPrice.cp || 0) - (removedItem.money.cp || 0);
+                        });
+                        updatedCarts[cartId] = { ...cart, items: remainingItems, price: normalizeToCP(newPrice) };
+                    }
+                });
+
+                return { ...currentData, items: updatedItems, cart: updatedCarts };
+            },
+            [token.id],
+        );
     };
 
     if (isEditing) {
-        return <EditShopItem item={item} token={token} data={data} setEdit={setIsEditing} />;
+        return <EditShopItem item={item} token={token} setEdit={setIsEditing} />;
     }
 
     return (

@@ -5,11 +5,13 @@ import { ShopItems } from "./ShopItems.tsx";
 import shopStyles from "./shop.module.scss";
 import { useBuyPartyItem } from "../../api/tabletop-almanac/useParty.ts";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
-import { ShopItemType } from "../../helper/types.ts";
+import { Money, ShopItemType } from "../../helper/types.ts";
 import { updateShopMetadata } from "../../helper/tokenHelper.ts";
-import { ShoppingCart, CheckCircle, ShoppingBag, DeleteOutline } from "@mui/icons-material";
+import { ShoppingCart, ShoppingBag } from "@mui/icons-material";
+import { Badge, Snackbar, Alert } from "@mui/material";
 import { useEffect, useState } from "react";
-import { MoneyDisplay } from "../money/MoneyDisplay.tsx";
+import { ShopPlayerCart } from "./ShopPlayerCart.tsx";
+import { ShopCustomerSelect } from "./ShopCustomerSelect.tsx";
 import { ShopHeader } from "./ShopHeader.tsx";
 import Tippy from "@tippyjs/react";
 import { useE5GetStatblock } from "../../api/e5/useE5Api.ts";
@@ -24,6 +26,10 @@ export const ShopPlayer = () => {
     const partyId = useMetadataContext((state) => state.room?.partyId);
     const [view, setView] = useState<"items" | "cart">("items");
     const [member, setMember] = useState<PartyStoreStatblock | null>(null);
+    const [notification, setNotification] = useState<{
+        message: string;
+        severity: "success" | "error" | "warning" | "info";
+    } | null>(null);
 
     const members = currentParty?.members.filter((m) => m.playerId === playerContext.id);
 
@@ -65,51 +71,82 @@ export const ShopPlayer = () => {
     const handleAddToCart = async (item: ShopItemType) => {
         if (!statblockId) return;
 
-        const updatedCart = { ...data.cart };
-        const currentCart = {
-            ...(updatedCart[statblockId] || { items: [], price: { pp: 0, gp: 0, ep: 0, sp: 0, cp: 0 } }),
-        };
+        await updateShopMetadata(
+            (currentData) => {
+                // Check stock
+                const shopItem = currentData.items.find((i) => i.id === item.id);
+                if (shopItem && shopItem.count !== undefined && shopItem.count <= 0) {
+                    setNotification({ message: "Out of stock!", severity: "warning" });
+                    return currentData;
+                }
 
-        // Check stock
-        if (item.count !== undefined) {
-            const inCartCount = currentCart.items.filter((i) => i.id === item.id).length;
-            if (inCartCount >= item.count) {
-                alert("Out of stock!");
-                return;
-            }
-        }
+                const updatedCart = { ...currentData.cart };
+                const currentCart = {
+                    ...(updatedCart[statblockId] || { items: [], price: { pp: 0, gp: 0, ep: 0, sp: 0, cp: 0 } }),
+                };
 
-        currentCart.items = [...currentCart.items, item];
-        currentCart.price = {
-            pp: (currentCart.price.pp || 0) + (item.money.pp || 0),
-            gp: (currentCart.price.gp || 0) + (item.money.gp || 0),
-            ep: (currentCart.price.ep || 0) + (item.money.ep || 0),
-            sp: (currentCart.price.sp || 0) + (item.money.sp || 0),
-            cp: (currentCart.price.cp || 0) + (item.money.cp || 0),
-        };
+                currentCart.items = [...currentCart.items, item];
+                currentCart.price = {
+                    pp: (currentCart.price.pp || 0) + (item.money.pp || 0),
+                    gp: (currentCart.price.gp || 0) + (item.money.gp || 0),
+                    ep: (currentCart.price.ep || 0) + (item.money.ep || 0),
+                    sp: (currentCart.price.sp || 0) + (item.money.sp || 0),
+                    cp: (currentCart.price.cp || 0) + (item.money.cp || 0),
+                };
 
-        updatedCart[statblockId] = currentCart;
-        await updateShopMetadata({ ...data, cart: updatedCart }, [token.id]);
+                // Update shop items stock
+                const updatedItems = [...currentData.items];
+                const itemIdx = updatedItems.findIndex((i) => i.id === item.id);
+                if (itemIdx >= 0 && updatedItems[itemIdx].count !== undefined) {
+                    updatedItems[itemIdx] = {
+                        ...updatedItems[itemIdx],
+                        count: Math.max(0, updatedItems[itemIdx].count! - 1),
+                    };
+                }
+
+                updatedCart[statblockId] = currentCart;
+                return { ...currentData, items: updatedItems, cart: updatedCart };
+            },
+            [token.id],
+        );
     };
 
     const handleRemoveFromCart = async (index: number) => {
-        if (!statblockId || !myCart) return;
+        if (!statblockId) return;
 
-        const updatedCart = { ...data.cart };
-        const currentCart = { ...myCart };
-        const item = currentCart.items[index];
+        await updateShopMetadata(
+            (currentData) => {
+                const myCart = currentData.cart[statblockId];
+                if (!myCart) return currentData;
 
-        currentCart.items = currentCart.items.filter((_, i) => i !== index);
-        currentCart.price = {
-            pp: (currentCart.price.pp || 0) - (item.money.pp || 0),
-            gp: (currentCart.price.gp || 0) - (item.money.gp || 0),
-            ep: (currentCart.price.ep || 0) - (item.money.ep || 0),
-            sp: (currentCart.price.sp || 0) - (item.money.sp || 0),
-            cp: (currentCart.price.cp || 0) - (item.money.cp || 0),
-        };
+                const updatedCart = { ...currentData.cart };
+                const currentCart = { ...myCart };
+                const item = currentCart.items[index];
 
-        updatedCart[statblockId] = currentCart;
-        await updateShopMetadata({ ...data, cart: updatedCart }, [token.id]);
+                currentCart.items = currentCart.items.filter((_, i) => i !== index);
+                currentCart.price = {
+                    pp: (currentCart.price.pp || 0) - (item.money.pp || 0),
+                    gp: (currentCart.price.gp || 0) - (item.money.gp || 0),
+                    ep: (currentCart.price.ep || 0) - (item.money.ep || 0),
+                    sp: (currentCart.price.sp || 0) - (item.money.sp || 0),
+                    cp: (currentCart.price.cp || 0) - (item.money.cp || 0),
+                };
+
+                // Return item to stock
+                const updatedItems = [...currentData.items];
+                const itemIdx = updatedItems.findIndex((i) => i.id === item.id);
+                if (itemIdx >= 0 && updatedItems[itemIdx].count !== undefined) {
+                    updatedItems[itemIdx] = {
+                        ...updatedItems[itemIdx],
+                        count: updatedItems[itemIdx].count! + 1,
+                    };
+                }
+
+                updatedCart[statblockId] = currentCart;
+                return { ...currentData, items: updatedItems, cart: updatedCart };
+            },
+            [token.id],
+        );
     };
 
     const handleBuy = async () => {
@@ -138,53 +175,47 @@ export const ShopPlayer = () => {
                 },
             });
 
-            // Update shop stock
-            const updatedShopItems = [...data.items];
-            myCart.items.forEach((cartItem) => {
-                const shopItemIndex = updatedShopItems.findIndex((si) => si.id === cartItem.id);
-                if (shopItemIndex >= 0 && updatedShopItems[shopItemIndex].count !== undefined) {
-                    updatedShopItems[shopItemIndex] = {
-                        ...updatedShopItems[shopItemIndex],
-                        count: Math.max(0, updatedShopItems[shopItemIndex].count! - 1),
+            // Clear cart (stock is already updated when added to cart)
+            await updateShopMetadata(
+                (currentData) => {
+                    const updatedCart = { ...currentData.cart };
+                    const cartMoney = setNullToZero(currentData.money);
+                    const cost = setNullToZero(updatedCart[statblockId].price);
+                    const newMoney: Money = {
+                        cp: cartMoney.cp + cost.cp,
+                        sp: cartMoney.sp + cost.sp,
+                        ep: cartMoney.ep + cost.ep,
+                        gp: cartMoney.gp + cost.gp,
+                        pp: cartMoney.pp + cost.pp,
                     };
-                }
-            });
 
-            // Clear cart
-            const updatedCart = { ...data.cart };
-            delete updatedCart[statblockId];
+                    delete updatedCart[statblockId];
+                    return { ...currentData, money: newMoney, cart: updatedCart };
+                },
+                [token.id],
+            );
 
-            await updateShopMetadata({ ...data, items: updatedShopItems, cart: updatedCart }, [token.id]);
             setView("items");
-            alert("Purchase successful!");
+            setNotification({ message: "Purchase successful!", severity: "success" });
         } catch (e: any) {
             console.error(e);
-            alert(`Purchase failed: ${e?.response?.data?.detail ?? e?.message ?? "Unknown error"}`);
+            setNotification({
+                message: `Purchase failed: ${e?.response?.data?.detail ?? e?.message ?? "Unknown error"}`,
+                severity: "error",
+            });
         }
     };
 
     return (
         <>
             <ShopHeader showClose={false} />
-            {member ? (
-                <div>
-                    Customer:
-                    {member.imageUrl ? (
-                        <img src={member.imageUrl} alt={member.statblock?.name} className={shopStyles.memberAvatar} />
-                    ) : null}
-                    {statblockQuery.isSuccess && statblock && (
-                        <MoneyDisplay
-                            money={statblock.money ? setNullToZero(statblock.money) : undefined}
-                            freeText="0cp"
-                        />
-                    )}
-                </div>
-            ) : (
-                <p style={{ fontWeight: "bold" }}>
-                    You currently have no party member assigned, ask your GM to assign you a party member to buy items
-                    from this shops and add them to your inventory directly.
-                </p>
-            )}
+            <ShopCustomerSelect
+                members={members ?? []}
+                member={member}
+                onMemberChange={setMember}
+                statblock={statblock}
+                isSuccess={statblockQuery.isSuccess}
+            />
             <div className={shopStyles.section}>
                 <div className={shopStyles.sectionHeader}>
                     <h2 className={shopStyles.sectionTitle}>{view === "items" ? "Inventory" : "My Cart"}</h2>
@@ -194,29 +225,17 @@ export const ShopPlayer = () => {
                                 className={shopStyles.addButton}
                                 onClick={() => setView(view === "items" ? "cart" : "items")}
                             >
-                                <div style={{ position: "relative" }}>
+                                <Badge
+                                    badgeContent={cartItemCount}
+                                    sx={{
+                                        "& .MuiBadge-badge": {
+                                            backgroundColor: "#448844",
+                                            color: "white",
+                                        },
+                                    }}
+                                >
                                     {view === "items" ? <ShoppingCart /> : <ShoppingBag />}
-                                    {cartItemCount > 0 && (
-                                        <span
-                                            style={{
-                                                position: "absolute",
-                                                top: "-8px",
-                                                right: "-8px",
-                                                background: "#448844",
-                                                borderRadius: "50%",
-                                                width: "16px",
-                                                height: "16px",
-                                                fontSize: "10px",
-                                                display: "flex",
-                                                justifyContent: "center",
-                                                alignItems: "center",
-                                                color: "white",
-                                            }}
-                                        >
-                                            {cartItemCount}
-                                        </span>
-                                    )}
-                                </div>
+                                </Badge>
                             </button>
                         </Tippy>
                     </div>
@@ -231,66 +250,29 @@ export const ShopPlayer = () => {
                         onAddToCart={member ? handleAddToCart : undefined}
                     />
                 ) : (
-                    <div className={shopStyles.cartView}>
-                        {cartItemCount === 0 ? (
-                            <div className={shopStyles.noItems}>Your cart is empty</div>
-                        ) : (
-                            <>
-                                <div className={shopStyles.cartItemsList}>
-                                    {myCart!.items.map((item, idx) => (
-                                        <div key={idx} className={shopStyles.itemRow}>
-                                            <div className={shopStyles.itemName}>{item.name}</div>
-                                            <div className={shopStyles.itemActions}>
-                                                <MoneyDisplay money={item.money} className={shopStyles.itemPrice} />
-                                                <button
-                                                    className={shopStyles.itemButton}
-                                                    onClick={() => handleRemoveFromCart(idx)}
-                                                >
-                                                    <DeleteOutline fontSize="small" />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                                <div
-                                    className={shopStyles.cartFooter}
-                                    style={{
-                                        marginTop: "1rem",
-                                        padding: "1rem",
-                                        borderTop: "1px solid rgba(255,255,255,0.1)",
-                                    }}
-                                >
-                                    <h3
-                                        style={{
-                                            marginBottom: "1rem",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            gap: "1ch",
-                                        }}
-                                    >
-                                        Total: <MoneyDisplay money={myCart!.price} freeText="0cp" />
-                                    </h3>
-                                    <button
-                                        className={"button"}
-                                        style={{
-                                            width: "100%",
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            gap: "1ch",
-                                        }}
-                                        onClick={handleBuy}
-                                        disabled={buyItem.isPending}
-                                    >
-                                        <CheckCircle fontSize="small" />
-                                        {buyItem.isPending ? "Processing..." : "Confirm Purchase"}
-                                    </button>
-                                </div>
-                            </>
-                        )}
-                    </div>
+                    <ShopPlayerCart
+                        cart={myCart ? { ...myCart, price: myCart.price } : null}
+                        onRemove={handleRemoveFromCart}
+                        onBuy={handleBuy}
+                        isBuying={buyItem.isPending}
+                    />
                 )}
             </div>
+            <Snackbar
+                open={!!notification}
+                autoHideDuration={6000}
+                onClose={() => setNotification(null)}
+                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            >
+                <Alert
+                    onClose={() => setNotification(null)}
+                    severity={notification?.severity}
+                    variant="filled"
+                    sx={{ width: "100%" }}
+                >
+                    {notification?.message}
+                </Alert>
+            </Snackbar>
         </>
     );
 };

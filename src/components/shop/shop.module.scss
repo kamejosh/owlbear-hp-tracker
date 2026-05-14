@@ -1,3 +1,36 @@
+.customerSection {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 1rem;
+}
+
+.memberAvatar {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+}
+
+.memberSelect {
+    min-width: 200px;
+
+    :global(.MuiInputLabel-root) {
+        color: rgba(255, 255, 255, 0.7);
+    }
+}
+
+.customerMoney {
+    display: flex;
+    align-items: center;
+}
+
+.noMemberWarning {
+    margin-bottom: 1.5rem;
+    color: #ffcc00;
+    font-weight: bold;
+}
+
 .header {
     display: flex;
     align-items: center;
@@ -684,4 +717,31 @@
             height: 16px;
         }
     }
+}
+
+.editButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 4px;
+    color: white;
+
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+.cartPriceRow {
+    display: flex;
+    gap: 1ch;
 }

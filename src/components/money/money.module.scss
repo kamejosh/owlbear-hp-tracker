@@ -1,0 +1,79 @@
+.moneyInputList {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 1ch;
+}
+
+.moneyContainer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.5ch;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 8px;
+}
+
+.moneyItem {
+    display: flex;
+    align-items: center;
+    gap: 0.5ch;
+}
+
+.moneyInput {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2ch;
+    width: 60px;
+
+    label {
+        opacity: 0.7;
+        cursor: help;
+        font-weight: bold;
+        font-size: 0.65rem;
+        text-align: center;
+        text-transform: uppercase;
+    }
+
+    input {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        background: rgba(0, 0, 0, 0.2);
+        padding: 4px;
+        color: white;
+        font-size: 0.85rem;
+        text-align: center;
+
+        &:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+        }
+    }
+}
+
+.costItem {
+    &.pp {
+        color: #e5e4e2;
+    }
+    &.gp {
+        color: #daa520; // darkgoldenrod
+    }
+    &.ep {
+        color: #4682b4; // steelblue
+    }
+    &.sp {
+        color: #c0c0c0; // silver
+    }
+    &.cp {
+        color: #b87333;
+    }
+}
+
+.itemCost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5ch;
+    font-size: 0.85rem;
+}

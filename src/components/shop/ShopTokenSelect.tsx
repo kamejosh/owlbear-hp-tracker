@@ -1,25 +1,14 @@
 import { useEffect, useState, useMemo } from "react";
 import { useDebounceFn } from "ahooks";
-import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
-import {
-    TextField,
-    Box,
-    Typography,
-    MenuItem,
-    Select,
-    FormControl,
-    InputLabel,
-    Tooltip,
-    IconButton,
-} from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import OBR, { Item } from "@owlbear-rodeo/sdk";
+import { TextField, Box, Typography, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
 import { infoMetadataKey, shopMetadataKey } from "../../helper/variables.ts";
 import { ShopMetadata } from "../../helper/types.ts";
 import { useShopTokenContext } from "../../context/ShopTokenContext.tsx";
 import shopStyles from "./shop.module.scss";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
-import Tippy from "@tippyjs/react";
-import { handleOnPlayerDoubleClick, updateShopMetadata } from "../../helper/tokenHelper.ts";
+import { handleOnPlayerDoubleClick } from "../../helper/tokenHelper.ts";
+import { ShopTokenListItem } from "./ShopTokenListItem.tsx";
 
 type SortOption = "name" | "items";
 
@@ -231,104 +220,14 @@ export const ShopTokenSelect = () => {
                 {filteredAndSortedTokens.length === 0 ? (
                     <Typography sx={{ p: 2, textAlign: "center", opacity: 0.5 }}>No tokens match filters</Typography>
                 ) : (
-                    filteredAndSortedTokens.map(({ token, matchedItems }) => {
-                        const shop = token.metadata[shopMetadataKey] as ShopMetadata | undefined;
-                        const hasShop = !!shop;
-                        const itemCount = hasShop ? shop.items?.length || 0 : 0;
-
-                        return (
-                            <Box
-                                key={token.id}
-                                className={shopStyles.tokenListItem}
-                                sx={{ display: "flex", gap: 1, p: 1, alignItems: "center" }}
-                                onClick={() => handleTokenClick(token)}
-                            >
-                                {token.type === "IMAGE" && (
-                                    <img
-                                        src={(token as Image).image.url}
-                                        alt=""
-                                        style={{ width: 32, height: 32, objectFit: "contain" }}
-                                    />
-                                )}
-                                <Box sx={{ flexGrow: 1 }}>
-                                    <Typography variant="body1">{token.name}</Typography>
-                                    {hasShop && (
-                                        <Box sx={{ display: "flex", gap: 1, alignItems: "center", opacity: 0.7 }}>
-                                            <Typography variant="caption">
-                                                {itemCount} items
-                                            </Typography>
-                                        </Box>
-                                    )}
-                                    {matchedItems.length > 0 && (
-                                        <Box sx={{ mt: 0.5, opacity: 0.8 }}>
-                                            <Typography
-                                                variant="caption"
-                                                sx={{ fontStyle: "italic", display: "block" }}
-                                            >
-                                                Found in shop:
-                                            </Typography>
-                                            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                                                {matchedItems.map((itemName, i) => (
-                                                    <span key={i} className={shopStyles.matchedItemHighlight}>
-                                                        {itemName}
-                                                    </span>
-                                                ))}
-                                            </Box>
-                                        </Box>
-                                    )}
-                                </Box>
-                                <Tooltip title={token.visible ? "Hide Token" : "Show Token"}>
-                                    <IconButton
-                                        size="small"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            void OBR.scene.items.updateItems([token.id], (items) => {
-                                                for (const item of items) {
-                                                    item.visible = !item.visible;
-                                                }
-                                            });
-                                        }}
-                                        sx={{ color: "white", opacity: token.visible ? 1 : 0.5 }}
-                                    >
-                                        {token.visible ? (
-                                            <Visibility fontSize="small" />
-                                        ) : (
-                                            <VisibilityOff fontSize="small" />
-                                        )}
-                                    </IconButton>
-                                </Tooltip>
-                                {hasShop && (
-                                    <Tippy
-                                        content={
-                                            shop.shopAvailable
-                                                ? "Shop is open for players"
-                                                : "Shop is closed for players"
-                                        }
-                                    >
-                                        <button
-                                            className={`${shopStyles.compactStatusButton} ${
-                                                shop.shopAvailable ? shopStyles.lootable : shopStyles.locked
-                                            }`}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                void updateShopMetadata(
-                                                    { ...shop, shopAvailable: !shop.shopAvailable },
-                                                    [token.id],
-                                                );
-                                            }}
-                                        >
-                                            <span
-                                                className={`${shopStyles.statusDot} ${
-                                                    shop.shopAvailable ? shopStyles.lootable : shopStyles.locked
-                                                }`}
-                                            />
-                                            {shop.shopAvailable ? "Open" : "Closed"}
-                                        </button>
-                                    </Tippy>
-                                )}
-                            </Box>
-                        );
-                    })
+                    filteredAndSortedTokens.map(({ token, matchedItems }) => (
+                        <ShopTokenListItem
+                            key={token.id}
+                            token={token}
+                            matchedItems={matchedItems}
+                            onClick={handleTokenClick}
+                        />
+                    ))
                 )}
             </Box>
         </Box>

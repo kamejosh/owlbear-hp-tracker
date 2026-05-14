@@ -1,5 +1,5 @@
 import { Money } from "../../helper/types";
-import styles from "../party/party-inventory.module.scss";
+import styles from "./money.module.scss";
 
 export const MoneyDisplay = ({ money, freeText = "Free", className }: { money?: Money; freeText?: string; className?: string }) => {
     if (!money) return <span className={className}>{freeText}</span>;
@@ -40,7 +40,7 @@ export const MoneyDisplay = ({ money, freeText = "Free", className }: { money?: 
     }
 
     return (
-        <span className={`${styles.itemCost} ${className}`} style={{ display: "inline-flex", gap: "0.5ch" }}>
+        <span className={`${styles.itemCost} ${className || ""}`}>
             {parts}
         </span>
     );

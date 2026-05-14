@@ -58,8 +58,8 @@ export const ShopGM = () => {
                         </Tippy>
                     </div>
                 </div>
-                {isSuggesting && <ShopSuggestions token={token} data={data} setOpen={setIsSuggesting} />}
-                {isAddingItem && <AddShopItem token={token} data={data} setAddItem={setIsAddingItem} />}
+                {isSuggesting && <ShopSuggestions token={token} setOpen={setIsSuggesting} />}
+                {isAddingItem && <AddShopItem token={token} setAddItem={setIsAddingItem} />}
                 <ShopItems items={data.items} token={token} data={data} />
             </div>
 

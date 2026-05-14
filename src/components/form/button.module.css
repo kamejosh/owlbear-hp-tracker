@@ -62,12 +62,6 @@
 }
 
 .formRight {
-    :nth-child(2) {
-        &:not(button) {
-            align-self: flex-end;
-        }
-    }
-
     .top {
         justify-content: flex-end;
     }

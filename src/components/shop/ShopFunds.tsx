@@ -1,4 +1,5 @@
 import { useShopTokenContext } from "../../context/ShopTokenContext.tsx";
+import { MoneyEditInputs } from "../money/MoneyEditInputs.tsx";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Money, ShopMetadata } from "../../helper/types.ts";
@@ -6,18 +7,9 @@ import { updateShopMetadata } from "../../helper/tokenHelper.ts";
 import shopStyles from "./shop.module.scss";
 import styles from "../party/party-inventory.module.scss";
 import { MoneyDisplay } from "../money/MoneyDisplay.tsx";
-import { Tooltip } from "@mui/material";
 import { EditButton } from "../form/EditButton.tsx";
 import { SubmitButton } from "../form/SubmitButton.tsx";
 import { CancelButton } from "../form/CancelButton.tsx";
-
-const currencyNames = {
-    pp: "Platinum Pieces",
-    gp: "Gold Pieces",
-    ep: "Electrum Pieces",
-    sp: "Silver Pieces",
-    cp: "Copper Pieces",
-};
 
 export const ShopFunds = () => {
     const data = useShopTokenContext((state) => state.data);
@@ -54,6 +46,7 @@ const EditShopFunds = ({
     tokenId: string;
     setEdit: (edit: boolean) => void;
 }) => {
+    const [error, setError] = useState<string | null>(null);
     const form = useForm<Money>({
         defaultValues: {
             pp: data.money?.pp ?? 0,
@@ -65,7 +58,7 @@ const EditShopFunds = ({
     });
 
     const onSubmit = async (formData: Money) => {
-        await updateShopMetadata({ ...data, money: formData }, [tokenId]);
+        await updateShopMetadata((currentData) => ({ ...currentData, money: formData }), [tokenId]);
         setEdit(false);
     };
 
@@ -75,26 +68,24 @@ const EditShopFunds = ({
                 <h2 className={shopStyles.sectionTitle}>Edit Shop Funds</h2>
             </div>
             <form onSubmit={form.handleSubmit(onSubmit)} className={styles.addForm}>
-                <div className={styles.moneyEditForm} style={{ marginBottom: "1rem" }}>
-                    <div className={styles.moneyInputList}>
-                        {(["pp", "gp", "ep", "sp", "cp"] as const).map((currency) => {
-                            return (
-                                <div key={currency} className={styles.moneyInput}>
-                                    <Tooltip title={currencyNames[currency]} arrow>
-                                        <label className={`${styles.costItem} ${styles[currency]}`}>{currency}</label>
-                                    </Tooltip>
-                                    <input
-                                        type="number"
-                                        min={0}
-                                        {...form.register(currency, {
-                                            valueAsNumber: true,
-                                            min: 0,
-                                        })}
-                                    />
-                                </div>
-                            );
-                        })}
+                {error && (
+                    <div
+                        style={{
+                            backgroundColor: "rgba(255, 0, 0, 0.1)",
+                            color: "#ff4444",
+                            padding: "8px",
+                            borderRadius: "4px",
+                            marginBottom: "8px",
+                            fontSize: "0.8rem",
+                            textAlign: "center",
+                            border: "1px solid rgba(255, 0, 0, 0.2)",
+                        }}
+                    >
+                        {error}
                     </div>
+                )}
+                <div className={styles.moneyEditForm} style={{ marginBottom: "1rem" }}>
+                    <MoneyEditInputs form={form} originalMoney={data.money} onError={setError} />
                 </div>
                 <div className={styles.buttonGroup}>
                     <SubmitButton form={form} pending={form.formState.isSubmitting} />

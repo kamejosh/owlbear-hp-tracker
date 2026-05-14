@@ -7,8 +7,10 @@ import { SubmitButton } from "../form/SubmitButton.tsx";
 import { Loader } from "../general/Loader.tsx";
 import { useForm } from "react-hook-form";
 import styles from "./party-inventory.module.scss";
+import moneyStyles from "../money/money.module.scss";
 import { PartyCollapse } from "./PartyCollapse.tsx";
 import { formatCP, normalizeToCP, resolveCalculation, toCP } from "../../helper/moneyHelpers.ts";
+import { MoneyEditInputs } from "../money/MoneyEditInputs.tsx";
 
 const PartyMoneyContent = ({ party }: { party: PartyOut | undefined }) => {
     const updateMoney = useUpdatePartyMoney(party?.id || 0, party?.money?.id);
@@ -66,55 +68,13 @@ const PartyMoneyContent = ({ party }: { party: PartyOut | undefined }) => {
         });
     };
 
-    const currencies: Array<{ key: keyof MoneyIn; label: string }> = [
+    const currenciesDisplay: Array<{ key: keyof MoneyIn; label: string }> = [
         { key: "pp", label: "pp" },
         { key: "gp", label: "gp" },
         { key: "ep", label: "ep" },
         { key: "sp", label: "sp" },
         { key: "cp", label: "cp" },
     ];
-
-    const onBlur = (key: keyof MoneyIn) => {
-        const input = String(form.getValues(key));
-        if (!input) {
-            form.setValue(key, (party?.money?.[key] || 0) as any);
-            return;
-        }
-
-        const currentValue = party?.money?.[key] || 0;
-        const resolved = resolveCalculation(input, currentValue);
-
-        const currentFormValues = form.getValues();
-        const draftMoney = { ...currentFormValues, [key]: resolved };
-
-        // Convert all keys to numbers for toCP
-        const draftMoneyNumeric: MoneyIn = {
-            pp: Number(draftMoney.pp) || 0,
-            gp: Number(draftMoney.gp) || 0,
-            ep: Number(draftMoney.ep) || 0,
-            sp: Number(draftMoney.sp) || 0,
-            cp: Number(draftMoney.cp) || 0,
-        };
-
-        const totalCP = toCP(draftMoneyNumeric);
-
-        if (totalCP < 0) {
-            const deficit = formatCP(totalCP);
-            setError(`Not enough money present (Missing ${deficit})`);
-            setTimeout(() => setError(null), 3000);
-            form.setValue(key, currentValue as any);
-        } else {
-            const normalized = normalizeToCP(draftMoneyNumeric);
-            form.reset(normalized);
-        }
-    };
-
-    const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, key: keyof MoneyIn) => {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            onBlur(key);
-        }
-    };
 
     return (
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -135,52 +95,31 @@ const PartyMoneyContent = ({ party }: { party: PartyOut | undefined }) => {
                 </div>
             )}
             <EditGroup heading={null} alignLeft={false} alignCenter={true} onClick={() => setIsEditing(!isEditing)}>
-                <div
-                    style={{
-                        display: "flex",
-                        gap: "1.5ch",
-                        flexWrap: "wrap",
-                        alignItems: "center",
-                        padding: "8px",
-                        backgroundColor: "rgba(255, 255, 255, 0.03)",
-                        borderRadius: "8px",
-                    }}
-                >
-                    {currencies.map((currency) => (
-                        <div key={currency.key} style={{ display: "flex", alignItems: "center", gap: "0.5ch" }}>
-                            {isEditing ? (
-                                <input
-                                    type="text"
-                                    {...form.register(currency.key)}
-                                    onBlur={() => onBlur(currency.key)}
-                                    onKeyDown={(e) => onKeyDown(e, currency.key)}
-                                    className={styles.costItem + " " + currency.key}
-                                    style={{
-                                        width: "7ch",
-                                        background: "rgba(0, 0, 0, 0.2)",
-                                        border: "1px solid rgba(255, 255, 255, 0.1)",
-                                        borderRadius: "4px",
-                                        color: "inherit",
-                                        padding: "4px 6px",
-                                        fontSize: "0.9rem",
-                                    }}
-                                />
-                            ) : (
+                <div className={moneyStyles.moneyContainer}>
+                    {isEditing ? (
+                        <MoneyEditInputs
+                            form={form}
+                            originalMoney={party?.money ?? { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 }}
+                            onError={setError}
+                        />
+                    ) : (
+                        currenciesDisplay.map((currency) => (
+                            <div key={currency.key} className={moneyStyles.moneyItem}>
                                 <span
                                     className={styles.costItem + " " + currency.key}
                                     style={{ fontWeight: "bold", fontSize: "1rem" }}
                                 >
                                     {form.getValues(currency.key) || 0}
                                 </span>
-                            )}
-                            <span
-                                className={styles.costItem + " " + styles[currency.key]}
-                                style={{ fontSize: "0.8rem", opacity: 0.8, textTransform: "uppercase" }}
-                            >
-                                {currency.label}
-                            </span>
-                        </div>
-                    ))}
+                                <span
+                                    className={styles.costItem + " " + styles[currency.key]}
+                                    style={{ fontSize: "0.8rem", opacity: 0.8, textTransform: "uppercase" }}
+                                >
+                                    {currency.label}
+                                </span>
+                            </div>
+                        ))
+                    )}
                     {isEditing && (
                         <div style={{ marginLeft: "auto" }}>
                             <SubmitButton form={form} pending={updateMoney.isPending} />
