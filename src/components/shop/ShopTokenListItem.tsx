@@ -7,6 +7,7 @@ import { shopMetadataKey } from "../../helper/variables.ts";
 import { updateShopMetadata } from "../../helper/tokenHelper.ts";
 import shopStyles from "./shop.module.scss";
 import { updateItems } from "../../helper/obrHelper.ts";
+import { getTokenName } from "../../helper/helpers.ts";
 
 interface ShopTokenListItemProps {
     token: Item;
@@ -30,7 +31,7 @@ export const ShopTokenListItem = ({ token, matchedItems, onClick }: ShopTokenLis
                 <img src={(token as Image).image.url} alt="" style={{ width: 32, height: 32, objectFit: "contain" }} />
             )}
             <Box sx={{ flexGrow: 1 }}>
-                <Typography variant="body1">{token.name}</Typography>
+                <Typography variant="body1">{getTokenName(token)}</Typography>
                 {hasShop && (
                     <Box sx={{ display: "flex", gap: 1, alignItems: "center", opacity: 0.7 }}>
                         <Typography variant="caption">{itemCount} items</Typography>

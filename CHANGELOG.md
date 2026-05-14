@@ -1,4 +1,4 @@
-## Unversioned
+# 3.7.2
 
 * Fix issues where party wouldn't update metadata when dropping tokens into the scene
 * Fix issue with unauthenticated party syncing

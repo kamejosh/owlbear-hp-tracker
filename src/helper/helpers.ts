@@ -853,13 +853,15 @@ export const updateLimit = async (itemId: string, limitValues: Limit, usage?: nu
     }
 };
 
-export const getTokenName = (token: Image) => {
+export const getTokenName = (token: Item) => {
     try {
-        if (token.text && token.text.plainText && token.text.plainText.replaceAll(" ", "").length > 0) {
-            return token.text.plainText;
-        } else {
-            return token.name;
+        if (token.type === "IMAGE") {
+            const image = token as Image;
+            if (image.text && image.text.plainText && image.text.plainText.replaceAll(" ", "").length > 0) {
+                return image.text.plainText;
+            }
         }
+        return token.name;
     } catch {
         return "";
     }

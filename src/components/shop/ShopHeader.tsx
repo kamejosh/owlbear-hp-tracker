@@ -4,6 +4,7 @@ import shopStyles from "./shop.module.scss";
 import Tippy from "@tippyjs/react";
 import { CloseSvg } from "../svgs/CloseSvg.tsx";
 import { updateShopMetadata } from "../../helper/tokenHelper.ts";
+import { getTokenName } from "../../helper/helpers.ts";
 
 export const ShopHeader = ({ showStatus = false, showClose = true }: { showStatus?: boolean; showClose?: boolean }) => {
     const data = useShopTokenContext((state) => state.data);
@@ -26,7 +27,7 @@ export const ShopHeader = ({ showStatus = false, showClose = true }: { showStatu
                     <img src={(token as Image).image.url} alt={token.name} className={shopStyles.tokenImage} />
                 ) : null}
             </div>
-            <h2 className={shopStyles.tokenName}>Shop: {token.name}</h2>
+            <h2 className={shopStyles.tokenName}>Shop: {getTokenName(token)}</h2>
             {showStatus && data && (
                 <Tippy content={data.shopAvailable ? "Shop is enabled for players" : "Shop is disabled for players"}>
                     <button

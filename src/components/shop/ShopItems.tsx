@@ -546,16 +546,18 @@ export const ShopItems = ({
 }) => {
     return (
         <div className={shopStyles.itemsList}>
-            {items.map((item) => (
-                <ShopItem
-                    key={item.id}
-                    item={item}
-                    token={token}
-                    data={data}
-                    readOnly={readOnly}
-                    onAddToCart={onAddToCart}
-                />
-            ))}
+            {items
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((item) => (
+                    <ShopItem
+                        key={item.id}
+                        item={item}
+                        token={token}
+                        data={data}
+                        readOnly={readOnly}
+                        onAddToCart={onAddToCart}
+                    />
+                ))}
         </div>
     );
 };
