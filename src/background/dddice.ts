@@ -70,49 +70,52 @@ const initDiceRoller = async (room: RoomMetadata, updateApi: boolean) => {
 const roomCallback = async (metadata: Metadata, forceLogin: boolean) => {
     await lock.promise;
     lock.enable();
-    const roomData = metadataKey in metadata ? (metadata[metadataKey] as RoomMetadata) : null;
-    const dddiceInUse = roomData?.diceRoller === DICE_ROLLER.DDDICE;
-    let initialized: boolean = false;
-    let reInitialize: boolean = diceRollerState.diceRoller !== roomData?.diceRoller;
-    reInitialize =
-        reInitialize ||
-        diceRollerState.diceUser?.diceRendering !== getRoomDiceUser(roomData, OBR.player.id)?.diceRendering;
-    diceRollerState.diceRoller = roomData?.diceRoller === undefined ? DICE_ROLLER.DDDICE : roomData.diceRoller;
+    try {
+        const roomData = metadataKey in metadata ? (metadata[metadataKey] as RoomMetadata) : null;
+        const dddiceInUse = roomData?.diceRoller === DICE_ROLLER.DDDICE;
+        let initialized: boolean = false;
+        let reInitialize: boolean = diceRollerState.diceRoller !== roomData?.diceRoller;
+        reInitialize =
+            reInitialize ||
+            diceRollerState.diceUser?.diceRendering !== getRoomDiceUser(roomData, OBR.player.id)?.diceRendering;
+        diceRollerState.diceRoller = roomData?.diceRoller === undefined ? DICE_ROLLER.DDDICE : roomData.diceRoller;
 
-    if (roomData && (dddiceInUse || reInitialize)) {
-        const newDiceUser = getRoomDiceUser(roomData, OBR.player.id);
-        if (newDiceUser) {
-            const newApiKey = newDiceUser.apiKey;
-            const diceRendering = newDiceUser.diceRendering;
+        if (roomData && (dddiceInUse || reInitialize)) {
+            const newDiceUser = getRoomDiceUser(roomData, OBR.player.id);
+            if (newDiceUser) {
+                const newApiKey = newDiceUser.apiKey;
+                const diceRendering = newDiceUser.diceRendering;
 
-            if (diceRollerState.diceUser) {
-                if (
-                    (newApiKey !== undefined && newApiKey !== diceRollerState.diceUser.apiKey) ||
-                    diceRendering !== diceRollerState.diceUser.diceRendering
-                ) {
-                    await initDiceRoller(roomData, forceLogin || newApiKey !== diceRollerState.diceUser.apiKey);
+                if (diceRollerState.diceUser) {
+                    if (
+                        (newApiKey !== undefined && newApiKey !== diceRollerState.diceUser.apiKey) ||
+                        diceRendering !== diceRollerState.diceUser.diceRendering
+                    ) {
+                        await initDiceRoller(roomData, forceLogin || newApiKey !== diceRollerState.diceUser.apiKey);
+                        diceRollerState.diceUser = newDiceUser;
+                        initialized = true;
+                    }
+                } else {
                     diceRollerState.diceUser = newDiceUser;
+                    await initDiceRoller(roomData, forceLogin || true);
                     initialized = true;
                 }
-            } else {
-                diceRollerState.diceUser = newDiceUser;
-                await initDiceRoller(roomData, forceLogin || true);
-                initialized = true;
+            }
+            if (reInitialize || !initialized) {
+                await initDiceRoller(roomData, forceLogin);
+            }
+
+            diceRollerState.diceRoom = roomData.diceRoom?.slug;
+        } else if (diceRollerState.diceRoom !== roomData?.diceRoom?.slug) {
+            const api = diceRollerStore.getState().rollerApi;
+            if (api && roomData?.diceRoom?.slug) {
+                diceRollerState.diceRoom = roomData.diceRoom.slug;
+                await connectToDddiceRoom(api, roomData);
             }
         }
-        if (reInitialize || !initialized) {
-            await initDiceRoller(roomData, forceLogin);
-        }
-
-        diceRollerState.diceRoom = roomData.diceRoom?.slug;
-    } else if (diceRollerState.diceRoom !== roomData?.diceRoom?.slug) {
-        const api = diceRollerStore.getState().rollerApi;
-        if (api && roomData?.diceRoom?.slug) {
-            diceRollerState.diceRoom = roomData.diceRoom.slug;
-            await connectToDddiceRoom(api, roomData);
-        }
+    } finally {
+        lock.disable(null);
     }
-    lock.disable(null);
 };
 
 export const setupDddice = async () => {
