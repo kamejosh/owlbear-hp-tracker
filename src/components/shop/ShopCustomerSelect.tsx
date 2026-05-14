@@ -23,8 +23,8 @@ export const ShopCustomerSelect = ({
     if (members.length === 0) {
         return (
             <p className={shopStyles.noMemberWarning}>
-                You currently have no party member assigned, ask your GM to assign you a party member to buy items
-                from this shops and add them to your inventory directly.
+                You currently have no party member assigned, ask your GM to assign you a party member to buy items from
+                this shops and add them to your inventory directly.
             </p>
         );
     }
@@ -62,20 +62,6 @@ export const ShopCustomerSelect = ({
                                     },
                                     "& .MuiSvgIcon-root": {
                                         color: "white",
-                                    },
-                                }}
-                                slotProps={{
-                                    paper: {
-                                        sx: {
-                                            backgroundColor: "#2b2a33",
-                                            color: "white",
-                                            "& .MuiMenuItem-root:hover": {
-                                                backgroundColor: "rgba(255, 255, 255, 0.1)",
-                                            },
-                                            "& .Mui-selected": {
-                                                backgroundColor: "rgba(68, 136, 68, 0.4) !important",
-                                            },
-                                        },
                                     },
                                 }}
                             >

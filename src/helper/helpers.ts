@@ -7,6 +7,7 @@ import {
     InitialStatblockData,
     Limit,
     LootMetadata,
+    Money,
     RoomMetadata,
     SceneMetadata,
 } from "./types.ts";
@@ -30,7 +31,6 @@ import { abilityShareRoute } from "../background/api.ts";
 import { replaceStatWithMod } from "./limitHelpers.ts";
 import { Stats } from "../components/general/DiceRoller/DiceButtonWrapper.tsx";
 import { partyStore } from "../context/PartyStore.tsx";
-import { Money } from "../components/party/PlayerParty.tsx";
 
 export const getYOffset = async (height: number) => {
     const metadata = (await OBR.room.getMetadata()) as Metadata;
