@@ -22,7 +22,6 @@ import { DicePlusRollResultData } from "../../../background/diceplus.ts";
 import { replaceStatWithMod } from "../../../helper/limitHelpers.ts";
 import { Skills } from "../../../helper/equipmentHelpers.ts";
 
-
 type DiceButtonProps = {
     dice: string;
     text: string;
@@ -352,6 +351,7 @@ export const DiceButtonWrapper = ({
     text,
     context,
     statblock,
+    skills,
     stats,
     onRoll,
     limitReached,
@@ -390,6 +390,7 @@ export const DiceButtonWrapper = ({
                                         dice={dice}
                                         text={props.children?.toString() || ""}
                                         context={context}
+                                        skills={skills}
                                         stats={stats}
                                         statblock={statblock}
                                         onRoll={onRoll}
