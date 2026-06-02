@@ -94,7 +94,7 @@ export const replaceStatWithMod = (
         if (text.includes("NAT")) {
             text = text.replace("NAT", (skills.nature ?? 0).toString());
         }
-        if (text.includes("PER")) {
+        if (text.includes("PRC")) {
             text = text.replace("PRC", (skills.perception ?? 0).toString());
         }
         if (text.includes("PRF")) {
