@@ -587,7 +587,7 @@ OBR.onReady(async () => {
         // render hosting warning
         if (HOSTING_NOTIFICATION) {
             await OBR.notification.show(
-                "You are using an old url for GMG - it will be removed in August. Please remove the extension and install it directly from the OBR Extension store. Your data will be preserved.",
+                "You are using an old url for GMG - it will be removed in August. Please remove the extension and install it directly from the OBR Extension store. Localstorage data (quick roll buttons, roll log, current party) will not be preserved.",
                 "WARNING",
             );
         }

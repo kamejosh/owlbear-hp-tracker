@@ -334,6 +334,10 @@ const wrapDiceWithBackticks = (input: string): string => {
     // This also captures fenced blocks ```...``` so we don't touch them.
     const splitRe = /(```[\s\S]*?```|`[^`]*`)/g;
 
+    if (input === null) {
+        return "";
+    }
+
     return input
         .split(splitRe)
         .map((part) => {
