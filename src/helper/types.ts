@@ -206,4 +206,4 @@ export type Stats = {
     charisma: number;
 };
 
-export type Ability = components["schemas"]["src__model_types__e5__base__Action"];
+export type Ability = components["schemas"]["Action-Output"];

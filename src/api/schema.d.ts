@@ -1060,6 +1060,24 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** Action */
+        "Action-Output": {
+            /** Name */
+            name: string;
+            /** Desc */
+            desc: string;
+            /** Attack Bonus */
+            attack_bonus?: number | null;
+            /** Stat Bonus */
+            stat_bonus?: ("STR" | "DEX" | "CON" | "INT" | "WIS" | "CHA")[] | null;
+            /** Use Proficiency */
+            use_proficiency?: boolean | null;
+            /** Needs Proficiency */
+            needs_proficiency?: boolean | null;
+            /** Damage Dice */
+            damage_dice?: string | null;
+            limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
+        };
         /** ActionOut */
         ActionOut: {
             /** Name */
@@ -1099,6 +1117,13 @@ export interface components {
          * @enum {string}
          */
         ActionTypeEnumOut: "FREE" | "ONE" | "TWO" | "THREE";
+        /** ArmorClass */
+        ArmorClass: {
+            /** Value */
+            value: number;
+            /** Special */
+            special?: string | null;
+        };
         /** Bloodline */
         Bloodline: {
             /** Name */
@@ -1262,7 +1287,7 @@ export interface components {
             group?: string | null;
             /** Alignment */
             alignment?: string | null;
-            armor_class: components["schemas"]["src__model_types__e5__base__ArmorClass"];
+            armor_class: components["schemas"]["ArmorClass"];
             hp: components["schemas"]["src__model_types__e5__base__Hitpoints"];
             speed: components["schemas"]["Speed"];
             stats: components["schemas"]["src__model_types__e5__base__Stats"];
@@ -1317,7 +1342,7 @@ export interface components {
             /** Spell Attack */
             spell_attack?: string | null;
             /** Limits */
-            limits?: components["schemas"]["src__model_types__base__LimitedUse"][] | null;
+            limits?: components["schemas"]["LimitedUse-Input"][] | null;
             /** Source */
             source?: string | null;
             money?: components["schemas"]["MoneyIn"] | null;
@@ -1340,7 +1365,7 @@ export interface components {
             group?: string | null;
             /** Alignment */
             alignment?: string | null;
-            armor_class: components["schemas"]["src__model_types__e5__base__ArmorClass"];
+            armor_class: components["schemas"]["ArmorClass"];
             hp: components["schemas"]["src__model_types__e5__base__Hitpoints"];
             speed: components["schemas"]["Speed"];
             stats: components["schemas"]["src__model_types__e5__base__Stats"];
@@ -1371,21 +1396,21 @@ export interface components {
             /** Cr */
             cr?: number | null;
             /** Actions */
-            actions?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
+            actions?: components["schemas"]["Action-Output"][] | null;
             /** Bonus Actions */
-            bonus_actions?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
+            bonus_actions?: components["schemas"]["Action-Output"][] | null;
             /** Lair Actions */
-            lair_actions?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
+            lair_actions?: components["schemas"]["Action-Output"][] | null;
             /** Mythic Actions */
-            mythic_actions?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
+            mythic_actions?: components["schemas"]["Action-Output"][] | null;
             /** Reactions */
-            reactions?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
+            reactions?: components["schemas"]["Action-Output"][] | null;
             /** Legendary Desc */
             legendary_desc?: string | null;
             /** Legendary Actions */
-            legendary_actions?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
+            legendary_actions?: components["schemas"]["Action-Output"][] | null;
             /** Special Abilities */
-            special_abilities?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
+            special_abilities?: components["schemas"]["Action-Output"][] | null;
             /** Spell Slots */
             spell_slots?: components["schemas"]["SpellSlots-Output"][] | null;
             /** Spells */
@@ -1571,13 +1596,13 @@ export interface components {
             /** Proficiency */
             proficiency?: string[] | null;
             /** Actions */
-            actions?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
+            actions?: components["schemas"]["Action-Output"][] | null;
             /** Bonus Actions */
-            bonus_actions?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
+            bonus_actions?: components["schemas"]["Action-Output"][] | null;
             /** Reactions */
-            reactions?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
+            reactions?: components["schemas"]["Action-Output"][] | null;
             /** Special Abilities */
-            special_abilities?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
+            special_abilities?: components["schemas"]["Action-Output"][] | null;
             stats?: components["schemas"]["src__model_types__e5__base__Stats"] | null;
             speed?: components["schemas"]["Speed"] | null;
             saving_throws?: components["schemas"]["src__model_types__e5__base__SavingThrows"] | null;
@@ -1612,7 +1637,7 @@ export interface components {
             range?: string | null;
             /** Spells */
             spells?: components["schemas"]["ItemSpellIn"][] | null;
-            charges?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
+            charges?: components["schemas"]["LimitedUse-Input"] | null;
             stats?: components["schemas"]["ItemStatsIn"] | null;
             bonus?: components["schemas"]["ItemBonusIn"] | null;
             modifiers?: components["schemas"]["ItemModifiersIn"] | null;
@@ -1698,7 +1723,7 @@ export interface components {
         };
         /** ItemStatsIn */
         ItemStatsIn: {
-            armor_class?: components["schemas"]["src__model_types__e5__base__ArmorClass"] | null;
+            armor_class?: components["schemas"]["ArmorClass"] | null;
             hp?: components["schemas"]["src__model_types__e5__base__Hitpoints"] | null;
             /** Senses */
             senses?: string[] | null;
@@ -1723,20 +1748,20 @@ export interface components {
         };
         /** ItemStatsOut */
         ItemStatsOut: {
-            armor_class?: components["schemas"]["src__model_types__e5__base__ArmorClass"] | null;
+            armor_class?: components["schemas"]["ArmorClass"] | null;
             hp?: components["schemas"]["src__model_types__e5__base__Hitpoints"] | null;
             /** Senses */
             senses?: string[] | null;
             /** Languages */
             languages?: string[] | null;
             /** Actions */
-            actions?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
+            actions?: components["schemas"]["Action-Output"][] | null;
             /** Bonus Actions */
-            bonus_actions?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
+            bonus_actions?: components["schemas"]["Action-Output"][] | null;
             /** Reactions */
-            reactions?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
+            reactions?: components["schemas"]["Action-Output"][] | null;
             /** Special Abilities */
-            special_abilities?: components["schemas"]["src__model_types__e5__base__Action"][] | null;
+            special_abilities?: components["schemas"]["Action-Output"][] | null;
             /** Spell Dc */
             spell_dc?: string | null;
             /** Spell Attack */
@@ -1747,6 +1772,19 @@ export interface components {
             skills?: components["schemas"]["Skills"] | null;
             /** Id */
             id: number;
+        };
+        /** LimitedUse */
+        "LimitedUse-Input": {
+            /** Name */
+            name: string;
+            /** Description */
+            description?: string | null;
+            /** Uses */
+            uses: number;
+            /** Resets */
+            resets?: string[];
+            /** Formula */
+            formula?: string | null;
         };
         /** LoggedIn */
         LoggedIn: {
@@ -1859,7 +1897,7 @@ export interface components {
             stats: components["schemas"]["src__model_types__pf__statblock__Stats"];
             /** Items */
             items?: string[] | null;
-            armor_class: components["schemas"]["src__model_types__e5__base__ArmorClass"];
+            armor_class: components["schemas"]["ArmorClass"];
             saving_throws: components["schemas"]["src__model_types__pf__statblock__SavingThrows"];
             hp: components["schemas"]["src__model_types__pf__statblock__Hitpoints"];
             /** Immunities */
@@ -1879,7 +1917,7 @@ export interface components {
             /** About */
             about?: string | null;
             /** Limits */
-            limits?: components["schemas"]["src__model_types__base__LimitedUse"][] | null;
+            limits?: components["schemas"]["LimitedUse-Input"][] | null;
             /** Special Abilities */
             special_abilities?: components["schemas"]["SpecialAbility-Input"][] | null;
         };
@@ -1904,7 +1942,7 @@ export interface components {
             stats: components["schemas"]["src__model_types__pf__statblock__Stats"];
             /** Items */
             items?: string[] | null;
-            armor_class: components["schemas"]["src__model_types__e5__base__ArmorClass"];
+            armor_class: components["schemas"]["ArmorClass"];
             saving_throws: components["schemas"]["src__model_types__pf__statblock__SavingThrows"];
             hp: components["schemas"]["src__model_types__pf__statblock__Hitpoints"];
             /** Immunities */
@@ -2226,7 +2264,7 @@ export interface components {
             failure?: string | null;
             /** Critical Failure */
             critical_failure?: string | null;
-            limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
+            limit?: components["schemas"]["LimitedUse-Input"] | null;
         };
         /** Reaction */
         "Reaction-Output": {
@@ -2292,7 +2330,7 @@ export interface components {
         /** ShopRequest */
         ShopRequest: {
             /** Shop Type */
-            shop_type?: ("blacksmith" | "alchemist" | "magic" | "general") | null;
+            shop_type?: ("blacksmith" | "alchemist" | "magic" | "general" | "") | null;
             /** Avg Party Level */
             avg_party_level?: number | null;
             /** Item Types */
@@ -2402,7 +2440,7 @@ export interface components {
             name: string;
             /** Description */
             description: string;
-            limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
+            limit?: components["schemas"]["LimitedUse-Input"] | null;
         };
         /** SpecialAbility */
         "SpecialAbility-Output": {
@@ -2529,7 +2567,7 @@ export interface components {
         "SpellSlots-Input": {
             /** Level */
             level: number;
-            limit: components["schemas"]["src__model_types__base__LimitedUse"];
+            limit: components["schemas"]["LimitedUse-Input"];
         };
         /** SpellSlots */
         "SpellSlots-Output": {
@@ -2601,7 +2639,7 @@ export interface components {
             level: string;
             /** Spells */
             spells: components["schemas"]["SpellInfo"][];
-            limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
+            limit?: components["schemas"]["LimitedUse-Input"] | null;
         };
         /** SpelllistOut */
         SpelllistOut: {
@@ -2889,6 +2927,10 @@ export interface components {
             msg: string;
             /** Error Type */
             type: string;
+            /** Input */
+            input?: unknown;
+            /** Context */
+            ctx?: Record<string, never>;
         };
         /**
          * e5_Action
@@ -3686,6 +3728,8 @@ export interface components {
             version: string;
             /** Active */
             active?: boolean | null;
+            /** Last Sync */
+            last_sync?: unknown | null;
             user?: components["schemas"]["User"] | null;
             /** Userid */
             userId?: string | null;
@@ -3878,6 +3922,8 @@ export interface components {
             reflex: number;
             /** Will */
             will: number;
+            /** Recall Knowledge */
+            recall_knowledge?: number | null;
             /** Special */
             special?: string | null;
             /** Pf Statblock */
@@ -4373,24 +4419,6 @@ export interface components {
             formula?: string | null;
         };
         /** Action */
-        src__model_types__e5__base__Action: {
-            /** Name */
-            name: string;
-            /** Desc */
-            desc: string;
-            /** Attack Bonus */
-            attack_bonus?: number | null;
-            /** Stat Bonus */
-            stat_bonus?: ("STR" | "DEX" | "CON" | "INT" | "WIS" | "CHA")[] | null;
-            /** Use Proficiency */
-            use_proficiency?: boolean | null;
-            /** Needs Proficiency */
-            needs_proficiency?: boolean | null;
-            /** Damage Dice */
-            damage_dice?: string | null;
-            limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
-        };
-        /** Action */
         "src__model_types__e5__base__Action-Input": {
             /** Name */
             name: string;
@@ -4406,14 +4434,7 @@ export interface components {
             needs_proficiency?: boolean | null;
             /** Damage Dice */
             damage_dice?: string | null;
-            limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
-        };
-        /** ArmorClass */
-        src__model_types__e5__base__ArmorClass: {
-            /** Value */
-            value: number;
-            /** Special */
-            special?: string | null;
+            limit?: components["schemas"]["LimitedUse-Input"] | null;
         };
         /** Hitpoints */
         src__model_types__e5__base__Hitpoints: {
@@ -4666,7 +4687,7 @@ export interface components {
             critical_failure?: string | null;
             /** Constant */
             constant?: string | null;
-            limit?: components["schemas"]["src__model_types__base__LimitedUse"] | null;
+            limit?: components["schemas"]["LimitedUse-Input"] | null;
         };
         /** Hitpoints */
         src__model_types__pf__statblock__Hitpoints: {
@@ -4683,6 +4704,8 @@ export interface components {
             reflex: number;
             /** Will */
             will: number;
+            /** Recall Knowledge */
+            recall_knowledge?: number | null;
             /** Special */
             special?: string | null;
         };

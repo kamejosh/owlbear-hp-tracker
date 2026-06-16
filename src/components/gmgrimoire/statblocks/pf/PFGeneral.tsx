@@ -7,7 +7,7 @@ import { usePFStatblockContext } from "../../../../context/PFStatblockContext.ts
 import { PFAbout } from "../About.tsx";
 
 const statList = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
-const saveList = ["reflex", "will", "fortitude"];
+const saveList = ["reflex", "will", "fortitude", "recall_knowledge"];
 
 export const PFGeneral = () => {
     const { statblock, stats, tokenName, item } = usePFStatblockContext();
@@ -56,24 +56,33 @@ export const PFGeneral = () => {
                     <div>Save</div>
                 </li>
                 {saveList.map((name) => {
-                    // @ts-ignore name is always in stats
-                    const saveValue = statblock.saving_throws[name];
-                    return (
-                        <li className={styles.stat} key={name}>
-                            <div className={styles.name}>
-                                <span>{name.substring(0, 3)}</span>
-                            </div>
-                            <div className={styles.value}>
-                                <DiceButton
-                                    dice={`d20+${saveValue}`}
-                                    text={`+${saveValue}`}
-                                    stats={stats}
-                                    context={`${capitalize(name)}: Save`}
-                                    statblock={tokenName}
-                                />
-                            </div>
-                        </li>
-                    );
+                    try {
+                        // @ts-ignore name is always in stats
+                        const saveValue = statblock.saving_throws[name];
+                        console.log(name, saveValue);
+                        if (saveValue !== null && saveValue !== undefined) {
+                            return (
+                                <li className={styles.stat} key={name}>
+                                    <div className={styles.name}>
+                                        <span>{name.replace("_", " ")}</span>
+                                    </div>
+                                    <div className={styles.value}>
+                                        <DiceButton
+                                            dice={`d20+${saveValue}`}
+                                            text={`+${saveValue}`}
+                                            stats={stats}
+                                            context={`${capitalize(name.replace("_", " "))}: Save`}
+                                            statblock={tokenName}
+                                        />
+                                    </div>
+                                </li>
+                            );
+                        } else {
+                            return null;
+                        }
+                    } catch {
+                        return null;
+                    }
                 })}
             </ul>
             {statblock.saving_throws.special ? <i>{statblock.saving_throws.special}</i> : null}

@@ -7,7 +7,7 @@ import { Action, Reaction, SpecialAbility } from "../components/gmgrimoire/statb
 import { PfSpellOut } from "../components/gmgrimoire/statblocks/pf/PfSpells.tsx";
 import { Stats } from "../helper/types.ts";
 
-export type E5Ability = components["schemas"]["src__model_types__e5__base__Action"];
+export type E5Ability = components["schemas"]["Action-Output"];
 export type E5Spell = components["schemas"]["src__model_types__e5__spell__Spell"];
 
 export type AbilityShareEntry = {
