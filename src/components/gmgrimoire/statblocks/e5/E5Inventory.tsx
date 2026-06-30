@@ -14,9 +14,14 @@ import { useInventoryFilterContext } from "../../../../context/InventoryFilter.t
 import { E5ItemFilter } from "./E5ItemFilter.tsx";
 import { usePartyStore } from "../../../../context/PartyStore.tsx";
 import { useUpdatePartyStatblockEquipment } from "../../../../api/tabletop-almanac/useParty.ts";
+import { useMetadataContext } from "../../../../context/MetadataContext.ts";
 export const E5Item = ({ equipment }: { equipment: StatblockItems }) => {
     const { statblock, stats, data, item } = useE5StatblockContext();
-    const currentParty = usePartyStore((state) => state.currentParty);
+    const activePartyId = useMetadataContext((state) => state.room?.partyId);
+    const currentParty = usePartyStore((state) => {
+        if (!activePartyId) return null;
+        return state.parties.find((p) => p.id === activePartyId) ?? null;
+    });
     const member = currentParty?.members.find((m) => m.statblock?.slug === statblock.slug);
     const updateStatblockEquipment = useUpdatePartyStatblockEquipment(
         currentParty?.id ?? 0,

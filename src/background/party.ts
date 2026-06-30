@@ -4,7 +4,7 @@ import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
 import { PartyStoreStatblock } from "../context/PartyStore.tsx";
 import { itemMetadataKey, metadataKey } from "../helper/variables.ts";
 import { GMGMetadata, RoomMetadata, SceneMetadata } from "../helper/types.ts";
-import { updateSceneMetadata } from "../helper/helpers.ts";
+import { getCurrentParty, getPartyId, updateSceneMetadata } from "../helper/helpers.ts";
 import { partyStore } from "../context/PartyStore.tsx";
 import { listParties } from "../api/tabletop-almanac/useParty.ts";
 import { updateHp } from "../helper/hpHelpers.ts";
@@ -87,7 +87,8 @@ export const stopPartyPolling = () => {
 };
 
 const initPlayerPartyMembers = async (items: Array<Item>) => {
-    const currentParty = partyStore.getState().currentParty;
+    const partyId = await getPartyId();
+    const currentParty = await getCurrentParty();
     const partyStatblocks = currentParty?.members.map((member) => member.statblock?.slug) || [];
     const membersToUpdate: PartyStoreStatblock[] = [];
     items.forEach((item) => {
@@ -119,8 +120,8 @@ const initPlayerPartyMembers = async (items: Array<Item>) => {
         }
     });
 
-    if (membersToUpdate.length > 0) {
-        partyStore.getState().updateMembers(membersToUpdate);
+    if (membersToUpdate.length > 0 && partyId) {
+        partyStore.getState().updateMembers(partyId, membersToUpdate);
     }
 };
 
@@ -132,9 +133,6 @@ export const initPlayerParty = async () => {
         if (apiKey) {
             try {
                 await startPartyPolling({ limit: 100, offset: 0 });
-                if (roomMetadata.partyId) {
-                    partyStore.getState().setCurrentParty(roomMetadata.partyId);
-                }
             } catch (e) {
                 console.error("GM's Grimoire - Error while fetching parties", e);
             }
@@ -147,10 +145,6 @@ export const initPlayerParty = async () => {
     OBR.room.onMetadataChange((metadata) => {
         const gmgMetadata = metadata[metadataKey] as RoomMetadata;
         if (gmgMetadata) {
-            if (gmgMetadata.partyId !== partyStore.getState().currentPartyId) {
-                partyStore.getState().setCurrentParty(gmgMetadata.partyId);
-            }
-
             const apiKey = gmgMetadata.tabletopAlmanacAPIKey;
             if (apiKey && apiKey !== failedToken && !pollingTimeout) {
                 void startPartyPolling({ limit: 100, offset: 0 });
@@ -166,48 +160,32 @@ export const initPlayerParty = async () => {
 export const initParty = async () => {
     await startPartyPolling({ limit: 100, offset: 0 });
     // subscribe to party changes
-    OBR.room.onMetadataChange((metadata) => {
+    OBR.room.onMetadataChange(async (metadata) => {
         const gmgMetadata = metadata[metadataKey] as RoomMetadata;
         if (gmgMetadata) {
-            if (gmgMetadata.partyId !== partyStore.getState().currentPartyId) {
-                partyStore.getState().setCurrentParty(gmgMetadata.partyId);
-            }
-
             const apiKey = gmgMetadata.tabletopAlmanacAPIKey;
             if (apiKey && apiKey !== failedToken && !pollingTimeout) {
                 void startPartyPolling({ limit: 100, offset: 0 });
             }
-        }
-    });
-
-    partyStore.subscribe(
-        (state) => state.currentParty,
-        async (currentParty) => {
-            if (await OBR.scene.isReady()) {
+            if (gmgMetadata.partyId) {
                 const sceneMetadata = await OBR.scene.getMetadata();
-                const roomMetadata = await OBR.room.getMetadata();
-                if (metadataKey in sceneMetadata && metadataKey in roomMetadata) {
+                if (metadataKey in sceneMetadata) {
+                    const currentParty = await getCurrentParty();
                     const gmgScene = sceneMetadata[metadataKey] as SceneMetadata;
-                    const gmgRoom = roomMetadata[metadataKey] as RoomMetadata;
-                    if (
-                        currentParty &&
-                        gmgRoom.partyId === currentParty.id &&
-                        gmgScene.groups &&
-                        currentParty.group &&
-                        !gmgScene.groups.includes(currentParty.group)
-                    ) {
-                        await updateSceneMetadata(gmgScene, { groups: [...gmgScene.groups, currentParty.group] });
+                    const sceneGroups = gmgScene.groups ?? [];
+                    if (currentParty && !sceneGroups.includes(currentParty.group)) {
+                        await updateSceneMetadata(gmgScene, { groups: [...sceneGroups, currentParty.group] });
                     }
                 }
             }
-        },
-        { fireImmediately: true },
-    );
+        }
+    });
 
     // subscribe to token changes
     OBR.scene.items.onChange(async (items) => {
         const newTokens: Array<Item> = [];
-        const currentParty = partyStore.getState().currentParty;
+        const partyId = await getPartyId();
+        const currentParty = await getCurrentParty();
         const partyStatblocks = currentParty?.members.map((member) => member.statblock?.slug) || [];
         const membersToUpdate: PartyStoreStatblock[] = [];
 
@@ -265,8 +243,8 @@ export const initParty = async () => {
             }
         });
 
-        if (membersToUpdate.length > 0) {
-            partyStore.getState().updateMembers(membersToUpdate);
+        if (membersToUpdate.length > 0 && partyId) {
+            partyStore.getState().updateMembers(partyId, membersToUpdate);
         }
         if (newTokens.length > 0) {
             const newItems = await OBR.scene.items.getItems(newTokens.map((t) => t.id));

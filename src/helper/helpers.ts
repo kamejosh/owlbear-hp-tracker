@@ -868,7 +868,7 @@ export const getTokenName = (token: Item) => {
 };
 
 export const prepareTokenForGrimoire = async (contextItems: Array<Image>) => {
-    const currentParty = partyStore.getState().currentParty;
+    const currentParty = await getCurrentParty();
     const members = currentParty?.members ?? [];
     const tokenIds: Array<string> = [];
     const settings = await getTASettings();
@@ -991,4 +991,14 @@ export const getItemMetadata = (item: Image) => {
     } else {
         return undefined;
     }
+};
+
+export const getPartyId = async () => {
+    const roomMetadata = await OBR.room.getMetadata();
+    return metadataKey in roomMetadata ? (roomMetadata[metadataKey] as RoomMetadata).partyId : undefined;
+};
+
+export const getCurrentParty = async () => {
+    const partyId = await getPartyId();
+    return partyId ? partyStore.getState().parties.find((p) => p.id === partyId) : undefined;
 };

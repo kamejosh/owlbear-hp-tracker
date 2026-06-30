@@ -30,7 +30,11 @@ import { Money } from "../../helper/types.ts";
 export const LootMoneyTransfer = ({ setIsTransferring }: { setIsTransferring: (value: boolean) => void }) => {
     const apiKey = useMetadataContext((state) => state.room?.tabletopAlmanacAPIKey);
     const partyId = useMetadataContext((state) => state.room?.partyId);
-    const currentParty = usePartyStore((state) => state.currentParty);
+    const activePartyId = useMetadataContext((state) => state.room?.partyId);
+    const currentParty = usePartyStore((state) => {
+        if (!activePartyId) return null;
+        return state.parties.find((p) => p.id === activePartyId) ?? null;
+    });
     const data = useLootTokenContext((state) => state.data);
     const token = useLootTokenContext((state) => state.token);
     const playerContext = usePlayerContext();

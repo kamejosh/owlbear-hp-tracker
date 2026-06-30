@@ -6,9 +6,14 @@ import { OpenInNew } from "@mui/icons-material";
 import { Link, Tooltip } from "@mui/material";
 import styles from "./party-inventory.module.scss";
 import { PartyCollapse } from "./PartyCollapse.tsx";
+import { useMetadataContext } from "../../context/MetadataContext.ts";
 
 export const PartyLinks = () => {
-    const currentParty = usePartyStore((state) => state.currentParty);
+    const activePartyId = useMetadataContext((state) => state.room?.partyId);
+    const currentParty = usePartyStore((state) => {
+        if (!activePartyId) return null;
+        return state.parties.find((p) => p.id === activePartyId) ?? null;
+    });
 
     const [partyId, setPartyId] = useState<number | undefined>(currentParty?.id);
 

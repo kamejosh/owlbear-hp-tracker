@@ -1,5 +1,5 @@
 import { getNewHpFieldValues, HpFields, updateHpFields, updateTokenMetadata } from "../../../helper/tokenHelper.ts";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { GMGMetadata } from "../../../helper/types.ts";
 import { Image } from "@owlbear-rodeo/sdk";
 import { useMetadataContext } from "../../../context/MetadataContext.ts";
@@ -98,21 +98,44 @@ export const HP = ({ id }: { id: string }) => {
         tempHp: (data.stats.tempHp ?? 0).toString(),
         persist: true,
     });
+
+    const prevDataRef = useRef({
+        hp: data.hp,
+        maxHp: data.maxHp,
+        tempHp: data.stats.tempHp,
+    });
+
     const debouncedHpFields = useDebounce(hpFields, { wait: 500 });
 
     useEffect(() => {
-        if (
-            data.hp !== Number(hpFields.hp) ||
-            data.maxHp !== Number(hpFields.maxHp) ||
-            data.stats.tempHp !== Number(hpFields.tempHp)
-        ) {
-            setHpFields({
-                hp: data.hp.toString(),
-                maxHp: data.maxHp.toString(),
-                tempHp: (data.stats.tempHp ?? 0).toString(),
-                persist: false,
-            });
-        }
+        setHpFields((prev) => {
+            let changed = false;
+            const nextFields = { ...prev };
+
+            if (data.hp !== prevDataRef.current.hp) {
+                nextFields.hp = data.hp.toString();
+                changed = true;
+            }
+            if (data.maxHp !== prevDataRef.current.maxHp) {
+                nextFields.maxHp = data.maxHp.toString();
+                changed = true;
+            }
+            if (data.stats.tempHp !== prevDataRef.current.tempHp) {
+                nextFields.tempHp = (data.stats.tempHp ?? 0).toString();
+                changed = true;
+            }
+
+            prevDataRef.current = {
+                hp: data.hp,
+                maxHp: data.maxHp,
+                tempHp: data.stats.tempHp,
+            };
+
+            if (changed) {
+                return { ...nextFields, persist: false };
+            }
+            return prev;
+        });
     }, [data.hp, data.maxHp, data.stats.tempHp]);
 
     useEffect(() => {
@@ -129,6 +152,29 @@ export const HP = ({ id }: { id: string }) => {
         }
     }, [debouncedHpFields]);
 
+    // This helper fixes the stale data bug and removes duplicate JSX code
+    const handleFieldUpdate = (field: "hp" | "maxHp" | "tempHp", numValue?: number, stringValue?: string) => {
+        setHpFields((prev) => {
+            // Merge external 'data' with the absolute latest local typing
+            const mergedData = {
+                ...data,
+                hp: isNaN(Number(prev.hp)) ? data.hp : Number(prev.hp),
+                maxHp: isNaN(Number(prev.maxHp)) ? data.maxHp : Number(prev.maxHp),
+                stats: {
+                    ...data.stats,
+                    tempHp: isNaN(Number(prev.tempHp)) ? (data.stats.tempHp ?? 0) : Number(prev.tempHp),
+                },
+            };
+
+            const newHpFields = getNewHpFieldValues(field, mergedData, numValue, stringValue, room);
+
+            if (!isEqual(newHpFields, prev)) {
+                return { ...newHpFields, persist: true };
+            }
+            return prev;
+        });
+    };
+
     return (
         <div className={"token-hp"}>
             <HPSvg percent={(data.hp / (data.maxHp + (data.stats.tempHp ?? 0))) * 100} name={item.id} />
@@ -144,48 +190,18 @@ export const HP = ({ id }: { id: string }) => {
                         type={"text"}
                         value={hpFields.hp}
                         onChange={(e) => {
-                            setHpFields({ ...hpFields, hp: e.currentTarget.value, persist: false });
+                            // Using functional state updates here prevents dropped keystrokes
+                            const val = e.currentTarget.value;
+                            setHpFields((prev) => ({ ...prev, hp: val, persist: false }));
                         }}
-                        onBlur={(e) => {
-                            const newHpFields = getNewHpFieldValues("hp", data, undefined, e.currentTarget.value, room);
-                            if (!isEqual(newHpFields, hpFields)) {
-                                setHpFields({ ...newHpFields, persist: true });
-                            }
-                        }}
+                        onBlur={(e) => handleFieldUpdate("hp", undefined, e.currentTarget.value)}
                         onKeyDown={async (e) => {
                             if (e.key === "ArrowUp") {
-                                const newHpFields = getNewHpFieldValues(
-                                    "hp",
-                                    data,
-                                    Number(hpFields.hp) + 1,
-                                    undefined,
-                                    room,
-                                );
-                                if (!isEqual(newHpFields, hpFields)) {
-                                    setHpFields({ ...newHpFields, persist: true });
-                                }
+                                handleFieldUpdate("hp", Number(hpFields.hp) + 1);
                             } else if (e.key === "ArrowDown") {
-                                const newHpFields = getNewHpFieldValues(
-                                    "hp",
-                                    data,
-                                    Number(hpFields.hp) - 1,
-                                    undefined,
-                                    room,
-                                );
-                                if (!isEqual(newHpFields, hpFields)) {
-                                    setHpFields({ ...newHpFields, persist: true });
-                                }
+                                handleFieldUpdate("hp", Number(hpFields.hp) - 1);
                             } else if (e.key === "Enter") {
-                                const newHpFields = getNewHpFieldValues(
-                                    "hp",
-                                    data,
-                                    undefined,
-                                    e.currentTarget.value,
-                                    room,
-                                );
-                                if (!isEqual(newHpFields, hpFields)) {
-                                    setHpFields({ ...newHpFields, persist: true });
-                                }
+                                handleFieldUpdate("hp", undefined, e.currentTarget.value);
                             }
                         }}
                     />
@@ -209,56 +225,19 @@ export const HP = ({ id }: { id: string }) => {
                                 setContextEvent(e.nativeEvent);
                             }
                         }}
+                        onChange={(e) => {
+                            const val = e.currentTarget.value;
+                            setHpFields((prev) => ({ ...prev, maxHp: val, persist: false }));
+                        }}
+                        onBlur={(e) => handleFieldUpdate("maxHp", undefined, e.currentTarget.value)}
                         onKeyDown={(e) => {
                             if (e.key === "ArrowUp") {
-                                const newHpFields = getNewHpFieldValues(
-                                    "maxHp",
-                                    data,
-                                    Number(hpFields.maxHp) + 1,
-                                    undefined,
-                                    room,
-                                );
-                                if (!isEqual(newHpFields, hpFields)) {
-                                    setHpFields({ ...newHpFields, persist: true });
-                                }
+                                handleFieldUpdate("maxHp", Number(hpFields.maxHp) + 1);
                             } else if (e.key === "ArrowDown") {
-                                const newHpFields = getNewHpFieldValues(
-                                    "maxHp",
-                                    data,
-                                    Number(hpFields.maxHp) - 1,
-                                    undefined,
-                                    room,
-                                );
-                                if (!isEqual(newHpFields, hpFields)) {
-                                    setHpFields({ ...newHpFields, persist: true });
-                                }
+                                handleFieldUpdate("maxHp", Number(hpFields.maxHp) - 1);
                             } else if (e.key === "Enter") {
-                                const newHpFields = getNewHpFieldValues(
-                                    "maxHp",
-                                    data,
-                                    undefined,
-                                    e.currentTarget.value,
-                                    room,
-                                );
-                                if (!isEqual(newHpFields, hpFields)) {
-                                    setHpFields({ ...newHpFields, persist: true });
-                                }
+                                handleFieldUpdate("maxHp", undefined, e.currentTarget.value);
                             }
-                        }}
-                        onBlur={(e) => {
-                            const newHpFields = getNewHpFieldValues(
-                                "maxHp",
-                                data,
-                                undefined,
-                                e.currentTarget.value,
-                                room,
-                            );
-                            if (!isEqual(newHpFields, hpFields)) {
-                                setHpFields({ ...newHpFields, persist: true });
-                            }
-                        }}
-                        onChange={(e) => {
-                            setHpFields({ ...hpFields, maxHp: e.currentTarget.value, persist: false });
                         }}
                     />
                 </Tippy>
@@ -268,55 +247,18 @@ export const HP = ({ id }: { id: string }) => {
                     <input
                         type={"text"}
                         value={hpFields.tempHp}
+                        onChange={(e) => {
+                            const val = e.currentTarget.value;
+                            setHpFields((prev) => ({ ...prev, tempHp: val, persist: false }));
+                        }}
+                        onBlur={(e) => handleFieldUpdate("tempHp", undefined, e.currentTarget.value)}
                         onKeyDown={(e) => {
                             if (e.key === "ArrowUp") {
-                                const newHpFields = getNewHpFieldValues(
-                                    "tempHp",
-                                    data,
-                                    Number(hpFields.tempHp) + 1,
-                                    undefined,
-                                    room,
-                                );
-                                if (!isEqual(newHpFields, hpFields)) {
-                                    setHpFields({ ...newHpFields, persist: true });
-                                }
+                                handleFieldUpdate("tempHp", Number(hpFields.tempHp) + 1);
                             } else if (e.key === "ArrowDown") {
-                                const newHpFields = getNewHpFieldValues(
-                                    "tempHp",
-                                    data,
-                                    Number(hpFields.tempHp) - 1,
-                                    undefined,
-                                    room,
-                                );
-                                if (!isEqual(newHpFields, hpFields)) {
-                                    setHpFields({ ...newHpFields, persist: true });
-                                }
+                                handleFieldUpdate("tempHp", Number(hpFields.tempHp) - 1);
                             } else if (e.key === "Enter") {
-                                const newHpFields = getNewHpFieldValues(
-                                    "tempHp",
-                                    data,
-                                    undefined,
-                                    e.currentTarget.value,
-                                    room,
-                                );
-                                if (!isEqual(newHpFields, hpFields)) {
-                                    setHpFields({ ...newHpFields, persist: true });
-                                }
-                            }
-                        }}
-                        onChange={async (e) => {
-                            setHpFields({ ...hpFields, tempHp: e.currentTarget.value, persist: false });
-                        }}
-                        onBlur={(e) => {
-                            const newHpFields = getNewHpFieldValues(
-                                "tempHp",
-                                data,
-                                undefined,
-                                e.currentTarget.value,
-                                room,
-                            );
-                            if (!isEqual(newHpFields, hpFields)) {
-                                setHpFields({ ...newHpFields, persist: true });
+                                handleFieldUpdate("tempHp", undefined, e.currentTarget.value);
                             }
                         }}
                     />

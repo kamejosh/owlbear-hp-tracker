@@ -38,6 +38,7 @@ import { PartyCollapse } from "./PartyCollapse.tsx";
 import { EditPlayerPartyInventoryItem } from "./PlayerParty.tsx";
 import { PersonAddAlt1 } from "@mui/icons-material";
 import { setNullToZero } from "../../helper/moneyHelpers.ts";
+import { useMetadataContext } from "../../context/MetadataContext.ts";
 
 export const AutoCompleteItemInput = (props: { error: string; onSelect: (value: number, item: ItemOut) => void }) => {
     const [items, setItems] = useState<Array<ItemOut>>([]);
@@ -397,7 +398,11 @@ export const sortInventory = (
 };
 
 export const PartyInventoryItems = ({ inventory }: { inventory: PartyInventoryOut }) => {
-    const currentParty = usePartyStore((state) => state.currentParty);
+    const activePartyId = useMetadataContext((state) => state.room?.partyId);
+    const currentParty = usePartyStore((state) => {
+        if (!activePartyId) return null;
+        return state.parties.find((p) => p.id === activePartyId) ?? null;
+    });
     const [addItem, setAddItem] = useState<boolean>(false);
     const [sort, setSort] = useState<"name" | "rarity">("name");
 
@@ -464,7 +469,11 @@ export const PartyInventoryItems = ({ inventory }: { inventory: PartyInventoryOu
 };
 
 export const PartyInventory = () => {
-    const currentParty = usePartyStore((state) => state.currentParty);
+    const activePartyId = useMetadataContext((state) => state.room?.partyId);
+    const currentParty = usePartyStore((state) => {
+        if (!activePartyId) return null;
+        return state.parties.find((p) => p.id === activePartyId) ?? null;
+    });
 
     const [partyId, setPartyId] = useState<number | undefined>(currentParty?.id);
     const [inventoryId, setInventoryId] = useState<number | undefined>(undefined);

@@ -211,9 +211,7 @@ export const PlayerStatblockMoney = ({ statblock, party }: { statblock: E5Statbl
                         <EditPlayerStatblockMoney statblock={statblock} party={party} setEdit={setEdit} />
                     ) : (
                         <>
-                            <div
-                                className={moneyStyles.moneyContainer}
-                            >
+                            <div className={moneyStyles.moneyContainer}>
                                 <MoneyDisplay money={money} freeText="0cp" />
                             </div>
                             <Tippy content={"Edit Money"}>
@@ -404,7 +402,11 @@ export const PlayerPartyStatblockItem = ({
 };
 
 export const PlayerPartyStatblockEquipment = ({ member }: { member: PartyStoreStatblock }) => {
-    const currentParty = usePartyStore((state) => state.currentParty);
+    const activePartyId = useMetadataContext((state) => state.room?.partyId);
+    const currentParty = usePartyStore((state) => {
+        if (!activePartyId) return null;
+        return state.parties.find((p) => p.id === activePartyId) ?? null;
+    });
     const apiKey = useMetadataContext((state) => state.room?.tabletopAlmanacAPIKey);
     const statblockQuery = useE5GetStatblock(member.statblock?.slug ?? "", apiKey);
 
@@ -444,6 +446,7 @@ export const PlayerPartyStatblock = ({ member, party }: { member: PartyStoreStat
     const player = usePlayerContext();
     const [obrParty, setObrParty] = useState<Player[]>([]);
     const apiKey = useMetadataContext((state) => state.room?.tabletopAlmanacAPIKey);
+    const partyId = useMetadataContext((state) => state.room?.partyId);
     const isOwner = player.id === member.playerId;
     const isGM = player.role === "GM";
 
@@ -543,7 +546,9 @@ export const PlayerPartyStatblock = ({ member, party }: { member: PartyStoreStat
                             <button
                                 style={{ border: "none", height: "45px", aspectRatio: "1/1" }}
                                 onClick={() => {
-                                    partyStore.getState().updateMember({ ...member, imageUrl: undefined });
+                                    if (partyId) {
+                                        partyStore.getState().updateMember(partyId, { ...member, imageUrl: undefined });
+                                    }
                                 }}
                             >
                                 <img src={member.imageUrl} alt={member.statblock?.name} style={{ height: "43px" }} />
@@ -601,7 +606,12 @@ export const PlayerPartyStatblock = ({ member, party }: { member: PartyStoreStat
 };
 
 export const PlayerPartyStatblocks = ({ party }: { party: PartyOut }) => {
-    const members = usePartyStore((state) => state.currentParty?.members);
+    const activePartyId = useMetadataContext((state) => state.room?.partyId);
+    const currentParty = usePartyStore((state) => {
+        if (!activePartyId) return null;
+        return state.parties.find((p) => p.id === activePartyId) ?? null;
+    });
+    const members = currentParty?.members ?? [];
 
     return (
         <PartyCollapse storageKey={`${ID}.party.player.members.collapsed`} heading={"Statblocks"}>
@@ -644,7 +654,10 @@ export const EditPlayerPartyInventoryItem = ({
     const addPartyStatblockEquipment = useAddPartyStatblockEquipment(partyId, slug);
     const updatePartyInventory = useUpdatePartyInventory(partyId, inventoryId);
     const player = usePlayerContext();
-    const members = usePartyStore((state) => state.currentParty?.members);
+    const currentParty = usePartyStore((state) => {
+        return state.parties.find((p) => p.id === partyId) ?? null;
+    });
+    const members = currentParty?.members ?? [];
 
     const availableStatblocks =
         player.role === "GM"
@@ -884,7 +897,11 @@ export const PlayerPartyInventory = ({ party }: { party: PartyOut }) => {
 };
 
 export const PlayerParty = () => {
-    const currentParty = usePartyStore((state) => state.currentParty);
+    const activePartyId = useMetadataContext((state) => state.room?.partyId);
+    const currentParty = usePartyStore((state) => {
+        if (!activePartyId) return null;
+        return state.parties.find((p) => p.id === activePartyId) ?? null;
+    });
     const partyQuery = useGetParty(currentParty?.id ?? 0);
 
     const party = partyQuery.isSuccess ? partyQuery.data : undefined;

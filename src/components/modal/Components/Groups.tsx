@@ -28,7 +28,11 @@ const updateGroups = (value: string, groups: Array<string>) => {
 
 const DraggableGroupList = React.memo(function DraggableGroupList() {
     const scene = useMetadataContext(useShallow((state) => state.scene));
-    const party = usePartyStore((state) => state.currentParty);
+    const activePartyId = useMetadataContext((state) => state.room?.partyId);
+    const party = usePartyStore((state) => {
+        if (!activePartyId) return null;
+        return state.parties.find((p) => p.id === activePartyId) ?? null;
+    });
 
     return (
         <div className={"group-list"}>

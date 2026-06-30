@@ -7,10 +7,15 @@ import { Loader } from "../general/Loader.tsx";
 import { PartyCollapse } from "./PartyCollapse.tsx";
 import { PlayerPartyStatblock } from "./PlayerParty.tsx";
 import { useGetParty } from "../../api/tabletop-almanac/useParty.ts";
+import { useMetadataContext } from "../../context/MetadataContext.ts";
 
 export const PartyStatblocks = () => {
-    const currentParty = usePartyStore((state) => state.currentParty);
-    const partyQuery = useGetParty(currentParty?.id ?? 0);
+    const activePartyId = useMetadataContext((state) => state.room?.partyId);
+    const currentParty = usePartyStore((state) => {
+        if (!activePartyId) return null;
+        return state.parties.find((p) => p.id === activePartyId) ?? null;
+    });
+    const partyQuery = useGetParty(activePartyId ?? 0);
 
     const party = partyQuery.isSuccess ? partyQuery.data : undefined;
 

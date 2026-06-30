@@ -22,8 +22,11 @@ export const ShopPlayer = () => {
     const data = useShopTokenContext((state) => state.data);
     const token = useShopTokenContext((state) => state.token);
     const playerContext = usePlayerContext();
-    const currentParty = usePartyStore((state) => state.currentParty);
     const partyId = useMetadataContext((state) => state.room?.partyId);
+    const currentParty = usePartyStore((state) => {
+        if (!partyId) return null;
+        return state.parties.find((p) => p.id === partyId) ?? null;
+    });
     const [view, setView] = useState<"items" | "cart">("items");
     const [member, setMember] = useState<PartyStoreStatblock | null>(null);
     const [notification, setNotification] = useState<{

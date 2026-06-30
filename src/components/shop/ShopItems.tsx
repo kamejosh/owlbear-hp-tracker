@@ -32,6 +32,7 @@ import { usePartyStore } from "../../context/PartyStore.tsx";
 import { useGetMultipleStatblocks } from "../../api/e5/useE5Api.ts";
 import { useEffect, useMemo } from "react";
 import { normalizeToCP, setNullToZero } from "../../helper/moneyHelpers.ts";
+import { useMetadataContext } from "../../context/MetadataContext.ts";
 
 type AddItemFormType = {
     item_id: number;
@@ -255,7 +256,11 @@ export const AddShopItem = ({ token, setAddItem }: { token: Item; setAddItem: (s
 };
 
 export const ShopSuggestions = ({ token, setOpen }: { token: Item; setOpen: (state: boolean) => void }) => {
-    const party = usePartyStore((state) => state.currentParty);
+    const activePartyId = useMetadataContext((state) => state.room?.partyId);
+    const party = usePartyStore((state) => {
+        if (!activePartyId) return null;
+        return state.parties.find((p) => p.id === activePartyId) ?? null;
+    });
 
     const partyQueries = useGetMultipleStatblocks(party);
     const itemTypesQuery = useGetItemTypes();

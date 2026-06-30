@@ -1,4 +1,3 @@
-import { usePartyStore } from "../../context/PartyStore.tsx";
 import { useEffect, useState } from "react";
 import { MoneyIn, PartyOut, useGetParty, useUpdatePartyMoney } from "../../api/tabletop-almanac/useParty.ts";
 import { ID } from "../../helper/variables.ts";
@@ -11,6 +10,7 @@ import moneyStyles from "../money/money.module.scss";
 import { PartyCollapse } from "./PartyCollapse.tsx";
 import { formatCP, normalizeToCP, resolveCalculation, toCP } from "../../helper/moneyHelpers.ts";
 import { MoneyEditInputs } from "../money/MoneyEditInputs.tsx";
+import { useMetadataContext } from "../../context/MetadataContext.ts";
 
 const PartyMoneyContent = ({ party }: { party: PartyOut | undefined }) => {
     const updateMoney = useUpdatePartyMoney(party?.id || 0, party?.money?.id);
@@ -132,19 +132,11 @@ const PartyMoneyContent = ({ party }: { party: PartyOut | undefined }) => {
 };
 
 export const PartyMoney = () => {
-    const currentParty = usePartyStore((state) => state.currentParty);
+    const activePartyId = useMetadataContext((state) => state.room?.partyId);
 
-    const [partyId, setPartyId] = useState<number | undefined>(currentParty?.id);
-
-    const partyQuery = useGetParty(partyId);
+    const partyQuery = useGetParty(activePartyId);
 
     const party = partyQuery.isSuccess ? partyQuery.data : undefined;
-
-    useEffect(() => {
-        if (currentParty) {
-            setPartyId(currentParty.id);
-        }
-    }, [currentParty]);
 
     return (
         <PartyCollapse storageKey={`${ID}.party.money.collapsed`} heading="Money">

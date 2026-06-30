@@ -40,7 +40,10 @@ const Content = () => {
 
 const GMContent = () => {
     const room = useMetadataContext((state) => state.room);
-    const currentParty = usePartyStore((state) => state.currentParty);
+    const currentParty = usePartyStore((state) => {
+        if (!room?.partyId) return null;
+        return state.parties.find((p) => p.id === room.partyId) ?? null;
+    });
     const loginQuery = useGetLoggedIn(room?.tabletopAlmanacAPIKey);
     const [apiKey, setApiKey] = useState<string>(room?.tabletopAlmanacAPIKey || "");
     const debouncedApiKey = useDebounce(apiKey, { wait: 1000 });
@@ -97,7 +100,10 @@ const GMContent = () => {
 
 const PlayerContent = () => {
     const room = useMetadataContext((state) => state.room);
-    const currentParty = usePartyStore((state) => state.currentParty);
+    const currentParty = usePartyStore((state) => {
+        if (!room?.partyId) return null;
+        return state.parties.find((p) => p.id === room.partyId) ?? null;
+    });
 
     if (!currentParty || !room?.partyId) {
         return <div>No party selected</div>;

@@ -1,6 +1,8 @@
 # Unversioned
 
 + Add Recall Knowledge as optional Pathfinder Saving Throw
++ Fix Bug when quickly editing maxHP and HP
++ Refactor Party System to support two different OBR rooms loading two different parties. 
 
 # 3.7.2
 

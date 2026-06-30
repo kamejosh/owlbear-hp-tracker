@@ -40,6 +40,7 @@ import {
     useUpdatePartyInventory,
 } from "../../api/tabletop-almanac/useParty.ts";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
+import { useMetadataContext } from "../../context/MetadataContext.ts";
 
 export const AddLootItem = ({
     token,
@@ -135,7 +136,12 @@ export const LootItem = ({ item, readOnly = false }: { item: LootItemType; readO
     const itemQuery = useGetItem(item.slug);
     const taItem = itemQuery.isSuccess ? itemQuery.data : null;
 
-    const currentParty = usePartyStore((state) => state.currentParty);
+    const activePartyId = useMetadataContext((state) => state.room?.partyId);
+    const currentParty = usePartyStore((state) => {
+        if (!activePartyId) return null;
+        return state.parties.find((p) => p.id === activePartyId) ?? null;
+    });
+
     const partyQuery = useGetParty(currentParty?.id ?? 0);
 
     const party = partyQuery.isSuccess ? partyQuery.data : null;
@@ -315,7 +321,11 @@ export const LootSuggestions = ({
     setOpen: (state: boolean) => void;
 }) => {
     const slug = itemMetadataKey in token.metadata ? (token.metadata[itemMetadataKey] as GMGMetadata).sheet : null;
-    const party = usePartyStore((state) => state.currentParty);
+    const activePartyId = useMetadataContext((state) => state.room?.partyId);
+    const party = usePartyStore((state) => {
+        if (!activePartyId) return null;
+        return state.parties.find((p) => p.id === activePartyId) ?? null;
+    });
 
     const partyQueries = useGetMultipleStatblocks(party);
     const itemTypesQuery = useGetItemTypes();
