@@ -59,7 +59,6 @@ export const PFGeneral = () => {
                     try {
                         // @ts-ignore name is always in stats
                         const saveValue = statblock.saving_throws[name];
-                        console.log(name, saveValue);
                         if (saveValue !== null && saveValue !== undefined) {
                             return (
                                 <li className={styles.stat} key={name}>

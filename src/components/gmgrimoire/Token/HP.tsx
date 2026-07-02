@@ -147,7 +147,7 @@ export const HP = ({ id }: { id: string }) => {
                 return;
             }
             if (hp !== data.hp || maxHp !== data.maxHp || tempHp !== (data.stats.tempHp ?? 0)) {
-                updateHpFields(debouncedHpFields, data, item);
+                void updateHpFields(debouncedHpFields, data, item);
             }
         }
     }, [debouncedHpFields]);
@@ -162,7 +162,7 @@ export const HP = ({ id }: { id: string }) => {
                 maxHp: isNaN(Number(prev.maxHp)) ? data.maxHp : Number(prev.maxHp),
                 stats: {
                     ...data.stats,
-                    tempHp: isNaN(Number(prev.tempHp)) ? (data.stats.tempHp ?? 0) : Number(prev.tempHp),
+                    tempHp: data.stats.tempHp ?? 0,
                 },
             };
 
