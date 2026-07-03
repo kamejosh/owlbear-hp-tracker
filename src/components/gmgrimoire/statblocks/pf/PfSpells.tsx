@@ -39,7 +39,12 @@ export const Spell = (props: { spell: PfSpellOut; statblock: string; stats: Stat
             <div className={"spell-main"}>
                 <div className={"spell-info"}>
                     <div className={"spell-header"}>
-                        <h4 className={"spell-name"}>{spell?.name}</h4>
+                        <h4 className={"spell-name"}>
+                            {spell?.name}{" "}
+                            <span className={"small"}>
+                                Level: {spell.info.level} | {spell.cast.type}
+                            </span>
+                        </h4>
                         {props.hideShare ? null : (
                             <ShareAbilityButton
                                 entry={{

@@ -45,6 +45,10 @@
                             font-size: 18px;
                             line-height: 1;
                             text-transform: capitalize;
+
+                            .small {
+                                font-size: 10px;
+                            }
                         }
 
                         .spell-level {
