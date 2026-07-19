@@ -29,16 +29,13 @@ export const rollLogStore = createStore<RollLogContextType>()(
             log: [],
             addRoll: (roll) =>
                 set((state) => {
-                    if (!state.log.find((r) => r.uuid === roll.uuid)) {
-                        if (state.log.length > 100) {
-                            state.log.splice(100, state.log.length - 100);
-                        }
-                        state.log.push(roll);
-                        window.dispatchEvent(
-                            new StorageEvent("storage", { newValue: "new roll", key: `${ID}.roll-log` }),
-                        );
+                    if (state.log.find((r) => r.uuid === roll.uuid)) {
+                        return state;
                     }
-                    return { ...state };
+                    window.dispatchEvent(
+                        new StorageEvent("storage", { newValue: "new roll", key: `${ID}.roll-log` }),
+                    );
+                    return { log: state.log.concat(roll).slice(-100) };
                 }),
             clear: () => {
                 set(() => {
