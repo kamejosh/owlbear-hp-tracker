@@ -52,6 +52,11 @@ import { registerMessageHandlers } from "./api.ts";
 import _, { isNull, isUndefined } from "lodash";
 import { initParty, initPlayerParty } from "./party.ts";
 import { HOSTING_NOTIFICATION } from "../config.ts";
+import { withStorageDOMEvents } from "../helper/hooks.ts";
+import { partyStore } from "../context/PartyStore.tsx";
+import { abilityShareStore } from "../context/AbilityShareStore.tsx";
+import { rollLogStore } from "../context/RollLogContext.tsx";
+import { diceButtonsStore } from "../context/DiceButtonContext.tsx";
 
 /**
  * All character items get the default values for the HpTrackeMetadata.
@@ -543,6 +548,16 @@ const initMessageBus = async () => {
 
 OBR.onReady(async () => {
     console.info(`GM's Grimoire - version ${version} initializing`);
+
+    // The background script never mounts <StoreSync/>, so without this its in-memory copies of
+    // these persisted stores go stale the moment another iframe (e.g. the party modal) writes to
+    // localStorage - e.g. party.ts's polling loop would then merge fresh API data on top of a
+    // stale `partyStore` member and silently resurrect fields like `imageUrl` that were cleared elsewhere.
+    withStorageDOMEvents(partyStore);
+    withStorageDOMEvents(abilityShareStore);
+    withStorageDOMEvents(rollLogStore);
+    withStorageDOMEvents(diceButtonsStore);
+
     try {
         await setupContextMenu();
     } catch (e) {

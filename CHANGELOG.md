@@ -4,6 +4,9 @@
 + Fix Bug when quickly editing maxHP and HP
 + Refactor Party System to support two different OBR rooms loading two different parties. 
 + Add Spell Cast Type and Spell Level to PF Spells
++ Fix Party Tokens don't get saved values applied on scene change
++ Fix Rolllog keeps oldest 100 entries instead of newest
++ Fix Reassigning Party Tokens does not work
 
 # 3.7.2
 
