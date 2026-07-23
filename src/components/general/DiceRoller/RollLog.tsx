@@ -124,6 +124,9 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
 
     return (
         <li className={`roll-log-entry ${props.classes} ${ownRoll ? "self" : ""}`}>
+            {props.entry.imageUrl ? (
+                <img className={"roll-avatar"} src={props.entry.imageUrl} alt={props.entry.username} />
+            ) : null}
             <div className={"roll-time"}>{rollTimeText}</div>
             <div className={"roll-context"}>{formatLabel()}</div>
             <div className={"username"}>{props.entry.username}</div>
@@ -134,6 +137,7 @@ export const RollLogEntry = (props: RollLogEntryProps) => {
                     stats={{ strength: 0, dexterity: 0, constitution: 0, intelligence: 0, wisdom: 0, charisma: 0 }}
                     context={props.entry.label || "re-roll"}
                     statblock={props.entry.username}
+                    imageUrl={props.entry.imageUrl}
                 />
             ) : null}
             <div className={"roll-equation"}>{props.entry.equation}</div>

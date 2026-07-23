@@ -214,7 +214,12 @@ export const Spell = ({
                                                 if (itemId && limitValues) {
                                                     await updateLimit(itemId, limitValues, chargesUsed);
                                                 }
-                                                await addSpellToRollLog(`${spell.name}: Cast`, addRoll, statblock);
+                                                await addSpellToRollLog(
+                                                    `${spell.name}: Cast`,
+                                                    addRoll,
+                                                    statblock,
+                                                    statblockContext.item.image.url,
+                                                );
                                             }}
                                         >
                                             cast

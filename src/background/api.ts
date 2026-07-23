@@ -236,6 +236,7 @@ export const registerMessageHandlers = async () => {
                     addRoll,
                     request.hidden,
                     request.statblock,
+                    undefined,
                     (rollResult: DiceRoll | IRoll | DicePlusRollResultData | null | undefined) => {
                         if (rollResult && "result" in rollResult) {
                             sendResponse(request, { total: rollResult.result.totalValue } as DiceResponse);

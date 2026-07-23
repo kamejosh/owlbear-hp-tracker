@@ -78,6 +78,8 @@
       </ul>
       <li><a href="#dnd-beyond-dice-rolls">DnD Beyond Dice Rolls</a></li>
       <li><a href="#simple-dice-calculator">Simple Dice-Calculator</a></li>
+      <li><a href="#dice-plus">Dice Plus</a></li>
+      <li><a href="#discord-roll-log-sync">Discord Roll Log Sync</a></li>
     </ul>
   </ul>
 </details>
@@ -215,6 +217,7 @@ The following settings are available:
 + Text and Bar Offset: To have a more flexible positioning of the HP Bar and Text, a value can be entered (negative or positive number) and the position of the HP Bar and Text is then adjusted by this value.
 + Armorclass Icon and Text Offset: To have a more flexible positioning of the AC Background and Text an offset for the X- and Y-Axis can be added. This value is scaled considering the Token size. 
 + Dice Roller: You can select which Dice Roller you want to use. By default the dddice roller is selected but you can also use the Simple Dice Roller or the [Dice+](https://owlbear.rogue.pub/extension/https://dice-plus.missinglinkdev.com/manifest.json) extension.
++ Discord Webhook URL: Paste a Discord Webhook URL here to have dice rolls posted to a Discord channel, see [Discord Roll Log Sync](#discord-roll-log-sync) for details.
 + Allow negative HP/AC: By default negative HP and AC are not allowed but when this settings is checked then HP and AC can be set to negative numbers. The HP Bar will always display negative HP the same as when it is 0.
 + Sort Tokens in Player View: When active, the [Player Action Window](#player-action-window) will display Tokens ordered by their initiative value. If not active, Tokens will have the same order as they were added to the scene (so kind of random).
 + Set Initiative Dice: This setting decides with which "dice" the roll initiative button in the groups and the token works. The default is 20, meaning a value from 1 to 20 (excl. modifiers) can be rolled. By setting it to 10 the value can only range from 1 to 10. When using 3D dice only values that are available in the selected theme should be used.
@@ -548,20 +551,26 @@ The Shop Management feature facilitates in-game commerce by allowing GMs to atta
 4.  **Shop Status:**
     *   Use the **"Shop Open / Closed"** toggle in the header to control player access. When closed, players can see the shop exists but cannot browse or purchase.
 5.  **Active Carts:**
-    *   GMs can see all active player carts for the current shop, allowing them to monitor what players are considering.
+    *   GMs can see all active player carts for the current shop, allowing them to monitor what players are considering, both what they intend to buy and what they've offered to sell.
+    *   For the "Selling" section of a cart, the offered total price can be manually **edited** (e.g. to haggle or account for special circumstances), or **reset** back to the sum of the individual item offers with the reset button.
 
 <h3 id="shop-player-workflow">Player Workflow</h3>
 
 1.  **Browsing the Shop:**
     *   Select a merchant token and open the Shop Management window.
     *   Browse available items, viewing their descriptions and prices.
-2.  **Managing the Cart:**
+2.  **Selling Items:**
+    *   Switch to the **Sell** tab (the tag icon next to the shop inventory tab) to see all the equipment currently on your selected party member's statblock.
+    *   Each item shows how many of it you have and the shop's offer price for it. The shop randomly offers between 80% and 95% of the item's catalog value each time it's added to the sell cart, so re-adding the same item can result in a slightly different offer.
+    *   Enter a quantity and click the sell icon to queue that many of the item for sale. Queued items are no longer available to queue again until removed from the cart (so you can't accidentally offer more than you own).
+3.  **Managing the Cart:**
     *   **Add to Cart:** Click the cart icon on an item to add it to your personal shopping bag.
-    *   **View Cart:** Click the bag icon in the header to review your selected items and total cost.
-    *   **Remove Items:** Remove items from the cart if you change your mind; stock will be returned to the shop.
-3.  **Checkout:**
-    *   **Select Customer:** Choose which party member is making the purchase.
-    *   **Purchase:** Complete the transaction. Items are automatically added to the player's statblock and currency is deducted.
+    *   **View Cart:** Click the cart icon in the header to review both the items you're buying and the items you're selling, along with their subtotals.
+    *   **Remove Items:** Remove items from the cart if you change your mind; purchased stock is returned to the shop and items queued for sale go back to being available to sell.
+    *   The cart shows a single net total ("You pay" or "You receive") combining both sides of the trade. If the shop doesn't have enough funds on hand to cover what you'd receive, a warning is shown and checkout is disabled until the cart is adjusted.
+4.  **Checkout:**
+    *   **Select Customer:** Choose which party member is making the purchase (this also determines whose inventory is used for selling).
+    *   **Purchase:** Complete the transaction. Purchased items are automatically added to the player's statblock and sold items are removed from it; the net currency difference is exchanged between the player and the shop, and any sold items are added back into the shop's own inventory at their catalog price so they can be resold later.
 
 
 <h1 id="custom-statblocks">Custom Statblocks</h1>
@@ -695,3 +704,26 @@ The simple dice-calculator uses the [rpg-dice-roller](https://dice-roller.github
 
 Since version 3.5.0 GMG supports [Dice+](https://owlbear.rogue.pub/extension/https://dice-plus.missinglinkdev.com/manifest.json) as a dice roller.  
 After installing the extension, you have to reload website (so that GMG ad Dice+ can exchange setup data with each other) and select the Dice+ extension as you dice roller in the settings.
+
+<h2 id="discord-roll-log-sync">Discord Roll Log Sync</h2>
+
+GMG can automatically post dice rolls to a Discord channel of your choice, so people who are not connected to the Owlbear Rodeo session (or just want a log outside of it) can follow along.
+
+**Setup**
+
+1. In Discord, go to the channel you want rolls posted to and create a Webhook (Channel Settings → Integrations → Webhooks → New Webhook). Discord's own [guide on creating a Webhook URL](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) explains this in detail, a link to this guide is also available directly next to the setting.
+2. Copy the Webhook URL and paste it into the "Discord Webhook URL" field in the [Room Settings](#room-settings).
+
+Once a Webhook URL is set, every roll that is made from that point on is posted to Discord automatically, no further action is needed.
+
+**What gets posted**
+
++ The roll's context/label (e.g. "Attack: To Hit") and the resulting dice equation.
++ The detailed roll result (the individual die values), the same as shown in the in-app Roll Log.
++ The Discord message's color matches the color of the roll's label in the in-app Roll Log (e.g. red for damage, blue for to-hit/attack rolls, green for saves).
++ If the roll came from a token that has an image, that image is attached to the Discord message and also shown alongside the roll in the in-app Roll Log.
+
+**Notes**
+
++ Hidden/whispered rolls are never posted to Discord, they stay private the same way they do in the in-app Roll Log.
++ Since the Webhook URL is stored in Room Settings, anyone with GM access to the room can read and change it. Treat it the same as any other credential and only share the room with people you trust.

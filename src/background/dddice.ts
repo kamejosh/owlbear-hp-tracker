@@ -15,6 +15,7 @@ import {
     blastMessage,
     connectToDddiceRoom,
     dddiceApiLogin,
+    getDiceUser,
     handleNewRoll,
     removeRollerApiCallbacks,
     rollerCallback,
@@ -27,6 +28,9 @@ const diceRollerState: { diceUser: DiceUser | null; diceRoller: DICE_ROLLER; dic
     diceUser: null,
     diceRoller: DICE_ROLLER.DDDICE,
 };
+// the dddice user uuid of the currently logged-in client, used to identify rolls that originated
+// from this client (dddice's RollCreated event fires identically on every connected participant)
+let ownDiceUserUuid: string | undefined;
 
 const initDice = async (room: RoomMetadata, updateApi: boolean) => {
     let api: ThreeDDiceAPI | undefined | null = undefined;
@@ -35,6 +39,7 @@ const initDice = async (room: RoomMetadata, updateApi: boolean) => {
         api = await dddiceApiLogin(room);
         if (api) {
             diceRollerStore.getState().setRollerApi(api);
+            ownDiceUserUuid = (await getDiceUser(api))?.uuid;
         } else {
             throw Error("Error connecting to dddice");
         }
@@ -53,7 +58,7 @@ const initDice = async (room: RoomMetadata, updateApi: boolean) => {
         }
     } else {
         if (api && !diceRollerStore.getState().dddiceExtensionLoaded) {
-            await addRollerApiCallbacks(api, rollLogStore.getState().addRoll);
+            await addRollerApiCallbacks(api, rollLogStore.getState().addRoll, ownDiceUserUuid);
         }
         await OBR.modal.close(diceTrayModalId);
     }
@@ -139,7 +144,7 @@ export const setupDddice = async () => {
         try {
             if (event.type === "message" && event.origin === "https://dddice.com") {
                 if (event.data.type === "roll:finished") {
-                    await rollerCallback(event.data.roll, rollLogStore.getState().addRoll);
+                    await rollerCallback(event.data.roll, rollLogStore.getState().addRoll, ownDiceUserUuid);
                 }
                 if (event.data.type === "dddice.loaded") {
                     diceRollerStore.getState().setDddiceExtensionLoaded(true);

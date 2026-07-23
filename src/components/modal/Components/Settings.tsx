@@ -73,6 +73,28 @@ export const Settings = () => {
                             }}
                         />
                     </div>
+                    <div className={"discord-webhook setting-group vertical"}>
+                        <div className={"setting"}>
+                            <span>
+                                Discord{" "}
+                                <a
+                                    style={{ display: "inline" }}
+                                    href={"https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks"}
+                                >
+                                    Webhook
+                                </a>{" "}
+                                URL:
+                            </span>
+                            <input
+                                className={"masked-input"}
+                                type={"text"}
+                                value={room?.discordWebhookUrl || ""}
+                                onChange={(e) => {
+                                    updateRoomMetadata(room, { discordWebhookUrl: e.currentTarget.value });
+                                }}
+                            />
+                        </div>
+                    </div>
                     <div className={"hp-mode setting-group vertical"}>
                         <div>
                             HP Bar Segments:{" "}

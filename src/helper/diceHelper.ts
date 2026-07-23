@@ -40,8 +40,35 @@ import {
 } from "../background/diceplus.ts";
 import { updateItems } from "./obrHelper.ts";
 import { useTaSettingsStore } from "../context/MetadataContext.ts";
+import { postRollToDiscord } from "./discordHelper.ts";
 
 let rollLogTimeOut: number;
+
+// dddice's roll API has no field to carry arbitrary custom data through a roll's lifecycle, so we
+// stash the initiating token's image here (keyed by roll uuid) when the roll is submitted and pick
+// it back up in rollerCallback once the roll result comes back. Entries are normally removed there,
+// but rolls that never come back (dddice outage, dropped connection, ...) would otherwise leak here
+// for as long as the room stays open, so we also bound this by age and count.
+const pendingRollImages = new Map<string, { imageUrl: string; created: number }>();
+const pendingRollImagesMaxAge = 1000 * 60 * 5;
+const pendingRollImagesMaxSize = 1000;
+
+const setPendingRollImage = (uuid: string, imageUrl: string) => {
+    const now = Date.now();
+    for (const [key, value] of pendingRollImages) {
+        if (now - value.created > pendingRollImagesMaxAge) {
+            pendingRollImages.delete(key);
+        }
+    }
+    while (pendingRollImages.size >= pendingRollImagesMaxSize) {
+        const oldestKey = pendingRollImages.keys().next().value;
+        if (oldestKey === undefined) {
+            break;
+        }
+        pendingRollImages.delete(oldestKey);
+    }
+    pendingRollImages.set(uuid, { imageUrl, created: now });
+};
 
 export const updateRoomMetadataDiceUser = async (
     room: RoomMetadata,
@@ -224,9 +251,15 @@ export const handleNewRoll = async (addRoll: (entry: RollLogEntryType) => void, 
     }, 7500);
 };
 
-export const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => void) => {
+export const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType) => void, ownUserUuid?: string) => {
     const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
     const rollLogEntry = await dddiceRollToRollLog(e, { participant: participant });
+
+    const pending = pendingRollImages.get(e.uuid);
+    if (pending) {
+        rollLogEntry.imageUrl = pending.imageUrl;
+        pendingRollImages.delete(e.uuid);
+    }
 
     // we only handle new rolls dddice extension is not loaded
     if (!diceRollerStore.getState().dddiceExtensionLoaded) {
@@ -234,10 +267,20 @@ export const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType
     } else {
         addRoll(rollLogEntry);
     }
+
+    // dddice's RollCreated event fires identically on every connected participant's client,
+    // so only the roll's own owner should relay it to Discord to avoid duplicate posts
+    if (ownUserUuid && e.user.uuid === ownUserUuid) {
+        void postRollToDiscord(rollLogEntry);
+    }
 };
 
-export const addRollerApiCallbacks = async (roller: ThreeDDiceAPI, addRoll: (entry: RollLogEntryType) => void) => {
-    roller.listen(ThreeDDiceRollEvent.RollCreated, (e) => rollerCallback(e, addRoll));
+export const addRollerApiCallbacks = async (
+    roller: ThreeDDiceAPI,
+    addRoll: (entry: RollLogEntryType) => void,
+    ownUserUuid?: string,
+) => {
+    roller.listen(ThreeDDiceRollEvent.RollCreated, (e) => rollerCallback(e, addRoll, ownUserUuid));
 };
 
 export const removeRollerApiCallbacks = async () => {
@@ -399,6 +442,7 @@ export const syncLocalRoll = (
     username: string,
     statblock?: string,
     ownerId?: string,
+    imageUrl?: string,
 ) => {
     try {
         const roll = new DiceRoll(diceEquation.replaceAll(" ", ""));
@@ -413,10 +457,12 @@ export const syncLocalRoll = (
             values: [roll.output.substring(roll.output.indexOf(":") + 1, roll.output.indexOf("=") - 1)],
             owlbear_user_id: ownerId ?? OBR.player.id,
             participantUsername: username,
+            imageUrl: imageUrl,
         };
 
         if (!hidden) {
             void OBR.broadcast.sendMessage(rollMessageChannel, logEntry, { destination: "REMOTE" });
+            void postRollToDiscord(logEntry);
         } else if (ownerId) {
             void OBR.broadcast.sendMessage(rollMessageWhisperChannel, logEntry, { destination: "REMOTE" });
         }
@@ -434,6 +480,7 @@ export const localRoll = async (
     addRoll: (entry: RollLogEntryType) => void,
     hidden: boolean = false,
     statblock?: string,
+    imageUrl?: string,
 ) => {
     try {
         const roll = new DiceRoll(diceEquation.replaceAll(" ", ""));
@@ -449,10 +496,12 @@ export const localRoll = async (
             values: [roll.output.substring(roll.output.indexOf(":") + 1, roll.output.indexOf("=") - 1)],
             owlbear_user_id: OBR.player.id,
             participantUsername: name,
+            imageUrl: imageUrl,
         };
 
         if (!hidden) {
             await OBR.broadcast.sendMessage(rollMessageChannel, logEntry, { destination: "REMOTE" });
+            void postRollToDiscord(logEntry);
         }
 
         await handleNewRoll(addRoll, logEntry);
@@ -468,6 +517,7 @@ export const dicePlusRoll = async (
     addRoll: (entry: RollLogEntryType) => void,
     hidden: boolean = false,
     statblock?: string,
+    imageUrl?: string,
     onRoll?: (rollResult?: IRoll | DiceRoll | DicePlusRollResultData | null) => void,
 ) => {
     const rollRequest: DicePlusRollRequestData = {
@@ -497,10 +547,12 @@ export const dicePlusRoll = async (
                 values: data.result.groups.flatMap((group) => group.dice.map((die) => String(die.value))),
                 owlbear_user_id: OBR.player.id,
                 participantUsername: name,
+                imageUrl: imageUrl,
             };
 
             if (!hidden) {
                 await OBR.broadcast.sendMessage(rollMessageChannel, logEntry, { destination: "REMOTE" });
+                void postRollToDiscord(logEntry);
             }
 
             await handleNewRoll(addRoll, logEntry);
@@ -571,10 +623,12 @@ export const dicePlusGroupRoll = async (
                         values: group.dice.map((die) => String(die.value)),
                         owlbear_user_id: OBR.player.id,
                         participantUsername: name,
+                        imageUrl: item.image.url,
                     };
 
                     if (!hidden) {
                         await OBR.broadcast.sendMessage(rollMessageChannel, logEntry, { destination: "REMOTE" });
+                        void postRollToDiscord(logEntry);
                     }
 
                     await handleNewRoll(addRoll, logEntry);
@@ -620,6 +674,7 @@ export const addSpellToRollLog = async (
     label: string,
     addRoll: (entry: RollLogEntryType) => void,
     statblock?: string,
+    imageUrl?: string,
 ) => {
     const logEntry = {
         uuid: v4(),
@@ -631,9 +686,11 @@ export const addSpellToRollLog = async (
         username: statblock || "",
         values: [],
         owlbear_user_id: OBR.player.id,
+        imageUrl: imageUrl,
     };
 
     await OBR.broadcast.sendMessage(rollMessageChannel, logEntry, { destination: "REMOTE" });
+    void postRollToDiscord(logEntry);
 
     await handleNewRoll(addRoll, logEntry);
     rollLogStore.persist.rehydrate();
@@ -643,11 +700,15 @@ export const rollWrapper = async (
     api: ThreeDDiceAPI | null,
     dice: Array<IDiceRoll>,
     options?: Partial<IDiceRollOptions>,
+    imageUrl?: string,
 ) => {
     if (api) {
         try {
             const roll = await api.roll.create(dice, options);
             if (roll && roll.data) {
+                if (imageUrl) {
+                    setPendingRollImage(roll.data.uuid, imageUrl);
+                }
                 return roll.data;
             }
         } catch {

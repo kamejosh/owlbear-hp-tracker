@@ -96,6 +96,7 @@ export const Initiative = ({ id }: { id: string }) => {
                 context={"Initiative: Roll"}
                 stats={defaultStats}
                 statblock={getTokenName(item) ?? data.sheet}
+                imageUrl={item.image.url}
                 onRoll={async (rollResult) => {
                     let localInitiative = 0;
                     try {

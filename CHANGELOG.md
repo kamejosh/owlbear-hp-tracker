@@ -6,6 +6,8 @@
 + Add Recall Knowledge as optional Pathfinder Saving Throw
 + Refactor Party System to support two different OBR rooms loading two different parties. 
 + Add Spell Cast Type and Spell Level to PF Spells
++ Add Discord Roll Log sync: configure a Discord Webhook URL in Settings to have dice rolls posted to a Discord channel, including the roll's detailed result, matching color-coding, and the rolling token's image
++ Add token image to Roll Log entries
 
 ### Improvements and Fixes
 

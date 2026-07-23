@@ -15,6 +15,7 @@ export type RollLogEntryType = {
     owlbear_user_id?: string;
     participantUsername?: string;
     values: Array<string>;
+    imageUrl?: string;
 };
 
 export type RollLogContextType = {
@@ -32,9 +33,7 @@ export const rollLogStore = createStore<RollLogContextType>()(
                     if (state.log.find((r) => r.uuid === roll.uuid)) {
                         return state;
                     }
-                    window.dispatchEvent(
-                        new StorageEvent("storage", { newValue: "new roll", key: `${ID}.roll-log` }),
-                    );
+                    window.dispatchEvent(new StorageEvent("storage", { newValue: "new roll", key: `${ID}.roll-log` }));
                     return { log: state.log.concat(roll).slice(-100) };
                 }),
             clear: () => {

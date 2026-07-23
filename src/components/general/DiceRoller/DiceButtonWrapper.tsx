@@ -1,6 +1,8 @@
 import { useDiceRoller } from "../../../context/DDDiceContext.tsx";
 import { useMetadataContext, useTaSettingsStore } from "../../../context/MetadataContext.ts";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useContext, useMemo, useState } from "react";
+import { E5StatblockContext } from "../../../context/E5StatblockContext.tsx";
+import { PFStatblockContext } from "../../../context/PFStatblockContext.tsx";
 import { dicePlusRoll, diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../../helper/diceHelper.ts";
 import { useRollLogContext } from "../../../context/RollLogContext.tsx";
 import { IRoll, parseRollEquation } from "dddice-js";
@@ -29,6 +31,7 @@ type DiceButtonProps = {
     stats: Stats;
     skills?: Skills | null;
     statblock?: string;
+    imageUrl?: string;
     onRoll?: (rollResult?: IRoll | DiceRoll | DicePlusRollResultData | null) => void;
     limitReached?: boolean | null;
     damageDie?: boolean;
@@ -49,6 +52,14 @@ export const DiceButton = (props: DiceButtonProps) => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const playerContext = usePlayerContext();
     const defaultHidden = playerContext.role === "GM" && !!taSettings.gm_rolls_hidden;
+
+    // most DiceButtons render as descendants of a statblock context provider, which already has the
+    // token's image on hand - fall back to reading it from there so callers don't have to thread an
+    // imageUrl prop through every intermediate component. Only an explicit prop (or no context, e.g.
+    // the roll log's re-roll button) overrides this.
+    const e5Context = useContext(E5StatblockContext);
+    const pfContext = useContext(PFStatblockContext);
+    const imageUrl = props.imageUrl ?? e5Context?.item.image.url ?? pfContext?.item.image.url;
 
     const customTheme = useMemo(() => {
         if (props.customDiceThemeId) {
@@ -172,20 +183,25 @@ export const DiceButton = (props: DiceButtonProps) => {
                 const parsed = diceToRoll(modifiedDice, customTheme.id);
                 if (parsed && rollerApi) {
                     try {
-                        rollResult = await rollWrapper(rollerApi, parsed.dice, {
-                            label: label,
-                            operator: parsed.operator,
-                            external_id: props.statblock,
-                            whisper: hidden ? await getUserUuid(room, rollerApi) : undefined,
-                        });
+                        rollResult = await rollWrapper(
+                            rollerApi,
+                            parsed.dice,
+                            {
+                                label: label,
+                                operator: parsed.operator,
+                                external_id: props.statblock,
+                                whisper: hidden ? await getUserUuid(room, rollerApi) : undefined,
+                            },
+                            imageUrl,
+                        );
                     } catch {
                         console.warn("error in dice roll", parsed.dice, parsed.operator);
                     }
                 }
             } else if (room?.diceRoller === DICE_ROLLER.SIMPLE) {
-                rollResult = await localRoll(modifiedDice, label, addRoll, hidden, props.statblock);
+                rollResult = await localRoll(modifiedDice, label, addRoll, hidden, props.statblock, imageUrl);
             } else if (room?.diceRoller === DICE_ROLLER.DICE_PLUS) {
-                await dicePlusRoll(modifiedDice, label, addRoll, hidden, props.statblock, props.onRoll);
+                await dicePlusRoll(modifiedDice, label, addRoll, hidden, props.statblock, imageUrl, props.onRoll);
             }
             if (props.onRoll && room?.diceRoller !== DICE_ROLLER.DICE_PLUS) {
                 props.onRoll(rollResult);
@@ -355,6 +371,7 @@ export const DiceButtonWrapper = ({
     text,
     context,
     statblock,
+    imageUrl,
     skills,
     stats,
     onRoll,
@@ -365,6 +382,7 @@ export const DiceButtonWrapper = ({
     text: string;
     context: string;
     statblock?: string;
+    imageUrl?: string;
     stats: Stats;
     skills?: Skills | null;
     onRoll?: () => void;
@@ -397,6 +415,7 @@ export const DiceButtonWrapper = ({
                                         skills={skills}
                                         stats={stats}
                                         statblock={statblock}
+                                        imageUrl={imageUrl}
                                         onRoll={onRoll}
                                         limitReached={limitReached}
                                         damageDie={damageDie}

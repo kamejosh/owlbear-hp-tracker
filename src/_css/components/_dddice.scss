@@ -649,6 +649,30 @@
         text-align: left;
         white-space: nowrap;
 
+        &:has(.roll-avatar) {
+            grid-template-columns: 40px 70px auto auto 80px;
+            grid-template-areas:
+                "avatar context context divider total"
+                "avatar user user divider total"
+                "avatar detail detail divider total"
+                "avatar reroll reroll divider total";
+        }
+
+        .roll-avatar {
+            grid-area: avatar;
+            align-self: flex-start;
+            justify-self: center;
+            transition:
+                margin-top 0.25s ease,
+                width 0.25s ease,
+                height 0.25s ease;
+            margin-top: 0;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            object-fit: cover;
+        }
+
         &.self {
             align-self: flex-end;
         }
@@ -661,6 +685,19 @@
                     "user user divider total";
                 padding-block: 2px;
                 min-width: 200px;
+
+                &:has(.roll-avatar) {
+                    grid-template-columns: 40px 70px auto auto 50px;
+                    grid-template-areas:
+                        "avatar context context divider total"
+                        "avatar user user divider total";
+                }
+
+                .roll-avatar {
+                    margin-top: 10px;
+                    width: 24px;
+                    height: 24px;
+                }
 
                 .detailed-result {
                     display: none;

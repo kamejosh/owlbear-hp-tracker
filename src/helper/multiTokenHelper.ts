@@ -180,14 +180,24 @@ const handleLimitFormula = (limit: Limit, item: Item) => {
 
         const label = `Limit: ${limit.id}`;
         const character = getTokenName(item as Image);
+        const imageUrl = (item as Image).image.url;
         if (comparisonMatch) {
             const [_, dice, operator, comparator] = comparisonMatch;
-            const rollResult = syncLocalRoll(dice, label, addRoll, true, "", character, item.createdUserId);
+            const rollResult = syncLocalRoll(dice, label, addRoll, true, "", character, item.createdUserId, imageUrl);
             if (rollResult) {
                 return onLimitRollComparison(rollResult, operator, Number(comparator), item.id, limit);
             }
         } else {
-            const rollResult = syncLocalRoll(limit.formula, label, addRoll, true, "", character, item.createdUserId);
+            const rollResult = syncLocalRoll(
+                limit.formula,
+                label,
+                addRoll,
+                true,
+                "",
+                character,
+                item.createdUserId,
+                imageUrl,
+            );
             if (rollResult) {
                 return onLimitRoll(rollResult, item.id, limit);
             }

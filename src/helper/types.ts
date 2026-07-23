@@ -108,6 +108,7 @@ export type RoomMetadata = {
     diceUser?: Array<DiceUser>;
     diceRoller?: DICE_ROLLER;
     tabletopAlmanacAPIKey?: string;
+    discordWebhookUrl?: string;
     disableHpBar?: boolean;
     disableColorGradient?: boolean;
     disableLimitRolls?: boolean;
