@@ -131,6 +131,33 @@ export const setNullToZero = (money: MoneyIn): Money => {
     };
 };
 
+export const addMoney = (a: MoneyIn, b: MoneyIn): Money => {
+    return {
+        pp: (Number(a.pp) || 0) + (Number(b.pp) || 0),
+        gp: (Number(a.gp) || 0) + (Number(b.gp) || 0),
+        ep: (Number(a.ep) || 0) + (Number(b.ep) || 0),
+        sp: (Number(a.sp) || 0) + (Number(b.sp) || 0),
+        cp: (Number(a.cp) || 0) + (Number(b.cp) || 0),
+    };
+};
+
+export const scaleMoney = (money: MoneyIn, factor: number): Money => {
+    return {
+        pp: Math.round((Number(money.pp) || 0) * factor),
+        gp: Math.round((Number(money.gp) || 0) * factor),
+        ep: Math.round((Number(money.ep) || 0) * factor),
+        sp: Math.round((Number(money.sp) || 0) * factor),
+        cp: Math.round((Number(money.cp) || 0) * factor),
+    };
+};
+
+export const subtractMoney = (a: MoneyIn, b: MoneyIn): Money => addMoney(a, scaleMoney(b, -1));
+
+// Shopkeepers offer between 80% and 95% of an item's catalog value when buying from players.
+export const randomSellPercent = (): number => 0.8 + Math.random() * 0.15;
+
+export const getRandomSellOffer = (catalogCost: MoneyIn): Money => scaleMoney(catalogCost, randomSellPercent());
+
 export const currencies: Array<{ key: keyof MoneyIn; label: string }> = [
     { key: "pp", label: "pp" },
     { key: "gp", label: "gp" },

@@ -2,12 +2,14 @@ import { useShopTokenContext } from "../../context/ShopTokenContext.tsx";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import { PartyStoreStatblock, usePartyStore } from "../../context/PartyStore.tsx";
 import { ShopItems } from "./ShopItems.tsx";
+import { ShopPlayerSell } from "./ShopPlayerSell.tsx";
 import shopStyles from "./shop.module.scss";
 import { useBuyPartyItem } from "../../api/tabletop-almanac/useParty.ts";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
-import { Money, ShopItemType } from "../../helper/types.ts";
+import { Money, ShopItemType, ShopSellItemType } from "../../helper/types.ts";
+import { StatblockItems } from "../../helper/equipmentHelpers.ts";
 import { updateShopMetadata } from "../../helper/tokenHelper.ts";
-import { ShoppingCart, ShoppingBag } from "@mui/icons-material";
+import { ShoppingCart, ShoppingBag, Sell } from "@mui/icons-material";
 import { Badge, Snackbar, Alert } from "@mui/material";
 import { useEffect, useState } from "react";
 import { ShopPlayerCart } from "./ShopPlayerCart.tsx";
@@ -15,7 +17,17 @@ import { ShopCustomerSelect } from "./ShopCustomerSelect.tsx";
 import { ShopHeader } from "./ShopHeader.tsx";
 import Tippy from "@tippyjs/react";
 import { useE5GetStatblock } from "../../api/e5/useE5Api.ts";
-import { setNullToZero } from "../../helper/moneyHelpers.ts";
+import {
+    addMoney,
+    getRandomSellOffer,
+    normalizeToCP,
+    scaleMoney,
+    setNullToZero,
+    subtractMoney,
+    toCP,
+} from "../../helper/moneyHelpers.ts";
+
+const zeroMoney: Money = { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 };
 
 export const ShopPlayer = () => {
     const apiKey = useMetadataContext((state) => state.room?.tabletopAlmanacAPIKey);
@@ -27,7 +39,7 @@ export const ShopPlayer = () => {
         if (!partyId) return null;
         return state.parties.find((p) => p.id === partyId) ?? null;
     });
-    const [view, setView] = useState<"items" | "cart">("items");
+    const [view, setView] = useState<"items" | "cart" | "sell">("items");
     const [member, setMember] = useState<PartyStoreStatblock | null>(null);
     const [notification, setNotification] = useState<{
         message: string;
@@ -70,6 +82,7 @@ export const ShopPlayer = () => {
 
     const myCart = statblockId ? data.cart[statblockId] : null;
     const cartItemCount = myCart?.items.length || 0;
+    const sellItemCount = myCart?.sellItems?.length || 0;
 
     const handleAddToCart = async (item: ShopItemType) => {
         if (!statblockId) return;
@@ -152,11 +165,66 @@ export const ShopPlayer = () => {
         );
     };
 
-    const handleBuy = async () => {
-        if (!statblockId || !myCart || !partyId || !member) return;
+    const handleAddToSellCart = async (equipmentItem: StatblockItems, count: number) => {
+        if (!statblockId || !token) return;
+
+        const catalogCost = setNullToZero(equipmentItem.item.cost ?? {});
+        const unitPrice = getRandomSellOffer(catalogCost);
+
+        await updateShopMetadata(
+            (currentData) => {
+                const updatedCart = { ...currentData.cart };
+                const currentCart = { ...(updatedCart[statblockId] || { items: [], price: zeroMoney }) };
+
+                const line: ShopSellItemType = {
+                    id: equipmentItem.item.id,
+                    name: equipmentItem.item.name,
+                    slug: equipmentItem.item.slug,
+                    count,
+                    unitPrice,
+                    catalogCost,
+                };
+
+                currentCart.sellItems = [...(currentCart.sellItems ?? []), line];
+                currentCart.sellPrice = addMoney(currentCart.sellPrice ?? zeroMoney, scaleMoney(unitPrice, count));
+
+                updatedCart[statblockId] = currentCart;
+                return { ...currentData, cart: updatedCart };
+            },
+            [token.id],
+        );
+    };
+
+    const handleRemoveFromSellCart = async (index: number) => {
+        if (!statblockId) return;
+
+        await updateShopMetadata(
+            (currentData) => {
+                const myCart = currentData.cart[statblockId];
+                if (!myCart || !myCart.sellItems) return currentData;
+
+                const updatedCart = { ...currentData.cart };
+                const currentCart = { ...myCart };
+                const line = currentCart.sellItems![index];
+
+                currentCart.sellItems = currentCart.sellItems!.filter((_, i) => i !== index);
+                currentCart.sellPrice = subtractMoney(
+                    currentCart.sellPrice ?? zeroMoney,
+                    scaleMoney(line.unitPrice, line.count),
+                );
+
+                updatedCart[statblockId] = currentCart;
+                return { ...currentData, cart: updatedCart };
+            },
+            [token.id],
+        );
+    };
+
+    const handleCheckout = async () => {
+        if (!statblockId || !myCart || !partyId || !member || !token || !data) return;
 
         try {
-            const transactionItems = myCart.items.reduce(
+            const buyItems = myCart.items.reduce(
                 (acc, item) => {
                     const existing = acc.find((i) => i.item_id === item.id);
                     if (existing) {
@@ -169,41 +237,78 @@ export const ShopPlayer = () => {
                 [] as { item_id: number; count: number }[],
             );
 
+            const sellItems = (myCart.sellItems ?? []).reduce(
+                (acc, item) => {
+                    const existing = acc.find((i) => i.item_id === item.id);
+                    if (existing) {
+                        existing.count += item.count;
+                    } else {
+                        acc.push({ item_id: item.id, count: item.count });
+                    }
+                    return acc;
+                },
+                [] as { item_id: number; count: number }[],
+            );
+
+            const sellPrice = myCart.sellPrice ?? zeroMoney;
+            const cost = subtractMoney(myCart.price, sellPrice);
+            const payoutCP = toCP(sellPrice) - toCP(myCart.price);
+
+            if (payoutCP > toCP(data.money)) {
+                setNotification({
+                    message: "The shop doesn't have enough funds to buy these items.",
+                    severity: "error",
+                });
+                return;
+            }
+
             await buyItem.mutateAsync({
                 partyStatblockId: member.partyStatblockId,
                 data: {
-                    cost: myCart.price,
-                    buy: transactionItems,
-                    sell: [],
+                    cost,
+                    buy: buyItems,
+                    sell: sellItems,
                 },
             });
 
-            // Clear cart (stock is already updated when added to cart)
+            // Clear cart (buy-side stock is already updated when added to cart), credit/debit the
+            // till, and restock sold items into the shop's own inventory at their catalog price.
             await updateShopMetadata(
                 (currentData) => {
                     const updatedCart = { ...currentData.cart };
-                    const cartMoney = setNullToZero(currentData.money);
-                    const cost = setNullToZero(updatedCart[statblockId].price);
-                    const newMoney: Money = {
-                        cp: cartMoney.cp + cost.cp,
-                        sp: cartMoney.sp + cost.sp,
-                        ep: cartMoney.ep + cost.ep,
-                        gp: cartMoney.gp + cost.gp,
-                        pp: cartMoney.pp + cost.pp,
-                    };
+                    const newMoney = normalizeToCP(addMoney(setNullToZero(currentData.money), cost));
+
+                    const updatedItems = [...currentData.items];
+                    (myCart.sellItems ?? []).forEach((line) => {
+                        const idx = updatedItems.findIndex((i) => i.id === line.id);
+                        if (idx >= 0) {
+                            updatedItems[idx] = {
+                                ...updatedItems[idx],
+                                count: (updatedItems[idx].count ?? 0) + line.count,
+                            };
+                        } else {
+                            updatedItems.push({
+                                id: line.id,
+                                name: line.name,
+                                slug: line.slug,
+                                money: line.catalogCost,
+                                count: line.count,
+                            });
+                        }
+                    });
 
                     delete updatedCart[statblockId];
-                    return { ...currentData, money: newMoney, cart: updatedCart };
+                    return { ...currentData, items: updatedItems, money: newMoney, cart: updatedCart };
                 },
                 [token.id],
             );
 
             setView("items");
-            setNotification({ message: "Purchase successful!", severity: "success" });
+            setNotification({ message: "Transaction successful!", severity: "success" });
         } catch (e: any) {
             console.error(e);
             setNotification({
-                message: `Purchase failed: ${e?.response?.data?.detail ?? e?.message ?? "Unknown error"}`,
+                message: `Transaction failed: ${e?.response?.data?.detail ?? e?.message ?? "Unknown error"}`,
                 severity: "error",
             });
         }
@@ -221,15 +326,19 @@ export const ShopPlayer = () => {
             />
             <div className={shopStyles.section}>
                 <div className={shopStyles.sectionHeader}>
-                    <h2 className={shopStyles.sectionTitle}>{view === "items" ? "Inventory" : "My Cart"}</h2>
+                    <h2 className={shopStyles.sectionTitle}>
+                        {view === "items" ? "Inventory" : view === "sell" ? "Sell Items" : "My Cart"}
+                    </h2>
                     <div className={shopStyles.actions}>
-                        <Tippy content={view === "items" ? "View Cart" : "View Inventory"}>
-                            <button
-                                className={shopStyles.addButton}
-                                onClick={() => setView(view === "items" ? "cart" : "items")}
-                            >
+                        <Tippy content="Shop Inventory">
+                            <button className={shopStyles.addButton} onClick={() => setView("items")}>
+                                <ShoppingBag />
+                            </button>
+                        </Tippy>
+                        <Tippy content="Sell Your Items">
+                            <button className={shopStyles.addButton} onClick={() => setView("sell")}>
                                 <Badge
-                                    badgeContent={cartItemCount}
+                                    badgeContent={sellItemCount}
                                     sx={{
                                         "& .MuiBadge-badge": {
                                             backgroundColor: "#448844",
@@ -237,14 +346,29 @@ export const ShopPlayer = () => {
                                         },
                                     }}
                                 >
-                                    {view === "items" ? <ShoppingCart /> : <ShoppingBag />}
+                                    <Sell />
+                                </Badge>
+                            </button>
+                        </Tippy>
+                        <Tippy content="My Cart">
+                            <button className={shopStyles.addButton} onClick={() => setView("cart")}>
+                                <Badge
+                                    badgeContent={cartItemCount + sellItemCount}
+                                    sx={{
+                                        "& .MuiBadge-badge": {
+                                            backgroundColor: "#448844",
+                                            color: "white",
+                                        },
+                                    }}
+                                >
+                                    <ShoppingCart />
                                 </Badge>
                             </button>
                         </Tippy>
                     </div>
                 </div>
 
-                {view === "items" ? (
+                {view === "items" && (
                     <ShopItems
                         items={data.items}
                         token={token}
@@ -252,12 +376,22 @@ export const ShopPlayer = () => {
                         readOnly={true}
                         onAddToCart={member ? handleAddToCart : undefined}
                     />
-                ) : (
+                )}
+                {view === "sell" && (
+                    <ShopPlayerSell
+                        equipment={statblock?.equipment ?? []}
+                        cart={myCart ?? null}
+                        onAddToSell={handleAddToSellCart}
+                    />
+                )}
+                {view === "cart" && (
                     <ShopPlayerCart
-                        cart={myCart ? { ...myCart, price: myCart.price } : null}
+                        cart={myCart ?? null}
+                        shopMoney={data.money}
                         onRemove={handleRemoveFromCart}
-                        onBuy={handleBuy}
-                        isBuying={buyItem.isPending}
+                        onRemoveSell={handleRemoveFromSellCart}
+                        onCheckout={handleCheckout}
+                        isCheckingOut={buyItem.isPending}
                     />
                 )}
             </div>

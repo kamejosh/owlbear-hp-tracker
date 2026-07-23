@@ -1,9 +1,15 @@
-# Unversioned
+# 3.7.3
 
+### New Features
+
++ Add Option to Sell items in shops
 + Add Recall Knowledge as optional Pathfinder Saving Throw
-+ Fix Bug when quickly editing maxHP and HP
 + Refactor Party System to support two different OBR rooms loading two different parties. 
 + Add Spell Cast Type and Spell Level to PF Spells
+
+### Improvements and Fixes
+
++ Fix Bug when quickly editing maxHP and HP
 + Fix Party Tokens don't get saved values applied on scene change
 + Fix Rolllog keeps oldest 100 entries instead of newest
 + Fix Reassigning Party Tokens does not work

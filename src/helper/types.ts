@@ -190,9 +190,25 @@ export type ShopItemType = {
     slug: string;
 };
 
+export type ShopSellItemType = {
+    id: number;
+    name: string;
+    slug: string;
+    count: number;
+    unitPrice: Money;
+    catalogCost: Money;
+};
+
+export type ShopCartEntry = {
+    items: Array<ShopItemType>;
+    price: Money;
+    sellItems?: Array<ShopSellItemType>;
+    sellPrice?: Money;
+};
+
 export type ShopMetadata = {
     items: Array<ShopItemType>;
-    cart: Record<string, { items: Array<ShopItemType>; price: Money }>;
+    cart: Record<string, ShopCartEntry>;
     money: Money;
     shopAvailable: boolean;
 };

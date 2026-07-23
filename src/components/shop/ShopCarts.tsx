@@ -1,4 +1,4 @@
-import { ShopMetadata, Money } from "../../helper/types.ts";
+import { ShopMetadata, Money, ShopCartEntry } from "../../helper/types.ts";
 import { MoneyEditInputs } from "../money/MoneyEditInputs.tsx";
 import { Item } from "@owlbear-rodeo/sdk";
 import shopStyles from "./shop.module.scss";
@@ -10,27 +10,31 @@ import styles from "../party/party-inventory.module.scss";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
 import { useGetParty } from "../../api/tabletop-almanac/useParty.ts";
 import { MoneyDisplay } from "../money/MoneyDisplay.tsx";
-import { toCP, formatCP, setNullToZero, normalizeToCP } from "../../helper/moneyHelpers.ts";
-import { Box, Typography, Divider } from "@mui/material";
+import { addMoney, formatCP, normalizeToCP, scaleMoney, setNullToZero, subtractMoney, toCP } from "../../helper/moneyHelpers.ts";
 import { useE5GetStatblock } from "../../api/e5/useE5Api.ts";
 import Tippy from "@tippyjs/react";
 import { CancelButton } from "../form/CancelButton.tsx";
 import { SubmitButton } from "../form/SubmitButton.tsx";
 
+const zeroMoney: Money = { pp: 0, gp: 0, ep: 0, sp: 0, cp: 0 };
+
 export const ShopCart = ({
     statblockId,
     cart,
     token,
+    data,
 }: {
     statblockId: string;
-    cart: { items: any[]; price: Money };
+    cart: ShopCartEntry;
     token: Item;
     data: ShopMetadata;
 }) => {
     const [isEditingPrice, setIsEditingPrice] = useState(false);
+    const [isEditingSellPrice, setIsEditingSellPrice] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const apiKey = useMetadataContext((state) => state.room?.tabletopAlmanacAPIKey);
     const form = useForm<Money>({ defaultValues: cart.price });
+    const sellForm = useForm<Money>({ defaultValues: cart.sellPrice ?? zeroMoney });
     const partyId = useMetadataContext((state) => state.room?.partyId);
     const { data: party } = useGetParty(partyId);
 
@@ -40,12 +44,21 @@ export const ShopCart = ({
     const ownerName = sb?.statblock?.name ?? `Statblock: ${statblockId}`;
 
     const statblock = statblockQuery.isSuccess ? statblockQuery.data : null;
-    const ownerMoney = statblock?.money ? setNullToZero(statblock.money) : { pp: 0, gp: 0, ep: 0, sp: 0, cp: 0 };
+    const ownerMoney = statblock?.money ? setNullToZero(statblock.money) : zeroMoney;
+
+    const sellItems = cart.sellItems ?? [];
+    const sellPrice = cart.sellPrice ?? zeroMoney;
 
     const ownerTotalCP = toCP(ownerMoney);
     const cartTotalCP = toCP(cart.price);
     const diffCP = ownerTotalCP - cartTotalCP;
     const isShort = diffCP < 0;
+
+    const shopMoney = setNullToZero(data.money);
+    const net = subtractMoney(cart.price, sellPrice);
+    const payoutCP = -toCP(net);
+    const tillShortCP = payoutCP - toCP(shopMoney);
+    const isTillShort = tillShortCP > 0;
 
     const handleUpdatePrice = async (newPrice: Money) => {
         await updateShopMetadata(
@@ -60,107 +73,150 @@ export const ShopCart = ({
     };
 
     const handleResetPrice = async () => {
-        const recalculatedPrice = cart.items.reduce(
-            (acc, item) => {
-                return {
-                    pp: (acc.pp || 0) + (item.money.pp || 0),
-                    gp: (acc.gp || 0) + (item.money.gp || 0),
-                    ep: (acc.ep || 0) + (item.money.ep || 0),
-                    sp: (acc.sp || 0) + (item.money.sp || 0),
-                    cp: (acc.cp || 0) + (item.money.cp || 0),
-                };
-            },
-            { pp: 0, gp: 0, ep: 0, sp: 0, cp: 0 },
-        );
-
+        const recalculatedPrice = cart.items.reduce((acc, item) => addMoney(acc, item.money), zeroMoney);
         await handleUpdatePrice(normalizeToCP(recalculatedPrice));
     };
 
+    const handleUpdateSellPrice = async (newPrice: Money) => {
+        await updateShopMetadata(
+            (currentData) => {
+                const updatedCart = { ...currentData.cart };
+                updatedCart[statblockId] = { ...currentData.cart[statblockId], sellPrice: newPrice };
+                return { ...currentData, cart: updatedCart };
+            },
+            [token.id],
+        );
+        setIsEditingSellPrice(false);
+    };
+
+    const handleResetSellPrice = async () => {
+        const recalculatedPrice = sellItems.reduce(
+            (acc, item) => addMoney(acc, scaleMoney(item.unitPrice, item.count)),
+            zeroMoney,
+        );
+        await handleUpdateSellPrice(normalizeToCP(recalculatedPrice));
+    };
+
     return (
-        <Box
-            className={shopStyles.cartRow}
-            sx={{
-                mb: 2,
-                p: 2,
-                borderRadius: 2,
-                bgcolor: "rgba(255,255,255,0.03)",
-                border: "1px solid rgba(255,255,255,0.1)",
-            }}
-        >
+        <div className={shopStyles.cartRow}>
             <div className={shopStyles.cartHeader}>
                 <span className={shopStyles.cartOwner}>{ownerName}</span>
-                {!isEditingPrice ? (
-                    <div className={shopStyles.cartPriceRow}>
-                        <span className={shopStyles.cartPrice}>
-                            Total: <MoneyDisplay money={cart.price} />
-                        </span>
-                        <div style={{ display: "flex", gap: "0.5ch", alignItems: "center" }}>
-                            <Tippy content="Edit price">
-                                <button className={shopStyles.editButton} onClick={() => setIsEditingPrice(true)}>
-                                    <Edit fontSize="small" />
-                                </button>
-                            </Tippy>
-                            <Tippy content="Reset price to total items cost">
-                                <button className={shopStyles.editButton} onClick={handleResetPrice}>
-                                    <RestartAlt fontSize="small" />
-                                </button>
-                            </Tippy>
-                        </div>
-                    </div>
-                ) : (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "0.5ch" }}>
-                        <form onSubmit={form.handleSubmit(handleUpdatePrice)} className={styles.moneyEditForm}>
-                            {error && (
-                                <div
-                                    style={{
-                                        backgroundColor: "rgba(255, 0, 0, 0.1)",
-                                        color: "#ff4444",
-                                        padding: "4px",
-                                        borderRadius: "4px",
-                                        fontSize: "0.7rem",
-                                        textAlign: "center",
-                                        border: "1px solid rgba(255, 0, 0, 0.2)",
-                                    }}
-                                >
-                                    {error}
-                                </div>
-                            )}
-                            <MoneyEditInputs form={form} originalMoney={cart.price} onError={setError} />
-                            <div style={{ display: "flex", gap: "0.5ch" }}>
-                                <SubmitButton form={form} pending={false} />
-                                <CancelButton onClick={() => setIsEditingPrice(false)} />
-                            </div>
-                        </form>
-                    </div>
-                )}
             </div>
 
-            <Box sx={{ mt: 1, mb: 1, display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap", opacity: 0.8 }}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+            <div className={shopStyles.cartMeta}>
+                <div className={shopStyles.cartMetaItem}>
                     <AccountBalanceWallet fontSize="inherit" />
-                    <Typography variant="caption">Available:</Typography>
+                    <span>Available:</span>
                     <MoneyDisplay money={ownerMoney} />
-                </Box>
+                </div>
                 {isShort && (
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, color: "#ff4444" }}>
+                    <div className={`${shopStyles.cartMetaItem} ${shopStyles.warningText}`}>
                         <WarningAmber fontSize="inherit" />
-                        <Typography variant="caption" fontWeight="bold">
-                            Missing: {formatCP(Math.abs(diffCP))}
-                        </Typography>
-                    </Box>
-                )}
-            </Box>
-
-            <Divider sx={{ my: 1, borderColor: "rgba(255,255,255,0.05)" }} />
-
-            <div className={shopStyles.cartItems}>
-                {cart.items.map((item, idx) => (
-                    <div key={idx} className={shopStyles.cartItem}>
-                        {item.name} (<MoneyDisplay money={item.money} />)
+                        <span>Missing: {formatCP(Math.abs(diffCP))}</span>
                     </div>
-                ))}
+                )}
             </div>
-        </Box>
+
+            {cart.items.length > 0 && (
+                <>
+                    <div className={shopStyles.cartHr} />
+                    <div className={shopStyles.cartSubsectionHeader}>
+                        <span className={shopStyles.cartSubsectionTitle}>Buying</span>
+                        {!isEditingPrice ? (
+                            <div className={shopStyles.cartPriceRow}>
+                                <span className={shopStyles.cartPrice}>
+                                    Total: <MoneyDisplay money={cart.price} />
+                                </span>
+                                <Tippy content="Edit price">
+                                    <button className={shopStyles.editButton} onClick={() => setIsEditingPrice(true)}>
+                                        <Edit fontSize="small" />
+                                    </button>
+                                </Tippy>
+                                <Tippy content="Reset price to total items cost">
+                                    <button className={shopStyles.editButton} onClick={handleResetPrice}>
+                                        <RestartAlt fontSize="small" />
+                                    </button>
+                                </Tippy>
+                            </div>
+                        ) : (
+                            <form onSubmit={form.handleSubmit(handleUpdatePrice)} className={styles.moneyEditForm}>
+                                {error && <div className={shopStyles.errorContainer}>{error}</div>}
+                                <MoneyEditInputs form={form} originalMoney={cart.price} onError={setError} />
+                                <div className={shopStyles.editActions}>
+                                    <SubmitButton form={form} pending={false} />
+                                    <CancelButton onClick={() => setIsEditingPrice(false)} />
+                                </div>
+                            </form>
+                        )}
+                    </div>
+                    <div className={shopStyles.cartItems}>
+                        {cart.items.map((item, idx) => (
+                            <div key={idx} className={shopStyles.cartItem}>
+                                {item.name} (<MoneyDisplay money={item.money} />)
+                            </div>
+                        ))}
+                    </div>
+                </>
+            )}
+
+            {sellItems.length > 0 && (
+                <>
+                    <div className={shopStyles.cartHr} />
+                    <div className={shopStyles.cartSubsectionHeader}>
+                        <span className={shopStyles.cartSubsectionTitle}>Selling</span>
+                        {!isEditingSellPrice ? (
+                            <div className={shopStyles.cartPriceRow}>
+                                <span className={shopStyles.cartPrice}>
+                                    Total: <MoneyDisplay money={sellPrice} />
+                                </span>
+                                <Tippy content="Edit price">
+                                    <button
+                                        className={shopStyles.editButton}
+                                        onClick={() => setIsEditingSellPrice(true)}
+                                    >
+                                        <Edit fontSize="small" />
+                                    </button>
+                                </Tippy>
+                                <Tippy content="Reset price to total items offer">
+                                    <button className={shopStyles.editButton} onClick={handleResetSellPrice}>
+                                        <RestartAlt fontSize="small" />
+                                    </button>
+                                </Tippy>
+                            </div>
+                        ) : (
+                            <form
+                                onSubmit={sellForm.handleSubmit(handleUpdateSellPrice)}
+                                className={styles.moneyEditForm}
+                            >
+                                {error && <div className={shopStyles.errorContainer}>{error}</div>}
+                                <MoneyEditInputs form={sellForm} originalMoney={sellPrice} onError={setError} />
+                                <div className={shopStyles.editActions}>
+                                    <SubmitButton form={sellForm} pending={false} />
+                                    <CancelButton onClick={() => setIsEditingSellPrice(false)} />
+                                </div>
+                            </form>
+                        )}
+                    </div>
+                    <div className={shopStyles.cartItems}>
+                        {sellItems.map((item, idx) => (
+                            <div key={idx} className={shopStyles.cartItem}>
+                                {item.count} x {item.name} (<MoneyDisplay money={scaleMoney(item.unitPrice, item.count)} />)
+                            </div>
+                        ))}
+                    </div>
+                </>
+            )}
+
+            {isTillShort && (
+                <>
+                    <div className={shopStyles.cartHr} />
+                    <div className={shopStyles.shortfallWarning}>
+                        <WarningAmber fontSize="small" />
+                        Shop till short by {formatCP(tillShortCP)}
+                    </div>
+                </>
+            )}
+        </div>
     );
 };
 

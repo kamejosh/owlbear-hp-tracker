@@ -1,6 +1,6 @@
 import { GMGMetadata, LootMetadata, RoomMetadata, ShopMetadata } from "./types.ts";
 import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
-import { itemMetadataKey, lootMetadataKey, shopMetadataKey } from "./variables.ts";
+import { defaultShop, itemMetadataKey, lootMetadataKey, shopMetadataKey } from "./variables.ts";
 import { evalString } from "./helpers.ts";
 import { updateHp } from "./hpHelpers.ts";
 import { updateAc } from "./acHelper.ts";
@@ -54,11 +54,7 @@ export const updateShopMetadata = async (
             await updateItems(subList, (items: Array<Item>) => {
                 items.forEach((item) => {
                     if (typeof shopData === "function") {
-                        const currentData = (item.metadata[shopMetadataKey] as ShopMetadata) || {
-                            items: [],
-                            cart: {},
-                            shopAvailable: false,
-                        };
+                        const currentData = (item.metadata[shopMetadataKey] as ShopMetadata) || defaultShop;
                         item.metadata[shopMetadataKey] = shopData(currentData);
                     } else {
                         item.metadata[shopMetadataKey] = { ...shopData };
