@@ -59,7 +59,7 @@ export const DiceButton = (props: DiceButtonProps) => {
     // the roll log's re-roll button) overrides this.
     const e5Context = useContext(E5StatblockContext);
     const pfContext = useContext(PFStatblockContext);
-    const imageUrl = props.imageUrl ?? e5Context?.item.image.url ?? pfContext?.item.image.url;
+    const imageUrl = props.imageUrl ?? e5Context?.item.image?.url ?? pfContext?.item.image?.url;
 
     const customTheme = useMemo(() => {
         if (props.customDiceThemeId) {
