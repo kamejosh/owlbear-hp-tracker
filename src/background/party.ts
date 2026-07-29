@@ -9,6 +9,7 @@ import { partyStore } from "../context/PartyStore.tsx";
 import { listParties } from "../api/tabletop-almanac/useParty.ts";
 import { updateHp } from "../helper/hpHelpers.ts";
 import { updateAc } from "../helper/acHelper.ts";
+import { updateItems } from "../helper/obrHelper.ts";
 
 let pollingTimeout: ReturnType<typeof setTimeout> | null = null;
 let failedToken: string | null = null;
@@ -275,10 +276,11 @@ export const initParty = async () => {
 
     // subscribe to token changes
     OBR.scene.items.onChange(async (items) => {
-        const newTokens: Array<Item> = [];
+        const newTokenIds: Array<string> = [];
         const partyId = await getPartyId();
         const currentParty = await getCurrentParty();
         const membersToUpdate: PartyStoreStatblock[] = [];
+        const itemsToApply: Array<string> = [];
 
         items.forEach((item) => {
             if (item.type === "IMAGE" && (item.layer === "CHARACTER" || item.layer === "MOUNT")) {
@@ -305,13 +307,7 @@ export const initParty = async () => {
                         }
                     }
                 } else if (member?.metadata && !_.isEqual(member.metadata, item.metadata)) {
-                    void OBR.scene.items.updateItems([item], (items) => {
-                        for (const i of items) {
-                            if (applyMemberToItem(i, member, currentParty?.group)) {
-                                newTokens.push(i);
-                            }
-                        }
-                    });
+                    itemsToApply.push(item.id);
                 }
             }
         });
@@ -319,6 +315,20 @@ export const initParty = async () => {
         if (membersToUpdate.length > 0 && partyId) {
             partyStore.getState().updateMembers(partyId, membersToUpdate);
         }
-        await refreshTokenDisplays(newTokens.map((t) => t.id));
+
+        // Batch all metadata applications into a single rate-limit-aware update instead of
+        // firing one unbatched updateItems per token (which overruns OBR's rate limit).
+        if (itemsToApply.length > 0 && currentParty) {
+            await updateItems(itemsToApply, (drafts) => {
+                for (const draft of drafts) {
+                    const member = findPartyMember(draft, currentParty);
+                    if (member && applyMemberToItem(draft, member, currentParty.group)) {
+                        newTokenIds.push(draft.id);
+                    }
+                }
+            });
+        }
+
+        await refreshTokenDisplays(newTokenIds);
     });
 };

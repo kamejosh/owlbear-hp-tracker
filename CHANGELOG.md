@@ -1,3 +1,7 @@
+## Unversioned
+
++ Adding the party to a scene runs into the OBR rate limit.
+
 # 3.7.3
 
 ### New Features
