@@ -20,6 +20,7 @@ import { RollLogEntryType, rollLogStore } from "../context/RollLogContext.tsx";
 import {
     GMG_ID,
     itemMetadataKey,
+    pendingRollMetaChannel,
     prettySordidID,
     rollLogPopover,
     rollLogPopoverId,
@@ -49,25 +50,43 @@ let rollLogTimeOut: number;
 // it back up in rollerCallback once the roll result comes back. Entries are normally removed there,
 // but rolls that never come back (dddice outage, dropped connection, ...) would otherwise leak here
 // for as long as the room stays open, so we also bound this by age and count.
-const pendingRollImages = new Map<string, { imageUrl: string; created: number }>();
-const pendingRollImagesMaxAge = 1000 * 60 * 5;
-const pendingRollImagesMaxSize = 1000;
+// We also stash whether the roll was submitted as hidden (whisper) here: the roll:finished event
+// relayed to us from the dddice.com iframe embed does not reliably echo back the whisper field, so
+// dddiceRollToRollLog's is_hidden (derived from the received roll's per-die values / whisper) can't
+// be trusted alone - we need to remember locally what we asked for at submission time.
+// rollWrapper (called from the action panel, dice buttons, ...) and rollerCallback (registered by
+// the background script) run in different iframes with separate JS module instances, so this map
+// can't just be written in one and read in the other - rollWrapper also broadcasts every entry over
+// pendingRollMetaChannel ("LOCAL" only, same client) and listenForPendingRollMeta mirrors it into
+// whichever context's map rollerCallback actually reads from.
+const pendingRollMeta = new Map<string, { imageUrl?: string; hidden?: boolean; created: number }>();
+const pendingRollMetaMaxAge = 1000 * 60 * 5;
+const pendingRollMetaMaxSize = 1000;
 
-const setPendingRollImage = (uuid: string, imageUrl: string) => {
+const setPendingRollMeta = (uuid: string, meta: { imageUrl?: string; hidden?: boolean }) => {
     const now = Date.now();
-    for (const [key, value] of pendingRollImages) {
-        if (now - value.created > pendingRollImagesMaxAge) {
-            pendingRollImages.delete(key);
+    for (const [key, value] of pendingRollMeta) {
+        if (now - value.created > pendingRollMetaMaxAge) {
+            pendingRollMeta.delete(key);
         }
     }
-    while (pendingRollImages.size >= pendingRollImagesMaxSize) {
-        const oldestKey = pendingRollImages.keys().next().value;
+    while (pendingRollMeta.size >= pendingRollMetaMaxSize) {
+        const oldestKey = pendingRollMeta.keys().next().value;
         if (oldestKey === undefined) {
             break;
         }
-        pendingRollImages.delete(oldestKey);
+        pendingRollMeta.delete(oldestKey);
     }
-    pendingRollImages.set(uuid, { imageUrl, created: now });
+    pendingRollMeta.set(uuid, { ...meta, created: now });
+};
+
+// registered once by the background script so rollerCallback's pendingRollMeta.get(e.uuid) lookup
+// can actually find entries set by rollWrapper in other iframes - see the comment above pendingRollMeta.
+export const listenForPendingRollMeta = () => {
+    return OBR.broadcast.onMessage(pendingRollMetaChannel, (event) => {
+        const data = event.data as { uuid: string; imageUrl?: string; hidden?: boolean };
+        setPendingRollMeta(data.uuid, { imageUrl: data.imageUrl, hidden: data.hidden });
+    });
 };
 
 export const updateRoomMetadataDiceUser = async (
@@ -255,10 +274,16 @@ export const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType
     const participant = e.room.participants.find((p) => p.user.uuid === e.user.uuid);
     const rollLogEntry = await dddiceRollToRollLog(e, { participant: participant });
 
-    const pending = pendingRollImages.get(e.uuid);
+    const pending = pendingRollMeta.get(e.uuid);
+    // whether the roll was submitted with a whisper - not reflected in rollLogEntry.is_hidden since
+    // that only marks the "?" masking for individually-hidden dice, and a whispered roll only ever
+    // reaches the whisperee's roll log in the first place, so it needs no extra masking there
+    const wasWhispered = pending?.hidden ?? false;
     if (pending) {
-        rollLogEntry.imageUrl = pending.imageUrl;
-        pendingRollImages.delete(e.uuid);
+        if (pending.imageUrl) {
+            rollLogEntry.imageUrl = pending.imageUrl;
+        }
+        pendingRollMeta.delete(e.uuid);
     }
 
     // we only handle new rolls dddice extension is not loaded
@@ -269,8 +294,9 @@ export const rollerCallback = async (e: IRoll, addRoll: (entry: RollLogEntryType
     }
 
     // dddice's RollCreated event fires identically on every connected participant's client,
-    // so only the roll's own owner should relay it to Discord to avoid duplicate posts
-    if (ownUserUuid && e.user.uuid === ownUserUuid) {
+    // so only the roll's own owner should relay it to Discord to avoid duplicate posts; whispered
+    // rolls are never relayed regardless, since they're not meant to be visible to anyone else
+    if (ownUserUuid && e.user.uuid === ownUserUuid && !wasWhispered) {
         void postRollToDiscord(rollLogEntry);
     }
 };
@@ -706,8 +732,14 @@ export const rollWrapper = async (
         try {
             const roll = await api.roll.create(dice, options);
             if (roll && roll.data) {
-                if (imageUrl) {
-                    setPendingRollImage(roll.data.uuid, imageUrl);
+                const hidden = (options?.whisper?.length ?? 0) > 0;
+                if (imageUrl || hidden) {
+                    setPendingRollMeta(roll.data.uuid, { imageUrl, hidden });
+                    await OBR.broadcast.sendMessage(
+                        pendingRollMetaChannel,
+                        { uuid: roll.data.uuid, imageUrl, hidden },
+                        { destination: "LOCAL" },
+                    );
                 }
                 return roll.data;
             }

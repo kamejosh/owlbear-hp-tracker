@@ -17,6 +17,7 @@ import {
     dddiceApiLogin,
     getDiceUser,
     handleNewRoll,
+    listenForPendingRollMeta,
     removeRollerApiCallbacks,
     rollerCallback,
 } from "../helper/diceHelper.ts";
@@ -129,6 +130,9 @@ export const setupDddice = async () => {
     const playerRole = await OBR.player.getRole();
 
     OBR.room.onMetadataChange((metadata) => roomCallback(metadata, false));
+    // mirror pending roll image/hidden metadata set by rollWrapper in other iframes into this
+    // context's map, since rollerCallback below (and the roll:finished handler further down) run here
+    listenForPendingRollMeta();
     // get dice rolls from integrated dice roller
     OBR.broadcast.onMessage(rollMessageChannel, (event) => {
         handleNewRoll(rollLogStore.getState().addRoll, event.data as RollLogEntryType);

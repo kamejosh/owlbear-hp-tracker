@@ -20,6 +20,7 @@ export const shortRestPopoverId = `${ID}/short-rest`;
 export const rollMessageChannel = `${ID}.roll-event`;
 export const rollMessageWhisperChannel = `${ID}.roll-event-whisper`;
 export const nextTurnChannel = `${ID}.next-turn`;
+export const pendingRollMetaChannel = `${ID}.pending-roll-meta`;
 
 export const prettySordidID = "com.pretty-initiative";
 

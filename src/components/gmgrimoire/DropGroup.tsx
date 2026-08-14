@@ -19,7 +19,7 @@ import {
 import { useMetadataContext, useTaSettingsStore } from "../../context/MetadataContext.ts";
 import { useDiceRoller } from "../../context/DDDiceContext.tsx";
 import { IDiceRoll, Operator } from "dddice-js";
-import { dicePlusGroupRoll, diceToRoll, getUserUuid, localRoll } from "../../helper/diceHelper.ts";
+import { dicePlusGroupRoll, diceToRoll, getUserUuid, localRoll, rollWrapper } from "../../helper/diceHelper.ts";
 import { getRoomDiceUser, getTokenName } from "../../helper/helpers.ts";
 import { usePlayerContext } from "../../context/PlayerContext.ts";
 import { useRollLogContext } from "../../context/RollLogContext.tsx";
@@ -108,14 +108,14 @@ export const DropGroup = (props: DropGroupProps) => {
                 customThemeId ?? theme.id,
             );
             if (parsed) {
-                const r = await rollerApi?.roll.create(parsed.dice, {
+                const r = await rollWrapper(rollerApi, parsed.dice, {
                     operator: parsed.operator,
                     external_id: statblock,
                     label: "Initiative: Roll",
-                    whisper: hidden ? await getUserUuid(room, rollerApi) : undefined,
+                    whisper: hidden ? await getUserUuid(room, rollerApi ?? undefined) : undefined,
                 });
                 return {
-                    value: Number(r?.data.total_value),
+                    value: Number(r?.total_value),
                     id: id,
                 };
             }
