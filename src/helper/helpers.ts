@@ -313,7 +313,11 @@ export const dddiceRollToRollLog = async (
         created_at: roll.created_at,
         equation: roll.equation,
         label: roll.label,
-        is_hidden: roll.values.some((v) => v.is_hidden),
+        // dddice tracks two distinct notions of "hidden": per-die is_hidden (a die whose face is
+        // concealed within an otherwise-visible roll) and roll-level whisper (the whole roll is only
+        // delivered to specific participants) - our "hidden roll" feature uses whisper, so both must
+        // be checked or whispered rolls leak through as non-hidden (e.g. get posted to Discord)
+        is_hidden: roll.values.some((v) => v.is_hidden) || (roll.whisper?.length ?? 0) > 0,
         total_value: roll.total_value,
         username: username,
         values: roll.values.map((v) => {
