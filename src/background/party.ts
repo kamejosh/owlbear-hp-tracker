@@ -1,6 +1,6 @@
 import { ListPartiesParams, PartyPagination } from "../api/tabletop-almanac/useParty.ts";
 import _ from "lodash";
-import OBR, { Image, Item } from "@owlbear-rodeo/sdk";
+import OBR, { Image, Item, Metadata } from "@owlbear-rodeo/sdk";
 import { PartySettings, PartyStoreStatblock } from "../context/PartyStore.tsx";
 import { itemMetadataKey, metadataKey } from "../helper/variables.ts";
 import { GMGMetadata, RoomMetadata, SceneMetadata } from "../helper/types.ts";
@@ -9,11 +9,32 @@ import { partyStore } from "../context/PartyStore.tsx";
 import { listParties } from "../api/tabletop-almanac/useParty.ts";
 import { updateHp } from "../helper/hpHelpers.ts";
 import { updateAc } from "../helper/acHelper.ts";
-import { updateItems } from "../helper/obrHelper.ts";
+import { updateItems, updateList } from "../helper/obrHelper.ts";
 
 let pollingTimeout: ReturnType<typeof setTimeout> | null = null;
 let failedToken: string | null = null;
 let retryCount = 0;
+
+/** True while applyPartyToTokens is writing, so the resulting onChange echo is ignored. */
+let applyingPartyToScene = false;
+/**
+ * itemId -> the party token's metadata as we last knew it to be correct (post scene-open
+ * apply, or post accepted edit). onChange only treats a token as edited when its metadata
+ * differs from this, which stops a freshly opened scene from writing its old values into
+ * the party store.
+ */
+let tokenMetadataBaseline = new Map<string, Metadata>();
+/**
+ * True once applyPartyToTokens has stamped the current scene against a real party. Until then a
+ * token without a baseline is not trusted (its metadata may be left over from a previous
+ * session); afterwards a token without a baseline is one that joined the party after the apply
+ * (e.g. a statblock was just assigned to it), so its metadata is a genuine edit.
+ */
+let appliedPartyToScene = false;
+/** Bumped for every apply run; a run whose generation is stale aborts instead of writing. */
+let applyGeneration = 0;
+/** The apply currently in flight, so overlapping callers join it instead of starting a second. */
+let applyInFlight: Promise<void> | null = null;
 
 export const startPartyPolling = async (params: ListPartiesParams) => {
     stopPartyPolling();
@@ -122,7 +143,8 @@ const initPlayerPartyMembers = async (items: Array<Item>) => {
     }
 };
 
-export const initPlayerParty = async () => {
+/** Room-scoped player setup: call exactly once, no scene needed. */
+export const initPlayerPartyRoom = async () => {
     const room = await OBR.room.getMetadata();
     if (metadataKey in room) {
         const roomMetadata = room[metadataKey] as RoomMetadata;
@@ -136,9 +158,6 @@ export const initPlayerParty = async () => {
         }
     }
 
-    const items = await OBR.scene.items.getItems();
-    await initPlayerPartyMembers(items);
-
     OBR.room.onMetadataChange((metadata) => {
         const gmgMetadata = metadata[metadataKey] as RoomMetadata;
         if (gmgMetadata) {
@@ -148,11 +167,42 @@ export const initPlayerParty = async () => {
             }
         }
     });
-
-    OBR.scene.items.onChange((items) => {
-        initPlayerPartyMembers(items);
-    });
 };
+
+let playerItemsUnsubscribe: (() => void) | null = null;
+/**
+ * Setup and teardown run one after another. Both can be triggered for a single scene load
+ * (OBR.scene.onReadyChange and the initial isReady() check), and without serialization both would
+ * unsubscribe the same null handle, subscribe, and orphan one of the two subscriptions - which
+ * then keeps firing, duplicating party store writes and outliving the scene.
+ */
+let playerSceneQueue: Promise<void> = Promise.resolve();
+
+const queuePlayerSceneTask = (task: () => Promise<void> | void): Promise<void> => {
+    const run = playerSceneQueue.then(task);
+    playerSceneQueue = run.catch(() => {});
+    return run;
+};
+
+/** Scene-scoped player setup: safe to call on every scene ready, replaces its own subscription. */
+export const initPlayerPartyScene = async () =>
+    queuePlayerSceneTask(async () => {
+        playerItemsUnsubscribe?.();
+        playerItemsUnsubscribe = null;
+
+        const items = await OBR.scene.items.getItems();
+        await initPlayerPartyMembers(items);
+
+        playerItemsUnsubscribe = OBR.scene.items.onChange((items) => {
+            void initPlayerPartyMembers(items);
+        });
+    });
+
+export const teardownPlayerPartyScene = () =>
+    queuePlayerSceneTask(() => {
+        playerItemsUnsubscribe?.();
+        playerItemsUnsubscribe = null;
+    });
 
 const findPartyMember = (item: Item, currentParty: PartySettings) => {
     const image = item as Image;
@@ -181,16 +231,112 @@ const applyMemberToItem = (item: Item, member: PartyStoreStatblock | undefined, 
 };
 
 /** Refreshes the HP/AC display of tokens whose GMG metadata was just changed. */
-const refreshTokenDisplays = async (tokenIds: Array<string>) => {
-    if (tokenIds.length === 0) {
+const refreshTokenDisplays = async (tokenIds: Set<string>) => {
+    if (tokenIds.size === 0) {
         return;
     }
-    const tokens = await OBR.scene.items.getItems(tokenIds);
-    for (const token of tokens) {
-        if (itemMetadataKey in token.metadata) {
-            const metadata = token.metadata[itemMetadataKey] as GMGMetadata;
-            await updateHp(token, metadata);
-            await updateAc(token, metadata);
+    const tokens = await OBR.scene.items.getItems([...tokenIds]);
+    // Each token can trigger up to four sub-mutations (HP bar, HP text, AC shape, visibility),
+    // so keep the chunk size small to stay under OBR's rate limit.
+    await updateList(tokens, 2, async (subList) => {
+        for (const token of subList) {
+            if (itemMetadataKey in token.metadata) {
+                const metadata = token.metadata[itemMetadataKey] as GMGMetadata;
+                await updateHp(token, metadata);
+                await updateAc(token, metadata);
+            }
+        }
+    });
+};
+
+/** Invalidates an apply that is still in flight - used when the scene it belongs to goes away. */
+const abortApplyPartyToTokens = () => {
+    applyGeneration++;
+    applyInFlight = null;
+    applyingPartyToScene = false;
+    appliedPartyToScene = false;
+    tokenMetadataBaseline = new Map<string, Metadata>();
+};
+
+const runApplyPartyToTokens = async (generation: number) => {
+    const isCurrent = () => generation === applyGeneration;
+
+    applyingPartyToScene = true;
+    appliedPartyToScene = false;
+    // Held locally as well, so an aborted run writes into its own orphaned map instead of into
+    // the one the scene that replaced it is using.
+    const baseline = new Map<string, Metadata>();
+    tokenMetadataBaseline = baseline;
+    try {
+        const currentParty = await getCurrentParty();
+        if (!isCurrent()) {
+            return;
+        }
+        if (!currentParty || currentParty.members.length === 0) {
+            // No party to stamp, so the tokens keep whatever they carry - which we must not trust
+            // as party state. appliedPartyToScene stays false, and onChange stays conservative.
+            return;
+        }
+
+        const items = await OBR.scene.items.getItems(
+            (item) => item.type === "IMAGE" && (item.layer === "CHARACTER" || item.layer === "MOUNT"),
+        );
+        if (!isCurrent()) {
+            return;
+        }
+
+        const partyTokenIds: Array<string> = [];
+        const membersByItemId = new Map<string, PartyStoreStatblock>();
+        for (const item of items) {
+            const member = findPartyMember(item, currentParty);
+            if (!member) {
+                continue;
+            }
+            partyTokenIds.push(item.id);
+            if (
+                (member.metadata && !_.isEqual(member.metadata, item.metadata)) ||
+                (member.playerId && member.playerId !== item.createdUserId)
+            ) {
+                membersByItemId.set(item.id, member);
+            }
+        }
+
+        // A Set, because updateItems replays the callback after a rate limit retry.
+        const newTokenIds = new Set<string>();
+        if (membersByItemId.size > 0) {
+            await updateItems([...membersByItemId.keys()], (drafts) => {
+                for (const item of drafts) {
+                    if (applyMemberToItem(item, membersByItemId.get(item.id), currentParty.group)) {
+                        newTokenIds.add(item.id);
+                    }
+                }
+            });
+            if (!isCurrent()) {
+                return;
+            }
+        }
+
+        // Take the baseline from what OBR actually persisted, not from the update drafts. If the
+        // write only partially applied, the baseline matches reality, onChange sees no diff and
+        // leaves the store alone, and the next scene open re-applies.
+        const persisted = await OBR.scene.items.getItems(partyTokenIds);
+        if (!isCurrent()) {
+            return;
+        }
+        for (const token of persisted) {
+            baseline.set(token.id, token.metadata);
+        }
+        appliedPartyToScene = true;
+
+        // Everything that could echo back as a token metadata change is written and baselined by
+        // now, so drop the guard before the display refresh - that part deliberately runs slowly
+        // (~500ms per two tokens) and any real edit during it must not be swallowed.
+        applyingPartyToScene = false;
+
+        await refreshTokenDisplays(newTokenIds);
+    } finally {
+        if (isCurrent()) {
+            applyingPartyToScene = false;
         }
     }
 };
@@ -200,42 +346,21 @@ const refreshTokenDisplays = async (tokenIds: Array<string>) => {
  * for its party member, instead of only applying them when a token is first matched to the party.
  * Runs on scene switch so stale values from a previous session don't linger.
  */
-export const applyPartyToTokens = async () => {
-    const currentParty = await getCurrentParty();
-    if (!currentParty || currentParty.members.length === 0) {
-        return;
+export const applyPartyToTokens = async (): Promise<void> => {
+    // Both OBR.scene.onReadyChange and the initial isReady() check can fire for one scene load.
+    // Join the run that is already going instead of starting a second one, which would reset the
+    // baseline map the first one just filled and clear the echo guard while it is still writing.
+    if (applyInFlight) {
+        return applyInFlight;
     }
-
-    const items = await OBR.scene.items.getItems(
-        (item) => item.type === "IMAGE" && (item.layer === "CHARACTER" || item.layer === "MOUNT"),
-    );
-
-    const membersByItemId = new Map<string, PartyStoreStatblock>();
-    for (const item of items) {
-        const member = findPartyMember(item, currentParty);
-        if (
-            member &&
-            ((member.metadata && !_.isEqual(member.metadata, item.metadata)) ||
-                (member.playerId && member.playerId !== item.createdUserId))
-        ) {
-            membersByItemId.set(item.id, member);
-        }
-    }
-
-    if (membersByItemId.size === 0) {
-        return;
-    }
-
-    const newTokens: Array<Item> = [];
-    await OBR.scene.items.updateItems([...membersByItemId.keys()], (items) => {
-        for (const item of items) {
-            if (applyMemberToItem(item, membersByItemId.get(item.id), currentParty.group)) {
-                newTokens.push(item);
-            }
+    const generation = ++applyGeneration;
+    const run = runApplyPartyToTokens(generation).finally(() => {
+        if (generation === applyGeneration) {
+            applyInFlight = null;
         }
     });
-
-    await refreshTokenDisplays(newTokens.map((t) => t.id));
+    applyInFlight = run;
+    return run;
 };
 
 export const initParty = async () => {
@@ -246,11 +371,27 @@ export const initParty = async () => {
     OBR.scene.onReadyChange(async (isReady) => {
         if (isReady) {
             await applyPartyToTokens();
+        } else {
+            abortApplyPartyToTokens();
         }
     });
     if (await OBR.scene.isReady()) {
         await applyPartyToTokens();
     }
+
+    // The apply above finds nothing when the party has not been fetched yet - then no token is
+    // stamped, no baseline is taken, and token edits stay untrusted. Retry as soon as the party
+    // arrives instead of waiting for the next scene open.
+    partyStore.subscribe(() => {
+        if (appliedPartyToScene || applyInFlight) {
+            return;
+        }
+        void (async () => {
+            if (await OBR.scene.isReady()) {
+                await applyPartyToTokens();
+            }
+        })();
+    });
 
     // subscribe to party changes
     OBR.room.onMetadataChange(async (metadata) => {
@@ -276,7 +417,13 @@ export const initParty = async () => {
 
     // subscribe to token changes
     OBR.scene.items.onChange(async (items) => {
-        const newTokenIds: Array<string> = [];
+        // Synchronous guard - must run before the first await, otherwise the echo of our own
+        // scene-open write slips through and poisons the party store with stale token values.
+        if (applyingPartyToScene) {
+            return;
+        }
+        // A Set, because updateItems replays the callback after a rate limit retry.
+        const newTokenIds = new Set<string>();
         const partyId = await getPartyId();
         const currentParty = await getCurrentParty();
         const membersToUpdate: PartyStoreStatblock[] = [];
@@ -298,8 +445,19 @@ export const initParty = async () => {
                             newMember.imageUrl = image.image.url;
                         }
 
-                        if (!_.isEqual(member.metadata, item.metadata)) {
+                        // Only treat this as an edit when the token's metadata moved away from
+                        // the value we last vouched for. A token without a baseline joined the
+                        // party after the scene-open apply (a statblock was just assigned, or the
+                        // token was just dropped in), so its metadata is a genuine edit and has to
+                        // reach the store - otherwise the next scene open would stamp the stale
+                        // stored values back over it. Before that apply has run we cannot tell an
+                        // edit from leftovers of a previous session, so we only record it.
+                        const baseline = tokenMetadataBaseline.get(item.id);
+                        if (!baseline && !appliedPartyToScene) {
+                            tokenMetadataBaseline.set(item.id, item.metadata);
+                        } else if (!_.isEqual(item.metadata, baseline)) {
                             newMember.metadata = item.metadata;
+                            tokenMetadataBaseline.set(item.id, item.metadata);
                         }
 
                         if (!_.isEqual(member, newMember)) {
@@ -323,10 +481,15 @@ export const initParty = async () => {
                 for (const draft of drafts) {
                     const member = findPartyMember(draft, currentParty);
                     if (member && applyMemberToItem(draft, member, currentParty.group)) {
-                        newTokenIds.push(draft.id);
+                        newTokenIds.add(draft.id);
                     }
                 }
             });
+
+            // these tokens just took on the store's values, so that is the correct baseline
+            for (const token of await OBR.scene.items.getItems(itemsToApply)) {
+                tokenMetadataBaseline.set(token.id, token.metadata);
+            }
         }
 
         await refreshTokenDisplays(newTokenIds);

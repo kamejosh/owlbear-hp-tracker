@@ -4,6 +4,10 @@ import { delay } from "./helpers.ts";
 
 export const delayDelta = 500;
 
+/**
+ * `update` may be invoked more than once - it is replayed after a rate limit retry - so it must be
+ * idempotent. Collect ids it produces in a Set rather than appending to an array.
+ */
 export const updateItems = async (list: ItemFilter<Item> | Array<Item>, update: (items: Array<Item>) => void) => {
     try {
         await OBR.scene.items.updateItems(list, update);
@@ -11,7 +15,13 @@ export const updateItems = async (list: ItemFilter<Item> | Array<Item>, update: 
         if (isObject(e) && "error" in e && isObject(e.error) && "name" in e.error && e.error.name === "RateLimitHit") {
             await delay(delayDelta);
             // delay and retry
-            await OBR.scene.items.updateItems(list, update);
+            try {
+                await OBR.scene.items.updateItems(list, update);
+            } catch (retryError) {
+                console.warn("GM's Grimoire - updateItems failed after rate limit retry", retryError);
+            }
+        } else {
+            console.warn("GM's Grimoire - updateItems failed", e);
         }
     }
 };
@@ -23,7 +33,13 @@ export const deleteItems = async (list: Array<string>) => {
         if (isObject(e) && "error" in e && isObject(e.error) && "name" in e.error && e.error.name === "RateLimitHit") {
             await delay(delayDelta);
             // delay and retry
-            await OBR.scene.items.deleteItems(list);
+            try {
+                await OBR.scene.items.deleteItems(list);
+            } catch (retryError) {
+                console.warn("GM's Grimoire - deleteItems failed after rate limit retry", retryError);
+            }
+        } else {
+            console.warn("GM's Grimoire - deleteItems failed", e);
         }
     }
 };
@@ -35,7 +51,13 @@ export const addItems = async (items: Array<Item>) => {
         if (isObject(e) && "error" in e && isObject(e.error) && "name" in e.error && e.error.name === "RateLimitHit") {
             await delay(1000);
             // delay and retry
-            await OBR.scene.items.addItems(items);
+            try {
+                await OBR.scene.items.addItems(items);
+            } catch (retryError) {
+                console.warn("GM's Grimoire - addItems failed after rate limit retry", retryError);
+            }
+        } else {
+            console.warn("GM's Grimoire - addItems failed", e);
         }
     }
 };

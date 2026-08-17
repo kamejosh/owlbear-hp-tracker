@@ -50,7 +50,7 @@ import { migrateTo350 } from "../migrations/v350.ts";
 import { setupDicePlus } from "./diceplus.ts";
 import { registerMessageHandlers } from "./api.ts";
 import _, { isNull, isUndefined } from "lodash";
-import { initParty, initPlayerParty } from "./party.ts";
+import { initParty, initPlayerPartyRoom, initPlayerPartyScene, teardownPlayerPartyScene } from "./party.ts";
 import { HOSTING_NOTIFICATION } from "../config.ts";
 import { withStorageDOMEvents } from "../helper/hooks.ts";
 import { partyStore } from "../context/PartyStore.tsx";
@@ -607,20 +607,31 @@ OBR.onReady(async () => {
             );
         }
     } else {
+        try {
+            await initPlayerPartyRoom();
+        } catch (e) {
+            console.warn("GM's Grimoire - error while initializing Player Party", e);
+        }
+
         OBR.scene.onReadyChange(async (isReady) => {
             if (isReady) {
                 try {
-                    await initPlayerParty();
+                    await initPlayerPartyScene();
                 } catch (e) {
                     console.warn("GM's Grimoire - error while initializing Player Party", e);
                 }
+            } else {
+                teardownPlayerPartyScene();
             }
         });
 
+        // both this and the listener above can fire for a single scene load if the scene is
+        // already ready here - initPlayerPartyScene serializes its calls and replaces its own
+        // subscription, so that is safe
         const isReady = await OBR.scene.isReady();
         if (isReady) {
             try {
-                await initPlayerParty();
+                await initPlayerPartyScene();
             } catch (e) {
                 console.warn("GM's Grimoire - error while initializing Player Party", e);
             }
