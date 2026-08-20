@@ -11,7 +11,7 @@ import { useMetadataContext, useTaSettingsStore } from "../../../context/Metadat
 import { useShallow } from "zustand/react/shallow";
 import { setPrettySordidActive } from "../../../helper/prettySordidHelpers.ts";
 import { updateTokenMetadata } from "../../../helper/tokenHelper.ts";
-import { delay } from "../../../helper/helpers.ts";
+import { delay, modulo } from "../../../helper/helpers.ts";
 import { useLongPress } from "../../../helper/hooks.ts";
 
 export const BattleRounds = () => {
@@ -125,14 +125,12 @@ export const BattleRounds = () => {
         }
         const currentTokenIndex = current ? battleTokens.findIndex((bt) => bt.item.id === current) : 0;
         const nextIndex = currentTokenIndex + mod;
-        let newCurrent: Image;
-        if (nextIndex >= 0 && nextIndex < battleTokens.length) {
-            newCurrent = battleTokens[currentTokenIndex + mod].item;
-        } else if (nextIndex < 0) {
-            newCurrent = battleTokens[(nextIndex % battleTokens.length) + battleTokens.length].item;
+        // nextIndex can point outside the list on wrap around, modulo keeps it in range for every input
+        const wrappedIndex = modulo(nextIndex, battleTokens.length);
+        const newCurrent: Image = battleTokens[wrappedIndex].item;
+        if (nextIndex < 0) {
             setBattleRound(battleRound - 1);
-        } else {
-            newCurrent = battleTokens[nextIndex % battleTokens.length].item;
+        } else if (nextIndex >= battleTokens.length) {
             setBattleRound(battleRound + 1);
             await rest(
                 battleTokens.map((b) => b.item),
@@ -143,7 +141,7 @@ export const BattleRounds = () => {
         setHold(true);
         await setIndicator(newCurrent);
         await setPrettySordidActive(current, newCurrent.id, taSettings);
-        setNext(await notifyNextPlayer(nextIndex + 1, battleTokens, taSettings));
+        setNext(await notifyNextPlayer(wrappedIndex + 1, battleTokens, taSettings));
         setTimeout(() => {
             setHold(false);
         }, 500);
