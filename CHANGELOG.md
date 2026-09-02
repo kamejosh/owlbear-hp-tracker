@@ -3,6 +3,7 @@
 + Adding the party to a scene runs into the OBR rate limit.
 + Fix issue where dddice sent hidden rolls to discord
 + Fix party HP, tempHP and initiative values reverting to values from another scene or room between sessions
++ Add Room Setting "Show Embedded Items in Party Inventory" to make Embedded Items visible in the Party Inventory again, so they can be equipped and attuned
 
 # 3.7.3
 

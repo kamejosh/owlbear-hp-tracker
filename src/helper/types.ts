@@ -113,6 +113,7 @@ export type RoomMetadata = {
     disableColorGradient?: boolean;
     disableLimitRolls?: boolean;
     partyId?: number;
+    showEmbeddedItems?: boolean;
 };
 
 export type AttachmentMetadata = {

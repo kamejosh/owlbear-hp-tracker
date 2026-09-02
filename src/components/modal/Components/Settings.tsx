@@ -274,6 +274,22 @@ export const Settings = () => {
                             }}
                         />
                     </div>
+                    <div className={"embedded-items setting"}>
+                        <Tippy
+                            content={
+                                "Embedded Items are reusable Statblock modifiers. Enable this to show them in the Party Inventory so they can be equipped and attuned."
+                            }
+                        >
+                            <span>Show Embedded Items in Party Inventory:</span>
+                        </Tippy>
+                        <input
+                            type={"checkbox"}
+                            checked={room?.showEmbeddedItems || false}
+                            onChange={() => {
+                                updateRoomMetadata(room, { showEmbeddedItems: !room?.showEmbeddedItems });
+                            }}
+                        />
+                    </div>
                     <div className={"player-sort setting"}>
                         Sort Tokens by Initiative for Players:
                         <input

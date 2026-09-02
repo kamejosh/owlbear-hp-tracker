@@ -408,6 +408,7 @@ export const PlayerPartyStatblockEquipment = ({ member }: { member: PartyStoreSt
         return state.parties.find((p) => p.id === activePartyId) ?? null;
     });
     const apiKey = useMetadataContext((state) => state.room?.tabletopAlmanacAPIKey);
+    const showEmbeddedItems = useMetadataContext((state) => state.room?.showEmbeddedItems);
     const statblockQuery = useE5GetStatblock(member.statblock?.slug ?? "", apiKey);
 
     const partyQuery = useGetParty(currentParty?.id ?? 0);
@@ -425,7 +426,7 @@ export const PlayerPartyStatblockEquipment = ({ member }: { member: PartyStoreSt
     return (
         <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "1ch" }}>
             {statblock?.equipment
-                ?.filter((eq) => !eq.embedded)
+                ?.filter((eq) => showEmbeddedItems || !eq.embedded)
                 .sort((a, b) => a.item.name.localeCompare(b.item.name))
                 .map((item, index) => (
                     <PlayerPartyStatblockItem
