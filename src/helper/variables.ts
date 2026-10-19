@@ -33,6 +33,13 @@ export const changelogModal: Modal = {
     url: "/modal.html?content=changelog",
 };
 
+export const gmg4NoticeSeenKey = `${ID}/gmg4-notice-seen`;
+
+export const gmg4NoticeModal: Modal = {
+    id: `${modalId}/gmg4-notice`,
+    url: "/modal.html?content=gmg4-notice",
+};
+
 export const helpModal: Modal = {
     id: `${modalId}/help`,
     url: "/modal.html?content=help",

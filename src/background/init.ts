@@ -1,6 +1,8 @@
 import OBR, { Image, Metadata } from "@owlbear-rodeo/sdk";
 import {
     changelogModal,
+    gmg4NoticeModal,
+    gmg4NoticeSeenKey,
     GMI_ID,
     ID,
     itemMetadataKey,
@@ -597,6 +599,18 @@ OBR.onReady(async () => {
             await initParty();
         } catch (e) {
             console.warn("GM's Grimoire - error while initializing Token event handler", e);
+        }
+
+        // one-time announcement that GMG 4.0 replaces this version
+        if (!localStorage.getItem(gmg4NoticeSeenKey)) {
+            localStorage.setItem(gmg4NoticeSeenKey, "true");
+            const width = await OBR.viewport.getWidth();
+            await OBR.modal.open({
+                ...gmg4NoticeModal,
+                fullScreen: false,
+                height: 640,
+                width: Math.min(width * 0.9, 640),
+            });
         }
 
         // render hosting warning

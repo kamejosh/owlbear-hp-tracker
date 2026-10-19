@@ -3,6 +3,7 @@ import { Help } from "./Components/Help.tsx";
 import { Changelog } from "./Components/Changelog.tsx";
 import OBR from "@owlbear-rodeo/sdk";
 import { modalId } from "../../helper/variables.ts";
+import { Gmg4Notice } from "./Components/Gmg4Notice.tsx";
 import { Settings } from "./Components/Settings.tsx";
 import { DiceLogin } from "./Components/DiceLogin.tsx";
 import { TokenContextWrapper } from "../TokenContextWrapper.tsx";
@@ -23,6 +24,8 @@ const Content = () => {
             return <Help />;
         } else if (content === "changelog") {
             return <Changelog />;
+        } else if (content === "gmg4-notice") {
+            return <Gmg4Notice />;
         } else if (content === "settings") {
             return (
                 <TokenContextWrapper>
