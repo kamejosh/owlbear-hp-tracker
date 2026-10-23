@@ -53,7 +53,8 @@ import { setupDicePlus } from "./diceplus.ts";
 import { registerMessageHandlers } from "./api.ts";
 import _, { isNull, isUndefined } from "lodash";
 import { initParty, initPlayerPartyRoom, initPlayerPartyScene, teardownPlayerPartyScene } from "./party.ts";
-import { HOSTING_NOTIFICATION } from "../config.ts";
+import { gmg4Headline, isGmg4BannerVisible } from "../helper/gmg4.ts";
+import { LEGACY_BUILD } from "../config.ts";
 import { withStorageDOMEvents } from "../helper/hooks.ts";
 import { partyStore } from "../context/PartyStore.tsx";
 import { abilityShareStore } from "../context/AbilityShareStore.tsx";
@@ -601,23 +602,24 @@ OBR.onReady(async () => {
             console.warn("GM's Grimoire - error while initializing Token event handler", e);
         }
 
-        // one-time announcement that GMG 4.0 replaces this version
-        if (!localStorage.getItem(gmg4NoticeSeenKey)) {
-            localStorage.setItem(gmg4NoticeSeenKey, "true");
-            const width = await OBR.viewport.getWidth();
-            await OBR.modal.open({
-                ...gmg4NoticeModal,
-                fullScreen: false,
-                height: 640,
-                width: Math.min(width * 0.9, 640),
-            });
-        }
-
-        // render hosting warning
-        if (HOSTING_NOTIFICATION) {
+        if (!LEGACY_BUILD) {
+            // one-time announcement that GMG 4.0 replaces this version
+            if (!localStorage.getItem(gmg4NoticeSeenKey)) {
+                localStorage.setItem(gmg4NoticeSeenKey, "true");
+                const width = await OBR.viewport.getWidth();
+                await OBR.modal.open({
+                    ...gmg4NoticeModal,
+                    fullScreen: false,
+                    height: 640,
+                    width: Math.min(width * 0.9, 640),
+                });
+            }
+        } else if (isGmg4BannerVisible()) {
+            // R10a: point the GM to the previous-version banner once per session (skipped while
+            // the GM has postponed or closed the banner).
             await OBR.notification.show(
-                "You are using an old url for GMG - it will be removed in August. Please remove the extension and install it directly from the OBR Extension store. Localstorage data (quick roll buttons, roll log, current party) will not be preserved.",
-                "WARNING",
+                `${gmg4Headline()}. It no longer receives updates - see the banner at the top of the Grimoire.`,
+                "INFO",
             );
         }
     } else {

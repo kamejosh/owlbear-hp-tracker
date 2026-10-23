@@ -1,742 +1,114 @@
 ---
 title: Game Master's Grimoire
-description: All-In-One Hitpoint, Initiative, Party, and Loot Tracking. 5e and PF2e Statblocks included, 3D dice-rolling and more.
+description: All-in-one initiative, hit point, party and loot tracking for D&D. In Owlbear Rodeo or in your browser.
 author: Joshua Hercher
-image: https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/GameMastersGrimoire.png
-icon: https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/public/GMG.svg
+image: https://gmg.tabletop-almanac.com/store/hero.png
+icon: https://gmg.tabletop-almanac.com/GMG.svg
 tags:
   - combat
   - tool
   - automation
   - dice
 manifest: https://gmg.tabletop-almanac.com/manifest.json
-learn-more: https://github.com/kamejosh/owlbear-hp-tracker
+learn-more: https://tabletop-almanac.com/help/gmg/
 ---
-<details>
-  <summary style="font-size:1.5rem;font-weight:bold;">Table of Content</summary>
-  <ul>
-    <li><a href="#game-masters-grimoire---owlbear-plugin">Game Master's Grimoire - Owlbear Plugin</a></li>
-    <li><a href="#quickstart">Quickstart</a></li>
-    <li><a href="#how-it-works">How it works</a></li>
-    <ul>
-      <li><a href="#adding-tokens-to-the-game-masters-grimoire">Adding Tokens to the Game Master's Grimoire</a></li>
-      <li><a href="#game-masters-grimoire-action-window">Game Master's Grimoire Action Window</a></li>
-      <ul>
-        <li><a href="#version-information-and-help-buttons">Version Information and Help Buttons</a></li>
-        <li><a href="#settings">Settings</a></li>
-        <li><a href="#token-list">Token List</a></li>
-        <li><a href="#group">Group</a></li>
-        <li><a href="#token">Token</a></li>
-        <ul>
-          <li><a href="#map-button">Map Button</a></li>
-          <li><a href="#changing-values">Changing Values</a></li>
-          <li><a href="#temporary-hitpoints">Temporary Hitpoints</a></li>
-          <li><a href="#initializing-token">Initializing Token</a></li>
-        </ul>
-        <li><a href="#statblock">Statblock</a></li>
-        <ul>
-          <li><a href="#limited-abilities">Limited Abilities</a></li>
-        </ul>
-        <li><a href="#player-action-window">Player Action Window</a></li>
-      </ul>
-      <li><a href="#game-masters-grimoire-context-menu">Game Master's Grimoire Context Menu</a></li>
-      <ul>
-        <li><a href="#single-selection">Single Selection</a></li>
-        <li><a href="#multi-selection">Multi Selection</a></li>
-      </ul>
-      <li><a href="#statblock-popover">Statblock Popover</a></li>
-      <li><a href="#shared-abilities">Shared Abilities</a></li>
-      <li><a href="#party-management">Party Management</a></li>
-      <ul>
-        <li><a href="#party-inventory">Party Inventory</a></li>
-        <li><a href="#party-money">Party Money</a></li>
-        <li><a href="#party-links">Party Links</a></li>
-        <li><a href="#party-statblocks">Party Statblocks</a></li>
-      </ul>
-      <li><a href="#loot-management">Loot Management</a></li>
-      <ul>
-        <li><a href="#summary">Summary</a></li>
-        <li><a href="#user-workflow">User Workflow</a></li>
-        <ul>
-          <li><a href="#gm-workflow">GM Workflow</a></li>
-          <li><a href="#player-workflow">Player Workflow</a></li>
-        </ul>
-      </ul>
-      <li><a href="#shop-management">Shop Management</a></li>
-      <ul>
-        <li><a href="#shop-summary">Summary</a></li>
-        <li><a href="#shop-user-workflow">User Workflow</a></li>
-        <ul>
-          <li><a href="#shop-gm-workflow">GM Workflow</a></li>
-          <li><a href="#shop-player-workflow">Player Workflow</a></li>
-        </ul>
-      </ul>
-    </ul>
-    <li><a href="#custom-statblocks">Custom Statblocks</a></li>
-    <li><a href="#dice-roller">Dice Roller</a></li>
-    <ul>
-      <li><a href="#getting-started">Getting Started</a></li>
-      <li><a href="#dddice-login">dddice Login</a></li>
-      <li><a href="#dice-settings">Dice Settings</a></li>
-      <ul>
-        <li><a href="#dice-theme">Dice Theme</a></li>
-        <li><a href="#dddice-room">dddice Room</a></li>
-        <li><a href="#3d-rendering">3D Rendering</a></li>
-      </ul>
-      <li><a href="#using-the-dice-roller">Using The Dice Roller</a></li>
-      <ul>
-        <li><a href="#dice-buttons-in-statblock">Dice Buttons in Statblocks</a></li>
-        <li><a href="#initiative-buttons">Initiative Buttons</a></li>
-        <li><a href="#custom-roll-buttons">Custom Roll Buttons</a></li>
-        <li><a href="#quick-roll-buttons">Quick Roll Buttons</a></li>
-      </ul>
-      <li><a href="#dnd-beyond-dice-rolls">DnD Beyond Dice Rolls</a></li>
-      <li><a href="#simple-dice-calculator">Simple Dice-Calculator</a></li>
-      <li><a href="#dice-plus">Dice Plus</a></li>
-      <li><a href="#discord-roll-log-sync">Discord Roll Log Sync</a></li>
-    </ul>
-  </ul>
-</details>
-
-<h1 id="game-masters-grimoire---owlbear-plugin">Game Master's Grimoire - Owlbear Plugin</h1>
-
-Designed for DnD 5e and PF2e this extension allows tracking and changing Players and Creatures' settings and statblocks while dynamically hiding and showing this information to players.
-
-[Check out the Tutorial](https://youtu.be/uEWr6qooAK8)
-[Check out the Battle Demo](https://youtu.be/N-rgaGysszg)
-
-![hp-tracker example](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/GameMastersGrimoire.png)
-
-<h1 id="quickstart">Quickstart</h1>
-
-This section is intended to describe and show an example of how fast a combat sequence can be setup using Game Master's Grimoire (GMG).
-
-<h2 id="scenario">Scenario</h2>
-
-Your players rest at a campsite, but they fell asleep during their watch and were surprised by an Ogre and five Hobgoblins. We quickly roll initiative sort the Tokens so we know whose turn is next and start doing damage.
 
-<h2 id="how">How</h2>
+The Game Master's Grimoire brings everything you need to run D&D 5e combat into Owlbear Rodeo. Track initiative, hit
+points and conditions, open the full statblock of any creature, and roll straight from the sheet. Linked tokens show
+their HP bars and AC shields right on the map.
 
-+ Create a new scene based on a map you have in your collection.
-+ Drop all the PC Tokens you need and fill in their info (or create custom statblocks for your PC).
-+ Drop an Ogre and Hobgoblin Token on scene and connect them with their statblocks (this will be done automatically for all statblocks where a matching entry is found)
-+ Copy the Hobgoblin Token four times
-+ Roll initiative for the whole group and sort by initiative
-+ Optional:
-  + Activate the participating groups for battle
-  + Start the battle using the "Start Battle"-Button
-  + Use The "Next" or "Back" button to circle through the battle participants and highlight the current token.
+Your table is saved to your Tabletop Almanac account, so you can also open it in any browser at
+[gmg.tabletop-almanac.com](https://gmg.tabletop-almanac.com). Your players can join from Owlbear Rodeo or from a browser
+tab, whichever suits them.
 
-<h2 id="video-example">Video Example</h2>
+New to the Grimoire? The [Handbook](https://tabletop-almanac.com/help/gmg/) walks you through every feature. For
+questions and feedback, join us on [Discord](https://discord.gg/EMg7pRQ5Fm) or
+[Reddit](https://www.reddit.com/r/tabletopalmanac/), watch our videos on
+[YouTube](https://www.youtube.com/@Tabletop-Almanac), and support the project on
+[Patreon](https://www.patreon.com/TTRPGAPI).
 
-Because the documentation currently requires gif for moving content the quality and length is limited, for better video quality consider going to the discord.
+**Playing Pathfinder 2e?** Take a look at Game Master's Pathfinder, our sister extension built for PF2e:
+`https://gmp.tabletop-almanac.com/manifest.json`
 
-![Game Master's Grimoire Quickstart](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/quickstart.gif)
+## Run your encounters
 
-<h1 id="how-it-works">How it works</h1>
+Add monsters from the SRD or your own homebrew statblocks, roll initiative and step through the rounds. Each combatant
+opens into a full sheet with its actions, spells, limited uses and conditions, and every number on it can be rolled. You
+decide what your players see, and anything you hide never reaches their screens.
 
-The extension has three windows:
+![The Battle tab and a character's actions](https://gmg.tabletop-almanac.com/store/battle.png)
 
-+ [Game Master's Grimoire Action Window](#game-masters-grimoire-action-window)
-+ [Game Master's Grimoire Context Menu](#game-masters-grimoire-context-menu)
-+ [Game Master's Grimoire Statblock Popover](#game-masters-grimoire-statblock-popover)
+When you roll an attack or cast a spell, pick its targets and apply the damage to every creature it hit, with saving
+throws taken into account.
 
-As well as the following on-scene information:
+![A spell list, and Fireball's damage applied to two goblins](https://gmg.tabletop-almanac.com/store/rolls.png)
 
-+ HP Bar
-+ HP Text
-+ AC Text
-+ Token Highlight (battle)
+[Read more about running encounters →](https://tabletop-almanac.com/help/gmg/battle/)
 
-<h3 id="adding-tokens-to-the-game-masters-grimoire">Adding Tokens to the Game Master's Grimoire</h3>
+## On the map
 
-Tokens that have not yet been added to the GMG have the following icon present when their context menu is open (right click on token):
+Link a token to its combatant, and its HP bar and AC shield appear on the map. You can deal damage or heal straight from
+the token's menu without opening the Grimoire. When you apply an attack, the Grimoire also shows how far each target is
+from the attacker.
 
-![Context Menu](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/context_menu.png)
+![A token's menu with the Grimoire's damage and heal panel](https://gmg.tabletop-almanac.com/store/map.png)
 
-Clicking this icon adds the token to the GMG and you can see its name appear in the extension's Action window. You can select multiple tokens and activate them all at once.
-When first clicked all the initial information is added to the tokens metadata, by default the name of the token is used, to make loading [statblocks](#statblock) easier. If the token has a label, this value is taken instead. GMG ignores name postfixes like "A" or "A1" when searching for statblocks.
+[Read more about the Grimoire in Owlbear Rodeo →](https://tabletop-almanac.com/help/gmg/owlbear/)
 
-Once the GMG is active you can remove the token from the GMG again by clicking the Deactivate GMG Icon in the Context Menu:
+## Loot and shops
 
-![Context Menu 2](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/context_menu2.png)
+Hand out treasure as loot piles of coins and items for your players to claim, or open a shop with its own stock and
+prices, where each player fills their own cart. Loot and shops need a party attached to the table.
 
-This does not remove the Tokens metadata so in case you want to reactivate the GMG all previous information is still stored with the token.
+![A loot pile, and a shop as a player sees it](https://gmg.tabletop-almanac.com/store/loot.png)
 
-Once a Token is deleted from a scene all the attached metadata is also removed so this cannot be undone.
+[Read more about loot and shops →](https://tabletop-almanac.com/help/gmg/loot/)
 
-In case you have a creature token multiple times within the same scene, it's easiest to setup one token and then copy it as often as you need, because the GMG information will be copied as well. This saves a lot of time when setting up scenes.
+## Your party
 
-<h3 id="game-masters-grimoire-action-window">Game Master's Grimoire Action Window</h3>
+Attach your Tabletop Almanac party to see every character at a glance, with their hit points, conditions and coins. The
+party's shared purse and stash sit right below, and each character's own purse and equipment are a click away.
 
-The Action Window can be opened by clicking the GMG Action Icon in the Owlbear scene. It is meant as a place for the GM to setup his scene and creatures in it. It is also available for players in a simplified form see [Player Action Window](#player-action-window);
+![The party overview and a character's equipment](https://gmg.tabletop-almanac.com/store/party.png)
 
-<h4 id="version-information-and-help-buttons">Version Information and Help Buttons</h4>
+[Read more about the party →](https://tabletop-almanac.com/help/gmg/party/)
 
-![Action Window Top](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/action_window_top.png)
+## Dice and the roll log
 
-At the top of the action window the current version of the extension is displayed as well as the link to the Tabletop Almanac (to create custom statblocks), four system buttons, the statblock popover button, a link to the GMG Patreon page, a link to the GMG/Tabletop Almanac Discord, and the [Token List Buttons](#token-list-buttons).
+Every roll at the table lands in one shared roll log, and the rolls you use most can be saved as templates and reached
+from any tab. Use the built-in roller, or bring 3D dice with dddice or dice+. Public rolls can also be posted to a
+Discord channel. In the settings, you choose how HP bars and AC shields look on the map.
 
-The system buttons open a new modal:
-+ The [⛭] buttons opens the [Settings](#settings).
-+ The [👤] button opens the [Party Management](#party-management).
-+ The [i] button opens the changelog so you can see recent changes
-+ The [?] button opens the help menu which displays the same help information you are currently reading
+![The roll log, and the settings for HP bars and AC shields](https://gmg.tabletop-almanac.com/store/log.png)
 
-The statblock popover button opens a popover, for more information see [here](#game-masters-grimoire-statblock-popover).
+[Read more about rolling dice →](https://tabletop-almanac.com/help/gmg/log/)
 
-The TA Link, Patreon Link and Discord Link open in a new window.
+## Getting started
 
-<h5 id="token-list-buttons">Token List Buttons</h5>
+Log in with your Tabletop Almanac account to bring along your characters, statblocks and parties, or start a guest
+table without an account. A guest table is removed after 48 hours without activity, unless you log in and keep it.
+Everyone in your Owlbear Rodeo room is seated at the table automatically, and players in a browser use the table's join
+link.
 
-The Token List Buttons are always visible and stick to the upper left corner, even while scrolling down and consist of two parts:
+![The login dialog, and the start page with your tables](https://gmg.tabletop-almanac.com/store/tables.png)
 
-+ The Token List Settings
-+ The Battle Buttons
+Read more about [logging in](https://tabletop-almanac.com/help/gmg/login/) and
+[joining a table](https://tabletop-almanac.com/help/gmg/seats/) →
 
-The Token List Settings consist of the "Player Preview Toggle"-Button, "Toggle Battle Focus"-Button, and the "Sort by Initiative"-Section. When the "Player Preview" is active, the Token Images in the Token List display an approximation of what players will see (HP Bar, HP Text, AC).
-When activating "Battle Focus" the UI gets smaller and only shows the elements necessary to manage a battle.
+## Upgrading from Grimoire 3.7
 
-When the Sort by Initiative Checkbox is active you can choose between ascending and descending to automatically sort all tokens in all groups by initiative. New Tokens added to a group will also automatically be sorted by initiative. You will still be able to sort Tokens manually if they have the same initiative value and the same initiative bonus.
+Version 4 uses the same manifest URL, so your rooms update automatically.
 
-When the auto sorting toggle is deactivated you can sort the Tokens in any order you want by manually dragging them into their position.
+- The first time the GM opens a room that used version 3.7, the Grimoire carries over its tokens with their hit points,
+  AC, initiative and groups, along with any loot piles and shops. Once that is done, the old 3.7 data is removed from the
+  room. [See exactly what is carried over](https://tabletop-almanac.com/help/gmg/owlbear/).
+- GMs now log in with their Tabletop Almanac account instead of pasting an API key.
+- Pathfinder tables move to Game Master's Pathfinder.
+- If you would rather stay on version 3.7, it remains available at
+  `https://old.gmg.tabletop-almanac.com/manifest.json`, but it no longer receives updates or support.
 
-The Battle Buttons come in two versions:
+---
 
-+ No battle active
-+ Active battle
-
-When no battle is active the "Start battle" button can be used to start a battle. But only if a [group](#group) is marked to participate in a battle and this group contains Tokens. If no group or token is ready for battle the button is disabled and has a red background. A tooltip explains why no battle is currently possible.
-
-When an active battle is going on then this section displays
-
-<h4 id="settings">Settings</h4>
-
-Settings are grouped into three categories:
-
-+ Room Settings - affecting all scenes in the current room
-+ Scene Settings - affecting only the current scene
-+ Tabletop Almanac Settings - only available on [TA](https://tabletop-almanac.com)
-
-<h5 id="room-settings">Room Settings</h5>
-
-![Room Settings](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/room_settings.png)
-
-The following settings are available:
-
-+ Statblock Game Rules: You can choose between DnD 5e and Pathfinder 2e as source for your statblocks. This will impact what statblocks are found, how they are displayed, and the content (including spells).
-+ Tabletop Almanac API Key: Here you can enter the Tabletop Almanac API Key to access your custom statblocks
-+ HP Bar Segments: This setting can be used to obfuscate the real HP loss of a creature. E.g. when set to "2" the HP Bar differentiates between 3 states: Full HP, less than half HP, and 0 HP. When changing the settings HP Bars are not updated until the HP value is changed at least once.
-+ Disable HP Bar: In case you don't want to display any HP Bar you can check this setting here.
-+ Text and Bar Offset: To have a more flexible positioning of the HP Bar and Text, a value can be entered (negative or positive number) and the position of the HP Bar and Text is then adjusted by this value.
-+ Armorclass Icon and Text Offset: To have a more flexible positioning of the AC Background and Text an offset for the X- and Y-Axis can be added. This value is scaled considering the Token size.
-+ Dice Roller: You can select which Dice Roller you want to use. By default the dddice roller is selected but you can also use the Simple Dice Roller or the [Dice+](https://owlbear.rogue.pub/extension/https://dice-plus.missinglinkdev.com/manifest.json) extension.
-+ Discord Webhook URL: Paste a Discord Webhook URL here to have dice rolls posted to a Discord channel, see [Discord Roll Log Sync](#discord-roll-log-sync) for details.
-+ Allow negative HP/AC: By default negative HP and AC are not allowed but when this settings is checked then HP and AC can be set to negative numbers. The HP Bar will always display negative HP the same as when it is 0.
-+ Sort Tokens in Player View: When active, the [Player Action Window](#player-action-window) will display Tokens ordered by their initiative value. If not active, Tokens will have the same order as they were added to the scene (so kind of random).
-+ Set Initiative Dice: This setting decides with which "dice" the roll initiative button in the groups and the token works. The default is 20, meaning a value from 1 to 20 (excl. modifiers) can be rolled. By setting it to 10 the value can only range from 1 to 10. When using 3D dice only values that are available in the selected theme should be used.
-+ Statblock Popover dimensions: This setting allows to set the width and height of the statblock popover. The default is 600x500. When changing the value (either press enter or move cursor outside of input field) while the statblock popover is open the size of the open statblock popover is automatically adjusted so you can preview what size fits you. The width and height cannot be lower than 200 and settings bigger than the viewport will be overwritten by the max viewport size.
-+ Don't show Changelog on updates: This will disable the automatic popup when a new version of GMG is loaded. If not selected a notification will be shown once the update process has been finished and the changelog icon will flash for 30 seconds to indicate that there are new changes available.
-
-<h5 id="scene-settings">Scene Settings</h5>
-
-![Scene Settings](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/scene_settings.png)
-
-+ Groups: This setting allows you to define different Groups used for ordering Tokens. There is a permanent "Default" group. The groups can be rearranged by **dragging and dropping** them in the desired order. To add a group use the text input below the group list. Press "Enter" to add a group to the list. Tokens in the GMG remember their group association (if the group is deleted) but are added into the default group until they are moved to a different group. So deleting and re-adding the same group restores the previously associated tokens to that same group.
-
-<h4 id="token-list">Token List</h4>
-
-![Action Window Token List](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/action_window_token_list.png)
-
-The Token List consists of groups and tokens associated with each group. GMG remembers which groups are open or collapsed between sessions. Collapsing a group hides the tokens it contains in the list, but they are still tracked by the GMG and the [Popover](#game-masters-grimoire-context-menu) is still available.
-
-Tokens can be moved between groups or reordered inside a group by dragging and dropping. By default, this has no effect on the [Player Action Window](#player-action-window) but when the [setting](#settings) "Sort in Player View" is active, the Tokens in the Player Action Window are **sorted by their initiative value regardless of group**.
-
-When a selected Token is moved all selected Tokens in the same group are moved as well.
-
-![token_list_dnd](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/token_list_dnd.gif)
-
-Clicking a token results in the corresponding item in the scene to be selected. To Select multiple tokens hold "SHIFT", "CTRL", or "CMD" and click token names in the list. Just like in other programs, holding "SHIFT" and clicking a Token selects all Tokens between the clicked and the nearest selected Token.
-
-Selecting token names in this way causes the Owlbear Token Contextmenu to open. When selecting multiple tokens names only the context menu for the first selected token is opened, but all items are selected.
-
-![token_list_select](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/token_list_select.gif)
-
-Double-clicking a token focuses the scene on the corresponding icon:
-
-![token_list_dblclk](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/token_list_dblclk.gif)
-
-<h4 id="group">Group</h4>
-
-GMG's groups offer a lot of functionality besides grouping tokens together. There are multiple reasons to consider groups:
-
-+ For larger maps it makes sense to group creatures of areas together to keep a better overview
-  + collapsing groups of creatures currently not seen by the players
-  + keeping an overview over which creatures will be fighting in the next battle.
-+ The group buttons allow you to change every token of the group at the same time
-+ You want to keep a group as reserve not yet part of the initiative order and activate it once it's time
-
-Each group shows the following things:
-
-![Action Window Token List](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/action_window_groups.png)
-
-1. Group name
-2. Add to Battle Button: The sword is shown when a group is part of a battle, the white flag if it's not.
-3. HP Map Button: Click to display HP on the map, right click to let players see the exact HP data
-4. AC Map Button: Click to display AC on the map, right click to let players see AC data
-5. Initiative Section: Click the button to toggle Tokens in the [Player Action Window](#player-action-window), click the dice button to roll Initiative for all tokens.
-6. Rest Section: Click "short" to perform a short rest (currently only resets abilities). Click "long" to perform a long rest, which heals all tokens and resets their abilities (like spell slots).
-7. Collapse Button: Click to show or hide tokens in the Action Window
-
-<h4 id="token">Token</h4>
-
-![Action Window Token](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/action_window_token.png)
-
-A token in the GMG represents a single Owlbear Item where the GMG Extension has been activated. It consists of the following parts:
-
-+ Dynamic Color Background (based on ratio between HP and max HP)
-+ Player Preview
-  + Shows an approximation what players will see
-  + Long Press the Icon to resync the Token with TA (if you changed any values there)
-+ HP Section
-  + Red Heart shows the current HP state
-  + Blue Heart shows if temporary HP are active for a token
-  + current HP / max HP on the top row
-  + temp HP / [Map Button](#map-button) on the bottom row
-+ AC Section
-  + Input for the AC
-  + [Map Button](#map-button)
-+ Initiative Section
-  + Input for the current initiative
-  + Dice Button to roll Initiative (automatically sets the current initiative) with initiative bonus modifier
-  + Input for initiative Bonus
-    + Is automatically prefilled by the selected statblock (DEX modifier for DnD and perception value for PF2e)
-  + Player List Button: When selected the token shows up in the [Player Action Window](#player-action-window)
-+ Statblock Section
-  + Open the assigned statblock or delete it
-  + If no statblock is assigned open the statblock search
-  + transfer token ownership to a player
-    + If this is set, a square in the players color indicates that this token is assigned to a player
-    + This player will have full access to the statblock
-    + This player will see this token in their Player Action Window (no matter the Player List Button setting)
-    + This works together with Smoke & Specter token ownership as it uses the base owlbear rodeo token ownership setting
-
-A token that is selected in the scene has a white border. A token whose turn it is in the current battle has a red border.
-
-<h5 id="map-button">Map Button</h5>
-
-The Map Buttons allow you to add information to the owlbear rodeo scene and control its visibility for players. A left click either activates or deactivates the element on the scene (this is context based either HP or AC). A right click toggles the visibility for the players. If the button is generally deactivated then nobody can see the information.
-
-<h5 id="changing-values">Changing Values</h5>
-
-Values can be changed in a few different ways:
-
-+ Arithmetic operations: for the HP field the value can be changed via arithmetic (+ and -) operations. If the current value is `"10"` and you edit the field like this `"10 + 3"` the field value will be changed to `"13"` once you select anything outside of the field or press enter.
-+ Arrow Keys: when focus is on HP, maxHP, tempHP or AC you can increase or decrease the values by 1 by pressing up or down arrow key respectively
-+ Entering a number: when focused on any field, you can delete its content and enter a new value.
-  + Note that changing the maxHP or tempHP field influences the HP field.
-+ Rolling Initiative: When clicking the Initiative Button a random number between 1 and the chosen [Initiative Dice](#settings) (default: 20) is rolled and the dexterity modifier (5e) or perception (pf2e) from the [Statblock](#statblock) (if selected) is added and entered as the final initiative value. You can also change the initiative bonus to any number, once a statblock is assigned. By default a 3D dice is rolled to determine the random value.
-
-**Note: The HP value can never exceed the maxHP value ([except when maxHP is 0](#initializing-token)). It can also not be a negative number if the [Setting](#settings) for "Allow negative numbers" is not selected. All symbols except numbers will be removed to maintain a compatible value.**
-
-<h5 id="temporary-hitpoints">Temporary Hitpoints</h5>
-
-Temporary Hitpoints follow these rules:
-
-+ Adding temporary hitpoints increases the current hitpoint maximum as well as the current hitpoints.
-+ Once temporary hitpoints are active, decreasing normal hitpoints removes the same amount of temporary hitpoints. E.g. if a token has 5 temporary HP, and takes 3 HP damage, the temporary HP are now at 2.
-
-<h5 id="initializing-token">Initializing Token</h5>
-
-To initialize a Token there are two approaches:
-
-**Tabletop Almanac Statblocks**
-
-If you are using a creature that is available on [Tabletop Almanac](https://tabletop-almanac.com) you can use the [statblock feature](#statblock). The statblocks from Tabletop Almanac include most of the statblocks that use the OGL. This includes DnD 5e and Pathfinder 2E statblocks. For switching between rulesets see [Settings](#settings).
-
-**Manual Initialization**
-
-When initializing manually you enter the 6 available fields manually. Normally the HP value cannot exceed the maxHP value but while maxHP is still 0 entering the HP value also sets the maxHP value. This allows for a quick initialization by pressing Tab to jump between the input fields.
-
-<h4 id="statblock">Statblock</h4>
-
-The statblock offers a search field for creature statblocks found in the [Tabletop Almanac](https://tabletop-almanac.com). By default, the Token Name is used to make an initial search. If the Token name has a modifier like A, B, A1, C, 1, 3, or similar at the end it will be automatically ignored for the search.
-
-All results for the current search are displayed with their HP, AC and CR visible.
-
-![Statblock Search](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/statblock_search.png)
-
-Available Statblocks have varying background depending on their source. Custom Statblocks created on [Tabletop Almanac](https://tabletop-almanac.com) are displayed first and with a slight green background. The currently selected statblock has a white glow.
-
-By clicking on one of the options this statblock is selected for the Token. If there are no values set for the Token or the Token still has its automatically assigned values, the values of the creature statblock are automatically used.
-
-![Statblock Selected](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/statblock_selected.png)
-
-The statblock shows all the creature information including available spells and detailed spell information. At the top is a section with jump links, that lets you quickly navigate to the different statblock sections.
-
-The Token Values section works the same as the [token](#token) in the Action Window.
-
-<h5 id="limited-abilities">Limited Abilities</h5>
-
-[Custom Statblocks](#custom-statblocks) can define limited abilities (see [this video](https://www.youtube.com/watch?v=injiQlxv5Fc) tutorial). These limited abilities allows to track how many uses are left and when those limits are refilled. This can be used for Death Saves, Spellslots, Actions, Abilities, Hitdice and whatever you can think of.
-
-There are a few automations in place to make tracking easier.
-
-+ If an ability has a "to hit" button this button will automatically mark off one use after clicking.
-+ If no "to hit" button is available any other dice button will mark off one use after clicking.
-+ All spells include a "cast" button (if spellslots are defined) that mark of one use after clicking (but the rules above are still true).
-
-The rest buttons automatically refill limited abilities where the reset value has been set to short or long rest.
-
-Buttons that trigger uses being consumed will indicate that no uses are left by being highlighted. The buttons will still work while being highlighted.
-
-To create custom statblocks go to [Tabletop Almanac](https://tabletop-almanac.com?ref=hp-doc) and create a free account.
-
-![Statblock Limits](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/statblock_limits.png)
-
-<h4 id="player-action-window">Player Action Window</h4>
-
-![Player Action Window](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/player_action_window.png)
-
-The Player Action Window has reduced functionality compared to the GM Action Window. Tokens that have the [Player List](#token) Button active or are assigned to the player show up in this window. Tokens that are invisible (hidden) within the scene don't show up here, except for Tokens assigned to the current player and tokens where HP and AC are revealed to the player.
-
-For tokens that have their HP and AC revealed to the players their values are shown. Tokens that are assigned to players also have an option to access the assigned statblock. Otherwise, just the dynamic-color background is there to indicate the current status of the creature.
-
-Tokens don't follow the drag and drop order in the [GM Action Window](#game-masters-grimoire-action-window). But when activated in the [Settings](#settings) Tokens will be ordered by their initiative value, disregarding which group they belong to.
-
-<h3 id="game-masters-grimoire-context-menu">Game Master's Grimoire Context Menu</h3>
-
-The GMG Context Menu comes in two versions depending on how many tokens are selected.
-
-<h4 id="single-selection">Single Selection</h4>
-
-The GMG Context Menu is a simplified version of the Action Window [Token](#token)
-
-For the GM all options except rest and statblock are available. And Initiative can only be rolled without 3D dice:
-
-![Popover GM](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/popover_gm.png)
-
-For the Players, only tokens that they own will show this popover, but the [Map Buttons](#map-button) and Player List Button are not available.
-
-<h4 id="multi-selection">Multi Selection</h4>
-
-When multiple Tokens are selected, the names of the selected tokens are displayed as well as their general state (background color). And Options to either heal or damage all of them at once. For GMs there is also the options to change the visibility settings for all Tokens at once.
-
-![Popover Multiselect](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/popover_multi_select.png)
-
-This can be used to do AoE damage or healing without entering the values for each Token. This also handles tempHP, maxHP, allowed negative values and every other system in GMG automatically.
-
-![Popover Multiselect](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/multiselect_demo.gif)
-
-<h3 id="statblock-popover">Statblock Popover</h3>
-
-Every Token that has a statblock assigned automatically shows up in the Statblock Popover. For Players only the tokens which they own show up in the Statblock Popover.
-
-The Popover contains two window buttons:
-
-+ Minimize: Reduces the height of the popover to 100px.
-+ Close: Closes the Popover
-
-The Popover displays all available statblocks indicating which statblock is currently displayed in detail.
-
-![Statblock Popover](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/statblock_popover.png)
-
-By default when selecting a Token either in the [Game Master's Grimoire Action Window](#game-masters-grimoire-action-window) or in the Scene. The associated statblock of the selected Token is displayed except when the statblock is collapsed. This can be prevented by "pinning" a statblock. While pinned no automatic switching is done even when another statblock is selected. To reactivate automatic switching unselect the pin on the currently active statblock.
-
-![Statblock Demo](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/statblock_demo.gif)
-
-<h4 id="shared-abilities">Shared Abilities</h4>
-
-The Statblock Popover also shows a list of all abilities that have been shared with you. You can pin and search these abilities. They are still connected with the token they've been shared from, so in case you use a limited ability it will reduce the uses for the statblock.
-
-<h1 id="party-management">Party Management</h1>
-
-[Video Tutorial](https://youtu.be/uakBb5yFhmo)
-
-See the [Tutorial](https://youtu.be/uakBb5yFhmo) for a walkthrough of the party management features.
-
-Party Management allows tracking group resources like items, money, and shared links. It can be accessed via the [👤] button in the action window top bar.
-
-To use party features, you must have a valid [Tabletop Almanac API Key](#room-settings) entered. All party data, including tokens, inventory, and currency, is automatically synced with your Tabletop Almanac account, ensuring your data is safe and accessible across different sessions and devices.
-
-When a token associated with a party member is added to a scene, it will automatically continue where it left off, restoring its previous HP, AC, inventory, and other status details.
-
-<h2 id="party-inventory">Party Inventory</h2>
-
-The Party Inventory is a shared storage space for all party members.
-
-+ **Adding Items:** Items can be added by searching the Tabletop Almanac database.
-+ **Exchange:** Items can be moved between individual player inventories and the party inventory. Players can "take" items added by the GM, equip them, and they will automatically appear in their statblock and sync to Tabletop Almanac.
-+ **Tracking:** Each item tracks its quantity and can have detailed descriptions or stat modifications.
-
-<h2 id="party-money">Party Money</h2>
-
-Tracks the party's shared currency.
-
-+ Supports standard currency types (Platinum, Gold, Electrum, Silver, Copper).
-+ Players and GMs can add or remove currency from the pool.
-+ Players can manage their assigned Party Token's money and inventory directly, with all changes syncing instantly to Tabletop Almanac.
-+ Every change is logged to keep track of the party's spending.
-
-<h2 id="party-links">Party Links</h2>
-
-A place to store and share important URLs for the party, such as shared notes, map links, or external handouts.
-
-<h2 id="party-statblocks">Party Statblocks</h2>
-
-All statblocks that you added to the party are shown here. You can change their equipment and money directly. If an Image is shown the party member is connected with a OBR Token and the Token will be auto initialized when added to a new scene.
-
-<h2 id="party-player-view">Player View</h2>
-
-Players can see all members of the party but can only edit their assigned Party Members. They can move equipment to the party inventory and back or exchange money with the party. All changes are synced instantly to Tabletop Almanac so you can always continue your session where you last left it.
-
-<h1 id="loot-management">Loot Management</h1>
-
-[Video Tutorial](https://youtu.be/vAR2ZfLwmqE)
-
-Loot Management allows Dungeon Masters (GMs) to manage items and currency directly on Owlbear Rodeo tokens. It provides a streamlined way to handle loot drops and distribute rewards to players.
-
-All looting information is persisted on **Tabletop Almanac**, ensuring that loot remains consistent across different scenes and sessions.
-
-<h2 id="summary">Summary</h2>
-
-The Loot Management feature solves the problem of tracking rewards and inventory for individual tokens (e.g., a defeated boss or a treasure chest) within Owlbear Rodeo. Instead of manual notes, GMs can attach items and money directly to a token's metadata. Players can then interact with these tokens to view and claim their rewards, which are automatically synced to the party's inventory or individual player statblocks.
-
-<h2 id="user-workflow">User Workflow</h2>
-
-<h3 id="gm-workflow">Game Master Workflow</h3>
-
-1.  **Initialization:**
-  *   Select a token in the scene.
-  *   Open the Loot Management window.
-  *   If the token has no loot metadata, click the **"Initialize"** button.
-2.  **Managing Money:**
-  *   In the **Money** section, GMs can add or remove currency (Platinum, Gold, Electrum, Silver, Copper).
-  *   Arithmetic operations (e.g., `+50`) are supported for quick updates.
-3.  **Managing Items:**
-  *   **Add Item:** Click the [+] button to search the Tabletop Almanac database and add items to the token.
-  *   **Loot Suggestions:** Click the magic wand icon to get matchting loot suggestions based on the token's statblock or the party's average level.
-  *   **Remove Item:** Click the delete icon next to an item to remove it from the token.
-4.  **Toggling Visibility:**
-  *   Use the **"Lootable / Locked"** toggle in the header to control whether players can see and interact with the loot.
-  *   GMs can also toggle the visibility of the token itself directly from the loot selection screen.
-
-<h3 id="player-workflow">Player Workflow</h3>
-
-1.  **Accessing Loot:**
-  *   Select a token that has been marked as **"Lootable"** by the GM.
-  *   Open the Loot Management window.
-2.  **Viewing Rewards:**
-  *   Players can see the list of items and the amount of money available on the token.
-3.  **Transferring Loot:**
-  *   **Transfer Items:** Click the transfer icon next to an item. Players can choose to move the item to the **Party Inventory** or directly to a **Party Member's Statblock** they have been assigned to.
-  *   **Loot Money:** Click the **"Loot Money"** button to transfer currency to the party's shared funds or a specific member.
-4.  **Automatic Sync:**
-  *   Once an item or money is "taken," it is removed from the token and added to the selected destination on Tabletop Almanac instantly.
-
-
-<h1 id="shop-management">Shop Management</h1>
-
-[Video Tutorial](https://youtu.be/JGILcK4fhO8)
-
-Shop Management allows Dungeon Masters (GMs) to create interactive shops directly on Owlbear Rodeo tokens. This feature enables a streamlined shopping experience where players can browse items, manage a personal cart, and purchase goods.
-
-Like Loot and Party management, all shop transactions are synced with **Tabletop Almanac** to ensure persistence across sessions.
-
-<h2 id="shop-summary">Summary</h2>
-
-The Shop Management feature facilitates in-game commerce by allowing GMs to attach an inventory and price list to any token. Players can interact with these "merchant" tokens to see available stock, add items to their shopping cart, and checkout. The system automatically handles currency transactions and updates both the shop's stock and the player's inventory.
-
-<h2 id="shop-user-workflow">User Workflow</h2>
-
-<h3 id="shop-gm-workflow">Game Master Workflow</h3>
-
-1.  **Initialization:**
-  *   Select a token in the scene (e.g., a merchant NPC or a storefront).
-  *   Open the Shop Management window from the context menu.
-  *   If the token has no shop metadata, click the **"Initialize"** button.
-2.  **Inventory Management:**
-  *   **Add Item:** Click the [+] button to search the Tabletop Almanac database and add items to the shop.
-  *   **Pricing:** Set the cost for each item in the inventory.
-  *   **Stock Control:** Specify the quantity available for each item. Stock is automatically decremented when players add items to their carts.
-  *   **Shop Suggestions:** Use the magic wand icon to generate thematic shop inventories based on the merchant type or location.
-3.  **Managing Funds:**
-  *   The **Funds** section allows GMs to manage the currency held by the merchant.
-4.  **Shop Status:**
-  *   Use the **"Shop Open / Closed"** toggle in the header to control player access. When closed, players can see the shop exists but cannot browse or purchase.
-5.  **Active Carts:**
-  *   GMs can see all active player carts for the current shop, allowing them to monitor what players are considering, both what they intend to buy and what they've offered to sell.
-  *   For the "Selling" section of a cart, the offered total price can be manually **edited** (e.g. to haggle or account for special circumstances), or **reset** back to the sum of the individual item offers with the reset button.
-
-<h3 id="shop-player-workflow">Player Workflow</h3>
-
-1.  **Browsing the Shop:**
-  *   Select a merchant token and open the Shop Management window.
-  *   Browse available items, viewing their descriptions and prices.
-2.  **Selling Items:**
-  *   Switch to the **Sell** tab (the tag icon next to the shop inventory tab) to see all the equipment currently on your selected party member's statblock.
-  *   Each item shows how many of it you have and the shop's offer price for it. The shop randomly offers between 80% and 95% of the item's catalog value each time it's added to the sell cart, so re-adding the same item can result in a slightly different offer.
-  *   Enter a quantity and click the sell icon to queue that many of the item for sale. Queued items are no longer available to queue again until removed from the cart (so you can't accidentally offer more than you own).
-3.  **Managing the Cart:**
-  *   **Add to Cart:** Click the cart icon on an item to add it to your personal shopping bag.
-  *   **View Cart:** Click the cart icon in the header to review both the items you're buying and the items you're selling, along with their subtotals.
-  *   **Remove Items:** Remove items from the cart if you change your mind; purchased stock is returned to the shop and items queued for sale go back to being available to sell.
-  *   The cart shows a single net total ("You pay" or "You receive") combining both sides of the trade. If the shop doesn't have enough funds on hand to cover what you'd receive, a warning is shown and checkout is disabled until the cart is adjusted.
-4.  **Checkout:**
-  *   **Select Customer:** Choose which party member is making the purchase (this also determines whose inventory is used for selling).
-  *   **Purchase:** Complete the transaction. Purchased items are automatically added to the player's statblock and sold items are removed from it; the net currency difference is exchanged between the player and the shop, and any sold items are added back into the shop's own inventory at their catalog price so they can be resold later.
-
-<h1 id="custom-statblocks">Custom Statblocks</h1>
-
-Custom statblocks can be created on [Tabletop Almanac](https://tabletop-almanac.com). Free accounts can create up to 20 statblocks and activate 10 statblocks at the same time. To increase this limit go to my patreon and consider supporting me.
-
-<h1 id="dice-roller">Dice Roller</h1>
-
-GMG comes with an integrated dice-roller. It can be disabled (removed) by changing the [Disable Dice Roller Setting](#room-settings);
-
-![Dice Roller](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/dice_roller_log.png)
-
-<h2 id="getting-started">Getting Started</h2>
-
-By default GMG uses the same account and room that dddice uses. So if you were already using dddice everything is setup. If you were not using the dddice extension you will be given a guest account and start a new dddice room. You should be able to start rolling dice after a few seconds where everything is setup.
-
-If you are using a guest account, the username that will appear under your rolls will be your owlbear username (or owlbear guest name). If you are logged in with you dddice account your dddice username will be used.
-
-You can now click on any dice button in your [statblocks](#statblock) and the dice will automatically roll.
-
-<h2 id="dddice-login">dddice login</h2>
-
-The login process is the same with the official dddice extension (as this integration was done with their help). When you open the roll log (scroll button on the bottom of the Action Window) you will se a Login Button on the top left of the Roll Log. When you click this Button an overlay appears. Just click the purple link and you are done. It might take a few seconds to register the login. If the overlay doesn't disappear after 5 seconds you were already authenticated, if that is not the case please [let me know](https://github.com/kamejosh/owlbear-hp-tracker/issues).
-
-<h2 id="dice-settings">Dice Settings</h2>
-
-When the Roll Log is open there is a settings button on the top right side of the roll log.
-
-![Roll Settings](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/roll_settings.png)
-
-There are currently two settings:
-
-<h3 id="dice-theme">Dice Theme</h3>
-
-Each Owlbear user can choose their own dice theme (and the other users will see them roll with this theme). When logged in the dropdown menu list all compatible dice themes (theme has d4, d6, d8, d10, d12 and d20 with matching labeling) will be shown. Users can switch between those themes. Guest users only have access to the default dddice theme (bees).
-
-<h3 id="dddice-room">dddice Room</h3>
-
-You can change the dddice room you want to use directly in this settings menu. Just select the room you want and every player will automatically join this room as well.
-
-<h3 id="3d-rendering">3D Rendering</h3>
-
-You can choose to use the 3D rendering of dddice, this is the default option. Should you already use the dddice owlbear extension you might want to turn HP Trackers dice rendering off to not have multiple dice showing the same thing.
-
-<h2 id="using-the-dice-roller">Using The Dice Roller</h2>
-
-By default all rolls are seen by all players. GMs can set their own roll to be hidden by default in the [Tabletop Almanac Settings](https://tabletop-almanac.com).
-
-There are multiple ways to use the dice roller:
-
-+ Dice Buttons in Statblocks
-+ Initiative Buttons
-+ Custom Roll Buttons
-+ Quick Roll Buttons
-
-<h3 id="dice-buttons-in-statblocks">Dice Buttons in Statblocks</h3>
-
-Each rollable element inside a statblock is replaced by a dice button. Some of them might not make sense but the rule is as long as the text can be transformed to a rollable string it will be rollable.
-
-![Statblock Buttons](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/statblock_buttons.png)
-
-While hovering over a dice button the little dice inside the button begins to shake and a list of optional parameters is shown.
-
-These optional parameters are:
-
-+ ADV
-  + changes the dice roll to 2d20kh1 (roll 2 d20 and keep the highest one) + modifier
-+ DIS
-  + changes the dice roll to 2d20dh1 (roll 2 d20 and drop the highest one) + modifier
-+ HIDE
-  + Dice roll will only be visible for you other people will not be notified and it will not show up in their dice log
-
-Dice that are marked as Damage Dice have optional roll button:
-
-+ CRIT
-  + automatically rolls the damage as a crit based on the selected crit rules on [Tabletop Almanac](https://tabletop-almanac.com)
-
-![Dice Button Hover](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/dice_button_hover.png)
-
-ADV and DIS are only available on d20s HIDE is available on all dice and CRIT is only available on Damage Dice.
-
-When rolling Dice Buttons in statblocks the dice context is set as meaningful as possible. This means attack rolls usually contain the attack name and "To Hit", and Damage rolls usually contain the attack name and "Damage". This is not always possible but should be close enough.
-
-<h3 id="initiative-buttons">Initiative Buttons</h3>
-
-Initiative Buttons can be used to roll for an individual entry or for the whole group. When rolling for the whole group a roll is triggered for each token in the group and will show up as individual roll in the roll log.
-
-![Dice Button Hover](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/initiative_roll.gif)
-
-<h3 id="custom-roll-buttons">Custom Roll Buttons</h3>
-
-At the Bottom of GMG there are 8 freely assignable buttons where you can create your custom presets. You can see the documentation for custom dice rolls [here](https://docs.dddice.com/docs/integrations/roll20/#roll-equation-compatibility).
-To get started click on a button with the "+" sign. A text input is opened where you can add your roll preset, if the preset is not valid the text input will be red. The dice roll will not be saved until a valid string has been found. To save the custom string press Enter or the "√"-button.
-
-Custom Roll Buttons are automatically assigned with dddice Dice Box presets where one dice is assigned to a free custom dice button. All already prepared or once deleted custom dice buttons get no value assigned.
-
-You can also choose a different theme than the main theme for your custom dice button by selecting the theme from the theme selector, this also includes themes not selectable as default theme.
-
-![Custom Roll Buttons](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/custom_roll_theme.png)
-
-Once the preset has been saved the button will show up to 4 parts of the dice equations to make it easier to identify which button does what. It will also display the full dice command when hovering over the button.
-
-To remove a preset hover over the button and press the now visible x-button in the top left corner. This delete button is off to the side and really small by design to make accidentally pressing it on mobile harder.
-
-![Custom Roll Buttons](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/custom_roll_buttons.gif)
-
-**Custom Dice Buttons are saved to your browsers localstorage. This means they will not be available on other devices or other browsers. Or you have to set them up there as well.**
-
-<h3 id="quick-roll-buttons">Quick Roll Buttons</h3>
-
-The Quick Roll Buttons is the button next to the Roll Log toggle button. It will always display all available dice in the selected theme to quickly roll them. It also contains a text input field where you can enter a valid dice string and roll it without saving it.
-
-<h2 id="dnd-beyond-dice-rolls">DnD Beyond Dice Rolls</h2>
-
-Using dddice you can roll dice in your DnD Beyond Character Sheets and see those rolls directly in Owlbear Rodeo. All you have to do is:
-
-- Install the dddice browser extension
-- Open your DnD Beyond Character Sheet in this browser
-- Open the Dice Log in GMG
-- Copy the link to the dddice room
-- Paste this link into the dddice browser extension (you must be in the DnD Beyond tab)
-- start rolling
-
-<h2 id="simple-dice-calculator">Simple Dice-Calculator</h2>
-
-When in the [Settings](#room-settings) the option "Use calculated rolls" is activated, dddice is disabled. GMG will then use a local script to calculate the result of the chosen dice-roll and use the OBR broadcast API to notify all connected players of the result.
-
-The simple dice-calculator uses the [rpg-dice-roller](https://dice-roller.github.io/documentation/) package under the hood. Available dice notations for custom dice buttons and the quickroll function can be found [here](https://dice-roller.github.io/documentation/guide/notation/).
-
-<h2 id="dice-plus">Dice Plus</h2>
-
-Since version 3.5.0 GMG supports [Dice+](https://owlbear.rogue.pub/extension/https://dice-plus.missinglinkdev.com/manifest.json) as a dice roller.  
-After installing the extension, you have to reload website (so that GMG ad Dice+ can exchange setup data with each other) and select the Dice+ extension as you dice roller in the settings.
-
-<h2 id="discord-roll-log-sync">Discord Roll Log Sync</h2>
-
-GMG can automatically post dice rolls to a Discord channel of your choice, so people who are not connected to the Owlbear Rodeo session (or just want a log outside of it) can follow along.
-
-**Setup**
-
-1. In Discord, go to the channel you want rolls posted to and create a Webhook (Channel Settings → Integrations → Webhooks → New Webhook). Discord's own [guide on creating a Webhook URL](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) explains this in detail, a link to this guide is also available directly next to the setting.
-2. Copy the Webhook URL and paste it into the "Discord Webhook URL" field in the [Room Settings](#room-settings).
-
-Once a Webhook URL is set, every roll that is made from that point on is posted to Discord automatically, no further action is needed.
-
-**What gets posted**
-
-+ The roll's context/label (e.g. "Attack: To Hit") and the resulting dice equation.
-+ The detailed roll result (the individual die values), the same as shown in the in-app Roll Log.
-+ The Discord message's color matches the color of the roll's label in the in-app Roll Log (e.g. red for damage, blue for to-hit/attack rolls, green for saves).
-+ If the roll came from a token that has an image, that image is attached to the Discord message and also shown alongside the roll in the in-app Roll Log.
-
-**Notes**
-
-+ Hidden/whispered rolls are never posted to Discord, they stay private the same way they do in the in-app Roll Log.
-+ Since the Webhook URL is stored in Room Settings, anyone with GM access to the room can read and change it. Treat it the same as any other credential and only share the room with people you trust.
+This work includes material from the System Reference Document 5.2.1 ("SRD 5.2.1") by Wizards of the Coast LLC,
+available at [dndbeyond.com/srd](https://www.dndbeyond.com/srd). The SRD 5.2.1 is licensed under the
+[Creative Commons Attribution 4.0 International License](https://tabletop-almanac.com/legal/cc-by-4.0).

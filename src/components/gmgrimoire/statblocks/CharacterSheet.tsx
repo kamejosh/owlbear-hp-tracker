@@ -10,6 +10,7 @@ import { useMetadataContext } from "../../../context/MetadataContext.ts";
 import { getSearchString, getTokenName, updateRoomMetadata } from "../../../helper/helpers.ts";
 import { useTokenListContext } from "../../../context/TokenContext.tsx";
 import { useShallow } from "zustand/react/shallow";
+import { ALMANAC_URL } from "../../../config.ts";
 
 type SearchWrapperProps = {
     name: string;
@@ -40,7 +41,7 @@ const SearchWrapper = (props: SearchWrapperProps) => {
                     {!room?.tabletopAlmanacAPIKey ? (
                         <div className={"custom-statblock-wrapper"}>
                             To create custom statblocks go to{" "}
-                            <a href={"https://tabletop-almanac.com"} target={"_blank"}>
+                            <a href={ALMANAC_URL} target={"_blank"}>
                                 Tabletop Almanac
                             </a>{" "}
                             and enter you API Key here:

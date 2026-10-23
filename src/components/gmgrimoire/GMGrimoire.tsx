@@ -34,6 +34,8 @@ import { updateItems } from "../../helper/obrHelper.ts";
 import { useShallow } from "zustand/react/shallow";
 import { FocusSvg } from "../svgs/FocusSvg.tsx";
 import { AddGroup } from "../general/AddGroup.tsx";
+import { Gmg4Banner } from "../general/Gmg4Banner/Gmg4Banner.tsx";
+import { LEGACY_BUILD } from "../../config.ts";
 
 export const GMGrimoire = () => {
     return (
@@ -343,6 +345,7 @@ const Content = () => {
                 <div className={"grimoire-content"}>
                     {playerContext.role === "GM" ? (
                         <>
+                            {LEGACY_BUILD ? <Gmg4Banner /> : null}
                             <div className={"gmg-name"}>
                                 <span>Game Master's Grimoire </span>
                                 <span className={"small"}>{version}</span>

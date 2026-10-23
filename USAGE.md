@@ -202,7 +202,7 @@ Settings are grouped into three categories:
 
 + Room Settings - affecting all scenes in the current room
 + Scene Settings - affecting only the current scene
-+ Tabletop Almanac Settings - only available on [TA](https://tabletop-almanac.com)
++ Tabletop Almanac Settings - only available on [TA](https://old.tabletop-almanac.com)
 
 <h5 id="room-settings">Room Settings</h5>
 
@@ -338,7 +338,7 @@ To initialize a Token there are two approaches:
 
 **Tabletop Almanac Statblocks**
 
-If you are using a creature that is available on [Tabletop Almanac](https://tabletop-almanac.com) you can use the [statblock feature](#statblock). The statblocks from Tabletop Almanac include most of the statblocks that use the OGL. This includes DnD 5e and Pathfinder 2E statblocks. For switching between rulesets see [Settings](#settings).
+If you are using a creature that is available on [Tabletop Almanac](https://old.tabletop-almanac.com) you can use the [statblock feature](#statblock). The statblocks from Tabletop Almanac include most of the statblocks that use the OGL. This includes DnD 5e and Pathfinder 2E statblocks. For switching between rulesets see [Settings](#settings).
 
 **Manual Initialization**
 
@@ -346,13 +346,13 @@ When initializing manually you enter the 6 available fields manually. Normally t
 
 <h4 id="statblock">Statblock</h4>
 
-The statblock offers a search field for creature statblocks found in the [Tabletop Almanac](https://tabletop-almanac.com). By default, the Token Name is used to make an initial search. If the Token name has a modifier like A, B, A1, C, 1, 3, or similar at the end it will be automatically ignored for the search.
+The statblock offers a search field for creature statblocks found in the [Tabletop Almanac](https://old.tabletop-almanac.com). By default, the Token Name is used to make an initial search. If the Token name has a modifier like A, B, A1, C, 1, 3, or similar at the end it will be automatically ignored for the search.
 
 All results for the current search are displayed with their HP, AC and CR visible.
 
 ![Statblock Search](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/statblock_search.png)
 
-Available Statblocks have varying background depending on their source. Custom Statblocks created on [Tabletop Almanac](https://tabletop-almanac.com) are displayed first and with a slight green background. The currently selected statblock has a white glow.
+Available Statblocks have varying background depending on their source. Custom Statblocks created on [Tabletop Almanac](https://old.tabletop-almanac.com) are displayed first and with a slight green background. The currently selected statblock has a white glow.
 
 By clicking on one of the options this statblock is selected for the Token. If there are no values set for the Token or the Token still has its automatically assigned values, the values of the creature statblock are automatically used. 
 
@@ -376,7 +376,7 @@ The rest buttons automatically refill limited abilities where the reset value ha
 
 Buttons that trigger uses being consumed will indicate that no uses are left by being highlighted. The buttons will still work while being highlighted.
 
-To create custom statblocks go to [Tabletop Almanac](https://tabletop-almanac.com?ref=hp-doc) and create a free account.
+To create custom statblocks go to [Tabletop Almanac](https://old.tabletop-almanac.com?ref=hp-doc) and create a free account.
 
 ![Statblock Limits](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/statblock_limits.png)
 
@@ -575,7 +575,7 @@ The Shop Management feature facilitates in-game commerce by allowing GMs to atta
 
 <h1 id="custom-statblocks">Custom Statblocks</h1>
 
-Custom statblocks can be created on [Tabletop Almanac](https://tabletop-almanac.com). Free accounts can create up to 20 statblocks and activate 10 statblocks at the same time. To increase this limit go to my patreon and consider supporting me.
+Custom statblocks can be created on [Tabletop Almanac](https://old.tabletop-almanac.com). Free accounts can create up to 20 statblocks and activate 10 statblocks at the same time. To increase this limit go to my patreon and consider supporting me.
 
 <h1 id="dice-roller">Dice Roller</h1>
 
@@ -617,7 +617,7 @@ You can choose to use the 3D rendering of dddice, this is the default option. Sh
 
 <h2 id="using-the-dice-roller">Using The Dice Roller</h2>
 
-By default all rolls are seen by all players. GMs can set their own roll to be hidden by default in the [Tabletop Almanac Settings](https://tabletop-almanac.com).
+By default all rolls are seen by all players. GMs can set their own roll to be hidden by default in the [Tabletop Almanac Settings](https://old.tabletop-almanac.com).
 
 There are multiple ways to use the dice roller:
 
@@ -646,7 +646,7 @@ These optional parameters are:
 Dice that are marked as Damage Dice have optional roll button:
 
 + CRIT
-  + automatically rolls the damage as a crit based on the selected crit rules on [Tabletop Almanac](https://tabletop-almanac.com)
+  + automatically rolls the damage as a crit based on the selected crit rules on [Tabletop Almanac](https://old.tabletop-almanac.com)
 
 ![Dice Button Hover](https://raw.githubusercontent.com/kamejosh/owlbear-hp-tracker/master/docs/dice_button_hover.png)
 

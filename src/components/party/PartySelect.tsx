@@ -6,6 +6,7 @@ import { updateRoomMetadata } from "../../helper/helpers.ts";
 import { usePartyStore } from "../../context/PartyStore.tsx";
 import { useListParties } from "../../api/tabletop-almanac/useParty.ts";
 import { Loader } from "../general/Loader.tsx";
+import { ALMANAC_URL } from "../../config.ts";
 
 export const PartySelect = () => {
     const room = useMetadataContext((state) => state.room);
@@ -41,7 +42,7 @@ export const PartySelect = () => {
         return (
             <div>
                 You have no parties yet. Create one in the{" "}
-                <Link href={"https://tabletop-almanac.com/party"} target={"_blank"}>
+                <Link href={`${ALMANAC_URL}/party`} target={"_blank"}>
                     Tabletop Almanac
                 </Link>
                 .

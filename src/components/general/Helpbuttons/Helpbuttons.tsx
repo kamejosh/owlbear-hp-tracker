@@ -20,6 +20,7 @@ import { useAbilityShareStore } from "../../../context/AbilityShareStore.tsx";
 import styles from "./help-buttons.module.scss";
 import { useUISettingsContext } from "../../../context/UISettingsContext.ts";
 import { SupervisedUserCircle } from "@mui/icons-material";
+import { ALMANAC_URL, LEGACY_BUILD } from "../../../config.ts";
 
 type HelpButtonsProps = {
     ignoredChanges?: boolean;
@@ -46,9 +47,11 @@ export const Helpbuttons = (props: HelpButtonsProps) => {
         <div className={`help-buttons ${battleFocus ? "battle-focus" : ""}`}>
             {!battleFocus ? (
                 <>
-                    <Tippy content={"Open Tabletop Almanac to create your own statblocks"}>
+                    <Tippy
+                        content={`Open ${LEGACY_BUILD ? "the previous " : ""}Tabletop Almanac to create your own statblocks`}
+                    >
                         <a
-                            href={"https://tabletop-almanac.com"}
+                            href={ALMANAC_URL}
                             className={"tabletop-almanac-button top-button link"}
                             title={"Tabletop Almanac"}
                             target={"_blank"}

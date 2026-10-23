@@ -1,5 +1,6 @@
-## Unversioned
+# 3.7.3-archived
 
++ Prepare the legacy version of Game Master's Grimoire 3.7 that stays available for GMs who do not want to switch to Game Master's Grimoire 4: it uses the previous Tabletop Almanac and shows GMs a banner explaining that it no longer receives updates or support and how to switch.
 + Adding the party to a scene runs into the OBR rate limit.
 + Fix issue where dddice sent hidden rolls to discord
 + Fix party HP, tempHP and initiative values reverting to values from another scene or room between sessions

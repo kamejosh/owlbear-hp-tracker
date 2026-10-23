@@ -8,6 +8,7 @@ import { PartyCollapse } from "./PartyCollapse.tsx";
 import { PlayerPartyStatblock } from "./PlayerParty.tsx";
 import { useGetParty } from "../../api/tabletop-almanac/useParty.ts";
 import { useMetadataContext } from "../../context/MetadataContext.ts";
+import { ALMANAC_URL } from "../../config.ts";
 
 export const PartyStatblocks = () => {
     const activePartyId = useMetadataContext((state) => state.room?.partyId);
@@ -30,8 +31,8 @@ export const PartyStatblocks = () => {
     if (currentParty.members.length === 0) {
         return (
             <div>
-                Party currently has no members. Go to{" "}
-                <Link href={"https://tabletop-almanac.com/party"}>Tabletop Almanac</Link> and update your party
+                Party currently has no members. Go to <Link href={`${ALMANAC_URL}/party`}>Tabletop Almanac</Link> and
+                update your party
             </div>
         );
     }

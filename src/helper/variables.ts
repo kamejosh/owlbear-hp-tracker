@@ -40,6 +40,11 @@ export const gmg4NoticeModal: Modal = {
     url: "/modal.html?content=gmg4-notice",
 };
 
+// R10a: timestamp (ms) until which the GM postponed the version-4 banner ("Later").
+export const gmg4BannerLaterKey = `${ID}/gmg4-banner-later-until`;
+// R10a: set once the GM closed the version-4 banner for good.
+export const gmg4BannerClosedKey = `${ID}/gmg4-banner-closed`;
+
 export const helpModal: Modal = {
     id: `${modalId}/help`,
     url: "/modal.html?content=help",

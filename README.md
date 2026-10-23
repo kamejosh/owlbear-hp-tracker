@@ -6,7 +6,9 @@ This Repository contains an Extension for Owlbear Rodeo 2.0. This extension allo
 
 ## Installing
 
-The extension can be installed manually, by pasting the [manifest link](https://hp-tracker.bitperfect-software.com/manifest.json) in the Add Extension dialog.
+The extension can be installed manually, by pasting the [manifest link](https://old.gmg.tabletop-almanac.com/manifest.json) in the Add Extension dialog.
+
+This is the **previous** version of Game Master's Grimoire (3.7). The current version, Game Master's Grimoire 4, lives at [https://gmg.tabletop-almanac.com/manifest.json](https://gmg.tabletop-almanac.com/manifest.json). This old build runs on the frozen previous Tabletop Almanac backend and no longer receives updates or support; it stays available for as long as it keeps running.
 
 ## How it works
 

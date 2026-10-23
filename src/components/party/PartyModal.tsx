@@ -16,6 +16,7 @@ import { PartyInventory } from "./PartyInventory.tsx";
 import { PartyMoney } from "./PartyMoney.tsx";
 import { PartyLinks } from "./PartyLinks.tsx";
 import { PlayerParty } from "./PlayerParty.tsx";
+import { ALMANAC_URL, LEGACY_BUILD } from "../../config.ts";
 
 export const PartyModal = () => {
     return (
@@ -59,8 +60,17 @@ const GMContent = () => {
             <div>
                 <h2>Party Settings</h2>
                 <div>
-                    To use the party feature enter your{" "}
-                    <Link href={"https://tabletop-almanac.com"}>Tabletop Almanac</Link> API Key:
+                    {LEGACY_BUILD ? (
+                        <>
+                            To use the party feature enter your API Key from{" "}
+                            <Link href={ALMANAC_URL}>the previous Tabletop Almanac</Link>:
+                        </>
+                    ) : (
+                        <>
+                            To use the party feature enter your <Link href={ALMANAC_URL}>Tabletop Almanac</Link> API
+                            Key:
+                        </>
+                    )}
                     <input
                         className={`masked-input ${validKey ? "valid" : styles.invalid}`}
                         type={"text"}
